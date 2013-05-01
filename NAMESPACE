@@ -1,0 +1,29 @@
+# exportPattern("^[^\\.]")
+
+export("db.connect", "db.disconnect", "db.list")
+
+export ("conn.pkg", "host", "dbname", "user", "dbms",
+        "schema.madlib", "madlib.version", "madlib")
+
+export ("db.data.frame", "as.db.data.frame")
+
+exportClasses ("db.obj", "db.Rquery", "db.data.frame",
+               "db.table", "db.view")
+
+exportMethods ("dim", "names")
+
+export ("content", "conn.id", "conn.id<-", "conn")
+
+exportMethods ("print", "show")
+
+export ("is.db.data.frame", "preview", "arraydb.to.arrayr")
+
+export ("madlib.lm", "summary.lm.madlib",
+        "print.lm.madlib", "show.lm.madlib")
+
+export ("madlib.glm", "summary.logregr.madlib",
+        "print.logregr.madlib", "show.logregr.madlib")
+
+export ("sample")
+
+exportMethods("$", "[[")
