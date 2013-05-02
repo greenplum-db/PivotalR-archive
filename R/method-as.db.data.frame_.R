@@ -67,7 +67,7 @@ setMethod (
     
     .db.writeTable(table, x, add.row.names = add.row.names,
                    distributed.by = distributed.by,
-                   is.temp = is.temp, ...)
+                   is.temp = is.temp, conn.id = conn.id, ...)
     if (length(table) == 1 && !is.temp) {
         table_schema <- .db.getQuery("select current_schema()");
         table.str <- paste(table_schema, ".", table, sep = "")
@@ -76,7 +76,7 @@ setMethod (
     if (! identical(key, character(0)))
         .db.getQuery(paste("alter table ", table.str,
                            " add primary key (\"",
-                           key, "\")", sep = ""))
+                           key, "\")", sep = ""), conn.id)
 
     if (is.data.frame(x)) {
         cat("\nThe data in the data.frame", deparse(substitute(x)),
@@ -96,10 +96,23 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
+## convert a db.Rquery object into a db.data.frame object
+
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, conn.id, is.temp = FALSE) {
-        stop("To be implemented !")
+    def = function (x, table.name, conn.id = 1, is.view = FALSE, is.temp = FALSE) {
+        if (is.temp) 
+            temp.str <- "temp"
+        else
+            temp.str <- ""
+        if (is.view)
+            obj.str <- "view"
+        else
+            obj.str <- "table"
+        create.str <- paste("create ", temp.str, " ", obj.str, " ", table.name,
+                            " as (", content(x), ")", sep = "")
+        .db.getQuery(create.str, conn.id) # create table
+        db.data.frame(table.name, conn.id, x@.key)
     },
     valueClass = "db.data.frame")

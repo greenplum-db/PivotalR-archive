@@ -18,6 +18,7 @@ setMethod (
         new("db.Rquery",
             .content = paste("select ", id.str, name,
             " from ", content(x), sep = ""),
+            .parent = as.character(match.call()$x),
             .conn.id = conn.id(x),
             .col.name = name,
             .key = x@.key)
@@ -41,6 +42,7 @@ setMethod (
         new("db.Rquery",
             .content = paste("select ", id.str, name,
             " from (", content(x), ") s", sep = ""),
+            .parent = x@.parent,
             .conn.id = conn.id(x),
             .col.name = name,
             .key = x@.key)
@@ -70,6 +72,7 @@ setMethod(
                     new("db.Rquery",
                         .content = paste("select ", id.str,
                         i, " from ", content(x), sep = ""),
+                        .parent = as.character(match.call()$x),
                         .conn.id = conn.id(x),
                         .col.name = i,
                         .key = x@.key)
@@ -86,6 +89,7 @@ setMethod(
                     .content = paste("select ", id.str,
                     names(x)[ii], " from ", content(x),
                     sep = ""),
+                    .parent = as.character(match.call()$x),
                     .conn.id = conn.id(x),
                     .col.name = names(x)[[ii]],
                     .key = x@.key)
@@ -115,6 +119,7 @@ setMethod(
                 .content = paste("select ", id.str, col.name,
                 " from ", content(x), " where ", x@.key,
                 " = ", i, sep = ""),
+                .parent = as.character(match.call()$x),
                 .col.name = col.name,
                 .conn.id = conn.id(x),
                 .key = x@.key)

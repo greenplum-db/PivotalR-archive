@@ -35,3 +35,28 @@ setMethod (
     function (object) {
         print(object)
     })
+
+## ------------------------------------------------------------------------
+
+## print method for db.Rquery objects
+
+setMethod (
+    "print",
+    signature (x = "db.Rquery"),
+    function (x) {
+        cat("A temporary object in R derived from ", x@.parent, "\n", sep = "")
+        cat("Database: ", dbname(x@.conn.id), "\n", sep = "")
+        cat("Host: ", host(x@.conn.id), "\n", sep = "")
+        cat("--\n")
+        cat("If you want to make it point to a real object in database,\n")
+        cat("please use the function commit. See help(commit) for more.\n")
+    })
+
+## ------------------------------------------------------------------------
+
+setMethod (
+    "show",
+    signature (object = "db.Rquery"),
+    function (object) {
+        print(object)
+    })
