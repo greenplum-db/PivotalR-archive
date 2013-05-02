@@ -49,7 +49,8 @@ setMethod (
         cat("Host: ", host(x@.conn.id), "\n", sep = "")
         cat("--\n")
         cat("If you want to make it point to a real object in database,\n")
-        cat("please use the function commit. See help(commit) for more.\n")
+        cat("please use the function as.db.data.frame.\n")
+        cat("See help(as.db.data.frame) for more.\n")
     })
 
 ## ------------------------------------------------------------------------
