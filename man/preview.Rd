@@ -1,6 +1,7 @@
 \name{preview}
 
-\alias{preview}
+\alias{preview.db.view}
+\alias{preview,db.view-method}
 
 \title{
   Read the actual data stored in the table of database
@@ -9,7 +10,7 @@
   The function reads the actual data from the table in the database.
 }
 \usage{
-preview(x, nrows = 100, interactive = TRUE)
+\S4method{preview}{db.view}(x, nrows = 100, interactive = TRUE)
 }
 
 \arguments{

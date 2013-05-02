@@ -9,28 +9,6 @@ is.db.data.frame <- function (x)
 }
 
 ## ------------------------------------------------------------------------
-
-## Grab a preview of the data
-preview <- function(x, nrows = 100, interactive = TRUE)
-{
-    if (! is(x, "db.data.frame"))
-        stop(deparse(substitute(x)), " must be a db.data.frame object!")
-
-    if (is(x, "db.view") && interactive) {
-        cat(deparse(substitute(x)),
-            "points to a view in the database",
-            dbname(conn.id(x)),
-            "and it takes time to evaluate and extract a preview of it !\n")
-        go <- .read.input("Do you really want to continue ? (Yes/No) : ",
-                          c("yes", "y", "no", "n"))
-        if (go == "no" || go == "n") return
-    }
-
-    .db.getQuery(paste("select * from", content(x), "limit", nrows),
-                 conn.id(x))
-}
-
-## ------------------------------------------------------------------------
 ## ------------------------------------------------------------------------
 ## Sampling function
 ## ------------------------------------------------------------------------
