@@ -1,9 +1,7 @@
 \name{[[-methods}
 \docType{methods}
-\alias{[[.db.data.frame}
-\alias{[[.db.Rquery}
-\alias{[[,db.data.frame-method}
-\alias{[[,db.Rquery-method}
+\alias{[[.db.obj}
+\alias{[[,db.obj-method}
 \title{ ~~ Methods for Function \code{[[} in Package \pkg{base} ~~}
 \description{
  ~~ Methods for function \code{[[} in package \pkg{base} ~~
@@ -11,7 +9,7 @@
 \section{Methods}{
 \describe{
 
-\item{\code{signature(x = "db.data.frame")}}{
+\item{\code{signature(x = "db.obj")}}{
 %%  ~~describe this method here~~
 }
 

@@ -5,7 +5,7 @@
 
 setMethod (
     "$",
-    signature(x = "db.data.frame"),
+    signature(x = "db.obj"),
     function (x, name) {
         if (! name %in% names(x))
             stop(paste("Column", name, "does not exist!"))
@@ -14,11 +14,16 @@ setMethod (
             id.str <- ""
         else
             id.str <- paste(x@.key, ", ", sep = "")
+
+        if (is(x, "db.data.frame"))
+            parent <- as.character(match.call()$x)
+        else
+            parent <- x@.parent
         
         new("db.Rquery",
             .content = paste("select ", id.str, name,
             " from ", content(x), sep = ""),
-            .parent = as.character(match.call()$x),
+            .parent = parent,
             .conn.id = conn.id(x),
             .col.name = name,
             .key = x@.key)
@@ -27,34 +32,9 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setMethod (
-    "$",
-    signature(x = "db.Rquery"),
-    function (x, name) {
-        if (! name %in% x@.col.name)
-            stop(paste("Column", name, "does not exist!"))
-
-        if (identical(x@.key, character(0)))
-            id.str <- ""
-        else
-            id.str <- paste(x@.key, ", ", sep = "")
-
-        new("db.Rquery",
-            .content = paste("select ", id.str, name,
-            " from (", content(x), ") s", sep = ""),
-            .parent = x@.parent,
-            .conn.id = conn.id(x),
-            .col.name = name,
-            .key = x@.key)
-    },
-    valueClass = "db.Rquery"
-    )
-
-## ------------------------------------------------------------------------
-
 setMethod(
     "[[",
-    signature(x = "db.data.frame"),
+    signature(x = "db.obj"),
     function (x, i, j, ...) {
         na <- nargs()
         if (na == 1)
@@ -64,6 +44,11 @@ setMethod(
             id.str <- ""
         else
             id.str <- paste(x@.key, ", ", sep = "")
+
+        if (is(x, "db.data.frame"))
+            parent <- as.character(match.call()$x)
+        else
+            parent <- x@.parent
         
         if (na == 2)
         {
@@ -72,7 +57,7 @@ setMethod(
                     new("db.Rquery",
                         .content = paste("select ", id.str,
                         i, " from ", content(x), sep = ""),
-                        .parent = as.character(match.call()$x),
+                        .parent = parent,
                         .conn.id = conn.id(x),
                         .col.name = i,
                         .key = x@.key)
@@ -89,7 +74,7 @@ setMethod(
                     .content = paste("select ", id.str,
                     names(x)[ii], " from ", content(x),
                     sep = ""),
-                    .parent = as.character(match.call()$x),
+                    .parent = parent,
                     .conn.id = conn.id(x),
                     .col.name = names(x)[[ii]],
                     .key = x@.key)
@@ -119,7 +104,7 @@ setMethod(
                 .content = paste("select ", id.str, col.name,
                 " from ", content(x), " where ", x@.key,
                 " = ", i, sep = ""),
-                .parent = as.character(match.call()$x),
+                .parent = parent,
                 .col.name = col.name,
                 .conn.id = conn.id(x),
                 .key = x@.key)
@@ -127,12 +112,3 @@ setMethod(
     },
     valueClass = "db.Rquery")
 
-## ------------------------------------------------------------------------
-
-setMethod(
-    "[[",
-    signature(x = "db.Rquery"),
-    function (x, i, j, ...) {
-        stop("To be implemented!")
-    },
-    valueClass = "db.Rquery")

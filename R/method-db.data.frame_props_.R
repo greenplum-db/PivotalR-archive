@@ -10,7 +10,7 @@ setMethod (
 
 setMethod (
     "names",
-    signature(x = "db.data.frame"),
+    signature(x = "db.obj"),
     function (x) {
         x@.col.name
     })
