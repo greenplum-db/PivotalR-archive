@@ -92,3 +92,21 @@ madlib <- function (conn.id = 1)
 {
     madlib.version(conn.id)
 }
+
+## ------------------------------------------------------------------------
+
+## Are the two connections equivalent? 
+conn.eql <- function (conn.id1, conn.id2)
+{
+    if (!.is.conn.id.valid(conn.id1) || !.is.conn.id.valid(conn.id2))
+        stop("At least one connection does not exist!")
+
+    ## I do not think the users or conection packages
+    ## have to be the same.
+    if (dbname(conn.id1) == dbname(conn.id2) &&
+        host(conn.id1) == host(conn.id2) &&
+        dbms(conn.id1) == dbms(conn.id2))
+        TRUE
+    else
+        FALSE
+}
