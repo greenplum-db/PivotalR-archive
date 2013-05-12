@@ -95,7 +95,9 @@ setClass("db.Rquery",
              .parent = "character", # name of its parent object
              .conn.id = "numeric",
              .col.name = "character",
-             .key = "character" # identification column
+             .key = "character", # identification column
+             .col.data_type = "character", # column types
+             .col.udt_name = "character"
              )
          )
 
