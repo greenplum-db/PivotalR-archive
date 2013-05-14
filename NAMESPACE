@@ -26,6 +26,10 @@ export ("madlib.glm", "summary.logregr.madlib",
 
 export ("sample")
 
-exportMethods("$", "[[")
+exportMethods("$", "[[", "[", "subset")
+
+exportMethods("$<-", "[[<-", "[<-")
 
 export("preview", "delete")
+
+exportMethods("==", "!=")

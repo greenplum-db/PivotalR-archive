@@ -97,3 +97,10 @@ setMethod (
 
 # ------------------------------------------------------------------------
 
+setMethod (
+    "[<-",
+    signature (x = "db.obj", value = "db.Rquery"),
+    function (x, i, j, value) {
+        stop("To be implemented")
+    },
+    valueClass = "db.Rquery")

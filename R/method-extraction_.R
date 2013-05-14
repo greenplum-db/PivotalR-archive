@@ -163,3 +163,13 @@ setMethod (
         .col.data_type = x@.col.data_type[cols.i],
         .col.udt_name = x@.col.udt_name[cols.i])
 }
+
+## ------------------------------------------------------------------------
+
+setMethod ("subset",
+    signature(x = "db.obj"),
+    function (x, subset, select)
+    {
+        x[subset, select]
+    }
+)
