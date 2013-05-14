@@ -6,7 +6,7 @@ Date: 2012-12-18
 Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>, with contributions from Woo Jung <Woo.Jung@gopivotal.com>
 Maintainer: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>
 Depends: R (>= 2.9.0), methods
-Imports: DBI, RPostgreSQL
+Enhances: DBI, RPostgreSQL
 Description: R wrapper for MADlib running on PostgreSQL or Greenplum database
 License: GPL (>= 2)
 LazyLoad: yes

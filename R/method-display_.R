@@ -20,9 +20,10 @@ setMethod (
             else
                 temp <- "Table"
         }
-        cat(temp, ": ", x@.content, "\n", sep = "")
-        cat("Database: ", dbname(x@.conn.id), "\n", sep = "")
-        cat("Host: ", host(x@.conn.id), "\n", sep = "")
+        cat(temp, "      :    ", x@.content, "\n", sep = "")
+        cat("Database   :    ", dbname(x@.conn.id), "\n", sep = "")
+        cat("Host       :    ", host(x@.conn.id), "\n", sep = "")
+        cat("Connection :    ", x@.conn.id, "\n", sep = "")
     })
 
 ## ------------------------------------------------------------------------
@@ -45,8 +46,9 @@ setMethod (
     signature (x = "db.Rquery"),
     function (x) {
         cat("A temporary object in R derived from ", x@.parent, "\n", sep = "")
-        cat("Database: ", dbname(x@.conn.id), "\n", sep = "")
-        cat("Host: ", host(x@.conn.id), "\n", sep = "")
+        cat("Database   :    ", dbname(x@.conn.id), "\n", sep = "")
+        cat("Host       :    ", host(x@.conn.id), "\n", sep = "")
+        cat("Connection :    ", x@.conn.id, "\n", sep = "")
         cat("--\n")
         cat("If you want to make it point to a real object in database,\n")
         cat("please use the function as.db.data.frame.\n")

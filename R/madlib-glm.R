@@ -63,7 +63,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(data, tbl.source, is.temp = TRUE)
+        data <- as.db.data.frame(data, tbl.source, is.temp = TRUE, conn.id = conn.id(data))
     }
 
     ## dependent, independent and grouping strings

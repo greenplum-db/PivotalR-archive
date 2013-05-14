@@ -53,7 +53,7 @@ setMethod (
 setMethod (
     "[[<-",
     signature (x = "db.obj", value = "db.Rquery"),
-    function (x, name, value) {
+    function (x, i, j, value) {
         ## One cannot do this without any restrictions
         if (is(x, "db.data.frame") && all(content(x) != value@.parent) ||
             is(x, "db.Rquery") && all(x@.parent != value@.parent))
@@ -76,11 +76,11 @@ setMethod (
                        "Something must have been wrong!"))
 
         x.names <- names(x)
-        if (is(name, "character")) {
-            idx <- which(x.names == name)
-            x.names[idx] <- paste(value@.expr, " as ", name, sep = "")
-        } else if (is(name, "numeric")) {
-            idx <- name
+        if (is(i, "character")) {
+            idx <- which(x.names == i)
+            x.names[idx] <- paste(value@.expr, " as ", i, sep = "")
+        } else if (is(i, "numeric")) {
+            idx <- i
             x.names[idx] <- paste(value@.expr, " as ", x.names[idx], sep = "")
         }
         expr <- paste(x.names, collapse = ", ")

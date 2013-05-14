@@ -55,9 +55,8 @@ db.data.frame <- function (x, conn.id = 1, key = character(0))
               .db.table.schema.str(table), sep = ""), conn.id)
     res@.table.type <- tbl.type$table_type
 
-    cat("An R object pointing to", x,
-        "in database", dbname(conn.id), "on", host(conn.id),
-        "is created !\n")
+    message("An R object pointing to ", x,
+            " in connection ", conn.id, " is created !")
     
     return (res)
 }

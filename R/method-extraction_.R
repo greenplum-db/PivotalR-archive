@@ -7,7 +7,7 @@ setMethod (
     "$",
     signature(x = "db.obj"),
     function (x, name) {
-        .create.db.Rquery(x, cols.i = name)            
+        .create.db.Rquery(x, cols.i = as.character(name))            
     },
     valueClass = "db.Rquery")
 
@@ -121,7 +121,7 @@ setMethod (
         message("Error : column missing or format wrong!")
         stop()
     }
-    
+
     if (is.character(cols.i)) {
         if (all(cols.i %in% names(x)))
             cols.i <- .gwhich(names(x), cols.i)
@@ -146,7 +146,7 @@ setMethod (
             cols.i <- setdiff(idxs, -cols.i)
     }
 
-    i.str <- paste(names[cols.i], collapse = ", ")
+    i.str <- paste(names(x)[cols.i], collapse = ", ")
 
     if (is(x, "db.data.frame"))
         parent <- content(x)
@@ -165,6 +165,8 @@ setMethod (
 }
 
 ## ------------------------------------------------------------------------
+
+setGeneric ("subset")
 
 setMethod ("subset",
     signature(x = "db.obj"),
