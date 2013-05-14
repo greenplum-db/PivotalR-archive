@@ -2,7 +2,7 @@
 \docType{methods}
 \alias{!=-methods}
 \alias{!=,ANY,ANY-method}
-\alias{!=,db.data.frame,db.data.frame-method}
+\alias{!=,db.obj,db.obj-method}
 \title{ ~~ Methods for Function \code{!=} in Package \pkg{base} ~~}
 \description{
  ~~ Methods for function \code{!=} in package \pkg{base} ~~
@@ -14,7 +14,7 @@
 %%  ~~describe this method here~~
 }
 
-\item{\code{signature(e1 = "db.data.frame", e2 = "db.data.frame")}}{
+\item{\code{signature(e1 = "db.obj", e2 = "db.obj")}}{
 %%  ~~describe this method here~~
 }
 }}

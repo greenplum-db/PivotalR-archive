@@ -16,20 +16,33 @@
 ## ------------------------------------------------------------------------
 
 setMethod ("==",
-           c("db.data.frame", "db.data.frame"),
+           c("db.obj", "db.obj"),
            function (e1, e2) {
-               if (all(e1@.name == e1@.name) &&
-                   e1@.content == e2@.content &&
-                   conn.eql(e1@.conn.id, e2@.conn.id) &&
-                   e1@.table.type == e2@.table.type)
-                   TRUE
-               else
-                   FALSE
+               if (class(e1)[1] != class(e2)[1])
+                   return (FALSE)
+               if (is(e1, "db.data.frame")) {
+                   if (all(e1@.name == e1@.name) &&
+                       e1@.content == e2@.content &&
+                       conn.eql(e1@.conn.id, e2@.conn.id) &&
+                       e1@.table.type == e2@.table.type)
+                       return (TRUE)
+                   else
+                       return (FALSE)
+               } else {
+                   if (e1@.content == e2@.content &&
+                       all(e1@.expr == e1@.expr) &&
+                       e1@.parent == e2@.parent &&
+                       conn.eql(e1@.conn.id, e2@.conn.id) &&
+                       all(e1@.names == e2@.names))
+                       return (TRUE)
+                   else
+                       return (FALSE)
+               }
            },
            valueClass = "logical")
 
 setMethod ("!=",
-           c("db.data.frame", "db.data.frame"),
+           c("db.obj", "db.obj"),
            function (e1, e2) {
                if (e1 == e2)
                    FALSE

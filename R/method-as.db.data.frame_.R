@@ -101,7 +101,7 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, conn.id = 1, is.view = FALSE, is.temp = FALSE) {
+    def = function (x, table.name, conn.id = 1, is.view = FALSE, is.temp = FALSE, verbose = TRUE) {
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -113,6 +113,6 @@ setMethod (
         create.str <- paste("create ", temp.str, " ", obj.str, " ", table.name,
                             " as (", content(x), ")", sep = "")
         .db.getQuery(create.str, conn.id) # create table
-        db.data.frame(table.name, conn.id, x@.key)
+        db.data.frame(table.name, conn.id, x@.key, verbose)
     },
     valueClass = "db.data.frame")

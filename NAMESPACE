@@ -33,3 +33,5 @@ exportMethods("$<-", "[[<-", "[<-")
 export("preview", "delete")
 
 exportMethods("==", "!=")
+
+export("conn.eql")

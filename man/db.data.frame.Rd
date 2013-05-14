@@ -8,7 +8,7 @@ function to do ... ~~
  A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-db.data.frame(x, conn.id = 1, key = character(0))
+db.data.frame(x, conn.id = 1, key = character(0), verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,9 @@ Describe \code{conn.id} here~~
 }
   \item{key}{
 Describe \code{key} here~~
+}
+\item{verbose}{
+  verbose
 }
 }
 \details{

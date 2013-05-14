@@ -33,17 +33,23 @@ setMethod (
                        "Something must have been wrong!"))
 
         x.names <- names(x)
+        x.col.data_type <- x@.col.data_type
+        x.col.udt_name <- x@.col.udt_name
         idx <- which(x.names == name)
         x.names[idx] <- paste(value@.expr, " as ", name, sep = "")
+        x.col.data_type[idx] <- value@.col.data_type
+        x.col.udt_name[idx] <- value@.col.udt_name
         expr <- paste(x.names, collapse = ", ")
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
             value@.parent, sep = ""),
-            .expr = expr,
+            .expr = x.names,
             .parent = value@.parent,
             .conn.id = conn.id(x),
-            .col.name = x.names,
-            .key = x@.key)
+            .col.name = names(x),
+            .key = x@.key,
+            .col.data_type = x.col.data_type,
+            .col.udt_name = x.col.udt_name)
     },
     valueClass = "db.Rquery")
 
@@ -76,6 +82,8 @@ setMethod (
                        "Something must have been wrong!"))
 
         x.names <- names(x)
+        x.col.data_type <- x@.col.data_type
+        x.col.udt_name <- x@.col.udt_name
         if (is(i, "character")) {
             idx <- which(x.names == i)
             x.names[idx] <- paste(value@.expr, " as ", i, sep = "")
@@ -83,15 +91,20 @@ setMethod (
             idx <- i
             x.names[idx] <- paste(value@.expr, " as ", x.names[idx], sep = "")
         }
+        x.col.data_type[idx] <- value@.col.data_type
+        x.col.udt_name[idx] <- value@.col.udt_name
+
         expr <- paste(x.names, collapse = ", ")
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
             value@.parent, sep = ""),
-            .expr = expr,
+            .expr = x.names,
             .parent = value@.parent,
             .conn.id = conn.id(x),
-            .col.name = x.names,
-            .key = x@.key)
+            .col.name = names(x),
+            .key = x@.key,
+            .col.data_type = x.col.data_type,
+            .col.udt_name = x.col.udt_name)
     },
     valueClass = "db.Rquery")
 
