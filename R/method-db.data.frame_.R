@@ -3,7 +3,7 @@
 ## create a R object that points to something inside the database
 ## ------------------------------------------------------------------------
 
-db.data.frame <- function (x, conn.id = 1, key = character(0))
+db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE)
 {
     if (! .is.arg.string(x))
         stop("The name of the database object must be a string!")
@@ -36,7 +36,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0))
 
     col.info <- .db.getQuery(
         paste("select column_name, data_type, udt_name from information_schema.columns where ",
-              .db.table.schema.str(table), sep = ""), conn.id)
+              .db.table.schema.str(table), " order by ordinal_position", sep = ""), conn.id)
 
     res@.col.name <- col.info$column_name
     res@.col.data_type <- col.info$data_type
@@ -55,9 +55,9 @@ db.data.frame <- function (x, conn.id = 1, key = character(0))
               .db.table.schema.str(table), sep = ""), conn.id)
     res@.table.type <- tbl.type$table_type
 
-    cat("\nAn R object pointing to", x,
-        "in database", dbname(conn.id), "on", host(conn.id),
-        "is created !\n\n")
+    if (verbose)
+        message("An R object pointing to ", x,
+                " in connection ", conn.id, " is created !")
     
     return (res)
 }

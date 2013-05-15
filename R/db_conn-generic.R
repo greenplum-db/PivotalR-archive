@@ -12,14 +12,14 @@
 ## If the connection package is not installed, it will
 ## be automatically installed
 ## A driver will be automatically created for connection package
-db.connect <- function (host, user, dbname, password = "", port = "",
+db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = user,
+                        password = "", port = 5432,
                         madlib = "madlib", conn.pkg = "RPostgreSQL")
 {
     ## available packages, to check whether RODBC and RPostgreSQL are
     ## already installed
-    if (is.null(.localVars$installed.pkgs))
-        .localVars$installed.pkgs <- tolower(attr(installed.packages(),
-                                                  "dimnames")[[1]])
+    .localVars$installed.pkgs <- tolower(attr(installed.packages(),
+                                              "dimnames")[[1]])
     
     ## argument type check
     if (!.is.arg.string(host) ||
@@ -38,7 +38,7 @@ db.connect <- function (host, user, dbname, password = "", port = "",
         ## if the package is not installed, install it
         if (!(conn.pkg.name %in% .localVars$installed.pkgs)) 
         {
-            print(paste("Package ", pkg.to.load,
+            message(paste("Package ", pkg.to.load,
                         " is going to be installed so that ",
                         .this.pkg.name,
                         " could connect to databases.\n\n", sep = ""))
@@ -120,16 +120,28 @@ db.list <- function ()
             idx <- .localVars$conn.id[i,]
             cat("\n## -------------------------------\n")
             cat(paste("[Connection ID ", idx[1], "]\n", sep = ""))
-            cat(paste("Host :     ", .localVars$db[[idx[2]]]$host,
+            cat(paste("Host     :    ", .localVars$db[[idx[2]]]$host,
                       "\n", sep = ""))
-            cat(paste("User :     ", .localVars$db[[idx[2]]]$user,
+            cat(paste("User     :    ", .localVars$db[[idx[2]]]$user,
                       "\n", sep = ""))
-            cat(paste("Database : ", .localVars$db[[idx[2]]]$dbname,
+            cat(paste("Database :    ", .localVars$db[[idx[2]]]$dbname,
                       "\n", sep = ""))
+
+            dbms.str <- dbms(conn.id = idx[1])
+            if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum") {
+                db.str <- "Greenplum"
+                version.str <- gsub(".*Greenplum[^\\d]+([\\d\\.]+).*",
+                                    "\\1", dbms.str, perl=T)
+            } else {
+                db.str <- "PostgreSQL"
+                version.str <- gsub(".*PostgreSQL[^\\d]+([\\d\\.]+).*",
+                                    "\\1", dbms.str, perl=T)
+            }
+            cat("DBMS     :   ", db.str, version.str, "\n")
             
             pkg <- .localVars$db[[idx[2]]]$conn.pkg
             id <- which(tolower(.supported.connections) == pkg)
-            cat(paste("Conn pkg : ", .supported.connections[id],
+            cat(paste("Conn pkg :    ", .supported.connections[id],
                       "\n", sep = ""))
         }
         cat("\n")

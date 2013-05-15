@@ -2,6 +2,8 @@
 \docType{methods}
 \alias{print.db.data.frame}
 \alias{print,db.data.frame-method}
+\alias{print.db.Rquery}
+\alias{print,db.Rquery-method}
 \title{ ~~ Methods for Function \code{print} in Package \pkg{base} ~~}
 \description{
  ~~ Methods for function \code{print} in package \pkg{base} ~~

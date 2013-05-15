@@ -86,12 +86,19 @@ setClass("db.view",
 ## a db.obj
 ## More precisely, it is a view existing in R only
 ## It can be converted into db.obj objects
+## The object is equivalent to
+## SELECT paste(.expr, collapse = ",") FROM .parent;
 setClass("db.Rquery",
          representation(
              .content = "character",
+             .expr = "character",
+             .source = "character", # the original table object
+             .parent = "character", # name of its parent object
              .conn.id = "numeric",
              .col.name = "character",
-             .key = "character" # identification column
+             .key = "character", # identification column
+             .col.data_type = "character", # column types
+             .col.udt_name = "character"
              )
          )
 

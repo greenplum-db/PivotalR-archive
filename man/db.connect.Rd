@@ -8,8 +8,8 @@
   ++ A concise (1-5 lines) description of what the function does. ++
 }
 \usage{
-db.connect(host, user, dbname, password = "", port = "", madlib =
-"madlib", conn.pkg = "RPostgreSQL")
+db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
+password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

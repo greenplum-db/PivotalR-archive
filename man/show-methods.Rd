@@ -2,6 +2,8 @@
 \docType{methods}
 \alias{show.db.data.frame}
 \alias{show,db.data.frame-method}
+\alias{show.db.Rquery}
+\alias{show,db.Rquery-method}
 \title{ ~~ Methods for Function \code{show} in Package \pkg{methods} ~~}
 \description{
  ~~ Methods for function \code{show} in package \pkg{methods} ~~
