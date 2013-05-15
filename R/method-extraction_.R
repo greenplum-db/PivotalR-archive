@@ -55,14 +55,16 @@ setMethod (
             message("Error : argument is missing!")
             stop()
         }
-        print(n)
+        
+        if (missing(i)) i.missing <- TRUE
+        
         if (n == 3) {
-            if (identical(x@.key, character(0))) {
+            if (!i.missing && identical(x@.key, character(0))) {
                 message("Error : there is no unique ID associated",
                         " with each row of the table!")
                 stop()
             }
-            if (is(i, "db.Rquery")) {
+            if (!i.missing && is(i, "db.Rquery")) {
                 if (length(i@.expr) > 1 || i@.col.data_type != "boolean") {
                     message("Error : cannot select columns!")
                     stop()
@@ -77,7 +79,7 @@ setMethod (
         if (n == 2) { # select columns
             .create.db.Rquery(x, cols.i = i)
         } else if (n == 3) { # several cases
-            if (missing(i)) {
+            if (i.missing) {
                 .create.db.Rquery(x, cols.i = j)
             } else if (is(i, "db.Rquery")) {          
                 where.str <- i@.expr
