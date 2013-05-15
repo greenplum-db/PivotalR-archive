@@ -92,6 +92,7 @@ setClass("db.Rquery",
          representation(
              .content = "character",
              .expr = "character",
+             .source = "character", # the original table object
              .parent = "character", # name of its parent object
              .conn.id = "numeric",
              .col.name = "character",

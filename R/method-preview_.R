@@ -56,7 +56,7 @@ setMethod (
 
         tbl <- .unique.string()
         tmp <- as.db.data.frame(x, tbl, is.temp = TRUE, verbose = interactive)
-        res <- .db.getQuery(paste("select * from", content(tmp), "limit", nrows),
+        res <- .db.getQuery(paste("select * from ", content(tmp), " limit", nrows),
                             conn.id(tmp))
         delete(tmp)
         return (res)

@@ -15,6 +15,7 @@ Objects can be created by calls of the form \code{new("db.Rquery", ...)}.
   \describe{
     \item{\code{.content}:}{Object of class \code{"character"} ~~ }
     \item{\code{.expr}:}{Object of class \code{"character"} ~~ }
+    \item{\code{.source}:}{Object of class \code{"character"} ~~ }
     \item{\code{.parent}:}{Object of class \code{"character"} ~~ }
     \item{\code{.conn.id}:}{Object of class \code{"numeric"} ~~ }
     \item{\code{.col.name}:}{Object of class \code{"character"} ~~ }

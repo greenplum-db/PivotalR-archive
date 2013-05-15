@@ -22,7 +22,7 @@ setMethod(
             message("Error : argument is missing!")
             stop()
         }
-        
+        print(na)
         if (na == 2) {
             if (length(i) > 1) {
                 message("Error : subscript out of range!")
@@ -32,7 +32,7 @@ setMethod(
             if (is.logical(i)) i <- as.integer(i)
             .create.db.Rquery(x, cols.i = i)
         } else if (na == 3) {
-            if (identical(x@.key, character(0)) == 0) {
+            if (identical(x@.key, character(0))) {
                 message("Error : there is no unique ID associated",
                         " with each row of the table!")
                 stop()
@@ -49,15 +49,15 @@ setMethod(
 setMethod (
     "[",
     signature (x = "db.obj"),
-    function (x, i, j) {
-        na <- nargs()
-        if (na == 1) {
+    function (x, i, j, ...) {
+        n <- nargs()
+        if (n == 1) {
             message("Error : argument is missing!")
             stop()
         }
-
-        if (na == 3) {
-            if (identical(x@.key, character(0)) == 0) {
+        print(n)
+        if (n == 3) {
+            if (identical(x@.key, character(0))) {
                 message("Error : there is no unique ID associated",
                         " with each row of the table!")
                 stop()
@@ -69,27 +69,27 @@ setMethod (
                 }
             }
             if (missing(j))
-                j <- seq_len(names(x))
+                j <- seq_len(length(names(x)))
             else if (is(j, "db.Rquery"))
                 j <- .db.getQuery(content(j), conn.id(x))
         }
         
-        if (na == 2) { # select columns
+        if (n == 2) { # select columns
             .create.db.Rquery(x, cols.i = i)
-        } else if (na == 3) { # several cases
+        } else if (n == 3) { # several cases
             if (missing(i)) {
                 .create.db.Rquery(x, cols.i = j)
             } else if (is(i, "db.Rquery")) {          
                 where.str <- i@.expr
                 .create.db.Rquery(x, cols.i = j, where = where.str)
             } else if (!is(i, "db.Rquery")) {
-                if (identical(x@.key, character(0)) == 0) {
+                if (identical(x@.key, character(0))) {
                     message("Error : there is no unique ID associated",
                             " with each row of the table!")
                     stop()
                 }
 
-                where.str <- paste(x@.key, "=", i, collapse = "or")
+                where.str <- paste(x@.key, "=", i, collapse = " or ")
                 .create.db.Rquery(x, cols.i = j, where = where.str)
             }
         }
@@ -148,14 +148,21 @@ setMethod (
 
     i.str <- paste(names(x)[cols.i], collapse = ", ")
 
+    parent <- content(x)
     if (is(x, "db.data.frame"))
-        parent <- content(x)
+        src <- content(x)
     else
-        parent <- x@.parent
+        src <- x@.source
 
+    if (is(x, "db.Rquery"))
+        tbl <- paste("(", content(x), ")", sep = "")
+    else
+        tbl <- content(x)
+    
     new("db.Rquery",
-        .content = paste("select", i.str, "from", content(x), where),
+        .content = paste("select", i.str, "from", tbl, "s", where),
         .expr = names(x)[cols.i],
+        .source = src,
         .parent = parent,
         .conn.id = conn.id(x),
         .col.name = names(x)[cols.i],

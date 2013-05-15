@@ -12,8 +12,7 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, name, value) {
         ## One cannot do this without any restrictions
-        if (is(x, "db.data.frame") && all(content(x) != value@.parent) ||
-            is(x, "db.Rquery") && all(x@.parent != value@.parent))
+        if (all(content(x) != value@.parent))
             stop(paste("This operation can only be done if both sides",
                        "are derived from the same database object!"))
 
@@ -40,10 +39,17 @@ setMethod (
         x.col.data_type[idx] <- value@.col.data_type
         x.col.udt_name[idx] <- value@.col.udt_name
         expr <- paste(x.names, collapse = ", ")
+
+        if (value@.parent != value@.source) 
+            tbl <- paste("(", value@.parent, ")", sep = "")
+        else
+            tbl <- value@.parent
+        
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
-            value@.parent, sep = ""),
+            tbl, " s", sep = ""),
             .expr = x.names,
+            .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
             .col.name = names(x),
@@ -61,8 +67,7 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
         ## One cannot do this without any restrictions
-        if (is(x, "db.data.frame") && all(content(x) != value@.parent) ||
-            is(x, "db.Rquery") && all(x@.parent != value@.parent))
+        if (all(content(x) != value@.parent))
             stop(paste("This operation can only be done if both sides",
                        "are derived from the same database object!"))
 
@@ -94,11 +99,17 @@ setMethod (
         x.col.data_type[idx] <- value@.col.data_type
         x.col.udt_name[idx] <- value@.col.udt_name
 
+        if (value@.parent != value@.source) 
+            tbl <- paste("(", value@.parent, ")", sep = "")
+        else
+            tbl <- value@.parent
+        
         expr <- paste(x.names, collapse = ", ")
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
-            value@.parent, sep = ""),
+            tbl, " s", sep = ""),
             .expr = x.names,
+            .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
             .col.name = names(x),
