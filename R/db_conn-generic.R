@@ -53,6 +53,7 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                          ")", sep = "")
         result <- eval(parse(text = command))
         cat(paste("Created a connection to database with ID", result, "\n"))
+        .madlib.version.number(result) # record the madlib version number
         return (result)
     }
     else

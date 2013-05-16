@@ -93,6 +93,17 @@ madlib <- function (conn.id = 1)
     madlib.version(conn.id)
 }
 
+## extract the version numbers 
+.madlib.version.number <- function (conn.id = 1)
+{
+    version <- madlib.version(conn.id)
+    num <- gsub("MADlib version: (\\d+\\.\\d+).*", "\\1",
+                version, perl=T)
+    idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
+    .localVars$db[[idx]]$madlib.v <- as.numeric(num)
+    as.numeric(num)
+}
+
 ## ------------------------------------------------------------------------
 
 ## Are the two connections equivalent? 

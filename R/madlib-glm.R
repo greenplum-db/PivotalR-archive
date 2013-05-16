@@ -10,6 +10,10 @@
 madlib.glm <- function (formula, data, family = "gaussian",
                         na.action = "na.omit", control = list(), ...)
 {
+    ## Only newer versions of MADlib are supported
+    if (.madlib.version.number(conn.id(data)) < 0.6)
+        stop("MADlib error: Please use Madlib version newer than 0.5!")
+    
     args <- control
     args$formula <- formula
     args$data <- data
