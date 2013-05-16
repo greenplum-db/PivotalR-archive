@@ -97,6 +97,9 @@ setMethod ("!=",
                 "bigint", "decimal", "numeric", "double precision",
                 "float8", "real", "serial", "bigserial")
 
+.int.types <- c("smallint", "integer", "int2", "int4", "int4",
+                "bigint")
+
 .txt.types <- c("character varying", "varchar", "character",
                 "char", "text")
 
@@ -361,6 +364,60 @@ setMethod(
     function (e1, e2) {
         .compare(e2, e1, "*", .num.types, prefix = "1./",
                  res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "^",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "^", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "^",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "^", sep = ""),
+                 res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%%",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "%", .num.types, res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%%",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "%"),
+                 res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%/%",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, as.integer(e2), "/", .int.types, res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%/%",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "%"),
+                 res = "integer")
     },
     valueClass = "db.Rquery")
 
