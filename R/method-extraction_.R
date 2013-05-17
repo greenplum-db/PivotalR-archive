@@ -165,6 +165,11 @@ setMethod (
         tbl <- paste("(", content(x), ")", sep = "")
     else
         tbl <- content(x)
+
+    if (is(x, "db.Rquery"))
+        is.factor <- x@.is.factor[cols.i]
+    else
+        is.factor <- rep(FALSE, length(cols.i))
     
     new("db.Rquery",
         .content = paste("select", i.str, "from", tbl, "s", where),
@@ -175,7 +180,8 @@ setMethod (
         .col.name = names(x)[cols.i],
         .key = x@.key,
         .col.data_type = x@.col.data_type[cols.i],
-        .col.udt_name = x@.col.udt_name[cols.i])
+        .col.udt_name = x@.col.udt_name[cols.i],
+        .is.factor = is.factor)
 }
 
 ## ------------------------------------------------------------------------
