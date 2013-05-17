@@ -47,6 +47,9 @@ setMethod (
             tbl <- paste("(", value@.parent, ")", sep = "")
         else
             tbl <- value@.parent
+
+        is.factor <- x@.is.factor
+        is.factor[idx] <- value@.is.factor
         
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
@@ -58,7 +61,8 @@ setMethod (
             .col.name = names(x),
             .key = x@.key,
             .col.data_type = x.col.data_type,
-            .col.udt_name = x.col.udt_name)
+            .col.udt_name = x.col.udt_name,
+            .is.factor = is.factor)
     },
     valueClass = "db.Rquery")
 
@@ -109,6 +113,9 @@ setMethod (
             tbl <- paste("(", value@.parent, ")", sep = "")
         else
             tbl <- value@.parent
+
+        is.factor <- x@.is.factor
+        is.factor[idx] <- value@.is.factor
         
         expr <- paste(x.names, collapse = ", ")
         new("db.Rquery",
@@ -121,7 +128,8 @@ setMethod (
             .col.name = names(x),
             .key = x@.key,
             .col.data_type = x.col.data_type,
-            .col.udt_name = x.col.udt_name)
+            .col.udt_name = x.col.udt_name,
+            .is.factor = is.factor)
     },
     valueClass = "db.Rquery")
 
