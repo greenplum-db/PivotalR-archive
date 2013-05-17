@@ -11,6 +11,9 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, name, value) {
+        if (!conn.eql(conn.id(x), conn.id(value)))
+            stop("Both sides must be derived from objects in the same connection!")
+        
         ## One cannot do this without any restrictions
         if (all(content(x) != value@.parent))
             stop(paste("This operation can only be done if both sides",
@@ -66,6 +69,9 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
+        if (!conn.eql(conn.id(x), conn.id(value)))
+            stop("Both sides must be derived from objects in the same connection!")
+        
         ## One cannot do this without any restrictions
         if (all(content(x) != value@.parent))
             stop(paste("This operation can only be done if both sides",

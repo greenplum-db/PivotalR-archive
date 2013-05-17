@@ -51,9 +51,374 @@ setMethod ("!=",
            },
            valueClass = "logical")
 
-## setMethod ("==",
-##            c("db.Rquery", "db.Rquery"),
-##            function(e1, e2) {
-##                e1@x != e2@x | e1@y != e2@y
-##            },
-##            valueClass = "db.Rquery")
+## ------------------------------------------------------------------------
+
+.compare <- function(e1, e2, cmp, data.types,
+                     prefix = "", res.type = "boolean")
+{
+    expr <- rep("", length(names(e1)))
+    col.data_type <- rep("", length(names(e1)))
+    col.udt_name <- rep("", length(names(e1)))
+    col.name <- rep("", length(names(e1)))
+    for (i in seq_len(length(names(e1)))) {
+        if (e1@.col.data_type[i] %in% data.types) {
+            expr[i] <- paste(prefix, names(e1)[i], cmp, e2)
+            col.data_type[i] <- res.type
+            col.udt_name[i] <- res.type
+        } else {
+            expr[i] <- "NULL"
+            col.data_type[i] <- "NULL"
+            col.udt_name[i] <- "NULL"
+        }
+        col.name[i] <- paste(names(e1)[i], "_compare", sep = "")
+    }
+    
+    if (is(e1, "db.data.frame"))
+        tbl <- content(e1)
+    else
+        tbl <- paste("(", content(e1), ")", sep = "")
+    
+    expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
+    new("db.Rquery",
+        .content = paste("select", expr.str, "from", tbl),
+        .expr = expr,
+        .source = e1@.source,
+        .parent = content(e1),
+        .conn.id = conn.id(e1),
+        .col.name = col.name,
+        .key = character(0),
+        .col.data_type = col.data_type,
+        .col.udt_name = col.udt_name)
+}
+
+## ------------------------------------------------------------------------
+
+.num.types <- c("smallint", "integer", "int2", "int4", "int4",
+                "bigint", "decimal", "numeric", "double precision",
+                "float8", "real", "serial", "bigserial")
+
+.int.types <- c("smallint", "integer", "int2", "int4", "int4",
+                "bigint")
+
+.txt.types <- c("character varying", "varchar", "character",
+                "char", "text")
+
+## ------------------------------------------------------------------------
+
+setMethod(
+    ">",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, ">", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 > e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "<", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 < e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">=",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, ">=", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<=",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 >= e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<=",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "<=", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">=",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 <= e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "==",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "==", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "==",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 == e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "!=",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "!=", .num.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "!=",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 != e1
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setMethod(
+    ">",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, ">", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 > e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, "<", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 < e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">=",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, ">=", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<=",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 >= e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "<=",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, "<=", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    ">=",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 <= e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "==",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, "==", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "==",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 == e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "!=",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        .compare(e1, e2, "!=", .txt.types)
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "!=",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 != e1
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setMethod(
+    "+",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "+", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "+",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 + e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "-",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "-", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "-",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, e1, "+", .num.types, prefix = "-",
+                 res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "*",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "*", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "*",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 * e1
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "/",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "/", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "/",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, e1, "*", .num.types, prefix = "1./",
+                 res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "^",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "^", .num.types, res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "^",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "^", sep = ""),
+                 res = "double precision")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%%",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, e2, "%", .num.types, res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%%",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "%"),
+                 res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%/%",
+    signature(e1 = "db.obj", e2 = "numeric"),
+    function (e1, e2) {
+        .compare(e1, as.integer(e2), "/", .int.types, res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+setMethod(
+    "%/%",
+    signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        .compare(e2, "", "", .num.types,
+                 prefix = paste(e1, "%"),
+                 res = "integer")
+    },
+    valueClass = "db.Rquery")
+
+
