@@ -54,19 +54,25 @@ setMethod (
         expr <- paste(x.names, collapse = ", ")
 
         if (value@.parent != value@.source) 
-            tbl <- paste("(", value@.parent, ")", sep = "")
+            tbl <- paste("(", value@.parent, ") s", sep = "")
         else
             tbl <- value@.parent
 
+        if (x@.where != "")
+            where.str <- paste("where", x@.where)
+        else
+            where.str <- ""
+
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
-            tbl, " s", sep = ""),
+            tbl, " ", where.str, sep = ""),
             .expr = x.names,
             .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
             .col.name = names(x),
             .key = x@.key,
+            .where = x@.where,
             .col.data_type = x.col.data_type,
             .col.udt_name = x.col.udt_name,
             .is.factor = is.factor)
@@ -128,21 +134,27 @@ setMethod (
         }
 
         if (value@.parent != value@.source) 
-            tbl <- paste("(", value@.parent, ")", sep = "")
+            tbl <- paste("(", value@.parent, ") s", sep = "")
         else
             tbl <- value@.parent
         
         expr <- paste(x.names, collapse = ", ")
 
+        if (x@.where != "")
+            where.str <- paste("where", x@.where)
+        else
+            where.str <- ""
+
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
-            tbl, " s", sep = ""),
+            tbl, " ", where.str, sep = ""),
             .expr = x.names,
             .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
             .col.name = names(x),
             .key = x@.key,
+            .where = x@.where,
             .col.data_type = x.col.data_type,
             .col.udt_name = x.col.udt_name,
             .is.factor = is.factor)

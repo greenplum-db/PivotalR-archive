@@ -117,17 +117,30 @@ setMethod (
             tbl <- paste("(", x@.parent, ")", sep = "")
 
         ## deal with factor, if exists
+        extra <- paste(x@.expr, collapse = ",")
         for (i in seq_len(x@.is.factor)) {
             if (x@.is.factor[i]) {
                 distinct <- .db.getQuery(paste("select distinc", x@.col.name[i],
                                                "from", tbl))[[1]]
                 for (j in seq_len(length(distinct))) {
                     new.col <- paste(x@.col.name[i], "_", distinct[j], sep = "")
-                    x[[new.col]] <- 0
-                    x[x[[i]] == distinct[j], new.col] <- 1
+                    if (extra != "") extra <- paste(extra, ", ")
+                    extra <- paste(extra, "(case when", x@.col.name[i], "=",
+                                   distinct[j], "then 1 else 0 end) as", new.col)
                 }
             }
         }
+
+        if (x@.source == x@.parent)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
+        if (x@.where != "")
+            where <- paste("where", x@.where)
+        else
+            where <- ""
+        
+        content.str <- paste("select", extra, "from", tbl, where)
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " ", table.name,
                             " as (", content(x), ")", sep = "")
