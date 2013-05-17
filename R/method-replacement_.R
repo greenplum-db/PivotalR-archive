@@ -40,18 +40,18 @@ setMethod (
         is.factor <- x@.is.factor
         idx <- which(x.names == name)
         if (identical(idx, integer(0))) { # a new column
-            x.names <- c(x.names, name)
+            x.names <- c(x.names, value@.expr)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
             is.factor <- c(is.factor, value@.is.factor)
         } else {
-            x.names[idx] <- paste(value@.expr, " as ", name, sep = "")
+            x.names[idx] <- value@.expr
             x.col.data_type[idx] <- value@.col.data_type
             x.col.udt_name[idx] <- value@.col.udt_name
             is.factor[idx] <- value@.is.factor
         }
             
-        expr <- paste(x.names, collapse = ", ")
+        expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
 
         if (value@.parent != value@.source) 
             tbl <- paste("(", value@.parent, ") s", sep = "")
@@ -122,12 +122,12 @@ setMethod (
         }
 
         if (identical(idx, integer(0))) { # a new column
-            x.names <- c(x.names, name)
+            x.names <- c(x.names, value@.expr)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
             is.factor <- c(is.factor, value@.is.factor)
         } else {
-            x.names[idx] <- paste(value@.expr, " as ", x.names[idx], sep = "")
+            x.names[idx] <- value@.expr
             x.col.data_type[idx] <- value@.col.data_type
             x.col.udt_name[idx] <- value@.col.udt_name
             is.factor[idx] <- value@.is.factor
@@ -138,7 +138,7 @@ setMethod (
         else
             tbl <- value@.parent
         
-        expr <- paste(x.names, collapse = ", ")
+        expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
 
         if (x@.where != "")
             where.str <- paste("where", x@.where)
