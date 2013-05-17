@@ -98,7 +98,8 @@ setClass("db.Rquery",
              .col.name = "character",
              .key = "character", # identification column
              .col.data_type = "character", # column types
-             .col.udt_name = "character"
+             .col.udt_name = "character",
+             .is.factor = "boolean" # a boolean vector
              )
          )
 
