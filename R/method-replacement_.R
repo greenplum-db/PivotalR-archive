@@ -37,10 +37,20 @@ setMethod (
         x.names <- names(x)
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
+        is.factor <- x@.is.factor
         idx <- which(x.names == name)
-        x.names[idx] <- paste(value@.expr, " as ", name, sep = "")
-        x.col.data_type[idx] <- value@.col.data_type
-        x.col.udt_name[idx] <- value@.col.udt_name
+        if (identical(idx, integer(0))) { # a new column
+            x.names <- c(x.names, name)
+            x.col.data_type <- c(x.col.data_type, value@.col.data_type)
+            x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
+            is.factor <- c(is.factor, value@.is.factor)
+        } else {
+            x.names[idx] <- paste(value@.expr, " as ", name, sep = "")
+            x.col.data_type[idx] <- value@.col.data_type
+            x.col.udt_name[idx] <- value@.col.udt_name
+            is.factor[idx] <- value@.is.factor
+        }
+            
         expr <- paste(x.names, collapse = ", ")
 
         if (value@.parent != value@.source) 
@@ -48,9 +58,6 @@ setMethod (
         else
             tbl <- value@.parent
 
-        is.factor <- x@.is.factor
-        is.factor[idx] <- value@.is.factor
-        
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
             tbl, " s", sep = ""),
@@ -99,25 +106,34 @@ setMethod (
         x.names <- names(x)
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
-        if (is(i, "character")) {
+        is.factor <- x@.is.factor
+        if (is(i, "character"))
             idx <- which(x.names == i)
-            x.names[idx] <- paste(value@.expr, " as ", i, sep = "")
-        } else if (is(i, "numeric")) {
+        else if (is(i, "numeric")) {
             idx <- i
-            x.names[idx] <- paste(value@.expr, " as ", x.names[idx], sep = "")
+            if (idx < 1 || idx > length(x@.col.name))
+                stop("Subscript out of range!")
         }
-        x.col.data_type[idx] <- value@.col.data_type
-        x.col.udt_name[idx] <- value@.col.udt_name
+
+        if (identical(idx, integer(0))) { # a new column
+            x.names <- c(x.names, name)
+            x.col.data_type <- c(x.col.data_type, value@.col.data_type)
+            x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
+            is.factor <- c(is.factor, value@.is.factor)
+        } else {
+            x.names[idx] <- paste(value@.expr, " as ", x.names[idx], sep = "")
+            x.col.data_type[idx] <- value@.col.data_type
+            x.col.udt_name[idx] <- value@.col.udt_name
+            is.factor[idx] <- value@.is.factor
+        }
 
         if (value@.parent != value@.source) 
             tbl <- paste("(", value@.parent, ")", sep = "")
         else
             tbl <- value@.parent
-
-        is.factor <- x@.is.factor
-        is.factor[idx] <- value@.is.factor
         
         expr <- paste(x.names, collapse = ", ")
+
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
             tbl, " s", sep = ""),

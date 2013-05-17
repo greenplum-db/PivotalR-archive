@@ -110,6 +110,9 @@ setMethod (
             obj.str <- "view"
         else
             obj.str <- "table"
+
+        
+        
         create.str <- paste("create ", temp.str, " ", obj.str, " ", table.name,
                             " as (", content(x), ")", sep = "")
         .db.getQuery(create.str, conn.id) # create table
