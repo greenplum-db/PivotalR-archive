@@ -34,11 +34,11 @@ setMethod (
             stop(paste("The primary key of the two sides are different!",
                        "Something must have been wrong!"))
 
-        x.names <- names(x)
+        x.names <- x@.expr
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
         is.factor <- x@.is.factor
-        idx <- which(x.names == name)
+        idx <- which(x@.col.names == name)
         if (identical(idx, integer(0))) { # a new column
             x.names <- c(x.names, value@.expr)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
@@ -109,12 +109,12 @@ setMethod (
             stop(paste("The primary key of the two sides are different!",
                        "Something must have been wrong!"))
 
-        x.names <- names(x)
+        x.names <- x@.expr
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
         is.factor <- x@.is.factor
         if (is(i, "character"))
-            idx <- which(x.names == i)
+            idx <- which(x@.col.names == i)
         else if (is(i, "numeric")) {
             idx <- i
             if (idx < 1 || idx > length(x@.col.name))

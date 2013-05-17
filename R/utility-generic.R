@@ -198,10 +198,14 @@ arraydb.to.arrayr <- function (str, type = "double")
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
+
+    
+    
     ##
     list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
-         has.intercept = as.logical(f.intercept))
+         has.intercept = as.logical(f.intercept),
+         data = data)
 }
 
 ## ------------------------------------------------------------------------

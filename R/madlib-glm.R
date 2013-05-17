@@ -60,18 +60,19 @@ madlib.glm <- function (formula, data, family = "gaussian",
     ## prints some unnessary warning messages
     warn.r <- getOption("warn")
     options(warn = -1)
+
+    params <- .analyze.formula(formula, data)
     
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
-    if (is(data, "db.Rquery"))
+    if (is(params$data, "db.Rquery"))
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(data, tbl.source, is.temp = TRUE, conn.id = conn.id(data))
+        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE, conn.id = conn.id(params$data))
     }
 
     ## dependent, independent and grouping strings
-    params <- .analyze.formula(formula, data)
     if (is.null(params$grp.str))
         grp <- "NULL::text"
     else
