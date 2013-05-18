@@ -128,6 +128,8 @@ setMethod (
                 distinct <- .db.getQuery(paste("select distinc", x@.col.name[i],
                                                "from", tbl))[[1]]
                 suffix[i] <- .unique.string()
+                ## Produce a fixed order for distinct values
+                distinct <- distinct[order(distinct, decreasing = TRUE)]
                 for (j in seq_len(length(distinct) - 1)) {
                     new.col <- paste(x@.col.name[i], suffix[i], distinct[j], sep = "")
                     if (extra != "") extra <- paste(extra, ", ")
