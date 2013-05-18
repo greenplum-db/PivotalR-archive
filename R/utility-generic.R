@@ -153,6 +153,14 @@ arraydb.to.arrayr <- function (str, type = "double")
     paste("__madlib_temp_", r1, "_", r2, "_", r3, "__", sep = "")
 }
 
+## -----------------------------------------------------------------------
+
+## strip the leading and trailing white spaces
+.strip <- function (str)
+{
+    gsub("\\s*(\\S*)\\s*", "\\1", str)
+}
+
 ## ------------------------------------------------------------------------
 
 ## analyze formula
@@ -162,6 +170,8 @@ arraydb.to.arrayr <- function (str, type = "double")
     f.str <- strsplit(deparse(formula), "\\|")[[1]]
 
     fstr <- f.str[1]
+    right.hand <- .strip(gsub("^[^~]*~(.*)", "\\1", fstr))
+    left.hand <- .strip(gsub("^([^~]*)~.*", "\\1", fstr))
     if (refresh) { # replace all factor
         replace.cols <- cols[is.factor]
         suffix <- suffix[is.factor]
@@ -170,11 +180,28 @@ arraydb.to.arrayr <- function (str, type = "double")
         suffix <- suffix[n.order]
         for (i in seq_len(replace.cols)) {
             col <- replace.cols[i]
-            new.col <- names(data)[grep(paste(col, suffix[i], sep=""), names(data))]
-            new.col <- paste("(", paste(new.col, collapse = " + "), ")", sep = "")
-            fstr <- gsub(col, new.col, fstr)
+            new.col <- names(data)[grep(paste(col, suffix[i], sep=""),
+                                        names(data))]
+            new.col <- paste("(", paste(new.col, collapse = " + "), ")",
+                             sep = "")
+            right.hand <- gsub(paste(col, "([^__]*)", sep = ""),
+                               paste(new.col, "\\1", sep = ""),
+                               right.hand)
         }
-    }         
+        fstr <- paste(left.hand, "~", right.hand)
+    } else {
+        ## find all the factor columns
+        right.hand <- gsub("as.factor\\s*\\((.*)\\)",
+                           "factor(\\1)", right.hand)
+        elm <- regmatches(right.hand,
+                          gregexpr("factor\\s*\\([^\\(\\)]+\\)",
+                                   right.hand, perl=T))[[1]]
+        col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm))
+        if (!all(col %in% names(data)))
+            stop("You can only make a existing column of",
+                 " the data into factor!")
+        for (cl in col) data[[cl]] <- as.factor(data[[cl]])
+    }
     
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
@@ -208,20 +235,8 @@ arraydb.to.arrayr <- function (str, type = "double")
     if (!is.null(f2.labels) && f.intercept != 0) 
         labels <- setdiff(labels, f2.labels)
 
-    ## independent variable factor
-    if (!refresh) {
-        ## just check whether there is factor in formula
-        for (i in seq_len(labels)) {
-            if (!identical(grep("as.factor", labels[i]), integer(0)) ||
-                !identical(grep("factor", labels[i]), integer(0))) {
-                col <- gsub("as.factor\\((.*)\\)", "\\1", labels[i])
-                col <- gsub("factor\\((.*)\\)", "\\1", col)
-                if (! col %in% names(data))
-                    stop("You can only make a column of data into factor!")
-                data[[col]] <- as.factor(data[[col]])
-            }
-        }
-    } 
+    labels <- gsub("as.factor\\((.*)\\)", "\\1", labels)
+    labels <- gsub("factor\\((.*)\\)", "\\1", labels)
     
     ## dependent variable
     ## factor does not play a role in dependent variable
