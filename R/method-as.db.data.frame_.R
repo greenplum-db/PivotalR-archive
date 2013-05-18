@@ -102,7 +102,7 @@ setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
     def = function (x, table.name, conn.id = 1, is.view = FALSE,
-    is.temp = FALSE, verbose = TRUE) {
+    is.temp = FALSE, verbose = TRUE, pivot.factor = TRUE) {
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -124,27 +124,27 @@ setMethod (
         ## grouping column.
         extra <- paste(x@.expr, collapse = ",")
         ## suffix used to avoid conflicts
-        suffix <- rep("", seq_len(x@.is.factor)) 
-        for (i in seq_len(x@.is.factor)) {
-            if (x@.is.factor[i]) {
-                distinct <- .db.getQuery(paste("select distinc",
-                                               x@.col.name[i],
-                                               "from", tbl))[[1]]
-                suffix[i] <- .unique.string()
-                ## Produce a fixed order for distinct values
-                distinct <- distinct[order(distinct, decreasing = TRUE)]
-                for (j in seq_len(length(distinct) - 1)) {
-                    new.col <- paste(x@.col.name[i], suffix[i],
-                                     distinct[j], sep = "")
-                    if (extra != "") extra <- paste(extra, ", ")
-                    extra <- paste(extra, "(case when", x@.expr[i], "=",
-                                   distinct[j], "then 1 else 0 end) as",
-                                   new.col)
-                }
-            } ## else {
-            ##     if (extra != "") extra <- paste(extra, ", ")
-            ##     extra <- paste(extra, x@.expr[i], "as", x@.col.name[i])
-            ## }
+        suffix <- rep("", seq_len(x@.is.factor))
+
+        if (pivot.factor) {
+            for (i in seq_len(x@.is.factor)) {
+                if (x@.is.factor[i]) {
+                    distinct <- .db.getQuery(paste("select distinc",
+                                                x@.col.name[i],
+                                                "from", tbl))[[1]]
+                    suffix[i] <- .unique.string()
+                    ## Produce a fixed order for distinct values
+                    distinct <- distinct[order(distinct, decreasing = TRUE)]
+                    for (j in seq_len(length(distinct) - 1)) {
+                        new.col <- paste(x@.col.name[i], suffix[i],
+                                        distinct[j], sep = "")
+                        if (extra != "") extra <- paste(extra, ", ")
+                        extra <- paste(extra, "(case when", x@.expr[i], "=",
+                                    distinct[j], "then 1 else 0 end) as",
+                                    new.col)
+                    }
+                } 
+            }
         }
 
         if (x@.source == x@.parent)
