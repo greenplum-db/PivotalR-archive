@@ -57,7 +57,8 @@ setClass("db.data.frame",
              .col.name = "character", # column names
              .col.data_type = "character", # column types
              .col.udt_name = "character",
-             .table.type = "character" # is the object temp ?
+             .table.type = "character", # is the object temp ?
+             .factor.suffix = "character"
              )
          )
 
@@ -98,7 +99,9 @@ setClass("db.Rquery",
              .col.name = "character",
              .key = "character", # identification column
              .col.data_type = "character", # column types
-             .col.udt_name = "character"
+             .col.udt_name = "character",
+             .where = "character", # WHERE clause
+             .is.factor = "logical" # a boolean vector
              )
          )
 

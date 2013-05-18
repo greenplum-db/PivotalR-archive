@@ -110,9 +110,52 @@ setMethod (
             obj.str <- "view"
         else
             obj.str <- "table"
+
+        if (x@.parent == x@.source)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ")", sep = "")
+
+        ## deal with factor, if exists
+        ## We still need to keep the original non-factor
+        ## column, because sometimes one wants to use the original
+        ## data without regarding it as a factor. For example, as the
+        ## grouping column.
+        extra <- paste(x@.expr, collapse = ",")
+        suffix <- rep("", seq_len(x@.is.factor)) # suffix used to avoid conflicts
+        for (i in seq_len(x@.is.factor)) {
+            if (x@.is.factor[i]) {
+                distinct <- .db.getQuery(paste("select distinc", x@.col.name[i],
+                                               "from", tbl))[[1]]
+                suffix[i] <- .unique.string()
+                for (j in seq_len(length(distinct) - 1)) {
+                    new.col <- paste(x@.col.name[i], suffix[i], distinct[j], sep = "")
+                    if (extra != "") extra <- paste(extra, ", ")
+                    extra <- paste(extra, "(case when", x@.expr[i], "=",
+                                   distinct[j], "then 1 else 0 end) as", new.col)
+                }
+            } ## else {
+            ##     if (extra != "") extra <- paste(extra, ", ")
+            ##     extra <- paste(extra, x@.expr[i], "as", x@.col.name[i])
+            ## }
+        }
+
+        if (x@.source == x@.parent)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
+        if (x@.where != "")
+            where <- paste("where", x@.where)
+        else
+            where <- ""
+        
+        content.str <- paste("select", extra, "from", tbl, where)
+                
         create.str <- paste("create ", temp.str, " ", obj.str, " ", table.name,
                             " as (", content(x), ")", sep = "")
         .db.getQuery(create.str, conn.id) # create table
-        db.data.frame(table.name, conn.id, x@.key, verbose)
+        res <- db.data.frame(table.name, conn.id, x@.key, verbose)
+        res@.factor.suffix <- suffix
+        res
     },
     valueClass = "db.data.frame")

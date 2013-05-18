@@ -32,6 +32,7 @@ exportMethods("$<-", "[[<-", "[<-")
 
 export("preview", "delete")
 
-exportMethods("==", "!=")
+exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
+              ">", "<", ">=", "<=")
 
 export("conn.eql")

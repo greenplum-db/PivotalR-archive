@@ -86,6 +86,8 @@ setMethod (
                 .create.db.Rquery(x, cols.i = j)
             } else if (is(i, "db.Rquery")) {          
                 where.str <- i@.expr
+                if (length(where.str) != 1)
+                    stop("More than 2 boolean expressions in selecting row!")
                 .create.db.Rquery(x, cols.i = j, where = where.str)
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
@@ -162,12 +164,20 @@ setMethod (
         src <- x@.source
 
     if (is(x, "db.Rquery"))
-        tbl <- paste("(", content(x), ")", sep = "")
+        tbl <- paste("(", content(x), ") s", sep = "")
     else
         tbl <- content(x)
+
+    if (is(x, "db.Rquery"))
+        is.factor <- x@.is.factor[cols.i]
+    else
+        is.factor <- rep(FALSE, length(cols.i))
+
+    if (where != "") where.str <- paste("where", where)
+    else where.str <- ""
     
     new("db.Rquery",
-        .content = paste("select", i.str, "from", tbl, "s", where),
+        .content = paste("select", i.str, "from", tbl, where.str),
         .expr = names(x)[cols.i],
         .source = src,
         .parent = parent,
@@ -175,7 +185,9 @@ setMethod (
         .col.name = names(x)[cols.i],
         .key = x@.key,
         .col.data_type = x@.col.data_type[cols.i],
-        .col.udt_name = x@.col.udt_name[cols.i])
+        .col.udt_name = x@.col.udt_name[cols.i],
+        .where = where,
+        .is.factor = is.factor)
 }
 
 ## ------------------------------------------------------------------------

@@ -1,15 +1,14 @@
-\name{==-methods}
+\name{<=-methods}
 \docType{methods}
-\alias{==-methods}
-\alias{==,ANY,ANY-method}
-\alias{==,character,db.obj-method}
-\alias{==,db.obj,character-method}
-\alias{==,db.obj,db.obj-method}
-\alias{==,db.obj,numeric-method}
-\alias{==,numeric,db.obj-method}
-\title{ ~~ Methods for Function \code{==} in Package \pkg{base} ~~}
+\alias{<=-methods}
+\alias{<=,ANY,ANY-method}
+\alias{<=,character,db.obj-method}
+\alias{<=,db.obj,character-method}
+\alias{<=,db.obj,numeric-method}
+\alias{<=,numeric,db.obj-method}
+\title{ ~~ Methods for Function \code{<=} in Package \pkg{base} ~~}
 \description{
- ~~ Methods for function \code{==} in package \pkg{base} ~~
+ ~~ Methods for function \code{<=} in package \pkg{base} ~~
 }
 \section{Methods}{
 \describe{
@@ -23,10 +22,6 @@
 }
 
 \item{\code{signature(e1 = "db.obj", e2 = "character")}}{
-%%  ~~describe this method here~~
-}
-
-\item{\code{signature(e1 = "db.obj", e2 = "db.obj")}}{
 %%  ~~describe this method here~~
 }
 
