@@ -56,7 +56,10 @@ setMethod (
             stop()
         }
         
-        if (missing(i)) i.missing <- TRUE
+        if (missing(i))
+            i.missing <- TRUE
+        else
+            i.missing <- FALSE
         
         if (n == 3) {
             if (!i.missing && identical(x@.key, character(0))) {
@@ -91,7 +94,9 @@ setMethod (
                     stop()
                 }
 
-                where.str <- paste(x@.key, "=", i, collapse = " or ")
+                ## where.str <- paste(x@.key, "=", i, collapse = " or ")
+                where.str <- paste(x@.key, " in (", paste(i, collapse = ","),
+                                   ")", sep = "")
                 .create.db.Rquery(x, cols.i = j, where = where.str)
             }
         }

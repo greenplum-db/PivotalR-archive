@@ -83,9 +83,13 @@ madlib.version <- function (conn.id = 1)
 {
     if (!.is.conn.id.valid(conn.id))
         stop("There is no such connection!")
-    as.character(.db.getQuery(paste("select ", schema.madlib(conn.id),
-                                    ".version()", sep = ""),
-                              conn.id))
+    res <- try(.db.getQuery(paste("select ", schema.madlib(conn.id),
+                                  ".version()", sep = ""),
+                            conn.id))
+    if (is(res, .err.class))
+        stop("Madlib does not exist in database ", dbname(conn.id),
+             " schema ", schema.madlib(conn.id))
+    as.character(res)
 }
 
 madlib <- function (conn.id = 1)
