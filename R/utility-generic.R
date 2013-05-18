@@ -161,18 +161,20 @@ arraydb.to.arrayr <- function (str, type = "double")
 {
     f.str <- strsplit(deparse(formula), "\\|")[[1]]
 
+    fstr <- f.str[1]
     if (refresh) {
-        for (i in seq_len(is.factor)) {
-            if (is.factor[i]) {
-                col <- cols[i]
-                new.col <- names(data)[grep(paste(col, suffix[i], sep=""), names(data))]
-                for (j in seq_len(labels)) {
-                    
-                }
-            }
+        replace.cols <- cols[is.factor]
+        suffix <- suffix[is.factor]
+        n.order <- order(nchar(replace.cols), decreasing = TRUE)
+        replace.cols <- replace.cols[n.order]
+        suffix <- suffix[n.order]
+        for (i in seq_len(replace.cols)) {
+            col <- replace.cols[i]
+            new.col <- names(data)[grep(paste(col, suffix[i], sep=""), names(data))]
+            new.col <- paste("(", paste(new.col, collapse = " + "), ")", sep = "")
+            fstr <- gsub(col, new.col, fstr)
         }
-    } else
-        fstr <- f.str[1]
+    }         
     
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
