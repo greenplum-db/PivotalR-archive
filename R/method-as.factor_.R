@@ -3,7 +3,7 @@
 ## as.factor
 ## ------------------------------------------------------------------------
 
-setGenric ("as.factor")
+setGeneric ("as.factor")
 
 setMethod (
     "as.factor",
@@ -21,6 +21,7 @@ setMethod (
                 .col.name = x@.col.name,
                 .col.data_type = x@.col.data_type,
                 .col.udt_name = x@.col.udt_name,
+                .where = x@.where,
                 .is.factor = TRUE)
         } else {
             new("db.Rquery",
@@ -32,6 +33,7 @@ setMethod (
                 .col.name = x@.col.name,
                 .col.data_type = x@.col.data_type,
                 .col.udt_name = x@.col.udt_name,
+                .where = x@.where,
                 .is.factor = TRUE)
         }
     },

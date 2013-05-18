@@ -162,7 +162,7 @@ arraydb.to.arrayr <- function (str, type = "double")
     f.str <- strsplit(deparse(formula), "\\|")[[1]]
 
     fstr <- f.str[1]
-    if (refresh) {
+    if (refresh) { # replace all factor
         replace.cols <- cols[is.factor]
         suffix <- suffix[is.factor]
         n.order <- order(nchar(replace.cols), decreasing = TRUE)

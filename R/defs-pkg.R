@@ -101,7 +101,7 @@ setClass("db.Rquery",
              .col.data_type = "character", # column types
              .col.udt_name = "character",
              .where = "character", # WHERE clause
-             .is.factor = "boolean" # a boolean vector
+             .is.factor = "logical" # a boolean vector
              )
          )
 

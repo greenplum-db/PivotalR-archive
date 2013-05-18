@@ -305,7 +305,7 @@ setMethod(
     "+",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "+", .num.types, res = "double precision")
+        .compare(e1, e2, "+", .num.types, res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -321,7 +321,7 @@ setMethod(
     "-",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "-", .num.types, res = "double precision")
+        .compare(e1, e2, "-", .num.types, res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -330,7 +330,7 @@ setMethod(
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
         .compare(e2, e1, "+", .num.types, prefix = "-",
-                 res = "double precision")
+                 res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -338,7 +338,7 @@ setMethod(
     "*",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "*", .num.types, res = "double precision")
+        .compare(e1, e2, "*", .num.types, res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -354,7 +354,7 @@ setMethod(
     "/",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "/", .num.types, res = "double precision")
+        .compare(e1, e2, "/", .num.types, res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -363,7 +363,7 @@ setMethod(
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
         .compare(e2, e1, "*", .num.types, prefix = "1./",
-                 res = "double precision")
+                 res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -371,7 +371,7 @@ setMethod(
     "^",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "^", .num.types, res = "double precision")
+        .compare(e1, e2, "^", .num.types, res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -381,7 +381,7 @@ setMethod(
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "^", sep = ""),
-                 res = "double precision")
+                 res.type = "double precision")
     },
     valueClass = "db.Rquery")
 
@@ -389,7 +389,7 @@ setMethod(
     "%%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "%", .num.types, res = "integer")
+        .compare(e1, e2, "%", .num.types, res.type = "integer")
     },
     valueClass = "db.Rquery")
 
@@ -399,7 +399,7 @@ setMethod(
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "%"),
-                 res = "integer")
+                 res.type = "integer")
     },
     valueClass = "db.Rquery")
 
@@ -407,7 +407,7 @@ setMethod(
     "%/%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, as.integer(e2), "/", .int.types, res = "integer")
+        .compare(e1, as.integer(e2), "/", .int.types, res.type = "integer")
     },
     valueClass = "db.Rquery")
 
@@ -417,7 +417,7 @@ setMethod(
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "%"),
-                 res = "integer")
+                 res.type = "integer")
     },
     valueClass = "db.Rquery")
 
