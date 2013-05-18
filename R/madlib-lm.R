@@ -25,6 +25,8 @@ madlib.lm <- function (formula, data, na.action,
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
+    is.factor <- data@.is.factor
+    cols <- names(data)
     
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
@@ -34,6 +36,10 @@ madlib.lm <- function (formula, data, na.action,
         is.tbl.source.temp <- TRUE
         data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE, conn.id = conn.id(params$data))
     }
+
+    params <- .analyze.formula(formula, data, refresh = TRUE,
+                               is.factor = is.factor, cols = cols,
+                               suffix = data@.factor.suffix)
 
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))

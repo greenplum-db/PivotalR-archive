@@ -156,10 +156,25 @@ arraydb.to.arrayr <- function (str, type = "double")
 ## ------------------------------------------------------------------------
 
 ## analyze formula
-.analyze.formula <- function (formula, data)
+.analyze.formula <- function (formula, data, refresh = FALSE,
+                              is.factor = NA, cols = NA, suffix = NA)
 {
     f.str <- strsplit(deparse(formula), "\\|")[[1]]
-    f1 <- formula(f.str[1]) # formula
+
+    if (refresh) {
+        for (i in seq_len(is.factor)) {
+            if (is.factor[i]) {
+                col <- cols[i]
+                new.col <- names(data)[grep(paste(col, suffix[i], sep=""), names(data))]
+                for (j in seq_len(labels)) {
+                    
+                }
+            }
+        }
+    } else
+        fstr <- f.str[1]
+    
+    f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
     if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
@@ -175,7 +190,7 @@ arraydb.to.arrayr <- function (str, type = "double")
         f2.labels <- NULL
         grp <- NULL
     }
-    
+
     ## create a fake data.frame only to extract
     ## terms when there is "." in formula
     fake.data <- data.frame(t(names(data)))
@@ -190,6 +205,21 @@ arraydb.to.arrayr <- function (str, type = "double")
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0) 
         labels <- setdiff(labels, f2.labels)
+
+    ## independent variable factor
+    if (!refresh) {
+        ## just check whether there is factor in formula
+        for (i in seq_len(labels)) {
+            if (!identical(grep("as.factor", labels[i]), integer(0)) ||
+                !identical(grep("factor", labels[i]), integer(0))) {
+                col <- gsub("as.factor\\((.*)\\)", "\\1", labels[i])
+                col <- gsub("factor\\((.*)\\)", "\\1", col)
+                if (! col %in% names(data))
+                    stop("You can only make a column of data into factor!")
+                data[[col]] <- as.factor(data[[col]])
+            }
+        }
+    } 
     
     ## dependent variable
     ## factor does not play a role in dependent variable
