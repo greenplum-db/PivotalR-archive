@@ -167,6 +167,9 @@ arraydb.to.arrayr <- function (str, type = "double")
         inter <- intersect(f2.labels, names(data))
         if (length(inter) != length(f2.labels))
             stop("The grouping part of the formula is not quite right!")
+        ## grouping column do not use factor
+        f2.labels <- gsub("as.factor\\((.*)\\)", "\\1", f2.labels)
+        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels)
         grp <- paste(f2.labels, collapse = ", ")
     } else {
         f2.labels <- NULL
@@ -187,21 +190,23 @@ arraydb.to.arrayr <- function (str, type = "double")
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0) 
         labels <- setdiff(labels, f2.labels)
-    ##
+    
     ## dependent variable
-    dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1]) 
+    ## factor does not play a role in dependent variable
+    dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1])
+    dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var)
+    dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var)
+    
     ## with or without intercept
     if (f.intercept == 0)
         intercept.str <- ""
     else
         intercept.str <- "1,"
+    
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
 
-    
-    
-    ##
     list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
