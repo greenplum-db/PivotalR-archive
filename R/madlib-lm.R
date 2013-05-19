@@ -10,7 +10,8 @@ madlib.lm <- function (formula, data, na.action,
                        hetero = FALSE, ...) # param name too long
 {
     ## Only newer versions of MADlib are supported
-    if (.madlib.version.number(conn.id(data)) < 0.6)
+    if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
+        .madlib.version.number(conn.id(data)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
     
     ## make sure fitting to db.obj
