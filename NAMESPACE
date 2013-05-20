@@ -36,3 +36,5 @@ exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
               ">", "<", ">=", "<=")
 
 export("conn.eql")
+
+export("madlib.summary", "print.summary.madlib", "show.summary.madlib")
