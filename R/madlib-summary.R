@@ -69,7 +69,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                  get.quartiles, ",", ntile, ",", n.mfv, ",", estimate,
                  ");", sep = "")
 
-    res <- try(.db.getQuery(sql, conn.id(x)))
+    res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
     if (is(res, ".err.class"))
         stop("Could not do the summary!")
     

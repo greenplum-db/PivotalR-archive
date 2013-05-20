@@ -140,8 +140,10 @@ db.list <- function ()
             }
             cat("DBMS     :   ", db.str, version.str, "\n")
 
-            if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)))
-                cat("MADlib   :   not installed in schema", schema.madlib(idx[1]), "\n")
+            if (identical(.localVars$db[[idx[2]]]$madlib.v, numeric(0)))
+                cat("MADlib   :    not installed in schema", schema.madlib(idx[1]), "\n")
+            else
+                cat("MADlib   :    installed in schema", schema.madlib(idx[1]), "\n")
             
             pkg <- .localVars$db[[idx[2]]]$conn.pkg
             id <- which(tolower(.supported.connections) == pkg)
