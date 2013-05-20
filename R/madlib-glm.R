@@ -73,7 +73,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE, conn.id = conn.id(params$data))
+        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE)
     }
 
     params <- .analyze.formula(formula, data, refresh = TRUE,

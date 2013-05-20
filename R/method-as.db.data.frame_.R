@@ -101,8 +101,9 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, conn.id = 1, is.view = FALSE,
+    def = function (x, table.name, is.view = FALSE,
     is.temp = FALSE, verbose = TRUE, pivot.factor = TRUE) {
+        conn.id <- conn.id(x)
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -124,10 +125,10 @@ setMethod (
         ## grouping column.
         extra <- paste(x@.expr, collapse = ",")
         ## suffix used to avoid conflicts
-        suffix <- rep("", seq_len(x@.is.factor))
+        suffix <- rep("", length(x@.is.factor))
 
         if (pivot.factor) {
-            for (i in seq_len(x@.is.factor)) {
+            for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
                     distinct <- .db.getQuery(paste("select distinc",
                                                 x@.col.name[i],

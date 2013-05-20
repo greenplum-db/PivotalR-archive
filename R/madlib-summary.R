@@ -41,7 +41,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         tbl <- .unique.string()
         to.drop.tbl <- TRUE
         if (is(x, "db.Rquery"))
-            tmp <- as.db.data.frame(x, tbl, conn.id(x), FALSE,
+            tmp <- as.db.data.frame(x, tbl, FALSE,
                                     is.temp = TRUE,
                                     verbose = interactive,
                                     pivot.factor = FALSE)
