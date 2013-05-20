@@ -9,6 +9,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                             interactive = TRUE)
 {
     ## Only newer versions of MADlib are supported
+    idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id(x), 2]
     if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
         .madlib.version.number(conn.id(data)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
@@ -20,6 +21,12 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         (!is.null(grouping.cols) && !all(grouping.cols %in% names(x))))
         stop("target.cols or grouping.cols has columns that are not in ",
              "the data!")
+
+    msg.level <- .set.msg.level("panic") # suppress all messages
+    ## disable warning in R, RPostgreSQL
+    ## prints some unnessary warning messages
+    warn.r <- getOption("warn")
+    options(warn = -1)
     
     if (is(x, "db.view") || is(x, "db.Rquery")) {
         if (interactive) {
@@ -34,7 +41,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         tbl <- .unique.string()
         to.drop.tbl <- TRUE
         if (is(x, "db.Rquery"))
-            tmp <- as.db.data.frame(x, tbl, conn.id(x), FALSE
+            tmp <- as.db.data.frame(x, tbl, conn.id(x), FALSE,
                                     is.temp = TRUE,
                                     verbose = interactive,
                                     pivot.factor = FALSE)
@@ -70,6 +77,11 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     if (to.drop.tbl) .db.removeTable(tbl, conn.id(x))
 
     class(res) <- "summary.madlib"
+
+    msg.level <- .set.msg.level(msg.level) # reset message level
+    options(warn = warn.r) # reset R warning level
+    
+    return (res)
 }
 
 ## ------------------------------------------------------------------------
@@ -121,16 +133,24 @@ print.summary.madlib <- function (x,
                               paste(rep(" ", add[i]), collapse = ""),
                               ":", sep = "")
 
+    first.group <- TRUE
     for (g in u.group) {
         if (is.na(g))
             gb <- is.na(g)
         else
             gb <- x$group_by_column == g
         for (v in u.value) {
-            if (is.na(v))
-                vb <- is.na(v)
+            if (!first.group)
+                cat("------------------------------------------------\n")
             else
+                first.group <- FALSE
+            if (is.na(v)) {
+                vb <- is.na(v)
+                if (!is.na(g)) cat("When", g, "= NA\n\n")
+            } else {
                 vb <- x$group_by_value == v
+                if (!is.na(g)) cat("When", g, "=", v, "\n\n")
+            }
 
             dat <- x[gb & vb, -(1:2)]
             dat.col <- dat[,1]
@@ -138,12 +158,23 @@ print.summary.madlib <- function (x,
 
             output <- .arrange.summary(dat, dat.col, dat.names,
                                        digits = digits)
-            
+            print(format(output, justify = "centre"))
         }
     }
 }
 
 ## ------------------------------------------------------------------------
+
+show.summary.madlib <- function(object)
+{
+    print(object)
+}
+
+## ------------------------------------------------------------------------
+
+.cut.digits <- c("fraction_missing", "fraction_blank", "mean", "variance",
+                 "first_quartile", "median", "third_quartile", "quartile_array",
+                 "mfv_frequencies")
 
 .arrange.summary <- function (dat, dat.col, dat.names, digits)
 {
@@ -153,10 +184,17 @@ print.summary.madlib <- function (x,
         for (j in seq_len(length(dat.names))) {
             if (is.na(dat[i,j]))
                 tmp[j] <- paste(dat.names[j], "NA")
-            else
-                tmp[j] <- paste(dat.names[j],
-                                paste(as.vector(arraydb.to.arrayr(dat[i,j], "character")),
-                                      collapse = ", "))
+            else {
+                if (dat.names[j] %in% .cut.digits) {
+                    nums <- as.vector(arraydb.to.arrayr(dat[i,j], "double"))
+                    nums.str <- paste(format(nums, digits = digits), collapse = ", ")
+                    tmp[j] <- paste(dat.names[j], nums.str)
+                } else {
+                    tmp[j] <- paste(dat.names[j],
+                                    paste(as.vector(arraydb.to.arrayr(dat[i,j], "character")),
+                                          collapse = ", "))
+                }
+            }
         }
         res[[dat.col[i]]] <- tmp
     }
