@@ -110,5 +110,57 @@ print.summary.madlib <- function (x,
                                   digits = max(3L,
                                   getOption("digits") - 3L), ...)
 {
-    
+    u.group <- unique(x$group_by_column)
+    u.value <- unique(x$group_by_value)
+
+    dat.names <- names(x)[-(1:3)]
+    names.len <- nchar(dat.names)
+    add <- max(names.len) - names.len
+    for (i in seq_len(length(add)))
+        dat.names[i] <- paste(dat.names[i],
+                              paste(rep(" ", add[i]), collapse = ""),
+                              ":", sep = "")
+
+    for (g in u.group) {
+        if (is.na(g))
+            gb <- is.na(g)
+        else
+            gb <- x$group_by_column == g
+        for (v in u.value) {
+            if (is.na(v))
+                vb <- is.na(v)
+            else
+                vb <- x$group_by_value == v
+
+            dat <- x[gb & vb, -(1:2)]
+            dat.col <- dat[,1]
+            dat <- dat[,-1]
+
+            output <- .arrange.summary(dat, dat.col, dat.names,
+                                       digits = digits)
+            
+        }
+    }
+}
+
+## ------------------------------------------------------------------------
+
+.arrange.summary <- function (dat, dat.col, dat.names, digits)
+{
+    res <- data.frame(tmp = dat.names)
+    for (i in seq_len(length(dat.col))) {
+        tmp <- rep("", length(dat.names))
+        for (j in seq_len(length(dat.names))) {
+            if (is.na(dat[i,j]))
+                tmp[j] <- paste(dat.names[j], "NA")
+            else
+                tmp[j] <- paste(dat.names[j],
+                                paste(as.vector(arraydb.to.arrayr(dat[i,j], "character")),
+                                      collapse = ", "))
+        }
+        res[[dat.col[i]]] <- tmp
+    }
+    res <- res[-1]
+    attr(res, "row.names") <- dat.names
+    return (res)
 }
