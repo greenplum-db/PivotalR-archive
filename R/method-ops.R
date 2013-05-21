@@ -179,7 +179,7 @@ setMethod(
     "==",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "==", .num.types)
+        .compare(e1, e2, "=", .num.types)
     },
     valueClass = "db.Rquery")
 
@@ -195,7 +195,7 @@ setMethod(
     "!=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "!=", .num.types)
+        .compare(e1, e2, "<>", .num.types)
     },
     valueClass = "db.Rquery")
 
@@ -277,7 +277,7 @@ setMethod(
     "==",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, "==", .txt.types)
+        .compare(e1, e2, "=", .txt.types)
     },
     valueClass = "db.Rquery")
 
@@ -293,7 +293,7 @@ setMethod(
     "!=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, "!=", .txt.types)
+        .compare(e1, e2, "<>", .txt.types)
     },
     valueClass = "db.Rquery")
 

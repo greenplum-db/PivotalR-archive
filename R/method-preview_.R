@@ -44,6 +44,10 @@ setMethod (
     "preview",
     signature (x = "db.Rquery"),
     def = function (x, nrows = 100, interactive = TRUE) {
+        msg.level <- .set.msg.level("panic") # suppress all messages
+        warn.r <- getOption("warn")
+        options(warn = -1)
+
         if (interactive) {
             cat(deparse(substitute(x)),
                 "is just a query in R and does not point to any object in the database",
@@ -60,5 +64,9 @@ setMethod (
                                   " limit", nrows),
                             conn.id(tmp))
         delete(tmp)
+
+        msg.level <- .set.msg.level(msg.level) # reset message level
+        options(warn = warn.r) # reset R warning level
+           
         return (res)
     })

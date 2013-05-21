@@ -35,7 +35,8 @@ setMethod (
                        "Something must have been wrong!"))
 
         if (is(x, "db.Rquery")) {
-            x.names <- x@.expr
+            ## x.names <- x@.expr
+            x.names <- x@.col.name
             is.factor <- x@.is.factor
         } else {
             x.names <- x@.col.name
@@ -43,9 +44,11 @@ setMethod (
         }
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
+        x.col.name <- x@.col.name
         idx <- which(x@.col.name == name)
         if (identical(idx, integer(0))) { # a new column
             x.names <- c(x.names, value@.expr)
+            x.col.name <- c(x.col.name, name)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
             is.factor <- c(is.factor, value@.is.factor)
@@ -56,7 +59,7 @@ setMethod (
             is.factor[idx] <- value@.is.factor
         }
             
-        expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
+        expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
 
         if (value@.parent != value@.source) 
             tbl <- paste("(", value@.parent, ") s", sep = "")
@@ -78,7 +81,7 @@ setMethod (
             .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
-            .col.name = names(x),
+            .col.name = x.col.name,
             .key = x@.key,
             .where = where,
             .col.data_type = x.col.data_type,
@@ -118,7 +121,8 @@ setMethod (
                        "Something must have been wrong!"))
 
         if (is(x, "db.Rquery")) {
-            x.names <- x@.expr
+            ## x.names <- x@.expr
+            x.names <- x@.col.name
             is.factor <- x@.is.factor
         } else {
             x.names <- x@.col.name
@@ -126,6 +130,7 @@ setMethod (
         }
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
+        x.col.name <- x@.col.name
         if (is(i, "character"))
             idx <- which(x@.col.name == i)
         else if (is(i, "numeric")) {
@@ -136,6 +141,7 @@ setMethod (
 
         if (identical(idx, integer(0))) { # a new column
             x.names <- c(x.names, value@.expr)
+            x.col.name <- c(x.col.name, name)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
             is.factor <- c(is.factor, value@.is.factor)
@@ -151,7 +157,7 @@ setMethod (
         else
             tbl <- value@.parent
         
-        expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
+        expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
 
         if (is(x, "db.Rquery") && x@.where != "") {
             where.str <- paste("where", x@.where)
@@ -168,7 +174,7 @@ setMethod (
             .source = value@.source,
             .parent = value@.parent,
             .conn.id = conn.id(x),
-            .col.name = names(x),
+            .col.name = x.col.name,
             .key = x@.key,
             .where = where,
             .col.data_type = x.col.data_type,

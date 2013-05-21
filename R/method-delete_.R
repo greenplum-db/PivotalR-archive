@@ -33,7 +33,7 @@ setMethod (
 setMethod (
     "delete",
     signature (x = "character"),
-    def = function (x, conn.id, is.temp = FALSE) {
+    def = function (x, conn.id = 1, is.temp = FALSE) {
         exists <- db.existsObject(x, conn.id, is.temp)
         if (length(exists) == 2)
             if (! exists[[1]])

@@ -132,7 +132,7 @@ setMethod (
         ## column, because sometimes one wants to use the original
         ## data without regarding it as a factor. For example, as the
         ## grouping column.
-        extra <- paste(x@.expr, collapse = ",")
+        extra <- paste(x@.expr, names(x), sep = " as ", collapse = ",")
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
         appear <- x@.col.name
