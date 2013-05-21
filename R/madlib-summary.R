@@ -6,7 +6,7 @@
 madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                             get.distinct = TRUE, get.quartiles = TRUE,
                             ntile = NULL, n.mfv = 10, estimate = TRUE,
-                            interactive = TRUE)
+                            interactive = FALSE)
 {
     ## Only newer versions of MADlib are supported
     idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id(x), 2]
@@ -44,7 +44,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
             tmp <- as.db.data.frame(x, tbl, FALSE,
                                     is.temp = TRUE,
                                     verbose = interactive,
-                                    pivot.factor = FALSE)
+                                    pivot = FALSE)
         else
             .db.getQuery(paste("create temp table", tbl,
                                "as select * from", content(x)), conn.id(x))
@@ -127,7 +127,7 @@ print.summary.madlib <- function (x,
                                   digits = max(3L,
                                   getOption("digits") - 3L), ...)
 {
-    x <- as.data.frame(x)
+    class(x) <- "data.frame"
     u.group <- unique(x$group_by)
     u.value <- unique(x$group_by_value)
 
@@ -164,7 +164,7 @@ print.summary.madlib <- function (x,
 
             output <- .arrange.summary(dat, dat.col, dat.names,
                                        digits = digits)
-            print(format(output, justify = "centre"))
+            print(format(output, justify = "left"), row.names = F)
         }
     }
 }
@@ -192,12 +192,12 @@ show.summary.madlib <- function(object)
                 tmp[j] <- paste(dat.names[j], "NA")
             else {
                 if (dat.names[j] %in% .cut.digits) {
-                    nums <- as.vector(arraydb.to.arrayr(dat[i,j], "double"))
+                    nums <- as.vector(arraydb.to.arrayr(as.character(dat[i,j]), "double"))
                     nums.str <- paste(format(nums, digits = digits), collapse = ", ")
                     tmp[j] <- paste(dat.names[j], nums.str)
                 } else {
                     tmp[j] <- paste(dat.names[j],
-                                    paste(as.vector(arraydb.to.arrayr(dat[i,j], "character")),
+                                    paste(as.vector(arraydb.to.arrayr(as.character(dat[i,j]), "character")),
                                           collapse = ", "))
                 }
             }
@@ -205,6 +205,6 @@ show.summary.madlib <- function(object)
         res[[dat.col[i]]] <- tmp
     }
     res <- res[-1]
-    attr(res, "row.names") <- dat.names
+    ## attr(res, "row.names") <- ""
     return (res)
 }
