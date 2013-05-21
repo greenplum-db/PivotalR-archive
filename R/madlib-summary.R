@@ -11,7 +11,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     ## Only newer versions of MADlib are supported
     idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id(x), 2]
     if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
-        .madlib.version.number(conn.id(data)) < 0.6)
+        .madlib.version.number(conn.id(x)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
     
     if (!is(x, "db.obj"))
@@ -64,12 +64,17 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     estimate <- .logical.string(estimate)
     
     sql <- paste("SELECT ", schema.madlib(conn.id(x)),
-                 ".summary(", tbl, ",", out.tbl, ",", target.cols,
-                 ",", grouping.cols, ",", get.distinct, ",",
+                 ".summary('", tbl, "', '", out.tbl, "', ", target.cols,
+                 ", ", grouping.cols, ",", get.distinct, ",",
                  get.quartiles, ",", ntile, ",", n.mfv, ",", estimate,
                  ");", sep = "")
 
     res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
+    if (is(res, ".err.class"))
+        stop("Could not do the summary!")
+
+    res <- try(.db.getQuery(paste("select * from", out.tbl),
+                            conn.id(x)), silent = TRUE)
     if (is(res, ".err.class"))
         stop("Could not do the summary!")
     

@@ -55,6 +55,8 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE)
               .db.table.schema.str(table), sep = ""), conn.id)
     res@.table.type <- tbl.type$table_type
 
+    res@.is.factor <- rep(FALSE, length(res@.col.name))
+
     if (verbose)
         message("An R object pointing to ", x,
                 " in connection ", conn.id, " is created !")

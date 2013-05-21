@@ -20,6 +20,7 @@ Objects can be created by calls of the form \code{new("db.data.frame", ...)}.
     \item{\code{.col.data_type}:}{Object of class \code{"character"} ~~ }
     \item{\code{.col.udt_name}:}{Object of class \code{"character"} ~~ }
     \item{\code{.table.type}:}{Object of class \code{"character"} ~~ }
+    \item{\code{.is.factor}:}{Object of class \code{"character"} ~~ }
     \item{\code{.factor.suffix}:}{Object of class \code{"character"} ~~ }
   }
 }

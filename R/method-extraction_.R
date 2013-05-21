@@ -169,11 +169,8 @@ setMethod (
     else
         tbl <- content(x)
 
-    if (is(x, "db.Rquery"))
-        is.factor <- x@.is.factor[cols.i]
-    else
-        is.factor <- rep(FALSE, length(cols.i))
-
+    is.factor <- x@.is.factor[cols.i]
+    
     if (where != "") where.str <- paste("where", where)
     else where.str <- ""
     

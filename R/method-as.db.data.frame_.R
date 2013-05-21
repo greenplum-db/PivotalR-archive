@@ -102,7 +102,7 @@ setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
     def = function (x, table.name, is.view = FALSE,
-    is.temp = FALSE, verbose = TRUE, pivot.factor = TRUE) {
+    is.temp = FALSE, verbose = TRUE, pivot = TRUE) {
         conn.id <- conn.id(x)
         if (is.temp) 
             temp.str <- "temp"
@@ -127,10 +127,10 @@ setMethod (
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
 
-        if (pivot.factor) {
+        if (pivot) {
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- .db.getQuery(paste("select distinc",
+                    distinct <- .db.getQuery(paste("select distinct",
                                                 x@.col.name[i],
                                                 "from", tbl))[[1]]
                     suffix[i] <- .unique.string()
@@ -161,10 +161,11 @@ setMethod (
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             table.name,
-                            " as (", content(x), ")", sep = "")
+                            " as (", content.str, ")", sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
         res <- db.data.frame(table.name, conn.id, x@.key, verbose)
+        res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
         res
     },

@@ -172,7 +172,7 @@ arraydb.to.arrayr <- function (str, type = "double")
     fstr <- f.str[1]
     right.hand <- .strip(gsub("^[^~]*~(.*)", "\\1", fstr))
     left.hand <- .strip(gsub("^([^~]*)~.*", "\\1", fstr))
-    if (refresh && is(data, "db.Rquery")) { # replace all factor
+    if (refresh) { # replace all factor
         replace.cols <- cols[is.factor]
         suffix <- suffix[is.factor]
         n.order <- order(nchar(replace.cols), decreasing = TRUE)

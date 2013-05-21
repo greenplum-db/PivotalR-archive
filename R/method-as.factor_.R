@@ -21,6 +21,7 @@ setMethod (
                 .col.name = x@.col.name,
                 .col.data_type = x@.col.data_type,
                 .col.udt_name = x@.col.udt_name,
+                .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE)
         } else {
@@ -33,6 +34,7 @@ setMethod (
                 .col.name = x@.col.name,
                 .col.data_type = x@.col.data_type,
                 .col.udt_name = x@.col.udt_name,
+                .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE)
         }

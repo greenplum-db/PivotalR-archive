@@ -30,6 +30,8 @@ exportMethods("$", "[[", "[", "subset")
 
 exportMethods("$<-", "[[<-", "[<-")
 
+exportMethods("as.factor")
+
 export("preview", "delete")
 
 exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
