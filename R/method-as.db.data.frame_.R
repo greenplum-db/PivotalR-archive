@@ -126,6 +126,7 @@ setMethod (
         extra <- paste(x@.expr, collapse = ",")
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
+        appear <- x@.col.name
 
         if (pivot) {
             for (i in seq_len(length(x@.is.factor))) {
@@ -143,6 +144,8 @@ setMethod (
                         extra <- paste(extra, "(case when", x@.expr[i], "=",
                                     distinct[j], "then 1 else 0 end) as",
                                     new.col)
+                        appear <- c(appear, paste(x@.col.name[i],":",
+                                                  distinct[j], sep = ""))
                     }
                 } 
             }
@@ -167,6 +170,7 @@ setMethod (
         res <- db.data.frame(table.name, conn.id, x@.key, verbose)
         res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
+        res@.appear.name <- appear
         res
     },
     valueClass = "db.data.frame")

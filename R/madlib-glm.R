@@ -132,6 +132,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
     rst$grp.cols <- arraydb.to.arrayr(params$grp.str, "character")
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- params$ind.vars
+    rst$col.name <- data@.col.name
+    rst$appear <- data@.appear.name
     rst$call <- call # the current function call itself
 
     class(rst) <- "logregr.madlib" # use this to track summary
@@ -157,6 +159,9 @@ print.logregr.madlib <- function (x,
         rows <- c("(Intercept)", x$ind.vars)
     else
         rows <- x$ind.vars
+    for (i in seq_len(length(x$col.name)))
+        if (x$col.name[i] != x$appear[i])
+            rows <- gsub(x$col.name[i], x$appear[i], rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")

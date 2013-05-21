@@ -59,6 +59,7 @@ setClass("db.data.frame",
              .col.udt_name = "character",
              .table.type = "character", # is the object temp ?
              .factor.suffix = "character",
+             .appear.name = "character",
              .is.factor = "logical"
              )
          )

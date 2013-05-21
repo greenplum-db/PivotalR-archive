@@ -8,7 +8,9 @@ function to do ... ~~
  A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-madlib.summary(x, target.cols = NULL, grouping.cols = NULL, get.distinct = TRUE, get.quartiles = TRUE, ntile = NULL, n.mfv = 10, estimate = TRUE, interactive = FALSE)
+madlib.summary(x, target.cols = NULL, grouping.cols = NULL, get.distinct
+= TRUE, get.quartiles = TRUE, ntile = NULL, n.mfv = 10, estimate = TRUE,
+interactive = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
