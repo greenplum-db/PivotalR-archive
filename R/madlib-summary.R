@@ -6,12 +6,12 @@
 madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                             get.distinct = TRUE, get.quartiles = TRUE,
                             ntile = NULL, n.mfv = 10, estimate = TRUE,
-                            interactive = TRUE)
+                            interactive = FALSE)
 {
     ## Only newer versions of MADlib are supported
     idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id(x), 2]
     if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
-        .madlib.version.number(conn.id(data)) < 0.6)
+        .madlib.version.number(conn.id(x)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
     
     if (!is(x, "db.obj"))
@@ -41,10 +41,10 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         tbl <- .unique.string()
         to.drop.tbl <- TRUE
         if (is(x, "db.Rquery"))
-            tmp <- as.db.data.frame(x, tbl, conn.id(x), FALSE,
+            tmp <- as.db.data.frame(x, tbl, FALSE,
                                     is.temp = TRUE,
                                     verbose = interactive,
-                                    pivot.factor = FALSE)
+                                    pivot = FALSE)
         else
             .db.getQuery(paste("create temp table", tbl,
                                "as select * from", content(x)), conn.id(x))
@@ -64,12 +64,17 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     estimate <- .logical.string(estimate)
     
     sql <- paste("SELECT ", schema.madlib(conn.id(x)),
-                 ".summary(", tbl, ",", out.tbl, ",", target.cols,
-                 ",", grouping.cols, ",", get.distinct, ",",
+                 ".summary('", tbl, "', '", out.tbl, "', ", target.cols,
+                 ", ", grouping.cols, ",", get.distinct, ",",
                  get.quartiles, ",", ntile, ",", n.mfv, ",", estimate,
                  ");", sep = "")
 
-    res <- try(.db.getQuery(sql, conn.id(x)))
+    res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
+    if (is(res, ".err.class"))
+        stop("Could not do the summary!")
+
+    res <- try(.db.getQuery(paste("select * from", out.tbl),
+                            conn.id(x)), silent = TRUE)
     if (is(res, ".err.class"))
         stop("Could not do the summary!")
     
@@ -122,7 +127,8 @@ print.summary.madlib <- function (x,
                                   digits = max(3L,
                                   getOption("digits") - 3L), ...)
 {
-    u.group <- unique(x$group_by_column)
+    class(x) <- "data.frame"
+    u.group <- unique(x$group_by)
     u.value <- unique(x$group_by_value)
 
     dat.names <- names(x)[-(1:3)]
@@ -136,16 +142,16 @@ print.summary.madlib <- function (x,
     first.group <- TRUE
     for (g in u.group) {
         if (is.na(g))
-            gb <- is.na(g)
+            gb <- is.na(x$group_by)
         else
-            gb <- x$group_by_column == g
+            gb <- x$group_by == g
         for (v in u.value) {
             if (!first.group)
                 cat("------------------------------------------------\n")
             else
                 first.group <- FALSE
             if (is.na(v)) {
-                vb <- is.na(v)
+                vb <- is.na(x$group_by_value)
                 if (!is.na(g)) cat("When", g, "= NA\n\n")
             } else {
                 vb <- x$group_by_value == v
@@ -158,7 +164,7 @@ print.summary.madlib <- function (x,
 
             output <- .arrange.summary(dat, dat.col, dat.names,
                                        digits = digits)
-            print(format(output, justify = "centre"))
+            print(format(output, justify = "left"), row.names = F)
         }
     }
 }
@@ -186,12 +192,12 @@ show.summary.madlib <- function(object)
                 tmp[j] <- paste(dat.names[j], "NA")
             else {
                 if (dat.names[j] %in% .cut.digits) {
-                    nums <- as.vector(arraydb.to.arrayr(dat[i,j], "double"))
+                    nums <- as.vector(arraydb.to.arrayr(as.character(dat[i,j]), "double"))
                     nums.str <- paste(format(nums, digits = digits), collapse = ", ")
                     tmp[j] <- paste(dat.names[j], nums.str)
                 } else {
                     tmp[j] <- paste(dat.names[j],
-                                    paste(as.vector(arraydb.to.arrayr(dat[i,j], "character")),
+                                    paste(as.vector(arraydb.to.arrayr(as.character(dat[i,j]), "character")),
                                           collapse = ", "))
                 }
             }
@@ -199,6 +205,6 @@ show.summary.madlib <- function(object)
         res[[dat.col[i]]] <- tmp
     }
     res <- res[-1]
-    attr(res, "row.names") <- dat.names
+    ## attr(res, "row.names") <- ""
     return (res)
 }

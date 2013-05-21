@@ -62,7 +62,7 @@ setMethod ("!=",
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
         if (e1@.col.data_type[i] %in% data.types) {
-            expr[i] <- paste(prefix, names(e1)[i], cmp, e2)
+            expr[i] <- paste(prefix, e1@.expr[i], cmp, e2)
             col.data_type[i] <- res.type
             col.udt_name[i] <- res.type
         } else {
@@ -70,25 +70,31 @@ setMethod ("!=",
             col.data_type[i] <- "NULL"
             col.udt_name[i] <- "NULL"
         }
-        col.name[i] <- paste(names(e1)[i], "_compare", sep = "")
+        col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
     }
     
     if (is(e1, "db.data.frame"))
         tbl <- content(e1)
-    else
-        tbl <- paste("(", content(e1), ")", sep = "")
+    else {
+        if (e1@.source == e1@.parent)
+            tbl <- e1@.source
+        else
+            tbl <- paste("(", e1@.parent, ")", sep = "")
+    }
     
     expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select", expr.str, "from", tbl),
         .expr = expr,
         .source = e1@.source,
-        .parent = content(e1),
+        .parent = e1@.parent,
         .conn.id = conn.id(e1),
         .col.name = col.name,
         .key = character(0),
         .col.data_type = col.data_type,
-        .col.udt_name = col.udt_name)
+        .col.udt_name = col.udt_name,
+        .where = e1@.where,
+        .is.factor = rep(FALSE, length(col.name)))
 }
 
 ## ------------------------------------------------------------------------

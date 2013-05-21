@@ -8,7 +8,8 @@ function to do ... ~~
  A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-db.data.frame(x, conn.id = 1, key = character(0), verbose = TRUE)
+db.data.frame(x, conn.id = 1, key = character(0), verbose = TRUE,
+is.temp = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,6 +24,9 @@ Describe \code{key} here~~
 }
 \item{verbose}{
   verbose
+}
+\item{is.temp}{
+  is temp object?
 }
 }
 \details{

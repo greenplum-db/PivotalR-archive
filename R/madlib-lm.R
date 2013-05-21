@@ -27,18 +27,19 @@ madlib.lm <- function (formula, data, na.action,
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
-    is.factor <- data@.is.factor
-    cols <- names(data)
-    
+
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
-    if (is(params$data, "db.Rquery"))
-    {
+    if (is(params$data, "db.Rquery")) {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE, conn.id = conn.id(params$data))
+        data <- as.db.data.frame(x = params$data,
+                                 table.name = tbl.source,
+                                 is.temp = FALSE, verbose = FALSE)
     }
 
+    is.factor <- data@.is.factor
+    cols <- names(data)
     params <- .analyze.formula(formula, data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)
@@ -92,6 +93,8 @@ madlib.lm <- function (formula, data, na.action,
     rst$grp.cols <- arraydb.to.arrayr(params$grp.str, "character")
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- params$ind.vars
+    rst$col.name <- data@.col.name
+    rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
     
     class(rst) <- "lm.madlib" # use this to track summary
@@ -116,6 +119,9 @@ print.lm.madlib <- function (x,
         rows <- c("(Intercept)", x$ind.vars)
     else
         rows <- x$ind.vars
+    for (i in seq_len(length(x$col.name))) 
+        if (x$col.name[i] != x$appear[i])
+            rows <- gsub(x$col.name[i], x$appear[i], rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Linear Regression Result\n")

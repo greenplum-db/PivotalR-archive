@@ -140,8 +140,10 @@ db.list <- function ()
             }
             cat("DBMS     :   ", db.str, version.str, "\n")
 
-            if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)))
-                cat("MADlib   :   not installed in schema", schema.madlib(idx[1]), "\n")
+            if (identical(.localVars$db[[idx[2]]]$madlib.v, numeric(0)))
+                cat("MADlib   :    not installed in schema", schema.madlib(idx[1]), "\n")
+            else
+                cat("MADlib   :    installed in schema", schema.madlib(idx[1]), "\n")
             
             pkg <- .localVars$db[[idx[2]]]$conn.pkg
             id <- which(tolower(.supported.connections) == pkg)
@@ -149,6 +151,39 @@ db.list <- function ()
                       "\n", sep = ""))
         }
         cat("\n")
+    }
+}
+
+## ------------------------------------------------------------------------
+
+## list tables and views in the connection
+db.objects <- function (conn.id = 1)
+{
+    .db.getQuery("select table_schema, table_name from information_schema.tables")
+}
+
+## ------------------------------------------------------------------------
+
+## does an object exist?
+db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
+{
+    name <- strsplit(name, "\\.")[[1]]
+    if (length(name) != 1 && length(name) != 2)
+        stop("The formation of object name is wrong!")
+    if (length(name) == 2) {
+        schema <- name[1]
+        table <- name[2]
+        ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
+                                 table, "' and table_schema = '", schema, "'", sep = ""), conn.id)
+        if (ct == 0)
+            FALSE
+        else
+            TRUE
+    } else {
+        if (is.temp)
+            .db.existsTempTable(name, conn.id)
+        else
+            .db.existsTable(name, conn.id)
     }
 }
 

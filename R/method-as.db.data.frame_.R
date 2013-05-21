@@ -46,6 +46,10 @@ setMethod (
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
+    exists <- db.existsObject(table.name, conn.id, is.temp)
+    if (is.temp) exists <- exists[[1]]
+    if (exists) stop("The table already exists in connection ", conn.id, "!")
+    
     if (!.is.arg.string(key)) stop("ID column name must be a string!")
     if (!identical(key, character(0)) &&
         key == "row.names" && !add.row.names)
@@ -101,8 +105,14 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, conn.id = 1, is.view = FALSE,
-    is.temp = FALSE, verbose = TRUE, pivot.factor = TRUE) {
+    def = function (x, table.name, is.view = FALSE,
+    is.temp = FALSE, verbose = TRUE, pivot = TRUE) {
+        conn.id <- conn.id(x)
+
+        exists <- db.existsObject(table.name, conn.id, is.temp)
+        if (is.temp) exists <- exists[[1]]
+        if (exists) stop("The table already exists in connection ", conn.id, "!")
+        
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -115,7 +125,7 @@ setMethod (
         if (x@.parent == x@.source)
             tbl <- x@.parent
         else
-            tbl <- paste("(", x@.parent, ")", sep = "")
+            tbl <- paste("(", x@.parent, ") s", sep = "")
 
         ## deal with factor, if exists
         ## We still need to keep the original non-factor
@@ -124,12 +134,13 @@ setMethod (
         ## grouping column.
         extra <- paste(x@.expr, collapse = ",")
         ## suffix used to avoid conflicts
-        suffix <- rep("", seq_len(x@.is.factor))
+        suffix <- rep("", length(x@.is.factor))
+        appear <- x@.col.name
 
-        if (pivot.factor) {
-            for (i in seq_len(x@.is.factor)) {
+        if (pivot) {
+            for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- .db.getQuery(paste("select distinc",
+                    distinct <- .db.getQuery(paste("select distinct",
                                                 x@.col.name[i],
                                                 "from", tbl))[[1]]
                     suffix[i] <- .unique.string()
@@ -142,6 +153,8 @@ setMethod (
                         extra <- paste(extra, "(case when", x@.expr[i], "=",
                                     distinct[j], "then 1 else 0 end) as",
                                     new.col)
+                        appear <- c(appear, paste(x@.col.name[i],":",
+                                                  distinct[j], sep = ""))
                     }
                 } 
             }
@@ -160,10 +173,13 @@ setMethod (
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             table.name,
-                            " as (", content(x), ")", sep = "")
+                            " as (", content.str, ")", sep = "")
+
         .db.getQuery(create.str, conn.id) # create table
-        res <- db.data.frame(table.name, conn.id, x@.key, verbose)
+        res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)
+        res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
+        res@.appear.name <- appear
         res
     },
     valueClass = "db.data.frame")

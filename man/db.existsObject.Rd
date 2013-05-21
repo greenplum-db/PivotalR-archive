@@ -1,53 +1,33 @@
-\name{madlib.summary}
-\alias{madlib.summary}
+\name{db.existsObject}
+\alias{db.existsObject}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 function to do ... ~~
 }
 \description{
- A concise (1-5 lines) description of what the function does. ~~
+A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-madlib.summary(x, target.cols = NULL, grouping.cols = NULL, get.distinct
-= TRUE, get.quartiles = TRUE, ntile = NULL, n.mfv = 10, estimate = TRUE,
-interactive = FALSE)
+db.existsObject(name, conn.id = 1, is.temp = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-Describe \code{x} here~~
+  \item{name}{
+Describe \code{name} here~~
 }
-  \item{target.cols}{
-Describe \code{target.cols} here~~
+  \item{conn.id}{
+Describe \code{conn.id} here~~
 }
-  \item{grouping.cols}{
-Describe \code{grouping.cols} here~~
-}
-  \item{get.distinct}{
-Describe \code{get.distinct} here~~
-}
-  \item{get.quartiles}{
-Describe \code{get.quartiles} here~~
-}
-  \item{ntile}{
-Describe \code{ntile} here~~
-}
-  \item{n.mfv}{
-Describe \code{n.mfv} here~~
-}
-  \item{estimate}{
-Describe \code{estimate} here~~
-}
-  \item{interactive}{
-Describe \code{interactive} here~~
+  \item{is.temp}{
+Describe \code{is.temp} here~~
 }
 }
 \details{
 If necessary, more details than the description above ~~
 }
 \value{
-~Describe the value returned
-If it is a LIST, use
+Describe the value returned
+%%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
@@ -74,7 +54,7 @@ objects to See Also as \code{\link{help}}, ~~~
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-"madlib.summary"
+"db.existsObject"
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

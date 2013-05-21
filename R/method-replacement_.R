@@ -34,11 +34,16 @@ setMethod (
             stop(paste("The primary key of the two sides are different!",
                        "Something must have been wrong!"))
 
-        x.names <- x@.expr
+        if (is(x, "db.Rquery")) {
+            x.names <- x@.expr
+            is.factor <- x@.is.factor
+        } else {
+            x.names <- x@.col.name
+            is.factor <- rep(FALSE, length(x@.col.name))
+        }
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
-        is.factor <- x@.is.factor
-        idx <- which(x@.col.names == name)
+        idx <- which(x@.col.name == name)
         if (identical(idx, integer(0))) { # a new column
             x.names <- c(x.names, value@.expr)
             x.col.data_type <- c(x.col.data_type, value@.col.data_type)
@@ -58,10 +63,13 @@ setMethod (
         else
             tbl <- value@.parent
 
-        if (x@.where != "")
+        if (is(x, "db.Rquery") && x@.where != "") {
             where.str <- paste("where", x@.where)
-        else
+            where <- x@.where
+        } else {
             where.str <- ""
+            where <- ""
+        }
 
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
@@ -72,7 +80,7 @@ setMethod (
             .conn.id = conn.id(x),
             .col.name = names(x),
             .key = x@.key,
-            .where = x@.where,
+            .where = where,
             .col.data_type = x.col.data_type,
             .col.udt_name = x.col.udt_name,
             .is.factor = is.factor)
@@ -109,12 +117,17 @@ setMethod (
             stop(paste("The primary key of the two sides are different!",
                        "Something must have been wrong!"))
 
-        x.names <- x@.expr
+        if (is(x, "db.Rquery")) {
+            x.names <- x@.expr
+            is.factor <- x@.is.factor
+        } else {
+            x.names <- x@.col.name
+            is.factor <- rep(FALSE, length(x@.col.name))
+        }
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
-        is.factor <- x@.is.factor
         if (is(i, "character"))
-            idx <- which(x@.col.names == i)
+            idx <- which(x@.col.name == i)
         else if (is(i, "numeric")) {
             idx <- i
             if (idx < 1 || idx > length(x@.col.name))
@@ -140,10 +153,13 @@ setMethod (
         
         expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
 
-        if (x@.where != "")
+        if (is(x, "db.Rquery") && x@.where != "") {
             where.str <- paste("where", x@.where)
-        else
+            where <- x@.where
+        } else {
             where.str <- ""
+            where <- ""
+        }
 
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
@@ -154,7 +170,7 @@ setMethod (
             .conn.id = conn.id(x),
             .col.name = names(x),
             .key = x@.key,
-            .where = x@.where,
+            .where = where,
             .col.data_type = x.col.data_type,
             .col.udt_name = x.col.udt_name,
             .is.factor = is.factor)

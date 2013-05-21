@@ -83,11 +83,18 @@ madlib.version <- function (conn.id = 1)
 {
     if (!.is.conn.id.valid(conn.id))
         stop("There is no such connection!")
-    res <- try(.db.getQuery(paste("select ", schema.madlib(conn.id),
-                                  ".version()", sep = ""),
-                            conn.id))
-    if (is(res, .err.class)) {
-        message("Madlib does not exist in database ", dbname(conn.id),
+    exists <- .db.getQuery(paste("select count(*) from ",
+                                 "information_schema.routines where ",
+                                 "routine_name = 'version' and ",
+                                 "routine_schema = '", schema.madlib(conn.id),
+                                 "'", sep = ""),
+                           conn.id)[1,1]
+    if (exists == 1) 
+        res <- try(.db.getQuery(paste("select ", schema.madlib(conn.id),
+                                      ".version()", sep = ""),
+                                conn.id), silent = TRUE)
+    if (exists == 0 || is(res, .err.class)) {
+        message("\nWarning: Madlib does not exist in database ", dbname(conn.id),
                 " schema ", schema.madlib(conn.id), ".")
         message("So all functions starting with 'madlib.' will not work.")
         message("But you can still use other functions.")
@@ -96,10 +103,14 @@ madlib.version <- function (conn.id = 1)
     return (as.character(res))
 }
 
+## ------------------------------------------------------------------------
+
 madlib <- function (conn.id = 1)
 {
     madlib.version(conn.id)
 }
+
+## ------------------------------------------------------------------------
 
 ## extract the version numbers 
 .madlib.version.number <- function (conn.id = 1)

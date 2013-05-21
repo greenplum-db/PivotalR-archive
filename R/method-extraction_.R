@@ -22,7 +22,7 @@ setMethod(
             message("Error : argument is missing!")
             stop()
         }
-        print(na)
+
         if (na == 2) {
             if (length(i) > 1) {
                 message("Error : subscript out of range!")
@@ -62,7 +62,8 @@ setMethod (
             i.missing <- FALSE
         
         if (n == 3) {
-            if (!i.missing && identical(x@.key, character(0))) {
+            if (!i.missing && identical(x@.key, character(0)) &&
+                !is(i, "db.Rquery")) {
                 message("Error : there is no unique ID associated",
                         " with each row of the table!")
                 stop()
@@ -168,11 +169,8 @@ setMethod (
     else
         tbl <- content(x)
 
-    if (is(x, "db.Rquery"))
-        is.factor <- x@.is.factor[cols.i]
-    else
-        is.factor <- rep(FALSE, length(cols.i))
-
+    is.factor <- x@.is.factor[cols.i]
+    
     if (where != "") where.str <- paste("where", where)
     else where.str <- ""
     
