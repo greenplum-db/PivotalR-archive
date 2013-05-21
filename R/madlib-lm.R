@@ -27,16 +27,20 @@ madlib.lm <- function (formula, data, na.action,
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
-    is.factor <- data@.is.factor
+    if (is(data, "db.Rquery"))
+        is.factor <- data@.is.factor
+    else
+        is.factor <- rep(FALSE, length(names(data)))
     cols <- names(data)
     
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
-    if (is(params$data, "db.Rquery"))
-    {
+    if (is(params$data, "db.Rquery")) {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE)
+        data <- as.db.data.frame(x = params$data,
+                                 table.name = tbl.source,
+                                 is.temp = FALSE, verbose = FALSE)
     }
 
     params <- .analyze.formula(formula, data, refresh = TRUE,
@@ -72,7 +76,7 @@ madlib.lm <- function (formula, data, na.action,
 
     ## drop temporary tables
     .db.removeTable(tbl.output, conn.id)
-    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+    #if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
     
     msg.level <- .set.msg.level(msg.level) # reset message level
     options(warn = warn.r) # reset R warning level

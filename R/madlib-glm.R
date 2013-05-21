@@ -64,7 +64,10 @@ madlib.glm <- function (formula, data, family = "gaussian",
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
-    is.factor <- data@.is.factor
+    if (is(data, "db.Rquery"))
+        is.factor <- data@.is.factor
+    else
+        is.factor <- rep(FALSE, length(names(data)))
     cols <- names(data)
     
     ## create temp table for db.Rquery objects
@@ -73,7 +76,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(params$data, tbl.source, is.temp = TRUE)
+        data <- as.db.data.frame(params$data, tbl.source, is.temp = FALSE,
+                                 verbose = FALSE)
     }
 
     params <- .analyze.formula(formula, data, refresh = TRUE,
