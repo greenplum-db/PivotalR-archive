@@ -27,9 +27,7 @@ madlib.lm <- function (formula, data, na.action,
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
-    is.factor <- data@.is.factor
-    cols <- names(data)
-    
+
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
     if (is(params$data, "db.Rquery")) {
@@ -40,6 +38,8 @@ madlib.lm <- function (formula, data, na.action,
                                  is.temp = FALSE, verbose = FALSE)
     }
 
+    is.factor <- data@.is.factor
+    cols <- names(data)
     params <- .analyze.formula(formula, data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)

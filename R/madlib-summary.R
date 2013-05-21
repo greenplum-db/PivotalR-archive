@@ -127,7 +127,8 @@ print.summary.madlib <- function (x,
                                   digits = max(3L,
                                   getOption("digits") - 3L), ...)
 {
-    u.group <- unique(x$group_by_column)
+    x <- as.data.frame(x)
+    u.group <- unique(x$group_by)
     u.value <- unique(x$group_by_value)
 
     dat.names <- names(x)[-(1:3)]
@@ -141,16 +142,16 @@ print.summary.madlib <- function (x,
     first.group <- TRUE
     for (g in u.group) {
         if (is.na(g))
-            gb <- is.na(g)
+            gb <- is.na(x$group_by)
         else
-            gb <- x$group_by_column == g
+            gb <- x$group_by == g
         for (v in u.value) {
             if (!first.group)
                 cat("------------------------------------------------\n")
             else
                 first.group <- FALSE
             if (is.na(v)) {
-                vb <- is.na(v)
+                vb <- is.na(x$group_by_value)
                 if (!is.na(g)) cat("When", g, "= NA\n\n")
             } else {
                 vb <- x$group_by_value == v

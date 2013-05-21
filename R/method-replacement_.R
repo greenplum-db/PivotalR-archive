@@ -117,10 +117,15 @@ setMethod (
             stop(paste("The primary key of the two sides are different!",
                        "Something must have been wrong!"))
 
-        x.names <- x@.expr
+        if (is(x, "db.Rquery")) {
+            x.names <- x@.expr
+            is.factor <- x@.is.factor
+        } else {
+            x.names <- x@.col.name
+            is.factor <- rep(FALSE, length(x@.col.name))
+        }
         x.col.data_type <- x@.col.data_type
         x.col.udt_name <- x@.col.udt_name
-        is.factor <- x@.is.factor
         if (is(i, "character"))
             idx <- which(x@.col.name == i)
         else if (is(i, "numeric")) {
@@ -148,10 +153,13 @@ setMethod (
         
         expr <- paste(x.names, x@.col.name, sep = " as ", collapse = ", ")
 
-        if (x@.where != "")
+        if (is(x, "db.Rquery") && x@.where != "") {
             where.str <- paste("where", x@.where)
-        else
+            where <- x@.where
+        } else {
             where.str <- ""
+            where <- ""
+        }
 
         new("db.Rquery",
             .content = paste("select ", expr, " from ",
@@ -162,7 +170,7 @@ setMethod (
             .conn.id = conn.id(x),
             .col.name = names(x),
             .key = x@.key,
-            .where = x@.where,
+            .where = where,
             .col.data_type = x.col.data_type,
             .col.udt_name = x.col.udt_name,
             .is.factor = is.factor)
