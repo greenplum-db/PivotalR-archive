@@ -1,7 +1,7 @@
 Package: PivotalR
 Type: Package
 Title: R wrapper for MADlib
-Version: 0.0.1
+Version: 0.0.2
 Date: 2012-12-18
 Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>, with contributions from Woo Jung <Woo.Jung@gopivotal.com>
 Maintainer: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>
