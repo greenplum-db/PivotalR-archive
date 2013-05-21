@@ -73,7 +73,7 @@ madlib.lm <- function (formula, data, na.action,
 
     ## drop temporary tables
     .db.removeTable(tbl.output, conn.id)
-    #if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
     
     msg.level <- .set.msg.level(msg.level) # reset message level
     options(warn = warn.r) # reset R warning level

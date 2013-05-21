@@ -46,6 +46,10 @@ setMethod (
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
+    exists <- db.existsObject(table.name, conn.id, is.temp)
+    if (is.temp) exists <- exists[[1]]
+    if (exists) stop("The table already exists in connection ", conn.id, "!")
+    
     if (!.is.arg.string(key)) stop("ID column name must be a string!")
     if (!identical(key, character(0)) &&
         key == "row.names" && !add.row.names)
@@ -104,6 +108,11 @@ setMethod (
     def = function (x, table.name, is.view = FALSE,
     is.temp = FALSE, verbose = TRUE, pivot = TRUE) {
         conn.id <- conn.id(x)
+
+        exists <- db.existsObject(table.name, conn.id, is.temp)
+        if (is.temp) exists <- exists[[1]]
+        if (exists) stop("The table already exists in connection ", conn.id, "!")
+        
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -116,7 +125,7 @@ setMethod (
         if (x@.parent == x@.source)
             tbl <- x@.parent
         else
-            tbl <- paste("(", x@.parent, ")", sep = "")
+            tbl <- paste("(", x@.parent, ") s", sep = "")
 
         ## deal with factor, if exists
         ## We still need to keep the original non-factor
@@ -167,7 +176,7 @@ setMethod (
                             " as (", content.str, ")", sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
-        res <- db.data.frame(table.name, conn.id, x@.key, verbose)
+        res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)
         res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear

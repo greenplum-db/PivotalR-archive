@@ -1,36 +1,23 @@
-\name{db.data.frame}
-\alias{db.data.frame}
+\name{db.objects}
+\alias{db.objects}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 function to do ... ~~
 }
 \description{
- A concise (1-5 lines) description of what the function does. ~~
+A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-db.data.frame(x, conn.id = 1, key = character(0), verbose = TRUE,
-is.temp = FALSE)
+db.objects(conn.id = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-Describe \code{x} here~~
-}
   \item{conn.id}{
 Describe \code{conn.id} here~~
 }
-  \item{key}{
-Describe \code{key} here~~
-}
-\item{verbose}{
-  verbose
-}
-\item{is.temp}{
-  is temp object?
-}
 }
 \details{
- If necessary, more details than the description above ~~
+If necessary, more details than the description above ~~
 }
 \value{
 Describe the value returned
@@ -55,16 +42,16 @@ further notes~~
 objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-## Not run:
+\dontrun{
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-"db.data.frame"
-## End (Not run)
+"db.objects"
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ kwd1 }
+\keyword{ kwd2 }% __ONLY ONE__ keyword per line

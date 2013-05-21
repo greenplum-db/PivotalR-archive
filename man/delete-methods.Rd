@@ -5,6 +5,7 @@
 \alias{delete.db.Rquery}
 \alias{delete,db.data.frame-method}
 \alias{delete,db.Rquery-method}
+\alias{delete,character-method}
 \title{ ~~ Methods for Function \code{delete} in Package \pkg{PivotalR} ~~}
 \description{
  ~~ Methods for function \code{delete} in package \pkg{PivotalR} ~~

@@ -3,7 +3,8 @@
 ## create a R object that points to something inside the database
 ## ------------------------------------------------------------------------
 
-db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE)
+db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
+                           is.temp = FALSE)
 {
     if (! .is.arg.string(x))
         stop("The name of the database object must be a string!")
@@ -12,8 +13,14 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE)
 
     ## a vector (schema_name, table_name) or just table_name
     table <- .db.analyze.table.name(x) 
-    if (!.is.table.or.view(table, conn.id))
-        stop("No such table or view!")
+    exists <- db.existsObject(x, conn.id, is.temp)
+    if (is.temp) {
+        table <- exists[[2]]
+        exists <- exists[[1]]
+    }
+
+    if (!exists)
+        stop("No such object in the connection ", conn.id)
 
     if (.is.view(table, conn.id))
     {

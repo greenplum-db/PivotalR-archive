@@ -155,6 +155,39 @@ db.list <- function ()
 }
 
 ## ------------------------------------------------------------------------
+
+## list tables and views in the connection
+db.objects <- function (conn.id = 1)
+{
+    .db.getQuery("select table_schema, table_name from information_schema.tables")
+}
+
+## ------------------------------------------------------------------------
+
+## does an object exist?
+db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
+{
+    name <- strsplit(name, "\\.")[[1]]
+    if (length(name) != 1 && length(name) != 2)
+        stop("The formation of object name is wrong!")
+    if (length(name) == 2) {
+        schema <- name[1]
+        table <- name[2]
+        ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
+                                 table, "' and table_schema = '", schema, "'", sep = ""), conn.id)
+        if (ct == 0)
+            FALSE
+        else
+            TRUE
+    } else {
+        if (is.temp)
+            .db.existsTempTable(name, conn.id)
+        else
+            .db.existsTable(name, conn.id)
+    }
+}
+
+## ------------------------------------------------------------------------
 ## All the following function are used inside the package only
 ## ------------------------------------------------------------------------
 
