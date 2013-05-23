@@ -180,17 +180,7 @@
     
     ## only for GPDB
     ## This why this function is so complicated
-    if (is.null(distributed.by)) {
-        dist.str <- ""
-    } else {
-        if (!.is.arg.string(distributed.by))
-            stop("distributed.by must be a string or NULL!")
-        if (distributed.by == "") # "" means distributed randomly
-            dist.str <- "DISTRIBUTED RANDOMLY"
-        else
-            dist.str <- paste("DISTRIBUTED BY (", distributed.by, ")",
-                              sep = "")
-    }
+    dist.str <- .get.distributed.by.str(conn.id, distributed.by)
     
     if (!append)
     {

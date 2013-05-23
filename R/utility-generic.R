@@ -95,6 +95,29 @@ arraydb.to.arrayr <- function (str, type = "double")
 
 ## ------------------------------------------------------------------------
 
+## get the distributed by string
+.get.distributed.by.str <- function(conn.id, distributed.by)
+{
+    dbms.str <- dbms(conn.id)
+    if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum") {
+        if (is.null(distributed.by))
+            dist.str <- "DISTRIBUTED RANDOMLY"
+        else {
+            if (!.is.arg.string(distributed.by))
+                stop("distributed.by must be a string or NULL!")
+            if (distributed.by == "") # "" means no distributed by 
+                dist.str <- ""
+            else
+                dist.str <- paste("DISTRIBUTED BY (", distributed.by, ")",
+                                  sep = "")
+        }
+    } else
+        dist.str <- ""
+    return (dist.str)
+}
+
+## ------------------------------------------------------------------------
+
 ## simply return the most direct answer
 .db.analyze.table.name <- function (name)
 {

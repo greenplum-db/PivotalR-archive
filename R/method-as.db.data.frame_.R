@@ -106,9 +106,11 @@ setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
     def = function (x, table.name, is.view = FALSE,
-    is.temp = FALSE, verbose = TRUE, pivot = TRUE) {
+    is.temp = FALSE, verbose = TRUE, pivot = TRUE, distributed.by = NULL) {
         conn.id <- conn.id(x)
 
+        dist.str <- .get.distributed.by.str(conn.id, distributed.by)
+        
         exists <- db.existsObject(table.name, conn.id, is.temp)
         if (is.temp) exists <- exists[[1]]
         if (exists) stop("The table already exists in connection ", conn.id, "!")
@@ -137,12 +139,20 @@ setMethod (
         suffix <- rep("", length(x@.is.factor))
         appear <- x@.col.name
 
-        if (pivot) {
+        if (pivot && !all(x@.is.factor == FALSE)) {
+            cats <- x@.col.name[x@.is.factor]
+            sql <- "select "
+            for (i in seq_len(length(cats))) {
+                sql <- paste(sql, "array_agg(distinct ", cats[i], ") as ",
+                             cats[i], sep = "")
+                if (i != length(cats)) sql <- paste(sql, ",", sep = "")
+            }
+            ## scan through the table only once
+            sql <- paste(sql, " from ", tbl, sep = "")
+            distincts <- .db.getQuery(sql)
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- .db.getQuery(paste("select distinct",
-                                                x@.col.name[i],
-                                                "from", tbl))[[1]]
+                    distinct <- as.vector(arraydb.to.arrayr(distincts[[x@.col.name[i]]], "character"))
                     suffix[i] <- .unique.string()
                     ## Produce a fixed order for distinct values
                     distinct <- distinct[order(distinct, decreasing = TRUE)]
@@ -173,7 +183,7 @@ setMethod (
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             table.name,
-                            " as (", content.str, ")", sep = "")
+                            " as (", content.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
         res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)
