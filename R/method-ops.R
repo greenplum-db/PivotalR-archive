@@ -30,10 +30,15 @@ setMethod ("==",
                        return (FALSE)
                } else {
                    if (e1@.content == e2@.content &&
+                       length(e1@.expr) == length(e2@.expr) &&
                        all(e1@.expr == e1@.expr) &&
+                       e1@.source == e1@.source &&
                        e1@.parent == e2@.parent &&
                        conn.eql(e1@.conn.id, e2@.conn.id) &&
-                       all(e1@.names == e2@.names))
+                       all(e1@.col.data_type == e2@.col.data_type) &&
+                       e1@.where == e2@.where &&
+                       all(e1@.is.factor == e2@.is.factor) &&
+                       all(e1@.col.name == e2@.col.name))
                        return (TRUE)
                    else
                        return (FALSE)
