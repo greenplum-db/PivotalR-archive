@@ -7,7 +7,11 @@ setMethod (
     "$",
     signature(x = "db.obj"),
     function (x, name) {
-        .create.db.Rquery(x, cols.i = as.character(name))            
+        if (is(x, "db.Rquery"))
+            x.where <- x@.where
+        else
+            x.where <- ""
+        .create.db.Rquery(x, cols.i = as.character(name), x.where)            
     },
     valueClass = "db.Rquery")
 
@@ -18,6 +22,10 @@ setMethod(
     signature(x = "db.obj"),
     function (x, i, j, ...) {
         na <- nargs()
+        if (is(x, "db.Rquery"))
+            x.where <- x@.where
+        else
+            x.where <- ""
         if (na == 1) {
             message("Error : argument is missing!")
             stop()
@@ -30,16 +38,17 @@ setMethod(
             }
 
             if (is.logical(i)) i <- as.integer(i)
-            .create.db.Rquery(x, cols.i = i)
+            .create.db.Rquery(x, cols.i = i, x.where)
         } else if (na == 3) {
             if (identical(x@.key, character(0))) {
                 message("Error : there is no unique ID associated",
                         " with each row of the table!")
                 stop()
             }
-
-            where.str <- paste("where", x@.key, "=", i)
-            .create.db.Rquery(x, cols.i = j, where = where.str)
+            if (x.where != "") x.where <- paste(x.where, "and")
+            where.str <- paste(x@.key, "=", i)
+            .create.db.Rquery(x, cols.i = j,
+                              where = paste(x.where, where.str))
         }
     },
     valueClass = "db.Rquery")
@@ -51,6 +60,10 @@ setMethod (
     signature (x = "db.obj"),
     function (x, i, j, ...) {
         n <- nargs()
+        if (is(x, "db.Rquery"))
+            x.where <- x@.where
+        else
+            x.where <- ""
         if (n == 1) {
             message("Error : argument is missing!")
             stop()
@@ -81,15 +94,16 @@ setMethod (
         }
         
         if (n == 2) { # select columns
-            .create.db.Rquery(x, cols.i = i)
+            .create.db.Rquery(x, cols.i = i, x.where)
         } else if (n == 3) { # several cases
             if (i.missing) {
-                .create.db.Rquery(x, cols.i = j)
+                .create.db.Rquery(x, cols.i = j, x.where)
             } else if (is(i, "db.Rquery")) {          
                 where.str <- i@.expr
                 if (length(where.str) != 1)
                     stop("More than 2 boolean expressions in selecting row!")
-                .create.db.Rquery(x, cols.i = j, where = where.str)
+                if (x.where != "") x.where <- paste(x.where, "and")
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str))
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
                     message("Error : there is no unique ID associated",
@@ -100,7 +114,8 @@ setMethod (
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
                 where.str <- paste(x@.key, " in (", paste(i, collapse = ","),
                                    ")", sep = "")
-                .create.db.Rquery(x, cols.i = j, where = where.str)
+                if (x.where != "") x.where <- paste(x.where, "and")
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str))
             }
         }
     },
@@ -156,18 +171,24 @@ setMethod (
             cols.i <- setdiff(idxs, -cols.i)
     }
 
-    i.str <- paste(names(x)[cols.i], collapse = ", ")
+    if (is(x, "db.data.frame"))
+        expr <- x@.col.name[cols.i]
+    else
+        expr <- x@.expr[cols.i]
+    i.str <- paste(expr, names(x)[cols.i], sep = " as ", collapse = ", ")
 
-    parent <- content(x)
     if (is(x, "db.data.frame"))
         src <- content(x)
     else
         src <- x@.source
 
-    if (is(x, "db.Rquery"))
-        tbl <- paste("(", content(x), ") s", sep = "")
-    else
+    if (is(x, "db.Rquery")) {
+        tbl <- x@.parent
+        parent <- x@.parent
+    } else {
         tbl <- content(x)
+        parent <- content(x)
+    }
 
     is.factor <- x@.is.factor[cols.i]
     
@@ -176,7 +197,7 @@ setMethod (
     
     new("db.Rquery",
         .content = paste("select", i.str, "from", tbl, where.str),
-        .expr = names(x)[cols.i],
+        .expr = expr,
         .source = src,
         .parent = parent,
         .conn.id = conn.id(x),

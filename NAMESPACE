@@ -35,9 +35,11 @@ exportMethods("as.factor")
 export("preview", "delete")
 
 exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
-              ">", "<", ">=", "<=")
+              ">", "<", ">=", "<=", "&", "|", "!")
 
 export("conn.eql")
+
+export("eql")
 
 export("madlib.summary", "print.summary.madlib", "show.summary.madlib")
 
