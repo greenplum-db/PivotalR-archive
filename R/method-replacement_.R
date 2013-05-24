@@ -3,7 +3,7 @@
 ## replacement methods
 ## ------------------------------------------------------------------------
 
-.replacement <- function (x, name, value)
+.replacement <- function (x, name, value, case = NULL)
 {
     if (!conn.eql(conn.id(x), conn.id(value)))
         stop("Both sides must be derived from objects in the same connection!")
@@ -15,7 +15,7 @@
                    "are derived from the same database object!"))
     
     ## value cannot have multiple columns
-    if (length(names(value)) != 1 || length(value@.expr) != 1)
+    if (length(name) != length(value@.expr))
         stop(paste("The value on the right cannot be",
                    "assign to a column on the left."))
     
@@ -33,22 +33,33 @@
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
     x.col.name <- x@.col.name
-    idx <- which(x@.col.name == name)
-    if (identical(idx, integer(0))) { # a new column
-        x.names <- c(x.names, value@.expr)
-        x.col.name <- c(x.col.name, name)
-        x.col.data_type <- c(x.col.data_type, value@.col.data_type)
-        x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name)
-        is.factor <- c(is.factor, value@.is.factor)
-    } else {
-        x.names[idx] <- value@.expr
-        x.col.data_type[idx] <- value@.col.data_type
-        x.col.udt_name[idx] <- value@.col.udt_name
-        is.factor[idx] <- value@.is.factor
+    for (i in seq_len(length(name)))
+    {
+        idx <- which(x@.col.name == name[i])
+        if (identical(idx, integer(0))) { # a new column
+            if (is.null(case))
+                x.names <- c(x.names, value@.expr[i])
+            else
+                stop("must create a column for all rows")
+            x.col.name <- c(x.col.name, name[i])
+            x.col.data_type <- c(x.col.data_type, value@.col.data_type[i])
+            x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name[i])
+            is.factor <- c(is.factor, value@.is.factor[i])
+        } else {
+            if (is.null(case))
+                x.names[idx] <- value@.expr[i]
+            else
+                x.names[idx] <- paste("case when", case, "then",
+                                      value@.expr[i], "else", x@.expr[i],
+                                      "end")
+            x.col.data_type[idx] <- value@.col.data_type[i]
+            x.col.udt_name[idx] <- value@.col.udt_name[i]
+            is.factor[idx] <- value@.is.factor[i]
+        }
     }
-    
+
     expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
-    
+        
     if (value@.parent != value@.source) 
         tbl <- paste("(", value@.parent, ") s", sep = "")
     else
@@ -80,25 +91,36 @@
 ## ------------------------------------------------------------------------
 
 # replace a single value
-.replace.single <- function (x, name, value, type, udt)
+.replace.single <- function (x, name, value, type, udt, case = NULL)
 {
     x.names <- x@.col.name
     is.factor <- x@.is.factor
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
     x.col.name <- x@.col.name
-    idx <- which(x@.col.name == name)
-    if (identical(idx, integer(0))) { # a new column
-        x.names <- c(x.names, value)
-        x.col.name <- c(x.col.name, name)
-        x.col.data_type <- c(x.col.data_type, type)
-        x.col.udt_name <- c(x.col.udt_name, udt)
-        is.factor <- c(is.factor, FALSE)
-    } else {
-        x.names[idx] <- value
-        x.col.data_type[idx] <- type
-        x.col.udt_name[idx] <- udt
-        is.factor[idx] <- FALSE
+    for (i in seq_len(length(name)))
+    {
+        idx <- which(x@.col.name == name[i])
+        if (identical(idx, integer(0))) { # a new column
+            if (is.null(case))
+                x.names <- c(x.names, as.character(value))
+            else
+                stop("must create a column for all rows")
+            x.col.name <- c(x.col.name, name[i])
+            x.col.data_type <- c(x.col.data_type, type)
+            x.col.udt_name <- c(x.col.udt_name, udt)
+            is.factor <- c(is.factor, FALSE)
+        } else {
+            if (is.null(case))
+                x.names[idx] <- as.character(value)
+            else
+                x.names[idx] <- paste("case when", case, "then",
+                                      value, "else", x@.expr[i],
+                                      "end")
+            x.col.data_type[idx] <- type
+            x.col.udt_name[idx] <- udt
+            is.factor[idx] <- FALSE
+        }
     }
     
     expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
@@ -150,6 +172,7 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, name, value) {
+        if (length(name) != 1) stop("Cannot replace multiple columns")
         .replacement(x, name, value)
     },
     valueClass = "db.Rquery")
@@ -158,7 +181,9 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "character"),
     function (x, name, value) {
-        .replace.single(x, name, value, "text", "text")
+        if (length(name) != 1) stop("Cannot replace multiple columns")
+        .replace.single(x, name, paste("'", value, "'", sep = ""),
+                        "text", "text")
     },
     valueClass = "db.Rquery")
 
@@ -166,6 +191,7 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "integer"),
     function (x, name, value) {
+        if (length(name) != 1) stop("Cannot replace multiple columns")
         .replace.single(x, name, value, "integer", "int4")
     },
     valueClass = "db.Rquery")
@@ -174,6 +200,7 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "numeric"),
     function (x, name, value) {
+        if (length(name) != 1) stop("Cannot replace multiple columns")
         .replace.single(x, name, value, "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -182,9 +209,25 @@ setMethod (
     "$<-",
     signature (x = "db.obj", value = "logical"),
     function (x, name, value) {
+        if (length(name) != 1) stop("Cannot replace multiple columns")
         .replace.single(x, name, value, "boolean", "bool")
     },
     valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+.preprocess.name <- function (i)
+{
+    if (is(i, "character"))
+        name <- i
+    else if (is(i, "numeric")) {
+        idx <- i
+        if (idx < 1 || idx > length(x@.col.name))
+            stop("Subscript out of range!")
+        name <- names(x)[idx]
+    }
+    name
+}
 
 ## ------------------------------------------------------------------------
 
@@ -193,15 +236,8 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
-        if (is(i, "character"))
-            name <- i
-        else if (is(i, "numeric")) {
-            idx <- i
-            if (idx < 1 || idx > length(x@.col.name))
-                stop("Subscript out of range!")
-            name <- names(x)[idx]
-        }
-        
+        if (length(i) != 1) stop("Cannot replace multiple columns")
+        name <- .preprocess.name(i)
         .replacement(x, name, value)
     },
     valueClass = "db.Rquery")
@@ -210,16 +246,10 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "character"),
     function (x, i, j, value) {
-        if (is(i, "character"))
-            name <- i
-        else if (is(i, "numeric")) {
-            idx <- i
-            if (idx < 1 || idx > length(x@.col.name))
-                stop("Subscript out of range!")
-            name <- names(x)[idx]
-        }
-        
-        .replace.single(x, name, value, "text", "text")
+        if (length(i) != 1) stop("Cannot replace multiple columns")
+        name <- .preprocess.name(i)
+        .replace.single(x, name, paste("'", value, "'", sep = ""),
+                        "text", "text")
     },
     valueClass = "db.Rquery")
 
@@ -227,15 +257,8 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "integer"),
     function (x, i, j, value) {
-        if (is(i, "character"))
-            name <- i
-        else if (is(i, "numeric")) {
-            idx <- i
-            if (idx < 1 || idx > length(x@.col.name))
-                stop("Subscript out of range!")
-            name <- names(x)[idx]
-        }
-        
+        if (length(i) != 1) stop("Cannot replace multiple columns")
+        name <- .preprocess.name(i)
         .replace.single(x, name, value, "integer", "int4")
     },
     valueClass = "db.Rquery")
@@ -244,15 +267,8 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "numeric"),
     function (x, i, j, value) {
-        if (is(i, "character"))
-            name <- i
-        else if (is(i, "numeric")) {
-            idx <- i
-            if (idx < 1 || idx > length(x@.col.name))
-                stop("Subscript out of range!")
-            name <- names(x)[idx]
-        }
-        
+        if (length(i) != 1) stop("Cannot replace multiple columns")
+        name <- .preprocess.name(i)
         .replace.single(x, name, value, "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -261,15 +277,8 @@ setMethod (
     "[[<-",
     signature (x = "db.obj", value = "logical"),
     function (x, i, j, value) {
-        if (is(i, "character"))
-            name <- i
-        else if (is(i, "numeric")) {
-            idx <- i
-            if (idx < 1 || idx > length(x@.col.name))
-                stop("Subscript out of range!")
-            name <- names(x)[idx]
-        }
-        
+        if (length(i) != 1) stop("Cannot replace multiple columns")
+        name <- .preprocess.name(i)
         .replace.single(x, name, value, "boolean", "bool")
     },
     valueClass = "db.Rquery")
@@ -277,10 +286,128 @@ setMethod (
 ## ------------------------------------------------------------------------
 ## ------------------------------------------------------------------------
 
+## the condition expression in case
+.case.condition <- function (i)
+{
+    if (is(i, "db.Rquery")) {          
+        str <- i@.expr
+        if (length(str) != 1)
+            stop("More than 2 boolean expressions in selecting row!")
+    } else if (!is(i, "db.Rquery")) {
+        if (identical(x@.key, character(0))) {
+            message("Error : there is no unique ID associated",
+                    " with each row of the table!")
+            stop()
+        }
+        
+        ## where.str <- paste(x@.key, "=", i, collapse = " or ")
+        str <- paste(x@.key, " in (", paste(i, collapse = ","),
+                     ")", sep = "")
+    }
+    str
+}
+
+## ------------------------------------------------------------------------
+
 setMethod (
     "[<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
-        stop("To be implemented")
+        n <- nargs()
+        if (n == 4) {
+            if (missing(i) && missing(j))
+                .replacement(x, names(x), value)
+            else if (missing(i))
+                .replacement(x, names(x[,j]), value)
+            else if (missing(j))
+                .replacement(x, names(x), value, .case.condition(i))
+            else
+                .replacement(x, names(x[i,j]), value, .case.condition(i))
+        } else if (n == 3) {
+            .replacement(x, names(x[i]), value)
+        }
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setMethod (
+    "[<-",
+    signature (x = "db.obj", value = "character"),
+    function (x, i, j, value) {
+        value <- paste("'", value, "'", sep = "")
+        n <- nargs()
+        if (n == 4) {
+            if (missing(i) && missing(j))
+                .replace.single(x, names(x), value)
+            else if (missing(i))
+                .replace.single(x, names(x[,j]), value)
+            else if (missing(j))
+                .replace.single(x, names(x), value, .case.condition(i))
+            else
+                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+        } else if (n == 3) {
+            .replace.single(x, names(x[i]), value)
+        }
+    },
+    valueClass = "db.Rquery")
+
+setMethod (
+    "[<-",
+    signature (x = "db.obj", value = "integer"),
+    function (x, i, j, value) {
+        n <- nargs()
+        if (n == 4) {
+            if (missing(i) && missing(j))
+                .replace.single(x, names(x), value)
+            else if (missing(i))
+                .replace.single(x, names(x[,j]), value)
+            else if (missing(j))
+                .replace.single(x, names(x), value, .case.condition(i))
+            else
+                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+        } else if (n == 3) {
+            .replace.single(x, names(x[i]), value)
+        }
+    },
+    valueClass = "db.Rquery")
+
+setMethod (
+    "[<-",
+    signature (x = "db.obj", value = "numeric"),
+    function (x, i, j, value) {
+        n <- nargs()
+        if (n == 4) {
+            if (missing(i) && missing(j))
+                .replace.single(x, names(x), value)
+            else if (missing(i))
+                .replace.single(x, names(x[,j]), value)
+            else if (missing(j))
+                .replace.single(x, names(x), value, .case.condition(i))
+            else
+                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+        } else if (n == 3) {
+            .replace.single(x, names(x[i]), value)
+        }
+    },
+    valueClass = "db.Rquery")
+
+setMethod (
+    "[<-",
+    signature (x = "db.obj", value = "logical"),
+    function (x, i, j, value) {
+        n <- nargs()
+        if (n == 4) {
+            if (missing(i) && missing(j))
+                .replace.single(x, names(x), value)
+            else if (missing(i))
+                .replace.single(x, names(x[,j]), value)
+            else if (missing(j))
+                .replace.single(x, names(x), value, .case.condition(i))
+            else
+                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+        } else if (n == 3) {
+            .replace.single(x, names(x[i]), value)
+        }
     },
     valueClass = "db.Rquery")
