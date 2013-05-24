@@ -94,6 +94,11 @@ setMethod (
         }
         
         if (n == 2) { # select columns
+            if (is(i, "db.Rquery")) {
+                i <- as.vector(unlist(.db.getQuery(content(i))))
+                if (length(i) > length(names(x)))
+                    stop("Are you sure the column number is correct?")
+            }
             .create.db.Rquery(x, cols.i = i, x.where)
         } else if (n == 3) { # several cases
             if (i.missing) {
