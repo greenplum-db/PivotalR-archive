@@ -365,7 +365,7 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, "and", c("logical"), res.type = "boolean")
+        .compare(e1, e2, "and", c("boolean"), res.type = "boolean")
     },
     valueClass = "db.Rquery")
 
@@ -375,7 +375,7 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, "or", c("logical"), res.type = "boolean")
+        .compare(e1, e2, "or", c("boolean"), res.type = "boolean")
     },
     valueClass = "db.Rquery")
 
@@ -558,7 +558,7 @@ setMethod (
         i1 <- (i-1) %% l1 + 1
         i2 <- (i-1) %% l2 + 1
         v <- 0
-        for (k in length(data.types))
+        for (k in seq_len(length(data.types)))
             if (e1@.col.data_type[i1] %in% data.types[[k]]) {
                 v <- k
                 break
@@ -749,7 +749,7 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
-        .operate.two(e1, e2, "and", list(c("logical")),
+        .operate.two(e1, e2, "and", list(c("boolean")),
                      res.type = "boolean")
     },
     valueClass = "db.Rquery")
@@ -760,7 +760,7 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
-        .operate.two(e1, e2, "or", list(c("logical")),
+        .operate.two(e1, e2, "or", list(c("boolean")),
                      res.type = "boolean")
     },
     valueClass = "db.Rquery")
@@ -771,7 +771,7 @@ setMethod (
     "!",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", "", c("logical"), prefix = "not",
+        .compare(x, "", "", c("boolean"), prefix = "not",
                  res.type = "boolean")
     },
     valueClass = "db.Rquery")
