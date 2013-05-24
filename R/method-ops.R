@@ -64,7 +64,7 @@ setMethod (
     col.udt_name <- rep("", length(names(e1)))
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
-        if (e1@.col.data_type[i] %in% data.types) {
+        if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cmp, e2)
             col.data_type[i] <- res.type
             col.udt_name[i] <- res.type
@@ -773,5 +773,17 @@ setMethod (
     function (x) {
         .compare(x, "", "", c("boolean"), prefix = "not",
                  res.type = "boolean")
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("is.na")
+
+setMethod (
+    "is.na",
+    signature(x = "db.obj"),
+    function (x) {
+        .compare(x, "", "is NULL", NA, "", "boolean")
     },
     valueClass = "db.Rquery")
