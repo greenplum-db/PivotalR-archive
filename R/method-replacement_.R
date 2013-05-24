@@ -216,7 +216,7 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-.preprocess.name <- function (i)
+.preprocess.name <- function (x, i)
 {
     if (is(i, "character"))
         name <- i
@@ -237,7 +237,7 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
-        name <- .preprocess.name(i)
+        name <- .preprocess.name(x, i)
         .replacement(x, name, value)
     },
     valueClass = "db.Rquery")
@@ -247,7 +247,7 @@ setMethod (
     signature (x = "db.obj", value = "character"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
-        name <- .preprocess.name(i)
+        name <- .preprocess.name(x, i)
         .replace.single(x, name, paste("'", value, "'", sep = ""),
                         "text", "text")
     },
@@ -258,7 +258,7 @@ setMethod (
     signature (x = "db.obj", value = "integer"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
-        name <- .preprocess.name(i)
+        name <- .preprocess.name(x, i)
         .replace.single(x, name, value, "integer", "int4")
     },
     valueClass = "db.Rquery")
@@ -268,7 +268,7 @@ setMethod (
     signature (x = "db.obj", value = "numeric"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
-        name <- .preprocess.name(i)
+        name <- .preprocess.name(x, i)
         .replace.single(x, name, value, "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -278,7 +278,7 @@ setMethod (
     signature (x = "db.obj", value = "logical"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
-        name <- .preprocess.name(i)
+        name <- .preprocess.name(x, i)
         .replace.single(x, name, value, "boolean", "bool")
     },
     valueClass = "db.Rquery")
@@ -287,7 +287,7 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 ## the condition expression in case
-.case.condition <- function (i)
+.case.condition <- function (x, i)
 {
     if (is(i, "db.Rquery")) {          
         str <- i@.expr
@@ -320,9 +320,9 @@ setMethod (
             else if (missing(i))
                 .replacement(x, names(x[,j]), value)
             else if (missing(j))
-                .replacement(x, names(x), value, .case.condition(i))
+                .replacement(x, names(x), value, .case.condition(x, i))
             else
-                .replacement(x, names(x[i,j]), value, .case.condition(i))
+                .replacement(x, names(x[i,j]), value, .case.condition(x, i))
         } else if (n == 3) {
             .replacement(x, names(x[i]), value)
         }
@@ -343,9 +343,9 @@ setMethod (
             else if (missing(i))
                 .replace.single(x, names(x[,j]), value)
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(i))
+                .replace.single(x, names(x), value, .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
         } else if (n == 3) {
             .replace.single(x, names(x[i]), value)
         }
@@ -363,9 +363,9 @@ setMethod (
             else if (missing(i))
                 .replace.single(x, names(x[,j]), value)
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(i))
+                .replace.single(x, names(x), value, .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
         } else if (n == 3) {
             .replace.single(x, names(x[i]), value)
         }
@@ -383,9 +383,9 @@ setMethod (
             else if (missing(i))
                 .replace.single(x, names(x[,j]), value)
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(i))
+                .replace.single(x, names(x), value, .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
         } else if (n == 3) {
             .replace.single(x, names(x[i]), value)
         }
@@ -403,9 +403,9 @@ setMethod (
             else if (missing(i))
                 .replace.single(x, names(x[,j]), value)
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(i))
+                .replace.single(x, names(x), value, .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(i))
+                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
         } else if (n == 3) {
             .replace.single(x, names(x[i]), value)
         }
