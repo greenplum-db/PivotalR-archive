@@ -23,7 +23,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.view"),
-    def = function (x, nrows = 100, interactive = TRUE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         if (interactive) {
             cat(deparse(substitute(x)),
                 "points to a view in the database",
@@ -43,7 +43,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rquery"),
-    def = function (x, nrows = 100, interactive = TRUE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         msg.level <- .set.msg.level("panic") # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
