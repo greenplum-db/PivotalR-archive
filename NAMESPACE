@@ -32,7 +32,7 @@ exportMethods("$<-", "[[<-", "[<-")
 
 exportMethods("as.factor")
 
-export("preview", "delete")
+export("preview", "delete", "merge", "key", "key<-")
 
 exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
               ">", "<", ">=", "<=", "&", "|", "!")
