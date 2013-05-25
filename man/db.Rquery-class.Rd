@@ -23,7 +23,8 @@ Objects can be created by calls of the form \code{new("db.Rquery", ...)}.
     \item{\code{.col.data_type}:}{Object of class \code{"character"} ~~ }
     \item{\code{.col.udt_name}:}{Object of class \code{"character"} ~~ }
     \item{\code{.where}:}{Object of class \code{"boolean"} ~~ }
-    \item{\code{.is.factor}:}{Object of class \code{"boolean"} ~~ }
+    \item{\code{.is.factor}:}{Object of class \code{"character"} ~~ }
+    \item{\code{.sort}:}{Object of class \code{"list"} ~~ }
   }
 }
 \section{Extends}{
