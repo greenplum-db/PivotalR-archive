@@ -87,10 +87,13 @@ setMethod (
 
     if (e1@.where != "") where.str <- paste("where", e1@.where)
     else where.str <- ""
+
+    sort <- .generate.sort(e1)
     
     expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
     new("db.Rquery",
-        .content = paste("select", expr.str, "from", tbl, where.str),
+        .content = paste("select", expr.str, "from", tbl,
+        where.str, sort$sort.str),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -100,7 +103,8 @@ setMethod (
         .col.data_type = col.data_type,
         .col.udt_name = col.udt_name,
         .where = e1@.where,
-        .is.factor = rep(FALSE, length(col.name)))
+        .is.factor = rep(FALSE, length(col.name)),
+        .sort = sort$sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -584,10 +588,13 @@ setMethod (
 
     if (e1@.where != "") where.str <- paste("where", e1@.where)
     else where.str <- ""
+
+    sort <- .generate.sort(e1)
     
     expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
     new("db.Rquery",
-        .content = paste("select", expr.str, "from", tbl, where.str),
+        .content = paste("select", expr.str, "from", tbl,
+        where.str, sort$sort.str),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -597,7 +604,8 @@ setMethod (
         .col.data_type = col.data_type,
         .col.udt_name = col.udt_name,
         .where = e1@.where,
-        .is.factor = e1@.is.factor & e2@.is.factor)
+        .is.factor = e1@.is.factor & e2@.is.factor,
+        .sort = sort$sort)
 }
 
 ## ------------------------------------------------------------------------

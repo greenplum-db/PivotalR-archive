@@ -182,11 +182,8 @@ setMethod (
         expr <- x@.expr[cols.i]
     i.str <- paste(expr, names(x)[cols.i], sep = " as ", collapse = ", ")
 
-    if (is(x, "db.data.frame"))
-        src <- content(x)
-    else
-        src <- x@.source
-
+    sort <- .generate.sort(x)
+    
     if (is(x, "db.Rquery")) {
         tbl <- x@.parent
         parent <- x@.parent
@@ -201,7 +198,8 @@ setMethod (
     else where.str <- ""
     
     new("db.Rquery",
-        .content = paste("select", i.str, "from", tbl, where.str),
+        .content = paste("select", i.str, "from", tbl, where.str,
+        sort$sort.str),
         .expr = expr,
         .source = src,
         .parent = parent,
@@ -211,7 +209,8 @@ setMethod (
         .col.data_type = x@.col.data_type[cols.i],
         .col.udt_name = x@.col.udt_name[cols.i],
         .where = where,
-        .is.factor = is.factor)
+        .is.factor = is.factor,
+        .sort = sort$sort)
 }
 
 ## ------------------------------------------------------------------------

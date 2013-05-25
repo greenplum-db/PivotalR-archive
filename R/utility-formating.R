@@ -20,3 +20,21 @@
 {
     for (i in seq_len(n)) cat(" ")
 }
+
+## ------------------------------------------------------------------------
+
+## generate sort and sort.str
+.generate.sort <- function (x)
+{
+    if (is(x, "db.data.frame")) {
+        sort <- list(by = "", order = "")
+    } else {
+        sort <- x@.sort
+    }
+    if (sort$by != "")
+        sort.str <- paste("order by", paste(sort$by, collapse = ", "),
+                          sort$order)
+    else
+        sort.str <- ""
+    list(sort = sort, sort.str = sort.str)
+}

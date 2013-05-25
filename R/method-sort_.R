@@ -8,9 +8,10 @@ setGeneric ("sort")
 setMethod (
     "sort",
     signature(x = "db.obj"),
-    function (x, by, decreasing = FALSE, ...)
+    function (x, by = character(0), decreasing = FALSE, ...)
     {
-        if (!is.character(by) || !all(by %in% names(x)))
+        if (!is.character(by) || length(by) == 0
+            !all(by %in% names(x)))
             stop("must sort by the column names!")
         if (decreasing)
             order <- "desc"
