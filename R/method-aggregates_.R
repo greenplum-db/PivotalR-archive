@@ -91,7 +91,7 @@ setGeneric ("length")
 setMethod (
     "length",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x) {
         .aggregate(x, "count", TRUE, "integer", "int4")
     },
     valueClass = "db.Rquery")
@@ -122,24 +122,12 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("min")
-
-setMethod (
-    "min",
-    signature(x = "db.obj"),
-    function (x, ...) {
-        .aggregate(x, "min", TRUE, x@.col.data_type, x@.col.udt_name)
-    },
-    valueClass = "db.Rquery")
-
-## ------------------------------------------------------------------------
-
 setGeneric ("sd")
 
 setMethod (
     "sd",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x) {
         .aggregate(x, "stddev", TRUE, "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -151,7 +139,7 @@ setGeneric ("var")
 setMethod (
     "var",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x) {
         .aggregate(x, "variance", TRUE, "double precision", "float8")
     },
     valueClass = "db.Rquery")

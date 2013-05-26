@@ -46,3 +46,6 @@ export("eql")
 export("madlib.summary", "print.summary.madlib", "show.summary.madlib")
 
 export("db.objects", "db.existsObject")
+
+exportMethods("mean", "sum", "length", "max", "min", "sd", "var")
+exportMethods("colMeans", "colSums", "c")

@@ -187,9 +187,11 @@ setMethod (
     if (is(x, "db.Rquery")) {
         tbl <- x@.parent
         parent <- x@.parent
+        src <- x@.source
     } else {
         tbl <- content(x)
         parent <- content(x)
+        src <- content(x)
     }
 
     is.factor <- x@.is.factor[cols.i]

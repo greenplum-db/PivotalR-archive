@@ -10,7 +10,7 @@
   The function reads the actual data from the table in the database.
 }
 \usage{
-\S4method{preview}{db.view}(x, nrows = 100, interactive = TRUE)
+\S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
 }
 
 \arguments{
