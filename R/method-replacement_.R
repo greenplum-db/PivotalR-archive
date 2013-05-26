@@ -3,7 +3,7 @@
 ## replacement methods
 ## ------------------------------------------------------------------------
 
-.replacement <- function (x, name, value, case = NULL)
+.replacement <- function (x, name, value, case = NULL, left.where = NULL)
 {
     if (!conn.eql(conn.id(x), conn.id(value)))
         stop("Both sides must be derived from objects in the same connection!")
@@ -18,17 +18,20 @@
     if (length(name) != length(value@.expr))
         stop(paste("The value on the right cannot be",
                    "assign to a column on the left."))
-    
-    ## The primary key should be the same
-    if (!identical(x@.key, value@.key))
-        stop(paste("The primary key of the two sides are different!",
-                   "Something must have been wrong!"))
 
-    if ((is(x, "db.data.frame") && value@.where != "") ||
-        (is(x, "db.Rquery") && x@.where != value@.where))
-        stop("The where parts do not match!")
+    if ((is.null(left.where) &&
+        ((is(x, "db.data.frame") && value@.where != "") ||
+        (is(x, "db.Rquery") && .strip(x@.where) != .strip(value@.where))))
+        || (!is.null(left.where) && .strip(left.where) != .strip(value@.where)))
+        stop("The where parts that do not match!")
     
-    x.names <- x@.col.name
+    if (is(x, "db.data.frame")) {
+        x.expr <- names(x)
+        x.names <- x@.col.name
+    } else {
+        x.expr <- x@.expr
+        x.names <- x@.expr
+    }
     is.factor <- x@.is.factor
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
@@ -50,7 +53,7 @@
                 x.names[idx] <- value@.expr[i]
             else
                 x.names[idx] <- paste("case when", case, "then",
-                                      value@.expr[i], "else", x@.expr[i],
+                                      value@.expr[i], "else", x.expr[i],
                                       "end")
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
@@ -93,7 +96,11 @@
 # replace a single value
 .replace.single <- function (x, name, value, type, udt, case = NULL)
 {
-    x.names <- x@.col.name
+    if (is(x, "db.data.frame")) {
+        x.names <- x@.col.name
+    } else {
+        x.names <- x@.expr
+    }
     is.factor <- x@.is.factor
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
@@ -319,10 +326,17 @@ setMethod (
                 .replacement(x, names(x), value)
             else if (missing(i))
                 .replacement(x, names(x[,j]), value)
-            else if (missing(j))
-                .replacement(x, names(x), value, .case.condition(x, i))
-            else
-                .replacement(x, names(x[i,j]), value, .case.condition(x, i))
+            else {
+                str <- .case.condition(x, i)
+                if (is(x, "db.data.frame") || x@.where == "")
+                    where.str <- str
+                else
+                    where.str <- paste(x@.where, "and", str)
+                if (missing(j))
+                    .replacement(x, names(x), value, str, where.str)
+                else
+                    .replacement(x, names(x[i,j]), value, str, where.str)
+            }
         } else if (n == 3) {
             .replacement(x, names(x[i]), value)
         }
@@ -342,10 +356,13 @@ setMethod (
                 .replace.single(x, names(x), value)
             else if (missing(i))
                 .replace.single(x, names(x[,j]), value)
-            else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
-            else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+            else {
+                str <- .case.condition(x, i)
+                if (missing(j))                 
+                    .replace.single(x, names(x), value, str)
+                else 
+                    .replace.single(x, names(x[i,j]), value, str)
+            }
         } else if (n == 3) {
             .replace.single(x, names(x[i]), value)
         }

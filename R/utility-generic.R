@@ -181,7 +181,7 @@ arraydb.to.arrayr <- function (str, type = "double")
 ## strip the leading and trailing white spaces
 .strip <- function (str)
 {
-    gsub("\\s*(\\S*)\\s*", "\\1", str)
+    gsub("^\\s*(.*\\S)\\s*$", "\\1", str)
 }
 
 ## ------------------------------------------------------------------------
