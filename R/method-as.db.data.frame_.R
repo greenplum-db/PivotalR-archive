@@ -106,7 +106,8 @@ setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
     def = function (x, table.name, is.view = FALSE,
-    is.temp = FALSE, verbose = TRUE, pivot = TRUE, distributed.by = NULL) {
+    is.temp = FALSE, verbose = FALSE, pivot = TRUE,
+    distributed.by = NULL) {
         conn.id <- conn.id(x)
 
         dist.str <- .get.distributed.by.str(conn.id, distributed.by)

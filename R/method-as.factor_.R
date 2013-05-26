@@ -23,7 +23,8 @@ setMethod (
                 .col.udt_name = x@.col.udt_name,
                 .key = x@.key,
                 .where = x@.where,
-                .is.factor = TRUE)
+                .is.factor = TRUE,
+                .sort = x@.sort)
         } else {
             new("db.Rquery",
                 .content = x@.content,
@@ -36,7 +37,8 @@ setMethod (
                 .col.udt_name = x@.col.udt_name,
                 .key = x@.key,
                 .where = x@.where,
-                .is.factor = TRUE)
+                .is.factor = TRUE,
+                .sort = x@.sort)
         }
     },
     valueClass = "db.Rquery")

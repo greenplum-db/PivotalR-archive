@@ -23,7 +23,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.view"),
-    def = function (x, nrows = 100, interactive = TRUE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         if (interactive) {
             cat(deparse(substitute(x)),
                 "points to a view in the database",
@@ -43,7 +43,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rquery"),
-    def = function (x, nrows = 100, interactive = TRUE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         msg.level <- .set.msg.level("panic") # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -60,8 +60,15 @@ setMethod (
 
         tbl <- .unique.string()
         tmp <- as.db.data.frame(x, tbl, is.temp = TRUE, verbose = interactive)
-        res <- .db.getQuery(paste("select * from ", content(tmp),
-                                  " limit", nrows),
+        if (x@.sort$by != "")
+            sort.str <- paste("order by",
+                              paste(x@.sort$by, collapse = ", "),
+                              x@.sort$order)
+        else
+            sort.str <- ""
+        
+        res <- .db.getQuery(paste("select * from", content(tmp), sort.str,
+                                  "limit", nrows),
                             conn.id(tmp))
         delete(tmp)
 
