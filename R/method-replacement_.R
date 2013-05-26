@@ -99,11 +99,8 @@
 # replace a single value
 .replace.single <- function (x, name, value, type, udt, case = NULL)
 {
-    if (is(x, "db.data.frame")) {
-        x.names <- x@.col.name
-    } else {
-        x.names <- x@.expr
-    }
+    if (is(x, "db.data.frame")) x <- x[,]
+    x.names <- x@.expr
     is.factor <- x@.is.factor
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
@@ -172,7 +169,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort.str)
+        .sort = sort$sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -359,18 +356,19 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "text", "text")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "text", "text")
             else {
                 str <- .case.condition(x, i)
                 if (missing(j))                 
-                    .replace.single(x, names(x), value, str)
+                    .replace.single(x, names(x), value, "text", "text", str)
                 else 
-                    .replace.single(x, names(x[i,j]), value, str)
+                    .replace.single(x, names(x[i,j]), value,
+                                    "text", "text", str)
             }
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            .replace.single(x, names(x[i]), value, "text", "text")
         }
     },
     valueClass = "db.Rquery")
@@ -382,15 +380,17 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "integer", "int4")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "integer", "int4")
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
+                .replace.single(x, names(x), value, "integer", "int4",
+                                .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+                .replace.single(x, names(x[i,j]), value, "integer",
+                                "int4", .case.condition(x, i))
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            .replace.single(x, names(x[i]), value, "integer", "int4")
         }
     },
     valueClass = "db.Rquery")
@@ -402,15 +402,20 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "double precision",
+                                "float8")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "double precision",
+                                "float8")
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
+                .replace.single(x, names(x), value, "double precision",
+                                "float8", .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+                .replace.single(x, names(x[i,j]), value, "double precision",
+                                "float8", .case.condition(x, i))
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            .replace.single(x, names(x[i]), value, "double precision",
+                            "float8")
         }
     },
     valueClass = "db.Rquery")
@@ -422,15 +427,17 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "boolean", "bool")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "boolean", "bool")
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
+                .replace.single(x, names(x), value, "boolean", "bool",
+                                .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+                .replace.single(x, names(x[i,j]), value, "boolean", "bool",
+                                .case.condition(x, i))
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            .replace.single(x, names(x[i]), value, "boolean", "bool")
         }
     },
     valueClass = "db.Rquery")

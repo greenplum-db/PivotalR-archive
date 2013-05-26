@@ -59,6 +59,7 @@ setMethod (
 .compare <- function (e1, e2, cmp, data.types,
                       prefix = "", res.type = "boolean")
 {
+    if (is(e1, "db.data.frame")) e1 <- e1[,]    
     expr <- rep("", length(names(e1)))
     col.data_type <- rep("", length(names(e1)))
     col.udt_name <- rep("", length(names(e1)))
