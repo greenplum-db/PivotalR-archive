@@ -34,7 +34,7 @@ exportMethods("as.factor")
 
 export("preview", "delete", "key", "key<-")
 
-exportMethods("sort", "merge")
+exportMethods("sort", "merge", "by")
 
 exportMethods("==", "!=", "+", "-", "*", "/", "^", "%%", "%/%",
               ">", "<", ">=", "<=", "&", "|", "!")

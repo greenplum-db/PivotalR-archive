@@ -52,11 +52,11 @@
         .parent = parent,
         .conn.id = conn.id(x),
         .col.name = col.name,
-        .key = "",
+        .key = character(0),
         .col.data_type = data.type,
         .col.udt_name = udt.name,
         .where = where,
-        .is.factor = FALSE,
+        .is.factor = rep(FALSE, length(names(x))),
         .sort = list(by = "", order = ""))
 }
 
