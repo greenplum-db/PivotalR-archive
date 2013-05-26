@@ -45,6 +45,10 @@ setMethod (
     "print",
     signature (x = "db.Rquery"),
     function (x) {
+        if (identical(content(x), character(0))) {
+            cat("NULL\n")
+            return (NULL)
+        }
         cat("A temporary object in R derived from ", x@.source, "\n", sep = "")
         cat("Database   :    ", dbname(x@.conn.id), "\n", sep = "")
         cat("Host       :    ", host(x@.conn.id), "\n", sep = "")

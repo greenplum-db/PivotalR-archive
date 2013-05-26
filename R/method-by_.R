@@ -8,7 +8,7 @@ setGeneric ("by")
 setMethod (
     "by",
     signature(data = "db.obj"),
-    function (data, INDICES, FUN, ...) {
+    function (data, INDICES = NULL, FUN, ...) {
         if (is(data, "db.data.frame")) {
             parent <- content(data)
             src <- parent
