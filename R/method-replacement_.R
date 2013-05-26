@@ -53,7 +53,7 @@
                 x.names[idx] <- value@.expr[i]
             else
                 x.names[idx] <- paste("case when", case, "then",
-                                      value@.expr[i], "else", x.expr[i],
+                                      value@.expr[i], "else", x.expr[idx],
                                       "end")
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
@@ -99,15 +99,13 @@
 # replace a single value
 .replace.single <- function (x, name, value, type, udt, case = NULL)
 {
-    if (is(x, "db.data.frame")) {
-        x.names <- x@.col.name
-    } else {
-        x.names <- x@.expr
-    }
+    if (is(x, "db.data.frame")) x <- x[,]
+    x.names <- x@.expr
     is.factor <- x@.is.factor
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
     x.col.name <- x@.col.name
+    if (length(case) == 1) case <- rep(case, length(name))
     for (i in seq_len(length(name)))
     {
         idx <- which(x@.col.name == name[i])
@@ -124,9 +122,10 @@
             if (is.null(case))
                 x.names[idx] <- as.character(value)
             else
-                x.names[idx] <- paste("case when", case, "then",
-                                      value, "else", x@.expr[i],
-                                      "end")
+                if (case[i] != "NULL")
+                    x.names[idx] <- paste("case when", case[i], "then",
+                                          value, "else", x@.expr[idx],
+                                          "end")
             x.col.data_type[idx] <- type
             x.col.udt_name[idx] <- udt
             is.factor[idx] <- FALSE
@@ -172,7 +171,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort.str)
+        .sort = sort$sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -359,18 +358,26 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "text", "text")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "text", "text")
             else {
                 str <- .case.condition(x, i)
-                if (missing(j))                 
-                    .replace.single(x, names(x), value, str)
+                if (missing(j))
+                    if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                        .replace.single(x, names(x), value, "integer", "int4",
+                                        i@.expr)
+                    else
+                        .replace.single(x, names(x), value, "text", "text", str)
                 else 
-                    .replace.single(x, names(x[i,j]), value, str)
+                    .replace.single(x, names(x[i,j]), value,
+                                    "text", "text", str)
             }
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "text", "text",
+                                i@.expr)
+            .replace.single(x, names(x[i]), value, "text", "text")
         }
     },
     valueClass = "db.Rquery")
@@ -382,15 +389,25 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "integer", "int4")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "integer", "int4")
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
+                if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                    .replace.single(x, names(x), value, "integer", "int4",
+                                    i@.expr)
+                else
+                    .replace.single(x, names(x), value, "integer", "int4",
+                                    .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+                .replace.single(x, names(x[i,j]), value, "integer",
+                                "int4", .case.condition(x, i))
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "integer", "int4",
+                                i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "integer", "int4")
         }
     },
     valueClass = "db.Rquery")
@@ -401,16 +418,30 @@ setMethod (
     function (x, i, j, value) {
         n <- nargs()
         if (n == 4) {
-            if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
-            else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
-            else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
-            else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+            if (missing(i) && missing(j)) {
+                .replace.single(x, names(x), value, "double precision",
+                                "float8")
+            } else if (missing(i)) {
+                .replace.single(x, names(x[,j]), value, "double precision",
+                                "float8")
+            } else if (missing(j)) {
+                if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean")) {
+                    .replace.single(x, names(x), value, "double precision",
+                                    "float8", i@.expr)
+                } else
+                    .replace.single(x, names(x), value, "double precision",
+                                    "float8", .case.condition(x, i))
+            } else {
+                .replace.single(x, names(x[i,j]), value, "double precision",
+                                "float8", .case.condition(x, i))
+            }
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "double precision",
+                                "float8", i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "double precision",
+                                "float8")
         }
     },
     valueClass = "db.Rquery")
@@ -422,15 +453,25 @@ setMethod (
         n <- nargs()
         if (n == 4) {
             if (missing(i) && missing(j))
-                .replace.single(x, names(x), value)
+                .replace.single(x, names(x), value, "boolean", "bool")
             else if (missing(i))
-                .replace.single(x, names(x[,j]), value)
+                .replace.single(x, names(x[,j]), value, "boolean", "bool")
             else if (missing(j))
-                .replace.single(x, names(x), value, .case.condition(x, i))
+                if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                    .replace.single(x, names(x), value, "boolean", "bool",
+                                    i@.expr)
+                else
+                    .replace.single(x, names(x), value, "boolean", "bool",
+                                    .case.condition(x, i))
             else
-                .replace.single(x, names(x[i,j]), value, .case.condition(x, i))
+                .replace.single(x, names(x[i,j]), value, "boolean", "bool",
+                                .case.condition(x, i))
         } else if (n == 3) {
-            .replace.single(x, names(x[i]), value)
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "boolean", "bool",
+                                i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "boolean", "bool")
         }
     },
     valueClass = "db.Rquery")

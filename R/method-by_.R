@@ -7,8 +7,8 @@ setGeneric ("by")
 
 setMethod (
     "by",
-    signature(data = "db.obj", INDICES = "db.Rquery"),
-    function (data, INDICES, FUN, ...) {
+    signature(data = "db.obj"),
+    function (data, INDICES = NULL, FUN, ...) {
         if (is(data, "db.data.frame")) {
             parent <- content(data)
             src <- parent
@@ -18,22 +18,37 @@ setMethod (
             parent <- data@.parent
             src <- data@.source
             where <- data@.where
-            if (where != "") where.str <- paste("where", where)
+            if (where != "")
+                where.str <- paste("where", where)
+            else
+                where.str <- ""
         }
-        by.name <- character(0)
-        for (i in seq_len(length(INDICES))) {
-            if (!is(INDICES[[i]], "db.Rquery") ||
-                INDICES[[i]]@.parent != parent)
-                stop("Only objects derived from the same table can match each other!")
-            by.name <- c(by.name, names(INDICES[[i]]))
+
+        if (!is.null(INDICES)) {
+            by.name <- character(0)
+            if (!is.list(INDICES)) INDICES <- list(INDICES)
+            for (i in seq_len(length(INDICES))) {
+                if (!is(INDICES[[i]], "db.Rquery") ||
+                    INDICES[[i]]@.parent != parent)
+                    stop("Only objects derived from the same table can match each other!")
+                by.name <- c(by.name, names(INDICES[[i]]))
+            }
+            by.name <- unique(by.name)
+
+            parent <- paste(parent, "group by", paste(by.name, collapse = ", "))
         }
-        by.name <- unique(by.name)
 
-        parent <- paste(parent, "group by", paste(by.name, collapse = ", "))
-
-        tmp <- FUN(data)
-        expr <- tmp@.expr
-        col.name <- tmp@.col.name
+        expr <- rep("", length(names(data)))
+        col.name <- rep("", length(names(data)))
+        col.data_type <- rep("", length(names(data)))
+        col.udt_name <- rep("", length(names(data)))
+        for (i in seq_len(length(names(data)))) {
+            tmp <- FUN(data[[names(data)[i]]])
+            expr[i] <- tmp@.expr
+            col.name[i] <- tmp@.col.name
+            col.data_type <- tmp@.col.data_type
+            col.udt_name <- tmp@.col.udt_name
+        }
 
         content <- paste("select",
                          paste(expr, col.name, sep = " as ",
@@ -48,8 +63,8 @@ setMethod (
             .conn.id = conn.id(data),
             .col.name = col.name,
             .key = character(0),
-            .col.data_type = tmp@.col.data_type,
-            .col.udt_name = tmp@.col.udt_name,
+            .col.data_type = col.data_type,
+            .col.udt_name = col.udt_name,
             .where = where,
             .is.factor = rep(FALSE, length(names(data))),
             .sort = list(by = "", order = ""))

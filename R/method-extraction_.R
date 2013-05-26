@@ -90,14 +90,23 @@ setMethod (
             if (missing(j))
                 j <- seq_len(length(names(x)))
             else if (is(j, "db.Rquery"))
-                j <- .db.getQuery(content(j), conn.id(x))
+                j <- .db.getQuery(paste(content(j), "limit 1"), conn.id(x))
         }
         
         if (n == 2) { # select columns
+            ## i.txt <- deparse(substitute(i))
+            ## if (gsub("is.na\\s*\\(\\s*(.*\\S)\\s*\\)", "\\1", i.txt) ==
+            ##     deparse(substitute(x))) { # i is is.na(...)
+            ##     return (is.na(x))
+            ## }
             if (is(i, "db.Rquery")) {
-                i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"))))
-                if (length(i) > length(names(x)))
-                    stop("Are you sure the column number is correct?")
+                if (all(i@.col.data_type == "boolean")) {
+                    return (i)
+                } else {
+                    i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"))))
+                    if (length(i) > length(names(x)))
+                        stop("Are you sure the column number is correct?")
+                }
             }
             .create.db.Rquery(x, cols.i = i, x.where)
         } else if (n == 3) { # several cases
@@ -180,6 +189,7 @@ setMethod (
         expr <- x@.col.name[cols.i]
     else
         expr <- x@.expr[cols.i]
+    if (length(expr) == 0) return (new("db.Rquery"))
     i.str <- paste(expr, names(x)[cols.i], sep = " as ", collapse = ", ")
 
     sort <- .generate.sort(x)
@@ -198,7 +208,7 @@ setMethod (
     
     if (where != "") where.str <- paste("where", where)
     else where.str <- ""
-    
+
     new("db.Rquery",
         .content = paste("select", i.str, "from", tbl, where.str,
         sort$sort.str),

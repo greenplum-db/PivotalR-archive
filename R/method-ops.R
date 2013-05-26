@@ -59,6 +59,7 @@ setMethod (
 .compare <- function (e1, e2, cmp, data.types,
                       prefix = "", res.type = "boolean")
 {
+    if (is(e1, "db.data.frame")) e1 <- e1[,]    
     expr <- rep("", length(names(e1)))
     col.data_type <- rep("", length(names(e1)))
     col.udt_name <- rep("", length(names(e1)))
@@ -66,13 +67,11 @@ setMethod (
     for (i in seq_len(length(names(e1)))) {
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cmp, e2)
-            col.data_type[i] <- res.type
-            col.udt_name[i] <- res.type
         } else {
             expr[i] <- "NULL"
-            col.data_type[i] <- "NULL"
-            col.udt_name[i] <- "NULL"
         }
+        col.data_type[i] <- res.type
+        col.udt_name[i] <- res.type
         col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
     }
     
@@ -570,13 +569,11 @@ setMethod (
         if (v > 0 && e2@.col.data_type[i2] %in% data.types[[v]]) {
             expr[i] <- paste("(", e1@.expr[i1], ")", op, "(",
                              e2@.expr[i2], ")")
-            col.data_type[i] <- res.type
-            col.udt_name[i] <- res.type
         } else {
             expr[i] <- "NULL"
-            col.data_type[i] <- "NULL"
-            col.udt_name[i] <- "NULL"
         }
+        col.data_type[i] <- res.type
+        col.udt_name[i] <- res.type
         col.name[i] <- paste(names(e1)[i1], "_", names(e2)[i2],
                              "_opr", sep = "")
     }
