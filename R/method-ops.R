@@ -72,14 +72,14 @@ setMethod (
         }
         col.data_type[i] <- res.type
         col.udt_name[i] <- res.type
-        col.name[i] <- paste("\"", names(e1)[i], "_opr\"", sep = "")
+        col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
     }
     
     if (is(e1, "db.data.frame"))
         tbl <- content(e1)
     else {
         if (e1@.source == e1@.parent)
-            tbl <- paste("\"", e1@.source, "\"", sep = "")
+            tbl <- e1@.source
         else
             tbl <- paste("(", e1@.parent, ")", sep = "")
     }
@@ -89,7 +89,8 @@ setMethod (
 
     sort <- .generate.sort(e1)
     
-    expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
+    expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
+                      sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
         where.str, sort$sort.str, sep = ""),
@@ -579,7 +580,7 @@ setMethod (
     }
     
     if (e1@.source == e1@.parent)
-        tbl <- paste("\"", e1@.source, "\"", sep = "")
+        tbl <- e1@.source
     else
         tbl <- paste("(", e1@.parent, ")", sep = "")
 

@@ -128,8 +128,8 @@ setMethod (
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
                 where.str <- paste(x@.key, " in (", paste(i, collapse = ","),
                                    ")", sep = "")
-                if (x.where != "") x.where <- paste(x.where, "and")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str))
+                if (x.where != "") x.where <- paste(x.where, "and ")
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
             }
         }
     },
@@ -196,7 +196,10 @@ setMethod (
     sort <- .generate.sort(x)
     
     if (is(x, "db.Rquery")) {
-        tbl <- paste("\"", x@.parent, "\"", sep = "")
+        if (x@.parent == x@.source)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
         parent <- x@.parent
         src <- x@.source
     } else {

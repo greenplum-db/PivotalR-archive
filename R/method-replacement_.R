@@ -67,7 +67,7 @@
     if (value@.parent != value@.source) 
         tbl <- paste("(", value@.parent, ") s", sep = "")
     else
-        tbl <- paste("\"", value@.parent, "\"", sep = "")
+        tbl <- value@.parent
     
     if (is(x, "db.Rquery") && x@.where != "") {
         where.str <- paste(" where", x@.where)
@@ -144,7 +144,7 @@
         if (x@.parent != x@.source) {
             tbl <- paste("(", x@.parent, ") s", sep = "")
         } else {
-            tbl <- paste("\"", x@.parent, "\"", sep = "")
+            tbl <- x@.parent
         }
         parent <- x@.parent
         src <- x@.source

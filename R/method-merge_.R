@@ -15,16 +15,18 @@ setMethod (
             stop("The two data sets are not on the same database!")
             
         if (is(x, "db.data.frame"))
-            x.content <- paste("\"", content(x), "\" s", sep = "")
-        else if (is(x, "db.Rquery") && x@.source == x@.parent)
-            x.content <- paste("\"", x@.source, "\" s", sep = "")
+            x.content <- paste(content(x), " s", sep = "")
+        else if (is(x, "db.Rquery") && x@.source == x@.parent &&
+                 x@.where == "")
+            x.content <- paste(x@.source, " s", sep = "")
         else
             x.content <- paste("(", content(x), ") s", sep = "")
         
         if (is(y, "db.data.frame"))
-            y.content <- paste("\"", content(y), "\" t", sep = "")
-        else if (is(y, "db.Rquery") && y@.source == y@.parent)
-            y.content <- paste("\"", y@.source, "\" t", sep = "")
+            y.content <- paste(content(y), " t", sep = "")
+        else if (is(y, "db.Rquery") && y@.source == y@.parent &&
+                 y@.where == "")
+            y.content <- paste(y@.source, " t", sep = "")
         else
             y.content = paste("(", content(y), ") t", sep = "")
 

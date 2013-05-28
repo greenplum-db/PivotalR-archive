@@ -28,7 +28,10 @@
         where <- ""
     } else {
         expr <- paste(func, "(", x@.expr, ")", sep = "")
-        parent <- x@.parent
+        if (x@.source == x@.parent)
+            parent <- x@.parent
+        else
+            parent <- paste("(", x@.parent, ") s", sep = "")
         src <- x@.source
         where <- x@.where
         if (x@.where != "")
@@ -43,8 +46,8 @@
                                      paste("\"", col.name, "\"", sep = ""),
                                      sep = " as ",
                                      collapse = ", "),
-                     " from \"", parent, "\"",
-                     where, sep = "")
+                     " from ", parent,
+                     where.str, sep = "")
     
     new("db.Rquery",
         .content = content,

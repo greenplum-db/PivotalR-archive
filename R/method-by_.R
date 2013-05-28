@@ -35,8 +35,6 @@ setMethod (
             }
             by.name <- unique(by.name)
 
-            if (is(data, "db.data.frame") || data@.parent == data@.source)
-                parent <- paste("\"", parent, "\"", sep = "")
             parent <- paste(parent, " group by ",
                             paste("\"", by.name, "\"", collapse = ", ",
                                   sep = ""),
