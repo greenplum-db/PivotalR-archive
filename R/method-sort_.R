@@ -8,8 +8,11 @@ setGeneric ("sort")
 setMethod (
     "sort",
     signature(x = "db.obj"),
-    function (x, by = character(0), decreasing = FALSE, ...)
+    function (x, decreasing = FALSE, by = character(0), ...)
     {
+        if (identical(by, character(0)) && !identical(x@.key, character(0)))
+            by <- x@.key
+        print(by)
         if (!is.character(by) || length(by) == 0 ||
             !all(by %in% names(x)))
             stop("must sort by the column names!")
@@ -21,15 +24,17 @@ setMethod (
         sort <- list(by = by, order = order)
 
         if (is(x, "db.data.frame")) {
-            content <- paste("select * from", content(x), "order by",
-                             paste(by, collapse = ", "), order)
+            content <- paste("select * from \"", content(x), "\" order by ",
+                             paste("\"", by, "\"", collapse = ", ",
+                                   sep = ""), order, sep = "")
             expr <- names(x)
             src <- content(x)
             parent <- src
             where <- ""
         } else {
-            content <- paste(content(x), "order by",
-                             paste(by, collapse = ", "), order)
+            content <- paste(content(x), " order by ",
+                             paste("\"", by, "\"", collapse = ", ",
+                                   sep = ""), order, sep = "")
             expr <- x@.expr
             src <- x@.source
             parent <- x@.parent

@@ -13,8 +13,9 @@ setMethod (
             stop("Cannot coerce multiple columns into factor!")
         if (is(x, "db.data.frame")) {
             new("db.Rquery",
-                .content = paste("select", x@.col.name, "from", content(x)),
-                .expr = x@.col.name,
+                .content = paste("select \"", x@.col.name, "\" from \"",
+                content(x), "\""),
+                .expr = paste("\"", x@.col.name, "\"", sep = ""),
                 .source = content(x),
                 .parent = content(x),
                 .conn.id = conn.id(x),

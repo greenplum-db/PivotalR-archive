@@ -22,12 +22,17 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     if (!exists)
         stop("No such object in the connection ", conn.id)
 
+    if (length(table) == 1)
+        content <- paste("\"", table, "\"", sep = "")
+    else
+        content <- paste("\"", table, "\"", sep = "", collapse = ".")
+    
     if (.is.view(table, conn.id))
     {
         ## view
         res <- new("db.view",
                    .name = table,
-                   .content = x,
+                   .content = content,
                    .conn.id = conn.id,
                    .key = character(0))
     }
@@ -36,7 +41,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
         ## table
         res <- new("db.table",
                    .name = table,
-                   .content = x,
+                   .content = content,
                    .conn.id = conn.id,
                    .key = key)
     }

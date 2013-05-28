@@ -32,8 +32,10 @@
         sort <- x@.sort
     }
     if (sort$by != "")
-        sort.str <- paste("order by", paste(sort$by, collapse = ", "),
-                          sort$order)
+        sort.str <- paste(" order by ",
+                          paste("\"", sort$by, "\"",
+                                collapse = ", ", sep = ""),
+                          sort$order, sep = "")
     else
         sort.str <- ""
     list(sort = sort, sort.str = sort.str)

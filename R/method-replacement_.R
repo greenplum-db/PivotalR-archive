@@ -26,8 +26,8 @@
         stop("The where parts that do not match!")
     
     if (is(x, "db.data.frame")) {
-        x.expr <- names(x)
-        x.names <- x@.col.name
+        x.expr <- paste("\"", names(x), "\"", sep = "")
+        x.names <- x.expr
     } else {
         x.expr <- x@.expr
         x.names <- x@.expr
@@ -52,16 +52,18 @@
             if (is.null(case))
                 x.names[idx] <- value@.expr[i]
             else
-                x.names[idx] <- paste("case when", case, "then",
-                                      value@.expr[i], "else", x.expr[idx],
-                                      "end")
+                x.names[idx] <- paste("case when ", case, " then ",
+                                      value@.expr[i], "::", x@.col.data_type[idx],
+                                      " else ", x.expr[idx],
+                                      " end", sep = "")
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
             is.factor[idx] <- value@.is.factor[i]
         }
     }
 
-    expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
+    expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
+                  sep = " as ", collapse = ", ")
         
     if (value@.parent != value@.source) 
         tbl <- paste("(", value@.parent, ") s", sep = "")
@@ -69,7 +71,7 @@
         tbl <- value@.parent
     
     if (is(x, "db.Rquery") && x@.where != "") {
-        where.str <- paste("where", x@.where)
+        where.str <- paste(" where", x@.where)
         where <- x@.where
     } else {
         where.str <- ""
@@ -80,7 +82,7 @@
 
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, " ", where.str, " ", sort$sort.str, sep = ""),
+        tbl, where.str, sort$sort.str, sep = ""),
         .expr = x.names,
         .source = value@.source,
         .parent = value@.parent,
@@ -123,16 +125,18 @@
                 x.names[idx] <- as.character(value)
             else
                 if (case[i] != "NULL")
-                    x.names[idx] <- paste("case when", case[i], "then",
-                                          value, "else", x@.expr[idx],
-                                          "end")
+                    x.names[idx] <- paste("case when ", case[i], " then ",
+                                          value, "::", x@.col.data_type[idx],
+                                          " else ", x@.expr[idx],
+                                          " end", sep = "")
             x.col.data_type[idx] <- type
             x.col.udt_name[idx] <- udt
             is.factor[idx] <- FALSE
         }
     }
     
-    expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
+    expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
+                  sep = " as ", collapse = ", ")
 
     if (is(x, "db.data.frame")) {
         tbl <- content(x)
@@ -149,7 +153,7 @@
     }
     
     if (is(x, "db.Rquery") && x@.where != "") {
-        where.str <- paste("where", x@.where)
+        where.str <- paste(" where", x@.where)
         where <- x@.where
     } else {
         where.str <- ""
@@ -160,7 +164,7 @@
     
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, " ", where.str, " ", sort$sort.str, sep = ""),
+        tbl, where.str, sort$sort.str, sep = ""),
         .expr = x.names,
         .source = src,
         .parent = parent,
@@ -313,7 +317,7 @@ setMethod (
         }
         
         ## where.str <- paste(x@.key, "=", i, collapse = " or ")
-        str <- paste(x@.key, " in (", paste(i, collapse = ","),
+        str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                      ")", sep = "")
     }
     str

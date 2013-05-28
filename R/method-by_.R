@@ -19,7 +19,7 @@ setMethod (
             src <- data@.source
             where <- data@.where
             if (where != "")
-                where.str <- paste("where", where)
+                where.str <- paste(" where", where)
             else
                 where.str <- ""
         }
@@ -35,7 +35,13 @@ setMethod (
             }
             by.name <- unique(by.name)
 
-            parent <- paste(parent, "group by", paste(by.name, collapse = ", "))
+            parent <- paste(parent, where.str, " group by ",
+                            paste("\"", by.name, "\"", collapse = ", ",
+                                  sep = ""),
+                            sep = "")
+            where.str <- ""
+            where <- ""
+            src <- parent
         }
 
         expr <- rep("", length(names(data)))
@@ -50,10 +56,11 @@ setMethod (
             col.udt_name <- tmp@.col.udt_name
         }
 
-        content <- paste("select",
-                         paste(expr, col.name, sep = " as ",
+        content <- paste("select ",
+                         paste(expr, paste("\"", col.name, "\"", sep = ""),
+                               sep = " as ",
                                collapse = ", "),
-                         "from", parent, where.str)
+                         " from ", parent, where.str, sep = "")
 
         new("db.Rquery",
             .content = content,
