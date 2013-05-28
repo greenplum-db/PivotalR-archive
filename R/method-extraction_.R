@@ -126,7 +126,7 @@ setMethod (
                 }
 
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
-                where.str <- paste(x@.key, " in (", paste(i, collapse = ","),
+                where.str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                                    ")", sep = "")
                 if (x.where != "") x.where <- paste(x.where, "and ")
                 .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))

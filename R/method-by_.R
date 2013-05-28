@@ -35,10 +35,12 @@ setMethod (
             }
             by.name <- unique(by.name)
 
-            parent <- paste(parent, " group by ",
+            parent <- paste(parent, where.str, " group by ",
                             paste("\"", by.name, "\"", collapse = ", ",
                                   sep = ""),
                             sep = "")
+            where.str <- ""
+            where <- ""
             src <- parent
         }
 

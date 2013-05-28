@@ -8,10 +8,11 @@ setGeneric ("sort")
 setMethod (
     "sort",
     signature(x = "db.obj"),
-    function (x, by = character(0), decreasing = FALSE, ...)
+    function (x, decreasing = FALSE, by = character(0), ...)
     {
         if (identical(by, character(0)) && !identical(x@.key, character(0)))
             by <- x@.key
+        print(by)
         if (!is.character(by) || length(by) == 0 ||
             !all(by %in% names(x)))
             stop("must sort by the column names!")
