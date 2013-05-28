@@ -70,7 +70,7 @@
         tbl <- paste("\"", value@.parent, "\"", sep = "")
     
     if (is(x, "db.Rquery") && x@.where != "") {
-        where.str <- paste("where", x@.where)
+        where.str <- paste(" where", x@.where)
         where <- x@.where
     } else {
         where.str <- ""
@@ -81,7 +81,7 @@
 
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, " ", where.str, " ", sort$sort.str, sep = ""),
+        tbl, where.str, sort$sort.str, sep = ""),
         .expr = x.names,
         .source = value@.source,
         .parent = value@.parent,
@@ -151,7 +151,7 @@
     }
     
     if (is(x, "db.Rquery") && x@.where != "") {
-        where.str <- paste("where", x@.where)
+        where.str <- paste(" where", x@.where)
         where <- x@.where
     } else {
         where.str <- ""
@@ -162,7 +162,7 @@
     
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, " ", where.str, " ", sort$sort.str, sep = ""),
+        tbl, where.str, sort$sort.str, sep = ""),
         .expr = x.names,
         .source = src,
         .parent = parent,

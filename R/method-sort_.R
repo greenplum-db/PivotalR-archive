@@ -21,17 +21,17 @@ setMethod (
         sort <- list(by = by, order = order)
 
         if (is(x, "db.data.frame")) {
-            content <- paste("select * from \"", content(x), "\" order by",
+            content <- paste("select * from \"", content(x), "\" order by ",
                              paste("\"", by, "\"", collapse = ", ",
-                                   sep = ""), order)
+                                   sep = ""), order, sep = "")
             expr <- names(x)
             src <- content(x)
             parent <- src
             where <- ""
         } else {
-            content <- paste(content(x), "order by",
+            content <- paste(content(x), " order by ",
                              paste("\"", by, "\"", collapse = ", ",
-                                   sep = ""), order)
+                                   sep = ""), order, sep = "")
             expr <- x@.expr
             src <- x@.source
             parent <- x@.parent

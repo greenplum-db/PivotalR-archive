@@ -10,7 +10,7 @@ setMethod (
     signature(data = "db.obj"),
     function (data, INDICES = NULL, FUN, ...) {
         if (is(data, "db.data.frame")) {
-            parent <- paste("\"", content(data), "\"", sep = "")
+            parent <- content(data)
             src <- parent
             where <- ""
             where.str <- ""
@@ -19,7 +19,7 @@ setMethod (
             src <- data@.source
             where <- data@.where
             if (where != "")
-                where.str <- paste("where", where)
+                where.str <- paste(" where", where)
             else
                 where.str <- ""
         }
@@ -35,7 +35,9 @@ setMethod (
             }
             by.name <- unique(by.name)
 
-            parent <- paste(parent, " group by",
+            if (is(data, "db.data.frame") || data@.parent == data@.source)
+                parent <- paste("\"", parent, "\"", sep = "")
+            parent <- paste(parent, " group by ",
                             paste("\"", by.name, "\"", collapse = ", ",
                                   sep = ""),
                             sep = "")
@@ -54,11 +56,11 @@ setMethod (
             col.udt_name <- tmp@.col.udt_name
         }
 
-        content <- paste("select",
+        content <- paste("select ",
                          paste(expr, paste("\"", col.name, "\"", sep = ""),
                                sep = " as ",
                                collapse = ", "),
-                         "from", parent, where.str)
+                         " from ", parent, where.str, sep = "")
 
         new("db.Rquery",
             .content = content,

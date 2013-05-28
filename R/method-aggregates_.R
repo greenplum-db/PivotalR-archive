@@ -32,18 +32,18 @@
         src <- x@.source
         where <- x@.where
         if (x@.where != "")
-            where.str <- paste("where", x@.where)
+            where.str <- paste(" where", x@.where)
         else
             where.str <- ""
     }
     
-    col.name <- paste(names(x), "_", func, sep = "")
+    col.name <- paste("\"", names(x), "_", func, "\"", sep = "")
     
-    content <- paste("select", paste(expr,
+    content <- paste("select ", paste(expr,
                                      paste("\"", col.name, "\"", sep = ""),
                                      sep = " as ",
                                      collapse = ", "),
-                     "from \"", parent, "\" ",
+                     " from \"", parent, "\"",
                      where, sep = "")
     
     new("db.Rquery",

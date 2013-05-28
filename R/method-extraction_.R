@@ -116,8 +116,8 @@ setMethod (
                 where.str <- i@.expr
                 if (length(where.str) != 1)
                     stop("More than 2 boolean expressions in selecting row!")
-                if (x.where != "") x.where <- paste(x.where, "and")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str))
+                if (x.where != "") x.where <- paste(x.where, " and ", sep = "")
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
                     message("Error : there is no unique ID associated",
@@ -207,12 +207,12 @@ setMethod (
 
     is.factor <- x@.is.factor[cols.i]
     
-    if (where != "") where.str <- paste("where", where)
+    if (where != "") where.str <- paste(" where", where)
     else where.str <- ""
 
     new("db.Rquery",
-        .content = paste("select", i.str, "from", tbl, where.str,
-        sort$sort.str),
+        .content = paste("select ", i.str, " from ", tbl, where.str,
+        sort$sort.str, sep = ""),
         .expr = expr,
         .source = src,
         .parent = parent,
