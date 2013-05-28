@@ -12,7 +12,7 @@ setMethod (
     {
         if (identical(by, character(0)) && !identical(x@.key, character(0)))
             by <- x@.key
-        print(by)
+
         if (!is.character(by) || length(by) == 0 ||
             !all(by %in% names(x)))
             stop("must sort by the column names!")
