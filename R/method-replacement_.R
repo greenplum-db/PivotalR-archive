@@ -26,8 +26,8 @@
         stop("The where parts that do not match!")
     
     if (is(x, "db.data.frame")) {
-        x.expr <- names(x)
-        x.names <- x@.col.name
+        x.expr <- paste("\"", names(x), "\"", sep = "")
+        x.names <- x.expr
     } else {
         x.expr <- x@.expr
         x.names <- x@.expr
@@ -61,12 +61,13 @@
         }
     }
 
-    expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
+    expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
+                  sep = " as ", collapse = ", ")
         
     if (value@.parent != value@.source) 
         tbl <- paste("(", value@.parent, ") s", sep = "")
     else
-        tbl <- value@.parent
+        tbl <- paste("\"", value@.parent, "\"", sep = "")
     
     if (is(x, "db.Rquery") && x@.where != "") {
         where.str <- paste("where", x@.where)
@@ -132,7 +133,8 @@
         }
     }
     
-    expr <- paste(x.names, x.col.name, sep = " as ", collapse = ", ")
+    expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
+                  sep = " as ", collapse = ", ")
 
     if (is(x, "db.data.frame")) {
         tbl <- content(x)
@@ -142,7 +144,7 @@
         if (x@.parent != x@.source) {
             tbl <- paste("(", x@.parent, ") s", sep = "")
         } else {
-            tbl <- x@.parent
+            tbl <- paste("\"", x@.parent, "\"", sep = "")
         }
         parent <- x@.parent
         src <- x@.source
@@ -313,7 +315,7 @@ setMethod (
         }
         
         ## where.str <- paste(x@.key, "=", i, collapse = " or ")
-        str <- paste(x@.key, " in (", paste(i, collapse = ","),
+        str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                      ")", sep = "")
     }
     str

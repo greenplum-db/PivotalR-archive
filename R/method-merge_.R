@@ -14,14 +14,17 @@ setMethod (
         if (!conn.eql(conn.id(x), conn.id(y)))
             stop("The two data sets are not on the same database!")
             
-        if (is(x, "db.data.frame") || (is(x, "db.Rquery") &&
-                                       x@.source == x@.parent))
-            x.content = paste(content(x), "s")
+        if (is(x, "db.data.frame"))
+            x.content <- paste("\"", content(x), "\" s", sep = "")
+        else if (is(x, "db.Rquery") && x@.source == x@.parent)
+            x.content <- paste("\"", x@.source, "\" s", sep = "")
         else
-            x.content = paste("(", content(x), ") s", sep = "")
-        if (is(y, "db.data.frame") || (is(y, "db.Rquery") &&
-                                       y@.source == y@.parent))
-            y.content = paste(content(y), "t")
+            x.content <- paste("(", content(x), ") s", sep = "")
+        
+        if (is(y, "db.data.frame"))
+            y.content <- paste("\"", content(y), "\" t", sep = "")
+        else if (is(y, "db.Rquery") && y@.source == y@.parent)
+            y.content <- paste("\"", y@.source, "\" t", sep = "")
         else
             y.content = paste("(", content(y), ") t", sep = "")
 
@@ -32,8 +35,8 @@ setMethod (
             join.str <- "cross join"
             on.str <- ""
         } else {
-            on.str <- paste("on", paste(paste("s.", by.x, sep = ""),
-                                        paste("t.", by.y, sep = ""),
+            on.str <- paste("on", paste(paste("s.\"", by.x, "\"", sep = ""),
+                                        paste("t.\"", by.y, "\"", sep = ""),
                                         sep = " = ", collapse = " and "))
             if (all.x == FALSE && all.y == FALSE) 
                 join.str <- "join"
@@ -92,7 +95,9 @@ setMethod (
         
         expr <- c(by.str, others)
 
-        sql <- paste("select", paste(expr, col.name, sep = " as ", collapse = ", "),
+        sql <- paste("select", paste(expr,
+                                     paste("\"", col.name, "\"", sep = ""),
+                                           sep = " as ", collapse = ", "),
                      "from", src)
 
         new("db.Rquery",

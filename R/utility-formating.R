@@ -32,7 +32,9 @@
         sort <- x@.sort
     }
     if (sort$by != "")
-        sort.str <- paste("order by", paste(sort$by, collapse = ", "),
+        sort.str <- paste("order by",
+                          paste("\"", sort$by, "\"",
+                                collapse = ", ", sep = ""),
                           sort$order)
     else
         sort.str <- ""

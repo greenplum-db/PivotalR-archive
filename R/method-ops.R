@@ -66,7 +66,7 @@ setMethod (
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
-            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cmp, e2)
+            expr[i] <- paste(prefix, "(", e1@.expr[i], ") ", cmp, " ", e2, sep = "")
         } else {
             expr[i] <- "NULL"
         }
@@ -79,7 +79,7 @@ setMethod (
         tbl <- content(e1)
     else {
         if (e1@.source == e1@.parent)
-            tbl <- e1@.source
+            tbl <- paste("\"", e1@.source, "\"", sep = "")
         else
             tbl <- paste("(", e1@.parent, ")", sep = "")
     }
@@ -567,8 +567,8 @@ setMethod (
                 break
             }
         if (v > 0 && e2@.col.data_type[i2] %in% data.types[[v]]) {
-            expr[i] <- paste("(", e1@.expr[i1], ")", op, "(",
-                             e2@.expr[i2], ")")
+            expr[i] <- paste("(", e1@.expr[i1], ") ", op, " (",
+                             e2@.expr[i2], ")", sep = "")
         } else {
             expr[i] <- "NULL"
         }
@@ -579,7 +579,7 @@ setMethod (
     }
     
     if (e1@.source == e1@.parent)
-        tbl <- e1@.source
+        tbl <- paste("\"", e1@.source, "\"", sep = "")
     else
         tbl <- paste("(", e1@.parent, ")", sep = "")
 
@@ -588,7 +588,8 @@ setMethod (
 
     sort <- .generate.sort(e1)
     
-    expr.str <- paste(expr, col.name, sep = " as ", collapse = ", ")
+    expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
+                      sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select", expr.str, "from", tbl,
         where.str, sort$sort.str),

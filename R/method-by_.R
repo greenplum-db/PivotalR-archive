@@ -10,7 +10,7 @@ setMethod (
     signature(data = "db.obj"),
     function (data, INDICES = NULL, FUN, ...) {
         if (is(data, "db.data.frame")) {
-            parent <- content(data)
+            parent <- paste("\"", content(data), "\"", sep = "")
             src <- parent
             where <- ""
             where.str <- ""
@@ -35,7 +35,11 @@ setMethod (
             }
             by.name <- unique(by.name)
 
-            parent <- paste(parent, "group by", paste(by.name, collapse = ", "))
+            parent <- paste(parent, " group by",
+                            paste("\"", by.name, "\"", collapse = ", ",
+                                  sep = ""),
+                            sep = "")
+            src <- parent
         }
 
         expr <- rep("", length(names(data)))
@@ -51,7 +55,8 @@ setMethod (
         }
 
         content <- paste("select",
-                         paste(expr, col.name, sep = " as ",
+                         paste(expr, paste("\"", col.name, "\"", sep = ""),
+                               sep = " as ",
                                collapse = ", "),
                          "from", parent, where.str)
 

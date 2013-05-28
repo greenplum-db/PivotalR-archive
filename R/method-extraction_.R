@@ -186,16 +186,17 @@ setMethod (
     }
 
     if (is(x, "db.data.frame"))
-        expr <- x@.col.name[cols.i]
+        expr <- paste("\"", x@.col.name[cols.i], "\"", sep = "")
     else
         expr <- x@.expr[cols.i]
     if (length(expr) == 0) return (new("db.Rquery"))
-    i.str <- paste(expr, names(x)[cols.i], sep = " as ", collapse = ", ")
+    i.str <- paste(expr, paste("\"", names(x)[cols.i], "\"", sep = ""),
+                   sep = " as ", collapse = ", ")
 
     sort <- .generate.sort(x)
     
     if (is(x, "db.Rquery")) {
-        tbl <- x@.parent
+        tbl <- paste("\"", x@.parent, "\"", sep = "")
         parent <- x@.parent
         src <- x@.source
     } else {

@@ -126,7 +126,7 @@ setMethod (
             obj.str <- "table"
 
         if (x@.parent == x@.source)
-            tbl <- x@.parent
+            tbl <- paste("\"", x@.parent, "\"", sep = "")
         else
             tbl <- paste("(", x@.parent, ") s", sep = "")
 
@@ -135,7 +135,8 @@ setMethod (
         ## column, because sometimes one wants to use the original
         ## data without regarding it as a factor. For example, as the
         ## grouping column.
-        extra <- paste(x@.expr, names(x), sep = " as ", collapse = ",")
+        extra <- paste(x@.expr, paste("\"", names(x), "\"", sep = ""),
+                       sep = " as ", collapse = ",")
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
         appear <- x@.col.name
@@ -144,7 +145,7 @@ setMethod (
             cats <- x@.col.name[x@.is.factor]
             sql <- "select "
             for (i in seq_len(length(cats))) {
-                sql <- paste(sql, "array_agg(distinct ", cats[i], ") as ",
+                sql <- paste(sql, "array_agg(distinct \"", cats[i], "\") as ",
                              cats[i], sep = "")
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
@@ -161,9 +162,9 @@ setMethod (
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
                         if (extra != "") extra <- paste(extra, ", ")
-                        extra <- paste(extra, "(case when", x@.expr[i], "=",
-                                    distinct[j], "then 1 else 0 end) as",
-                                    new.col)
+                        extra <- paste(extra, " (case when ", x@.expr[i], " = ",
+                                    distinct[j], " then 1 else 0 end) as ",
+                                    "\"", new.col, "\"", sep = "")
                         appear <- c(appear, paste(x@.col.name[i],":",
                                                   distinct[j], sep = ""))
                     }
@@ -182,9 +183,9 @@ setMethod (
         
         content.str <- paste("select", extra, "from", tbl, where)
                 
-        create.str <- paste("create ", temp.str, " ", obj.str, " ",
+        create.str <- paste("create ", temp.str, " ", obj.str, " \"",
                             table.name,
-                            " as (", content.str, ") ", dist.str, sep = "")
+                            "\" as (", content.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
         res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)

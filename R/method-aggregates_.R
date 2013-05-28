@@ -21,7 +21,7 @@
     }
     
     if (is(x, "db.data.frame")) {
-        expr <- paste(func, "(", names(x), ")", sep = "")
+        expr <- paste(func, "(\"", names(x), "\")", sep = "")
         parent <- content(x)
         src <- parent
         where.str <- ""
@@ -39,11 +39,12 @@
     
     col.name <- paste(names(x), "_", func, sep = "")
     
-    content <- paste("select", paste(expr, col.name,
+    content <- paste("select", paste(expr,
+                                     paste("\"", col.name, "\"", sep = ""),
                                      sep = " as ",
                                      collapse = ", "),
-                     "from", parent,
-                     where)
+                     "from \"", parent, "\" ",
+                     where, sep = "")
     
     new("db.Rquery",
         .content = content,
