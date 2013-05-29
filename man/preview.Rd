@@ -1,7 +1,8 @@
 \name{preview}
-
-\alias{preview.db.view}
+\alias{preview}
 \alias{preview,db.view-method}
+\alias{preview,db.table-method}
+\alias{preview,db.Rquery-method}
 
 \title{
   Read the actual data stored in the table of database
@@ -10,19 +11,22 @@
   The function reads the actual data from the table in the database.
 }
 \usage{
+\S4method{preview}{db.table}(x, nrows = 100)
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
+\S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
 }
 
 \arguments{
   \item{x}{
-    A \code{db.data.frame} object, which points to a table or view in
-    the database.
+    A \code{db.data.frame}, which points to a table or view in
+    the database; or a \code{db.Rquery} object, which represents some
+  operations on a \code{db.data.frame} object.
   }
   \item{nrows}{
     An integer, default is 100, how many rows of data 
   }
   \item{interactive}{
-    A boolean, default is TRUE. If \code{x} is a view, then extracting
+    A boolean, default is FALSE. If \code{x} is a view, then extracting
   data from it would actually compute the view, which might take a
   longer time, especially for large data sets. When \code{interactive}
   is TRUE, this function will ask the user whether to continue to
