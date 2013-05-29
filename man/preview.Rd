@@ -58,15 +58,19 @@
 \examples{
 \dontrun{
 
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone, "abalone")
+
 ## preview of a table
-x <- db.data.frame("table_in_database", conn.id = 1)
 preview(x, nrows = 10) # extract 10 rows of data
 
 ## do some operations and preview the result
 y <- (x[,1:2] + 1.2) * 2
 preview(y, 20, FALSE)
 
-## Suppose that the table has a column named "id"
+## table abalone has a column named "id"
 preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 }
 }

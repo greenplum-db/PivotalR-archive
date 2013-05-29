@@ -5,7 +5,24 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, ...) standardGeneric("as.db.data.frame"),
+    def = function (x, table.name, ...) {
+        x.str <- deparse(substitute(x))
+        res <- standardGeneric("as.db.data.frame")
+        if (is.data.frame(x)) {
+            cat("\nThe data in the data.frame", x.str,
+                "is stored into the table", table.name, "in database",
+                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+        } else if (is.character(x)) {
+            cat("\nThe data in the file", x,
+                "is stored into the table", table.name, "in database",
+                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+        } else {
+            cat("\nThe data created by ", x,
+                "is stored into the table", table.name, "in database",
+                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+        }
+        return (res$res)
+    },
     signature = "x")
 
 ## ------------------------------------------------------------------------
@@ -17,10 +34,12 @@ setMethod (
     def = function (
     x, table.name, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
-    is.temp = FALSE, ...)
-    .method.as.db.data.frame.1(x, table.name, conn.id,
-                               add.row.names, key,
-                               distributed.by, is.temp, ...),
+    is.temp = FALSE, ...) {
+         .method.as.db.data.frame.1(x, 
+                                   table.name, conn.id,
+                                   add.row.names, key,
+                                   distributed.by, is.temp, ...)
+    },
     valueClass = "db.data.frame")
 
 ## ------------------------------------------------------------------------
@@ -33,10 +52,12 @@ setMethod (
     def = function (
     x, table.name, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
-    is.temp = FALSE, ...)
-    .method.as.db.data.frame.1(x, table.name, conn.id,
-                               add.row.names, key,
-                               distributed.by, is.temp, ...),
+    is.temp = FALSE, ...) {
+        .method.as.db.data.frame.1(x,
+                                   table.name, conn.id,
+                                   add.row.names, key,
+                                   distributed.by, is.temp, ...)
+    },
     valueClass = "db.data.frame")
 
 ## ------------------------------------------------------------------------
@@ -82,20 +103,12 @@ setMethod (
                            " add primary key (\"",
                            key, "\")", sep = ""), conn.id)
 
-    if (is.data.frame(x)) {
-        cat("\nThe data in the data.frame", deparse(substitute(x)),
-            "is stored into the table", table.name, "in database",
-            dbname(conn.id), "on", host(conn.id), "!\n\n")
-    } else {
-        cat("\nThe data in the file", x,
-            "is stored into the table", table.name, "in database",
-            dbname(conn.id), "on", host(conn.id), "!\n\n")
-    }
-    cat("\nAn R object pointing to", table.name,
-        "in database", dbname(conn.id), "on", host(conn.id),
-        "is created !\n\n")
+    ## cat("\nAn R object pointing to", table.name,
+    ##     "in database", dbname(conn.id), "on", host(conn.id),
+    ##     "is created !\n\n")
     
-    db.data.frame(table.name, conn.id, key)
+    list(res = db.data.frame(table.name, conn.id, key),
+         conn.id = conn.id)
 }
 
 ## ------------------------------------------------------------------------
@@ -192,6 +205,6 @@ setMethod (
         res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
-        res
+        list(res = res, conn.id = conn.id)
     },
     valueClass = "db.data.frame")

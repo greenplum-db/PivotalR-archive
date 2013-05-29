@@ -253,7 +253,7 @@
                     return(FALSE)
                 }
                 else
-                    func1(rs)
+                    func1(rs$res)
             }
             else if(!append)
             {
@@ -308,7 +308,7 @@
                 }
                 else
                 {
-                    func1(rs)#######
+                    func1(rs$res)#######
                 }
             }
 
