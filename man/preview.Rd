@@ -12,13 +12,16 @@
 }
 \usage{
 \S4method{preview}{db.table}(x, nrows = 100)
+
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
+
 \S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
 }
 
 \arguments{
   \item{x}{
-    A \code{db.data.frame}, which points to a table or view in
+    A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
+  object, which points to a table or view in
     the database; or a \code{db.Rquery} object, which represents some
   operations on a \code{db.data.frame} object.
   }
@@ -45,7 +48,7 @@
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
   Maintainer: Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+  Inc. \email{user@madlib.net}
 }
 
 \seealso{
@@ -55,8 +58,16 @@
 \examples{
 \dontrun{
 
+## preview of a table
 x <- db.data.frame("table_in_database", conn.id = 1)
-preview(x, nrows = 10, interactive = FALSE) # extract 10 rows of data
+preview(x, nrows = 10) # extract 10 rows of data
+
+## do some operations and preview the result
+y <- (x[,1:2] + 1.2) * 2
+preview(y, 20, FALSE)
+
+## Suppose that the table has a column named "id"
+preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 }
 }
 

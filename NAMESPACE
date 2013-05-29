@@ -24,7 +24,8 @@ export ("madlib.lm", "summary.lm.madlib",
 export ("madlib.glm", "summary.logregr.madlib",
         "print.logregr.madlib", "show.logregr.madlib")
 
-export ("sample")
+# export sample in the future
+# export ("sample")
 
 exportMethods("$", "[[", "[", "subset")
 
