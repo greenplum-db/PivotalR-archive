@@ -8,7 +8,8 @@
   Read the actual data stored in the table of database
 }
 \description{
-  The function reads the actual data from the table in the database.
+  The function reads the actual data from the table in the database, it
+  can also preview the actual result of some operations on a table.
 }
 \usage{
 \S4method{preview}{db.table}(x, nrows = 100)
@@ -20,6 +21,7 @@
 
 \arguments{
   \item{x}{
+    The signature of the method. 
     A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
   object, which points to a table or view in
     the database; or a \code{db.Rquery} object, which represents some
@@ -35,8 +37,17 @@
   is TRUE, this function will ask the user whether to continue to
   extract data from the view. 
   }
-  
 }
+
+\details{
+  When the signature \code{x} is a \code{db.data.frame} object, this
+  function reads the data in a table or view in the connected database.
+
+  When the signature \code{x} is a \code{db.Rquery} object, this
+  function reads the result of some operations on a \code{db.data.frame}
+  object. 
+}
+
 \value{
   A \code{data.frame} object. Each column in the table becomes a column
   of the returned \code{data.frame}. A column of arrays is converted into

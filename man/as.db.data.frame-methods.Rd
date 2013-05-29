@@ -1,16 +1,36 @@
-\name{as.db.data.frame-methods}
-\docType{methods}
+\name{as.db.data.frame}
 \alias{as.db.data.frame}
-\alias{as.db.data.frame.character}
-\alias{as.db.data.frame.data.frame}
-\alias{as.db.data.frame.db.Rquery}
 \alias{as.db.data.frame,character-method}
 \alias{as.db.data.frame,data.frame-method}
 \alias{as.db.data.frame,db.Rquery-method}
-\title{ Methods for Function \code{as.db.data.frame} in Package \pkg{PivotalR} ~~}
+
+\title{
+  Convert other objects into a \code{db.data.frame} object
+}
+
 \description{
   Methods for function \code{as.db.data.frame} in package \pkg{PivotalR} ~~
 }
+
+\usage{
+\S4method{as.db.data.frame}{data.frame}(x, table.name, verbose = FALSE,
+conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
+NULL, is.temp = FALSE, ...)
+
+\S4method{as.db.data.frame}{character}(x, table.name, verbose = FALSE,
+conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
+NULL, is.temp = FALSE, ...)
+
+\S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = FALSE,
+is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
+}
+
+\arguments{
+
+
+
+}
+
 \section{Methods}{
 \describe{
 

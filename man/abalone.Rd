@@ -73,8 +73,9 @@ Sea Fisheries Division, Technical Report No. 48 (ISSN 1034-3288)
 
 ## The user does not need to run data(abalone) to load the data
 
+# Suppose that a valid Connection 1 exists
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone", key = "id")
+x <- as.db.data.frame(abalone, "abalone", key = "id") # use default connection 1
 
 ## preview the actual data
 preview(x)
