@@ -303,7 +303,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
                             is.temp = FALSE,
                             conn.id = 1, header = FALSE, nrows = 50,
                             sep = ",",
-                            eol="\n", skip = 0, quote = '"', ...)
+                            eol="\n", skip = 0, quote = "\"", ...)
 {
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
     command <- paste(".db.writeTable.", .localVars$db[[id]]$conn.pkg,

@@ -158,7 +158,7 @@
                                         overwrite, append, distributed.by,
                                         is.temp, 
                                         idx, header, nrows = 50, sep = ",",
-                                        eol="\n", skip = 0, quote = '"',
+                                        eol="\n", skip = 0, quote = "\"",
                                         field.types, ...)
 {
     conn <- .localVars$db[[idx]]$conn
