@@ -5,7 +5,7 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, table.name, verbose, ...) {
+    def = function (x, table.name, verbose = FALSE, ...) {
         x.str <- deparse(substitute(x))
         res <- standardGeneric("as.db.data.frame")
         if (verbose) {
@@ -63,7 +63,7 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
-    x, table.name, verbose, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
@@ -107,7 +107,8 @@ setMethod (
     ##     "in database", dbname(conn.id), "on", host(conn.id),
     ##     "is created !\n\n")
     
-    list(res = db.data.frame(table.name, conn.id, key, verbose, is.temp),
+    list(res = db.data.frame(x = table.name, conn.id = conn.id, key = key,
+         verbose = verbose, is.temp = is.temp),
          conn.id = conn.id)
 }
 
