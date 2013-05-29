@@ -89,7 +89,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- content(data)
+    tbl.source <- .strip(content(data), "\"")
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select ", madlib, ".logregr_train('",

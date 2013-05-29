@@ -56,12 +56,12 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 
 \details{
-  To be added ...
+  explain the formula, especially '|' 
 }
 
 \value{
   A list which contains the following items:
-
+  
   \item{grouping column(s)}{
     When there are grouping columns in the formula, the resulting list
     has multiple items, each of which has the same name as one of the
@@ -109,7 +109,8 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   }
 
   \item{grps}{
-    To be added ...
+    An integer, the number of groups that the data is divided into
+    according to the grouping columns in the formula.
   }
 
   \item{grp.cols}{
@@ -125,6 +126,14 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   }
 
   \item{call}{
+    To be added ...
+  }
+
+  \item{col.name}{
+    To be added ...
+  }
+
+  \item{appear}{
     To be added ...
   }
 }

@@ -5,21 +5,23 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, table.name, ...) {
+    def = function (x, table.name, verbose, ...) {
         x.str <- deparse(substitute(x))
         res <- standardGeneric("as.db.data.frame")
-        if (is.data.frame(x)) {
-            cat("\nThe data in the data.frame", x.str,
-                "is stored into the table", table.name, "in database",
-                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
-        } else if (is.character(x)) {
-            cat("\nThe data in the file", x,
-                "is stored into the table", table.name, "in database",
-                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
-        } else {
-            cat("\nThe data created by ", x,
-                "is stored into the table", table.name, "in database",
-                dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+        if (verbose) {
+            if (is.data.frame(x)) {
+                cat("\nThe data in the data.frame", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else if (is.character(x)) {
+                cat("\nThe data in the file", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else {
+                cat("\nThe data created by ", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            }
         }
         return (res$res)
     },
@@ -32,15 +34,14 @@ setMethod (
     "as.db.data.frame",
     signature (x = "data.frame"),
     def = function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
          .method.as.db.data.frame.1(x, 
-                                   table.name, conn.id,
+                                   table.name, verbose, conn.id,
                                    add.row.names, key,
                                    distributed.by, is.temp, ...)
-    },
-    valueClass = "db.data.frame")
+    })
 
 ## ------------------------------------------------------------------------
 
@@ -50,20 +51,19 @@ setMethod (
     "as.db.data.frame",
     signature (x = "character"),
     def = function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
         .method.as.db.data.frame.1(x,
-                                   table.name, conn.id,
+                                   table.name, verbose, conn.id,
                                    add.row.names, key,
                                    distributed.by, is.temp, ...)
-    },
-    valueClass = "db.data.frame")
+    })
 
 ## ------------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
@@ -107,7 +107,7 @@ setMethod (
     ##     "in database", dbname(conn.id), "on", host(conn.id),
     ##     "is created !\n\n")
     
-    list(res = db.data.frame(table.name, conn.id, key),
+    list(res = db.data.frame(table.name, conn.id, key, verbose, is.temp),
          conn.id = conn.id)
 }
 
@@ -118,8 +118,9 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, is.view = FALSE,
-    is.temp = FALSE, verbose = FALSE, pivot = TRUE,
+    def = function (x, table.name, verbose = FALSE,
+    is.view = FALSE,
+    is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL) {
         conn.id <- conn.id(x)
 
@@ -138,10 +139,8 @@ setMethod (
         else
             obj.str <- "table"
 
-        if (x@.parent == x@.source)
-            tbl <- paste("\"", x@.parent, "\"", sep = "")
-        else
-            tbl <- paste("(", x@.parent, ") s", sep = "")
+        ## if (x@.parent != x@.source)
+        ##     tbl <- paste("(", x@.parent, ") s", sep = "")
 
         ## deal with factor, if exists
         ## We still need to keep the original non-factor
@@ -189,22 +188,23 @@ setMethod (
             tbl <- x@.parent
         else
             tbl <- paste("(", x@.parent, ") s", sep = "")
+        
         if (x@.where != "")
-            where <- paste("where", x@.where)
+            where <- paste(" where", x@.where)
         else
             where <- ""
         
-        content.str <- paste("select", extra, "from", tbl, where)
+        content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " \"",
                             table.name,
                             "\" as (", content.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
-        res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)
+        res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
+                             verbose = verbose, is.temp = is.temp)
         res@.is.factor <- x@.is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
         list(res = res, conn.id = conn.id)
-    },
-    valueClass = "db.data.frame")
+    })
