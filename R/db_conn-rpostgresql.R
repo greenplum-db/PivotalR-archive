@@ -133,7 +133,7 @@
         obj <- as.data.frame(obj)
     if(!is.null(add.row.names) && add.row.names){
         obj  <- cbind(row.names(obj), obj)  ## can't use row.names= here
-        names(obj)[1] <- "row.names"
+        names(obj)[1] <- "row_names"
     }
     if(is.null(field.types)){
         ## the following mapping should be coming from some kind of table

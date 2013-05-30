@@ -140,8 +140,10 @@ setMethod (
         else
             obj.str <- "table"
 
-        ## if (x@.parent != x@.source)
-        ##     tbl <- paste("(", x@.parent, ") s", sep = "")
+        if (x@.source == x@.parent)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
 
         ## deal with factor, if exists
         ## We still need to keep the original non-factor
@@ -153,7 +155,8 @@ setMethod (
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
         appear <- x@.col.name
-
+        is.factor <- x@.is.factor
+        
         if (pivot && !all(x@.is.factor == FALSE)) {
             cats <- x@.col.name[x@.is.factor]
             sql <- "select "
@@ -174,21 +177,18 @@ setMethod (
                     for (j in seq_len(length(distinct) - 1)) {
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
+                        is.factor <- c(is.factor, FALSE)
                         if (extra != "") extra <- paste(extra, ", ")
-                        extra <- paste(extra, " (case when ", x@.expr[i], " = ",
-                                    distinct[j], " then 1 else 0 end) as ",
-                                    "\"", new.col, "\"", sep = "")
+                        extra <- paste(extra, " (case when ", x@.expr[i], " = '",
+                                       distinct[j], "'::", x@.col.data_type[i],
+                                       " then 1 else 0 end) as ",
+                                       "\"", new.col, "\"", sep = "")
                         appear <- c(appear, paste(x@.col.name[i],":",
                                                   distinct[j], sep = ""))
                     }
                 } 
             }
         }
-
-        if (x@.source == x@.parent)
-            tbl <- x@.parent
-        else
-            tbl <- paste("(", x@.parent, ") s", sep = "")
         
         if (x@.where != "")
             where <- paste(" where", x@.where)
@@ -202,9 +202,10 @@ setMethod (
                             "\" as (", content.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
+        ## print(create.str)
         res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)
-        res@.is.factor <- x@.is.factor
+        res@.is.factor <- is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
         list(res = res, conn.id = conn.id)

@@ -9,7 +9,7 @@
 }
 
 \description{
-  Methods for function \code{as.db.data.frame} in package \pkg{PivotalR} ~~
+  Methods for function \code{as.db.data.frame} in package \pkg{PivotalR}
 }
 
 \usage{
@@ -98,9 +98,9 @@ is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
   will try to infer the data type of each column using the first
   \code{nrows} rows of the data.}
 
-\code{sep} specifies the field separator, and its default is ','.
+\code{sep} specifies the field separator, and its default is ",".
 
-\code{eol} specifies the end-of-line delimiter, and its default is '\n'.
+\code{eol} specifies the end-of-line delimiter, and its default is "\\n".
 
 \code{skip} specifies number of lines to skip before reading the data,
 and it defaults to 0.

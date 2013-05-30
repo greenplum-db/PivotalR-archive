@@ -77,7 +77,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     is.factor <- data@.is.factor
     cols <- names(data)
-    params <- .analyze.formula(formula, data, refresh = TRUE,
+    params <- .analyze.formula(formula, data, params$data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)
     
@@ -129,10 +129,11 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- arraydb.to.arrayr(params$grp.str, "character")
+    rst$grp.cols <- .strip(arraydb.to.arrayr(params$grp.str, "character"),
+                           "\"")
     rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- params$ind.vars
-    rst$col.name <- data@.col.name
+    rst$ind.vars <- .strip(params$ind.vars, "\"")
+    rst$col.name <- .strip(data@.col.name, "\"")
     rst$appear <- data@.appear.name
     rst$call <- call # the current function call itself
 

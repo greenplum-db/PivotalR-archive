@@ -69,6 +69,8 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                  get.quartiles, ",", ntile, ",", n.mfv, ",", estimate,
                  ");", sep = "")
 
+    print(sql)
+
     res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
     if (is(res, ".err.class"))
         stop("Could not do the summary!")
@@ -106,7 +108,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     if (is.null(str))
         "NULL::TEXT"
     else 
-        paste("'", paste(str, collapse = ","),
+        paste("'", paste("\"", str, "\"", collapse = ", ", sep = ""),
               "'", sep = "")
 }
 

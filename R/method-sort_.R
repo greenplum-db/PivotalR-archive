@@ -24,7 +24,7 @@ setMethod (
         sort <- list(by = by, order = order)
 
         if (is(x, "db.data.frame")) {
-            content <- paste("select * from \"", content(x), "\" order by ",
+            content <- paste("select * from ", content(x), " order by ",
                              paste("\"", by, "\"", collapse = ", ",
                                    sep = ""), order, sep = "")
             expr <- names(x)
