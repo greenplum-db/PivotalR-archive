@@ -41,6 +41,8 @@ conn.eql(conn.id1, conn.id2)
 
   \code{\link{db.connect}} creates connections to the databases.
 
+  \code{\link{db.disconnect}} disconnects an existing connection.
+
   \code{\link{db.list}} lists all the current connections with their
   information.
 }
@@ -53,7 +55,7 @@ db.connect(user = "you", dbname = "your_db") # use default values
 
 db.list() # list the above two connections
 
-conn.eql(1, 2) # return TRUE
+conn.eql(1, 2) # returns TRUE
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

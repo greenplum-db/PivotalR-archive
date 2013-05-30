@@ -85,6 +85,18 @@ conn.pkg(conn.id = 1)
   Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
 }
 
+\seealso{
+  \code{\link{db.connect}} creates connections to the databases.
+
+  \code{\link{db.disconnect}} disconnects an existing connection.
+
+  \code{\link{db.list}} lists all the current connections with their
+  information.
+
+  \code{\link{conn.eql}} tests whether two connections are actually the
+  same one.
+}
+
 \examples{
 \dontrun{
 
@@ -97,8 +109,12 @@ madlib.version()
 schema.madlib()
 conn.pkg()
 
+## conn is mostly for other packages
 con <- conn(1) # get the connection object
-dbListTables(con) # directly use functions in RPostgreSQL
+dbListTables(con) # directly use functions in package RPostgreSQL
+
+## This package provides a better function to list all tables/views
+db.objects(1) # list all tables/views with their schema in connection 1
 }
 }
 
