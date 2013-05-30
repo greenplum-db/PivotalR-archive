@@ -1,17 +1,16 @@
 \name{Aggregate functions}
 
 \alias{aggregate functions}
-\alias{mean}
-\alias{sum}
-\alias{length}
-\alias{max}
-\alias{min}
-\alias{sd}
-\alias{var}
-\alias{colMeans}
-\alias{colSums}
-\alias{c}
-
+\alias{mean,db.obj-method}
+\alias{sum,db.obj-method}
+\alias{length,db.obj-method}
+\alias{max,db.obj-method}
+\alias{min,db.obj-method}
+\alias{sd,db.obj-method}
+\alias{var,db.obj-method}
+\alias{colMeans,db.obj-method}
+\alias{colSums,db.obj-method}
+\alias{c,db.obj-method}
 
 \title{Functions to perform a calculation on multiple values and return a single value}
 \description{
@@ -23,39 +22,63 @@ includes a function to compute mean value of each column and a function to compu
 the sum of each column.}
 
 \usage{
-    mean(y$rings)
+    \S4method{mean}{db.obj}(x, ...)
 
-    sum(y$rings)
+    \S4method{sum}{db.obj}(x, ..., na.rm = FALSE)
 
-    length(y$rings)
+    \S4method{length}{db.obj}(x)
 
-    max(y$rings)
+    \S4method{max}{db.obj}(x, ..., na.rm = FALSE)
 
-    min(y$rings)
+    \S4method{min}{db.obj}(x, ..., na.rm = FALSE)
 
-    sd(y$rings)
+    \S4method{sd}{db.obj}(x)
 
-    var(y$rings)
+    \S4method{var}{db.obj}(x)
 
-    colMeans(y)
+    \S4method{colMeans}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
 
-    colSums(y)
+    \S4method{colSums}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
+
+    \S4method{c}{db.obj}(x, ..., recursive = FALSE)
 }
 
 \arguments{
     \item{x}{
+        A \code{db.obj} object.
         The signature of the method.
-        A \code{db.obj} object, which points to either a table or a column of a
-        table in the database.
     }
+
+    \item{...}{
+        further arguments passed to or from other methods
+        This is currently not implemented.
+    }
+
+    \item{na.rm}{
+        logical.  Should missing values (including 'NaN') be removed?
+        This is currently not implemented.
+    }
+
+    \item{dims}{
+        integer: Which dimensions are regarded as 'rows' or 'columns'
+          to sum over.
+          This is currently not implemented and the default behavior is to
+          sum over columns
+    }
+
+    \item{recursive}{
+        logical. This is currently not implemented.
+    }
+
 }
 
 \details{
     For aggregates mean, sum, length, max, min, sd, and var, the signature
-    \code{x} must be a reference to a column in a table.
+    \code{x} must be a reference to a single column in a table.
 
-    For aggregates colMeans and colSums, the signature
-    \code{x} can be a reference to a single column or the table.
+    For aggregates colMeans, colSums, and c the signature
+    \code{x} can be a \code{db.obj} referencing to a single column or a single
+    table, or can be a \code{db.Rquery} referencing to multiple columns in a table.
 }
 
 \value{
@@ -77,6 +100,7 @@ the sum of each column.}
 
     For \code{colSums}, a \code{db.Rquery} which is a SQL query to extract the sum of multiple columns of a table.
 
+    For \code{c}, a \code{db.Rquery} which is a SQL query to extract the values as an array aggregate.
 }
 
 \author{
@@ -122,9 +146,15 @@ colMeans(x)
 
 # get the sum of all columns in the table
 colSums(x)
+
+# get the array aggregate of a specific column in the table
+c(x$diameter)
+
+# get the array aggregate of all columns in the table
+c(x)
+
     }
 }
 
 \keyword{database}
 \keyword{aggregates}
-\keyword{utility}
