@@ -2,10 +2,14 @@
 \alias{content}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-function to do ... ~~
+  Print the content of a \code{db.obj} object
 }
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  A \code{db.data.frame} object's content is the table/view name that it
+  points to. A \code{db.Rquery} object's content is the SQL query that
+  represents the operations applied on an existing
+  \code{db.data.frame}. This function is mainly for debugging. Normal
+  user who is not familiar with SQL does not need to use it.
 }
 \usage{
 content(x)
@@ -13,45 +17,57 @@ content(x)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-Describe \code{x} here~~
+    A \code{db.obj} object, whose content will be returned.
 }
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A string, the content of \code{db.obj} object \code{x}.   A
+  \code{db.data.frame} object's content is the table/view name that it 
+  points to. A \code{db.Rquery} object's content is the SQL query that
+  represents the operations applied on an existing \code{db.data.frame}.
+}
+
+\author{
+   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+}
+
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{db.obj-class}}, \code{\link{db.data.frame-class}},
+  \code{\link{db.table-class}}, \code{\link{db.view-class}},
+  \code{\link{db.Rquery-class}} explain the definitions of the class
+  hierarchy of this package.
 }
-\examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"content"
-## End (Not run)
+\examples{
+\dontrun{
+
+## create a database connection using default settings
+db.connect()
+
+y <- as.db.data.frame(abalone, "abalone") # create a table
+x <- db.data.frame("abalone")
+
+## actually, x and y are pointing the same table
+eql(x, y) # returns TRUE
+
+content(x)
+content(x$id)
+content(x$id < 10)
+content(x[,1:5])
+content(x == y) # this is different from eql(x, y)
+content(sort(x, by = "id"))
+content(x[x$id<10,])
+content(x[1:10,])
+content(colSums(x))
+content(by(x, NULL, sum))
+content(by(x, x$sex, sum))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{ sql }
+\keyword{ database }
