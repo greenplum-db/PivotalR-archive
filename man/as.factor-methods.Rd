@@ -43,15 +43,26 @@
 \examples{
 \dontrun{
 
-## Suppose that a valid connection with ID 1 exists
+## Suppose that a valid connection with ID 1 is already created by db.connect
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, "abalone") # use default connection 1
 
 ## set sex to be a categorial variable
 x$sex <- as.factor(x$sex)
 
-fit <- madlib.lm(rings ~ . - id, data = x)
+fit1 <- madlib.lm(rings ~ . - id, data = x) # linear regression
+
+fit2 <- madlib.glm(rings < 10 ~ . - id, data = x, family = "binomial") # logistic regression
+
+## create another R db.data.frame object pointing to "abalone"
+z <- db.data.frame("abalone", conn.id = 1) # explicitly specify the connection
+
+## specify factor during fitting
+fit3 <- madlib.lm(rings ~ as.factor(sex) + length + diameter, data = z)
+
+fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
+= z, family = "binomial")
 }
 }
 

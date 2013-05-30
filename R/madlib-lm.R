@@ -52,7 +52,7 @@ madlib.lm <- function (formula, data, na.action,
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- .strip(content(data), "\"")
+    tbl.source <- content(data)
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select ", madlib, ".linregr_train('",

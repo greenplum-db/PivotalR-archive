@@ -252,6 +252,9 @@ arraydb.to.arrayr <- function (str, type = "double")
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
     }
 
+    right.hand <- gsub("as.factor\\((.*)\\)", "\\1", right.hand, perl = T)
+    right.hand <- gsub("factor\\((.*)\\)", "\\1", right.hand, perl = T)
+    
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
 
@@ -263,9 +266,6 @@ arraydb.to.arrayr <- function (str, type = "double")
     ## if (!is.null(f2.labels) && f.intercept != 0) 
         ## labels <- setdiff(labels, f2.labels)
 
-    labels <- gsub("as.factor\\((.*)\\)", "\\1", labels, perl = T)
-    labels <- gsub("factor\\((.*)\\)", "\\1", labels, perl = T)
-    
     ## dependent variable
     ## factor does not play a role in dependent variable
     dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
