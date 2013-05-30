@@ -89,7 +89,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- .strip(content(data), "\"")
+    tbl.source <- gsub("\"", "", content(data))
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select ", madlib, ".logregr_train('",
@@ -129,11 +129,10 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- .strip(arraydb.to.arrayr(params$grp.str, "character"),
-                           "\"")
+    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str, "character"))
     rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- .strip(params$ind.vars, "\"")
-    rst$col.name <- .strip(data@.col.name, "\"")
+    rst$ind.vars <- gsub("\"", "", params$ind.vars)
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- call # the current function call itself
 

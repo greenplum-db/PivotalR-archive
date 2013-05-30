@@ -262,10 +262,6 @@ arraydb.to.arrayr <- function (str, type = "double")
     labels <- gsub(":", "*", f.labels, perl = T) # replace interaction : with *
     labels <- gsub("I\\((.*)\\)", "\\1", labels, perl = T) # remove I()
 
-    ## remove grouping columns, when there is no intercept term
-    ## if (!is.null(f2.labels) && f.intercept != 0) 
-        ## labels <- setdiff(labels, f2.labels)
-
     ## dependent variable
     ## factor does not play a role in dependent variable
     dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
@@ -280,6 +276,9 @@ arraydb.to.arrayr <- function (str, type = "double")
         intercept.str <- "1,"
 
     labels <- .replace.with.quotes(labels, data@.col.name)
+    ## remove grouping columns, when there is no intercept term
+    if (!is.null(f2.labels) && f.intercept != 0)
+        labels <- setdiff(labels, f2.labels)
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable

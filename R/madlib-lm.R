@@ -52,14 +52,14 @@ madlib.lm <- function (formula, data, na.action,
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- content(data)
+    tbl.source <- gsub("\"", "", content(data))
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select ", madlib, ".linregr_train('",
                  tbl.source, "', '", tbl.output, "', '",
                  params$dep.str, "', '", params$ind.str, "', ",
                  grp, ", ", hetero, ")", sep = "")
-
+    
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class))
@@ -90,11 +90,10 @@ madlib.lm <- function (formula, data, na.action,
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- .strip(arraydb.to.arrayr(params$grp.str, "character"),
-                           "\"")
+    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str, "character"))
     rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- .strip(params$ind.vars, "\"")
-    rst$col.name <- .strip(data@.col.name, "\"")
+    rst$ind.vars <- gsub("\"", "", params$ind.vars)
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
     
