@@ -1,5 +1,6 @@
 \name{Aggregate functions}
 
+\alias{aggregate functions}
 \alias{mean}
 \alias{sum}
 \alias{length}

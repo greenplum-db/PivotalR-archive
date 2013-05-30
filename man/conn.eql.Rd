@@ -1,56 +1,62 @@
 \name{conn.eql}
 \alias{conn.eql}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-  Check whether two connections are equal
+  Check whether two connections are the same
 }
+
 \description{
-  A concise (1-5 lines) description of what the function does. ~~
+  Two connections are regarded as equal if and only if they have the
+  same database name, host, DBMS, and port number.
 }
+
 \usage{
 conn.eql(conn.id1, conn.id2)
 }
 
 \arguments{
   \item{conn.id1}{
-     Describe \code{conn.id1} here~~
+    An integer, a connection ID number.
 }
   \item{conn.id2}{
-     Describe \code{conn.id2} here~~
+    An integer, another connection ID number.
 }
 }
-\details{
- If necessary, more details than the description above ~~
-}
+
 \value{
-~Describe the value returned
-  If it is a LIST, use
-  \item{conn.id1}{Connection 1}
-  \item{conn.id2}{Connection 2}
+  A logical. TRUE if and only if the two connections have the
+  same database name, host, DBMS, and port number.
 }
-\references{
-put references to the literature/web site here ~
-}
+
 \author{
-who you are~~
-}
-\note{
-further notes~~
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
 }
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{connection info}} has all functions that can extract
+  information about the database connection.
+
+  \code{\link{db.connect}} creates connections to the databases.
+
+  \code{\link{db.list}} lists all the current connections with their
+  information.
 }
 \examples{
 \dontrun{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
+## Create two connections
+db.connect(host = "localhost", user = "you", dbname = "your_db", port = 5432)
+db.connect(user = "you", dbname = "your_db") # use default values
+
+db.list() # list the above two connections
+
+conn.eql(1, 2) # return TRUE
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ kwd1 }
-\keyword{ kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ database }
+

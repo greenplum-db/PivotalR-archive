@@ -28,6 +28,7 @@
         conn.id = conn.id,
         host = host,
         user = user,
+        port = port,
         dbname = dbname, # database name
         # which R package is used to connected to database
         conn.pkg = "rpostgresql",

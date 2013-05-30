@@ -1,10 +1,12 @@
 \name{Extract database connection info}
 
+\alias{connection info}
 \alias{user}
 \alias{host}
 \alias{dbname}
 \alias{dbms}
 \alias{conn}
+\alias{port}
 \alias{madlib}
 \alias{madlib.version}
 \alias{schema.madlib}
@@ -33,6 +35,8 @@ dbms(conn.id = 1)
 
 conn(conn.id = 1)
 
+port(conn.id = 1)
+
 madlib(conn.id = 1)
 
 madlib.version(conn.id = 1)
@@ -60,6 +64,8 @@ conn.pkg(conn.id = 1)
 
   For \code{conn}, an object of DBI connection, which can be directly
   used with packages such as RPostgreSQL.
+
+  For \code{port}, an integer, which is the port number of the connection.
 
   For \code{madlib}, a string, which is the MADlib version information.
 

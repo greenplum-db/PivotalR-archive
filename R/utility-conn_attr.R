@@ -47,6 +47,17 @@ conn.pkg <- function (conn.id = 1)
 
 ## ------------------------------------------------------------------------
 
+## connection port
+port <- function (conn.id = 1)
+{
+    if (!.is.conn.id.valid(conn.id))
+        stop("There is no such connection!")
+    id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
+    .localVars$db[[id]]$port
+}
+
+## ------------------------------------------------------------------------
+
 ## connection itself
 conn <- function (conn.id = 1)
 {
@@ -140,7 +151,8 @@ conn.eql <- function (conn.id1, conn.id2)
     ## have to be the same.
     if (dbname(conn.id1) == dbname(conn.id2) &&
         host(conn.id1) == host(conn.id2) &&
-        dbms(conn.id1) == dbms(conn.id2))
+        dbms(conn.id1) == dbms(conn.id2) &&
+        port(conn.id1) == port(conn.id2))
         TRUE
     else
         FALSE

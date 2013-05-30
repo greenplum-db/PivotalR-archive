@@ -1,6 +1,6 @@
 \name{by}
 \alias{by,db.obj-method}
-\title{ Apply a Function to a \code{db.data.frame} Split by a column }
+\title{ Apply a Function to a \code{db.data.frame} Split by column(s) }
 \description{
   \code{by} is equivalent to "group by" in SQL language. It groups the
   data according the value(s) of one or multiple columns, and then apply
@@ -8,7 +8,7 @@
 }
 
 \usage{
-\S4method{by}{db.obj}(data, INDICES = NULL, FUN, ...)
+\S4method{by}{db.obj}(data, INDICES, FUN, ..., simplify = TRUE)
 }
 
 \arguments{
@@ -20,7 +20,7 @@
   }
 
   \item{INDICES}{
-    A list of \code{db.Rquery} objects, default is \code{NULL}. Each of
+    A list of \code{db.Rquery} objects. Each of
     the list element selects a column of \code{data}. When the value is
     \code{NULL}, no grouping of data is done, and the aggregate function
     \code{FUN} will be applied onto 
@@ -33,6 +33,10 @@
 
   \item{...}{
     Extra arguments passed to \code{FUN}, currently not implemented.
+  }
+
+  \item{simplify}{
+    Not implemented yet.
   }
 }
 
@@ -49,7 +53,7 @@
 }
 
 \seealso{
-  \code{\link{Aggregate functions}} lists all the supported aggregate
+  \code{\link{aggregate functions}} lists all the supported aggregate
   functions.
 
   \code{\link{preview}} can display the actual result of this function.
