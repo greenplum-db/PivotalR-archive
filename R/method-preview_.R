@@ -58,19 +58,8 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        tbl <- .unique.string()
-        tmp <- as.db.data.frame(x, tbl, is.temp = TRUE, verbose = interactive)
-        if (x@.sort$by != "")
-            sort.str <- paste("order by",
-                              paste(x@.sort$by, collapse = ", "),
-                              x@.sort$order)
-        else
-            sort.str <- ""
-        
-        res <- .db.getQuery(paste("select * from", content(tmp), sort.str,
-                                  "limit", nrows),
-                            conn.id(tmp))
-        delete(tmp)
+        res <- .db.getQuery(paste(content(x), "limit", nrows),
+                            conn.id(x))
 
         msg.level <- .set.msg.level(msg.level) # reset message level
         options(warn = warn.r) # reset R warning level
