@@ -39,7 +39,7 @@ The return value is the primary key of the table.
 } 
 
 \seealso{
-  \code{\link{preview}} Displays the contents of an \code{db.obj} object.
+  \code{\link{preview}} Displays the contents of a \code{db.obj} object.
 }
 \examples{
 \dontrun{

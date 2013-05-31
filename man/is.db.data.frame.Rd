@@ -18,7 +18,7 @@ The input can be of any type.
 }
 
 \details{
-\code{is.db.data.frame()} returns \code{true} if \code{x} is of type \code{db.data.frame}.  Otherwise, it returns \code{false}.  
+\code{is.db.data.frame()} returns \code{TRUE} if \code{x} is of type \code{db.data.frame}.  Otherwise, it returns \code{FALSE}.  
 
 }
 \value{
@@ -32,7 +32,7 @@ The return value is a boolean indicating the type of the input.
 } 
 
 \seealso{
-  \code{\link{as.db.data.frame}} Casting an object into another object of type \code{db.data.frame}.
+  \code{\link{as.db.data.frame}} Convert an object into another object of type \code{db.data.frame}.
 }
 \examples{
 \dontrun{
