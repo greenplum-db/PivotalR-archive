@@ -5,7 +5,9 @@
   Create a connection to a database
 }
 \description{
-  Create a connection to a database.
+  Create a connection to a database. One can create multiple connections
+  to multiple databases. The connections are indexed by an integer
+  starting from 1.
 }
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
@@ -40,10 +42,7 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
   to connect to the database. Currently, only RPostgreSQL is supported,
   but the support for other packages such as RODBC can be easily added.
    }
-}
-\details{
-  
-}
+ }
 
 \value{
   An integer, the ID number for the newly created connection.
@@ -56,14 +55,30 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
   Inc. \email{user@madlib.net}
 }
 
+\note{
+  Right only MADlib 0.6 or later is supported. If you have an older
+  version of MADlib, you will not be able to use all the functions whose
+  names start with "madlib.". However you can still use all the other
+  functions. 
+}
+
 \seealso{
-  
+  \code{\link{db.disconnect}} disconnects a connection.
+
+  \code{\link{db.list}} lists all active connections.
+
+  \code{\link{connection info}} the functions that extract information
+  about the connection.
 }
 \examples{
 \dontrun{
 
+## connect to a database
+db.connect(host = "localhost", user = "me", dbname = "me", password =
+"", port = 5432, madlib = "madlib")
 }
 }
 
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utility}
+\keyword{ database }
+\keyword{ connection }
