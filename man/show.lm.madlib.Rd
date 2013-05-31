@@ -1,6 +1,8 @@
 \name{show.lm.madlib}
 \alias{show.lm.madlib}
 
+\title{Show function}
+
 \description{
     TODO: add this function as alias of \code{\link{print.lm.madlib}} and
     remove this file.
