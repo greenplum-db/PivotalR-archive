@@ -1,12 +1,12 @@
 \name{key}
 \alias{key}
 \alias{key<-}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
 Get or set the primary key for a table
 }
 \description{
-This function returns or sets the primary key for a \code{db.obj} table.  
+This function gets or sets the primary key for a \code{db.obj} table.  
 }
 \usage{
 key(x)
@@ -17,10 +17,10 @@ key(x) <- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-\code{x} is a db.obj.   
+ is a db.obj object.   
 }
 \item{value}{
-    If \code{key} is being used to set the primary key, then \code{value} must be a string.  
+     must be a string.  
 }
 }
 \details{

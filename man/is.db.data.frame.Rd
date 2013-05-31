@@ -1,57 +1,52 @@
 \name{is.db.data.frame}
 \alias{is.db.data.frame}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+Check if an object is of type \code{db.data.frame}
 }
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+This function checks if the input is of type \code{db.data.frame}.
 }
 \usage{
 is.db.data.frame(x)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{x}{
-Describe \code{x} here~~
+The input can be of any type.  
 }
 }
+
 \details{
-If necessary, more details than the description above ~~
+\code{is.db.data.frame()} returns \code{true} if \code{x} is of type \code{db.data.frame}.  Otherwise, it returns \code{false}.  
+
 }
 \value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
+The return value is a boolean indicating the type of the input.  
 }
 \author{
-who you are~~
-}
-\note{
-further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+} 
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{as.db.data.frame}} Casting an object into another object of type \code{db.data.frame}.
 }
 \examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
 
-## The function is currently defined as
-"is.db.data.frame"
-## End (Not run)
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- db.data.frame('abalone', key = 'id')
+
+## getting the primary key
+is.db.data.frame(x) #check if x is of type db.data.frame
+
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{data}
+\keyword{utilities}
