@@ -69,6 +69,8 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
 
   \code{\link{connection info}} the functions that extract information
   about the connection.
+  
+  \code{\link{conn.eql}} tests whether two connections are the same.
 }
 \examples{
 \dontrun{

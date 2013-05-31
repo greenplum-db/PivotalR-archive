@@ -7,7 +7,7 @@ Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>, with contri
 Maintainer: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>
 Depends: R (>= 2.9.0), methods
 Enhances: DBI, RPostgreSQL
-Description: R wrapper for MADlib running on PostgreSQL or Greenplum database
+Description: R wrapper for Pivotal Data Fabrics running on PostgreSQL or Greenplum database
 License: GPL (>= 2)
 LazyLoad: yes
 LazyData: yes
