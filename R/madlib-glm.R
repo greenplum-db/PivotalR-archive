@@ -127,6 +127,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     rst$z_stats <- arraydb.to.arrayr(res$z_stats, "double", n)
     rst$p_values <- arraydb.to.arrayr(res$p_values, "double", n)
     rst$odds_ratios <- arraydb.to.arrayr(res$odds_ratios, "double", n)
+    rst$ind.str <- params$ind.str
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups

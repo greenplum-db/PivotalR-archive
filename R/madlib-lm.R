@@ -95,6 +95,7 @@ madlib.lm <- function (formula, data, na.action,
                                                      "character", n))
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- gsub("\"", "", params$ind.vars)
+    rst$ind.str <- params$ind.str
     rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
