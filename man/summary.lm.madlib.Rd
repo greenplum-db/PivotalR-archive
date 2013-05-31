@@ -8,7 +8,7 @@
 }
 
 \usage{
-    \method{summary}{lm.madlib}(object, ...)
+\method{summary}{lm.madlib}(object, ...)
 }
 
 
@@ -18,10 +18,6 @@
     \item{...}{
       Further arguments passed to or from other methods.
       This is currently not implemented.}
-}
-
-\details{
-
 }
 
 \value{
@@ -40,7 +36,7 @@
 }
 
 \examples{
-    \dontrun{
+\dontrun{
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame
@@ -56,7 +52,7 @@ fit
 fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
 data = x, heteroskedasticity = T)
 summary(fit)
-       }
+}
 }
 
 \keyword{madlib}

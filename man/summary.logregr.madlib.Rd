@@ -19,10 +19,6 @@
       This is currently not implemented.}
 }
 
-\details{
-
-}
-
 \value{
     The function returns the \code{logregr.madlib} object passed to the function
 

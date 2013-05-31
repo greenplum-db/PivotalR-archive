@@ -22,25 +22,25 @@ includes a function to compute mean value of each column and a function to compu
 the sum of each column.}
 
 \usage{
-    \S4method{mean}{db.obj}(x, ...)
+\S4method{mean}{db.obj}(x, ...)
 
-    \S4method{sum}{db.obj}(x, ..., na.rm = FALSE)
+\S4method{sum}{db.obj}(x, ..., na.rm = FALSE)
 
-    \S4method{length}{db.obj}(x)
+\S4method{length}{db.obj}(x)
 
-    \S4method{max}{db.obj}(x, ..., na.rm = FALSE)
+\S4method{max}{db.obj}(x, ..., na.rm = FALSE)
 
-    \S4method{min}{db.obj}(x, ..., na.rm = FALSE)
+\S4method{min}{db.obj}(x, ..., na.rm = FALSE)
 
-    \S4method{sd}{db.obj}(x)
+\S4method{sd}{db.obj}(x)
 
-    \S4method{var}{db.obj}(x)
+\S4method{var}{db.obj}(x)
 
-    \S4method{colMeans}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
+\S4method{colMeans}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
 
-    \S4method{colSums}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
+\S4method{colSums}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
 
-    \S4method{c}{db.obj}(x, ..., recursive = FALSE)
+\S4method{c}{db.obj}(x, ..., recursive = FALSE)
 }
 
 \arguments{
@@ -115,7 +115,10 @@ the sum of each column.}
 % }
 
 \examples{
-    \dontrun{
+\dontrun{
+## get the help for a method
+help("mean,db.obj-method")
+
 ## Suppose that a valid connection to a database (with ID=1) is established
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone")

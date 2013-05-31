@@ -1,5 +1,4 @@
 \name{as.factor}
-\alias{as.factor}
 \alias{as.factor,db.obj-method}
 
 \title{ Convert one column of a \code{db.obj} object into a categorial variable }
@@ -42,6 +41,9 @@
 
 \examples{
 \dontrun{
+## get help for a method
+help("as.factor,db.obj-method")
+
 ## Suppose that a valid connection with ID 1 is already created by db.connect
 
 ## create a table from the example data.frame "abalone"

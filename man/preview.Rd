@@ -68,6 +68,9 @@
 }
 \examples{
 \dontrun{
+## get the help for a method
+help("preview,db.Rquery-method")
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame "abalone"

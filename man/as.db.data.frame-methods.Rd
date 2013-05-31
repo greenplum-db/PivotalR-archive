@@ -146,6 +146,9 @@ and it defaults to 0.
 }
 \examples{
 \dontrun{
+## get the help for a method
+help("as.db.data.frame")
+help("as.db.data.frame,db.Rquery-method")
 
 ## Suppose that a valid connection with ID 1 exists
 
