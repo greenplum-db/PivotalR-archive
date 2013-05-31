@@ -21,7 +21,7 @@ predict.logregr.madlib <- function (object, newdata, ...)
 {
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
-    coef <- paste("array[", paste(object$coef, collapse = ", "), "]"
+    coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
                   sep = "")
     madlib <- schema.madlib(conn.id(newdata))
     if (is(newdata, "db.data.frame")) {
