@@ -1,8 +1,10 @@
 
 setMethod (
     "dim",
-    signature(x = "db.table"),
+    signature(x = "db.obj"),
     function (x) {
+        if (!is(x, "db.table"))
+            stop("Dim information is only available for db.table object!")
         x@.dim
     })
 

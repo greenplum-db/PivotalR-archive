@@ -57,7 +57,8 @@ setMethod (
 
 ## operation between an db.obj and a single value
 .compare <- function (e1, e2, cmp, data.types,
-                      prefix = "", res.type = "boolean", cast = "::double precision")
+                      prefix = "", res.type = "boolean",
+                      cast = "::double precision")
 {
     if (is(e1, "db.data.frame")) e1 <- e1[,]    
     expr <- rep("", length(names(e1)))
@@ -494,7 +495,7 @@ setMethod (
     "%%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " % ", .num.types, res.type = "double precision")
+        .compare(e1, e2, " % ", .num.types, res.type = "double precision", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -506,7 +507,7 @@ setMethod (
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "% "),
-                 res.type = "double precision")
+                 res.type = "double precision", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -528,7 +529,7 @@ setMethod (
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "%"),
-                 res.type = "integer")
+                 res.type = "integer", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -793,6 +794,6 @@ setMethod (
     "is.na",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", " is NULL", NA, "", "boolean", "::boolean")
+        .compare(x, "", " is NULL", NA, "", "boolean", "")
     },
     valueClass = "db.Rquery")
