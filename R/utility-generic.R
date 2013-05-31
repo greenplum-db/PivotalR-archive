@@ -348,6 +348,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 ## ------------------------------------------------------------------------
 
+## If an independent variable is an array, it needs special treatment
 .is.array <- function (labels, data)
 {
     nlabels <- character(0)

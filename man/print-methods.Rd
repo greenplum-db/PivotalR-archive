@@ -8,7 +8,7 @@ This function displays the SQL table, database, host, and connection information
 \usage{
 \S4method{print}{db.data.frame}(x)
 
-\S4method{preview}{db.Rquery}(x)
+\S4method{print}{db.Rquery}(x)
 }
 
 \arguments{
