@@ -99,7 +99,6 @@ conn.pkg(conn.id = 1)
 
 \examples{
 \dontrun{
-
 user(1)
 host(2)
 dbname() # use default connection 1

@@ -42,7 +42,6 @@
 
 \examples{
 \dontrun{
-
 ## Suppose that a valid connection with ID 1 is already created by db.connect
 
 ## create a table from the example data.frame "abalone"

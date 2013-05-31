@@ -152,7 +152,6 @@ c(x$diameter)
 
 # get the array aggregate of all columns in the table
 c(x)
-
     }
 }
 

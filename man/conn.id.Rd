@@ -53,7 +53,6 @@ conn.id(x) <- value
 }
 \examples{
 \dontrun{
-
 ## create two connections
 db.connect(host = "localhost", user = "you", dbname = "your_db", port = 5432)
 db.connect(user = "you", dbname = "your_db") # use default values

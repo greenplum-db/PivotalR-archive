@@ -68,7 +68,6 @@
 }
 \examples{
 \dontrun{
-
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame "abalone"

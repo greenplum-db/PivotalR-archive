@@ -72,7 +72,6 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
 }
 \examples{
 \dontrun{
-
 ## connect to a database
 db.connect(host = "localhost", user = "me", dbname = "me", password =
 "", port = 5432, madlib = "madlib")

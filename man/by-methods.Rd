@@ -61,7 +61,6 @@
 
 \examples{
 \dontrun{
-
 help("by,db.obj-method") # display this doc
 
 ## Suppose a valid database connection 1 has been created by db.connect

@@ -165,7 +165,6 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 \examples{
 \dontrun{
-
 ## connect to a data base
 db.connect(dbname = "exampledb", user = "example", host = "localhost", port = 5433)
 x <- db.data.frame("madlibtestdata.lin_ornstein")
@@ -179,7 +178,8 @@ fit
 ## use I(.) for expressions
 fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
 data = x, heteroskedasticity = T)
-fit
+fit # display the result
+
 }
 }
 

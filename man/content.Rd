@@ -45,7 +45,6 @@ content(x)
 
 \examples{
 \dontrun{
-
 ## create a database connection using default settings
 db.connect()
 
