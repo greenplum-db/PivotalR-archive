@@ -1,9 +1,9 @@
 \name{summary.logregr.madlib}
 \alias{summary.logregr.madlib}
 
-\title{Summary information about Logistic Regression output}
+\title{Summary information for Logistic Regression output}
 \description{
-    The function prints information about the logistic regression object with
+    The function prints information about the logistic regression object along with
     the value for each returned element.
 }
 
@@ -20,7 +20,7 @@
 }
 
 \value{
-    The function returns the \code{logregr.madlib} object passed to the function
+    The function returns the \code{logregr.madlib} object passed to the function.
 
 }
 

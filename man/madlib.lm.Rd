@@ -8,7 +8,7 @@
 
 \description{
   The wrapper function for MADlib linear regression. Heteroskedasticity
-  can be detected using Breusch-Pagan test. One or multiple columns of
+  can be detected using the Breusch-Pagan test. One or multiple columns of
   data can be used to separated the data set into multiple groups
   according to the values of the grouping columns. Linear regression is
   applied onto each group, which has fixed values of the grouping columns.

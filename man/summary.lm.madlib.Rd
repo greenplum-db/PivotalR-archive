@@ -1,10 +1,10 @@
 \name{summary.lm.madlib}
 \alias{summary.lm.madlib}
 
-\title{Summary information about Linear Regression output}
+\title{Summary information for Linear Regression output}
 \description{
-    The function prints information about the linear regression object with
-    the value for each returned element.
+    The function prints information about the linear regression object along with
+    the value of each returned element.
 }
 
 \usage{
