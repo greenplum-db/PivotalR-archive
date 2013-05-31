@@ -5,10 +5,10 @@
 \alias{preview,db.Rquery-method}
 
 \title{
-  Read the actual data stored in the table of database
+  Read the actual data stored in a table of database.
 }
 \description{
-  The function reads the actual data from the table in the database, it
+  The function reads the actual data from a table in the database, it
   can also preview the actual result of some operations on a table.
 }
 \usage{
@@ -28,7 +28,7 @@
   operations on a \code{db.data.frame} object.
   }
   \item{nrows}{
-    An integer, default is 100, how many rows of data 
+    An integer, default is 100, how many rows of data.
   }
   \item{interactive}{
     A boolean, default is FALSE. If \code{x} is a view, then extracting
@@ -64,7 +64,7 @@
 
 \seealso{
   \code{\link{arraydb.to.arrayr}} convert strings extracted form
-  database into arrays
+  database into arrays.
 }
 \examples{
 \dontrun{

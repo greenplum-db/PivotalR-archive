@@ -1,19 +1,60 @@
-\name{print-methods}
-\docType{methods}
-\alias{print.db.data.frame}
+\name{print}
 \alias{print,db.data.frame-method}
-\alias{print.db.Rquery}
 \alias{print,db.Rquery-method}
-\title{ ~~ Methods for Function \code{print} in Package \pkg{base} ~~}
+\title{ Display the connection information associated with a \code{db} object}
 \description{
- ~~ Methods for function \code{print} in package \pkg{base} ~~
+This function displays the SQL table, database, host, and connection information associated with a \code{db.table} or \code{db.view} object.
 }
-\section{Methods}{
-\describe{
+\usage{
+\S4method{print}{db.data.frame}(x)
 
-\item{\code{signature(x = "db.data.frame")}}{
-%%  ~~describe this method here~~
+\S4method{preview}{db.Rquery}(x)
 }
-}}
-\keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
+
+\arguments{
+  \item{x}{
+    The signature of the method. 
+    A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
+  object, which points to a table or view in
+    the database; or a \code{db.Rquery} object, which represents some
+  operations on a \code{db.data.frame} object.
+  }
+}
+
+\details{
+  When the signature \code{x} is either a \code{db.data.frame} object or a \code{db.Rquery} object, this
+  function displays the name of connected SQL database, the SQL database host, and the connection ID.
+
+	When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this
+  function displays the temporary status of the input, and it's the table that it is derived from.  }
+
+\value{
+  There is no return value. 
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
+
+\seealso{
+  \code{\link{preview}} Displays the contents of an associated table.
+}
+\examples{
+\dontrun{
+
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone, "abalone")
+
+## printing db.data.frame object
+print(x) # Display the associated table, and database information for x
+
+##Alternative way of doing the same thing
+x# Display the associated table, and database information for x
+
+}
+}

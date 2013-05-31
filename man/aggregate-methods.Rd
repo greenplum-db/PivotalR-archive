@@ -15,10 +15,10 @@
 \title{Functions to perform a calculation on multiple values and return a single value}
 \description{
     An aggregate function is a function where the values of multiple rows are
-grouped together as input on certain criteria to calculate a single value of more
-significant meaning or measurement. The aggregate functions included here are
-mean, sum, count, max, min, standard deviation, and variance. The set also
-includes a function to compute mean value of each column and a function to compute
+grouped together as input to calculate a single value of more
+significant meaning or measurement. The aggregate functions included are
+mean, sum, count, max, min, standard deviation, and variance. Also included is
+a function to compute the mean value of each column and a function to compute
 the sum of each column.}
 
 \usage{
@@ -73,10 +73,10 @@ the sum of each column.}
 }
 
 \details{
-    For aggregates mean, sum, length, max, min, sd, and var, the signature
+    For aggregate functions: mean, sum, length, max, min, sd, and var, the signature
     \code{x} must be a reference to a single column in a table.
 
-    For aggregates colMeans, colSums, and c the signature
+    For aggregate functions: colMeans, colSums, and c the signature
     \code{x} can be a \code{db.obj} referencing to a single column or a single
     table, or can be a \code{db.Rquery} referencing to multiple columns in a table.
 }
@@ -84,17 +84,17 @@ the sum of each column.}
 \value{
     For \code{mean}, a \code{db.Rquery} which is a SQL query to extract the average of a column of a table.
 
-    For \code{sum}, a \code{db.Rquery} which is a SQL query to extract the sum of a column of a table..
+    For \code{sum}, a \code{db.Rquery} which is a SQL query to extract the sum of a column of a table.
 
-    For \code{length}, a \code{db.Rquery} which is a SQL query to extract the count of a column of a table..
+    For \code{length}, a \code{db.Rquery} which is a SQL query to extract the count of a column of a table.
 
-    For \code{max}, a \code{db.Rquery} which is a SQL query to extract the max of a column of a table..
+    For \code{max}, a \code{db.Rquery} which is a SQL query to extract the max of a column of a table.
 
-    For \code{min}, a \code{db.Rquery} which is a SQL query to extract the min of a column of a table..
+    For \code{min}, a \code{db.Rquery} which is a SQL query to extract the min of a column of a table.
 
-    For \code{sd}, a \code{db.Rquery} which is a SQL query to extract the standard deviation of a column of a table..
+    For \code{sd}, a \code{db.Rquery} which is a SQL query to extract the standard deviation of a column of a table.
 
-    For \code{var}, a \code{db.Rquery} which is a SQL query to extract the variance of a column of a table..
+    For \code{var}, a \code{db.Rquery} which is a SQL query to extract the variance of a column of a table.
 
     For \code{colMeans}, a \code{db.Rquery} which is a SQL query to extract the mean of multiple columns of a table.
 
