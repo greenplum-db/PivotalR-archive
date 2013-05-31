@@ -114,6 +114,6 @@ setMethod (
             .col.udt_name = col.udt_name,
             .where = "",
             .is.factor = is.factor,
-            .sort = list(by = "", order = ""))
+            .sort = list(by = "", order = "", str = ""))
     },
     valueClass = "db.Rquery")

@@ -215,7 +215,7 @@ setMethod (
 
     new("db.Rquery",
         .content = paste("select ", i.str, " from ", tbl, where.str,
-        sort$sort.str, sep = ""),
+        sort$str, sep = ""),
         .expr = expr,
         .source = src,
         .parent = parent,
@@ -226,7 +226,7 @@ setMethod (
         .col.udt_name = x@.col.udt_name[cols.i],
         .where = where,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------

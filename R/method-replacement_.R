@@ -82,7 +82,7 @@
 
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, where.str, sort$sort.str, sep = ""),
+        tbl, where.str, sort$str, sep = ""),
         .expr = x.names,
         .source = value@.source,
         .parent = value@.parent,
@@ -93,7 +93,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -164,7 +164,7 @@
     
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, where.str, sort$sort.str, sep = ""),
+        tbl, where.str, sort$str, sep = ""),
         .expr = x.names,
         .source = src,
         .parent = parent,
@@ -175,7 +175,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------

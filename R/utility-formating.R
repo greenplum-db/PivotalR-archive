@@ -27,16 +27,16 @@
 .generate.sort <- function (x)
 {
     if (is(x, "db.data.frame")) {
-        sort <- list(by = "", order = "")
+        sort <- list(by = "", order = "", str = "")
     } else {
         sort <- x@.sort
     }
-    if (sort$by != "")
-        sort.str <- paste(" order by ",
-                          paste("\"", sort$by, "\"",
-                                collapse = ", ", sep = ""),
-                          sort$order, sep = "")
-    else
-        sort.str <- ""
-    list(sort = sort, sort.str = sort.str)
+    ## if (sort$by != "")
+    ##     sort.str <- paste(" order by ",
+    ##                       paste("\"", sort$by, "\"",
+    ##                             collapse = ", ", sep = ""),
+    ##                       sort$order, sep = "")
+    ## else
+    ##     sort.str <- ""
+    sort
 }

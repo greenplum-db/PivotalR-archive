@@ -74,6 +74,6 @@ setMethod (
             .col.udt_name = col.udt_name,
             .where = where,
             .is.factor = rep(FALSE, length(names(data))),
-            .sort = list(by = "", order = ""))
+            .sort = list(by = "", order = "", str = ""))
     },
     valueClass = "db.Rquery")

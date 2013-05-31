@@ -77,7 +77,7 @@
         .col.udt_name = udt.name,
         .where = where,
         .is.factor = rep(FALSE, length(names(x))),
-        .sort = list(by = "", order = ""))
+        .sort = list(by = "", order = "", str = ""))
 }
 
 ## ------------------------------------------------------------------------

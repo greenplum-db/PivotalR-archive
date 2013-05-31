@@ -93,7 +93,7 @@ setMethod (
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
-        where.str, sort$sort.str, sep = ""),
+        where.str, sort$str, sep = ""),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -104,7 +104,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -593,7 +593,7 @@ setMethod (
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
-        where.str, sort$sort.str, sep = ""),
+        where.str, sort$str, sep = ""),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -604,7 +604,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = e1@.is.factor & e2@.is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------

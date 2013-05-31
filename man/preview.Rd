@@ -88,5 +88,6 @@ preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 }
 }
 
-\keyword{ database }
-\keyword{ utility }
+\keyword{methods}
+\keyword{database}
+\keyword{utility}
