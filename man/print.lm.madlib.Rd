@@ -1,63 +1,72 @@
 \name{print.lm.madlib}
 \alias{print.lm.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-function to do ... ~~
-}
+\alias{show.lm.madlib}
+
+\title{Display results of linear regression}
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
-}
-\usage{
-\method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
-}
-%- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{x}{
-Describe \code{x} here~~
-}
-  \item{digits}{
-Describe \code{digits} here~~
-}
-  \item{\dots}{
-Describe \code{\dots} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    This function displays the results of linear regression in a pretty format.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\usage{
+    \method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+    \method{show}{lm.madlib}(object)
+}
+
+\arguments{
+    \item{x}{
+        The linear regression result object to be printed.
+    }
+
+    \item{digits}{
+        A non-null value for `digits' specifies the minimum number of
+          significant digits to be printed in values.  The default,
+          `NULL', uses `getOption("digits")'.  (For the interpretation
+          for complex numbers see \code{signif}.)  Non-integer values will
+          be rounded down, and only values greater than or equal to 1
+          and no greater than 22 are accepted.
+    }
+
+    \item{\dots}{
+      Further arguments passed to or from other methods.
+      This is currently not implemented.
+    }
+
+    \item{object}{
+        The linear regression result object to be printed.
+    }
+
+}
+
+\value{
+    No value is returned
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{madlib.lm}} Wrapper for MADlib linear regression
 }
-\examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"print.lm.madlib"
-## End (Not run)
+\examples{
+\dontrun{
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame
+x <- db.data.frame("madlibtestdata.lin_ornstein")
+preview(x, 10)
+
+## linear regression conditioned on nation value
+## i.e. grouping
+fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
+print(fit)
+    }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{ madlib }
+\keyword{ utility }
