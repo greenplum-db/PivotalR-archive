@@ -21,8 +21,23 @@ predict.logregr.madlib <- function (object, newdata, ...)
 {
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
-    coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
-                  sep = "")
+
+    ## deal with groups
+    coef.i <- which(names(object) == "coef")
+    grp.col <- names(object)[seq_len(coef.i - 1)]
+
+    if (length(grp.cols) == 0) {
+        coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
+                      sep = "")
+    } else {
+        terms <- .strip(strsplit(newdata@.where, "and")[[1]])
+        cond.str <- character(0)
+        for (i in seq_len(length(terms))) {
+            a <- terms[i]
+            b <- gsub("")
+        }
+    }
+    
     madlib <- schema.madlib(conn.id(newdata))
     if (is(newdata, "db.data.frame")) {
         tbl <- content(newdata)
