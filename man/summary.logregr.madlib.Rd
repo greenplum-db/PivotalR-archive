@@ -20,7 +20,6 @@
 
 \value{
     The function returns the \code{logregr.madlib} object passed to the function.
-
 }
 
 \author{
@@ -31,7 +30,9 @@
 }
 
 \seealso{
-    \code{\link{madlib.logregr}} Wrapper for MADlib logistic regression
+  \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
+  
+  \code{\link{madlib.lm}} wrapper for MADlib linear regression
 }
 
 

@@ -89,5 +89,5 @@ eql(x, y) # returns TRUE
 }
 }
 
-\keyword{ database }
-\keyword{ creation }
+\keyword{ utilities }
+\keyword{ misc }
