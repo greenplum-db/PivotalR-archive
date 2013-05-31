@@ -240,8 +240,13 @@ setGeneric ("subset")
 
 setMethod ("subset",
     signature(x = "db.obj"),
-    function (x, subset, select)
-    {
-        x[subset, select]
-    }
-)
+    function (x, subset, select) {
+        n <- nargs()
+        if (n == 1) return (x[,])
+        if (n == 2) return x[subset]
+        if (n == 3) {
+            if (missing(subset) && missing(select)) return (x[,])
+            if (missing(subset)) return (x[,select])
+            if (missing(select)) return (x[subset,])
+        }
+    })
