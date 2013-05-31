@@ -2,6 +2,9 @@
 \alias{print,db.data.frame-method}
 \alias{print,db.Rquery-method}
 
+\alias{show,db.data.frame-method}
+\alias{show,db.Rquery-method}
+
 \title{Display the connection information associated with a \code{db} object}
 
 \description{
@@ -12,6 +15,9 @@ information associated with a \code{db.table} or \code{db.view} object.
 \usage{
   \S4method{print}{db.data.frame}(x)
   \S4method{print}{db.Rquery}(x)
+  \S4method{show}{db.data.frame}(object)
+  \S4method{show}{db.Rquery}(object)
+
 }
 
 \arguments{
@@ -19,8 +25,16 @@ information associated with a \code{db.table} or \code{db.view} object.
     The signature of the method.
     A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
     object, which points to a table or view in the database; or a \code{db.Rquery}
-    object, which represents some   operations on a \code{db.data.frame} object.
+    object, which represents some operations on a \code{db.data.frame} object.
   }
+
+  \item{object}{
+    The signature of the method.
+    A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
+    object, which points to a table or view in the database; or a \code{db.Rquery}
+    object, which represents some operations on a \code{db.data.frame} object.
+  }
+
 }
 
 \details{
@@ -29,11 +43,10 @@ information associated with a \code{db.table} or \code{db.view} object.
   database, the SQL database host, and the connection ID.
 
 
-	When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this
-  function displays the temporary status of the input, and the table that it is derived from.  }
+	When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this function displays the temporary status of the input, and the table that it is derived from.  }
 
 \value{
-  This function returns nothing. 
+  This function returns nothing.
 }
 
 \author{
