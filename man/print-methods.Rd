@@ -2,7 +2,7 @@
 \alias{print,db.data.frame-method}
 \alias{print,db.Rquery-method}
 
-\title{ Display the connection information associated with a \code{db} object}
+\title{Display the connection information associated with a \code{db} object}
 
 \description{
   This function displays the SQL table, database, host, and connection
@@ -28,14 +28,12 @@ information associated with a \code{db.table} or \code{db.view} object.
   \code{db.Rquery} object, this function displays the name of connected SQL
   database, the SQL database host, and the connection ID.
 
-  When the signature \code{x} is a \code{db.data.frame} object, the function
-  also displays the associated table.  When the signature \code{x} is a
-  \code{db.Rquery} object, this   function displays the temporary status of the
-  input, and it's the table that it is derived from.
-}
+
+	When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this
+  function displays the temporary status of the input, and the table that it is derived from.  }
 
 \value{
-  There is no return value.
+  This function returns nothing. 
 }
 
 \author{
@@ -64,3 +62,8 @@ x# Display the associated table, and database information for x
 
 }
 }
+\keyword{IO}
+\keyword{print}
+
+
+
