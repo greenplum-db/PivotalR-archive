@@ -68,6 +68,11 @@ setMethod (
             message("Error : argument is missing!")
             stop()
         }
+
+        if (length(names(x)) == 1) {
+            n <- 3
+            j <- 1
+        }
         
         if (missing(i))
             i.missing <- TRUE

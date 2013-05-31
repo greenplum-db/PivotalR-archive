@@ -117,19 +117,21 @@ madlib.glm <- function (formula, data, family = "gaussian",
     options(warn = warn.r) # reset R warning level
     
     ## organize the result
+    n <- length(params$ind.vars)
     rst <- list()
     res.names <- names(res)
     for (i in seq(res.names))
         rst[[res.names[i]]] <- res[[res.names[i]]]
-    rst$coef <- arraydb.to.arrayr(res$coef, "double")
-    rst$std_err <- arraydb.to.arrayr(res$std_err, "double")
-    rst$z_stats <- arraydb.to.arrayr(res$z_stats, "double")
-    rst$p_values <- arraydb.to.arrayr(res$p_values, "double")
-    rst$odds_ratios <- arraydb.to.arrayr(res$odds_ratios, "double")
+    rst$coef <- arraydb.to.arrayr(res$coef, "double", n)
+    rst$std_err <- arraydb.to.arrayr(res$std_err, "double", n)
+    rst$z_stats <- arraydb.to.arrayr(res$z_stats, "double", n)
+    rst$p_values <- arraydb.to.arrayr(res$p_values, "double", n)
+    rst$odds_ratios <- arraydb.to.arrayr(res$odds_ratios, "double", n)
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str, "character"))
+    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
+                                                     "character", n))
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- gsub("\"", "", params$ind.vars)
     rst$col.name <- gsub("\"", "", data@.col.name)
@@ -174,7 +176,7 @@ print.logregr.madlib <- function (x,
         cat("\n---------------------------------------\n\n")
         if (! is.null(x$grp.cols))
         {
-            cat("When\n")
+            cat("Group", i, "when\n")
             for (col in x$grp.cols)
                 cat(col, ": ", x[[col]][i], ",\n", sep = "")
             cat("\n")
@@ -187,7 +189,11 @@ print.logregr.madlib <- function (x,
         odds.ratios <- format(x$odds_ratios[i,], digits = digits)
         
         stars <- rep("", length(x$p_values[i,]))
-        for (j in seq(x$p_values[i,]))
+        for (j in seq(x$p_values[i,])) {
+            if (is.na(x$p_values[i,j]) || is.nan(x$p_values)) {
+                stars[j] <- " "
+                next
+            }
             if (x$p_values[i,j] < 0.001)
                 stars[j] <- "***"
             else if (x$p_values[i,j] < 0.01)
@@ -198,6 +204,8 @@ print.logregr.madlib <- function (x,
                 stars[j] <- "."
             else
                 stars[j] <- " "
+        }
+        
         p.values <- paste(format(x$p_values[i,], digits = digits),
                           stars)
         output <- data.frame(cbind(Estimate = coef,

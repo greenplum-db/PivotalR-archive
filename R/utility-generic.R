@@ -6,7 +6,7 @@
 ## ------------------------------------------------------------------------
 
 ## convert {...} string into an arrayparams$grp.str
-arraydb.to.arrayr <- function (str, type = "double")
+arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     if (is.null(str)) return (NULL)
     
@@ -21,8 +21,13 @@ arraydb.to.arrayr <- function (str, type = "double")
     
     for (i in seq(str))
     {
+        if (is.na(str[i])) {
+            res <- rbind(res, rep(NA, n))
+            next
+        }
+        
         elm <- regmatches(str[i],
-                          gregexpr("[^,\"\\s\\{\\}]+|\"(\\\"|[^\"])*\"",
+                          gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
                                    str[i], perl=T))[[1]]
         if (type == "character")
             elm <- as.character(elm)
