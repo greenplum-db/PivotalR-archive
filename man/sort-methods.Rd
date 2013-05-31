@@ -9,7 +9,7 @@
 }
 
 \usage{
-\S4method{sort}{db.obj}(x, decreasing = FALSE, by = character(0), ...)
+\S4method{sort}{db.obj}(x, decreasing = FALSE, INDICES, ...)
 }
 
 \arguments{
@@ -21,10 +21,10 @@
     desc
   }
 
-  \item{by}{
-    A string. \code{NULL} to order by random(). \code{character(0)} to
-    order by 
-    the key, no key then raise an error. 
+  \item{INDICES}{
+    A list of \code{db.Rquery} objects. Each of
+    the list element selects one or multiple columns of \code{x}.
+    \code{NULL} to order by random(). 
   }
 
   \item{...}{

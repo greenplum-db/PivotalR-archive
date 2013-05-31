@@ -21,7 +21,7 @@
 
   \item{INDICES}{
     A list of \code{db.Rquery} objects. Each of
-    the list element selects a column of \code{data}. When the value is
+    the list element selects one or multiple columns of \code{data}. When the value is
     \code{NULL}, no grouping of data is done, and the aggregate function
     \code{FUN} will be applied onto 
     all the data.

@@ -31,12 +31,12 @@ setMethod (
                 if (!is(INDICES[[i]], "db.Rquery") ||
                     INDICES[[i]]@.parent != parent)
                     stop("Only objects derived from the same table can match each other!")
-                by.name <- c(by.name, names(INDICES[[i]]))
+                by.name <- c(by.name, INDICES[[i]]@.expr)
             }
             by.name <- unique(by.name)
 
             parent <- paste(parent, where.str, " group by ",
-                            paste("\"", by.name, "\"", collapse = ", ",
+                            paste("(", by.name, ")", collapse = ", ",
                                   sep = ""),
                             sep = "")
             where.str <- ""

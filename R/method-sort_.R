@@ -8,18 +8,26 @@ setGeneric ("sort")
 setMethod (
     "sort",
     signature(x = "db.obj"),
-    function (x, decreasing = FALSE, by = character(0), ...)
+    function (x, decreasing = FALSE, INDICES, ...)
     {
-        if (is.null(by)) { # order by random()
+        if (is(x, "db.data.frame"))
+            parent <- content(x)
+        else
+            parent <- x@.parent
+        if (is.null(INDICES)) { # order by random()
             sort <- list(by = NULL, order = "",
                          str = "order by random()")
         } else {
-            if (identical(by, character(0)) && !identical(x@.key, character(0)))
-                by <- x@.key
+            by <- character(0)
+            if (!is.list(INDICES)) INDICES <- list(INDICES)
+            for (i in seq_len(length(INDICES))) {
+                if (!is(INDICES[[i]], "db.Rquery") ||
+                    INDICES[[i]]@.parent != parent)
+                    stop("Only objects derived from the same table can match each other!")
+                by <- c(by, INDICES[[i]]@.expr)
+            }
+            by <- unique(by)
             
-            if (!is.character(by) || length(by) == 0 ||
-                !all(by %in% names(x)))
-                stop("must sort by the column names!")
             if (decreasing)
                 order <- "desc"
             else
@@ -27,7 +35,7 @@ setMethod (
 
             sort <- list(by = by, order = order,
                          str = paste(" order by ",
-                         paste("\"", by, "\"", collapse = ", ",
+                         paste("(", by, ")", collapse = ", ",
                                sep = ""), order, sep = ""))
         }
 
