@@ -3,8 +3,8 @@
 
 \title{Summary information for Linear Regression output}
 \description{
-    The function prints information about the linear regression object along with
-    the value of each returned element.
+    The function prints the value of each element in the Linear
+    Regression output object.
 }
 
 \usage{
@@ -46,7 +46,7 @@ preview(x, 10)
 ## linear regression conditioned on nation value
 ## i.e. grouping
 fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
-fit
+summary(fit)
 
 ## use I(.) for expressions
 fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),

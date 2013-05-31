@@ -3,7 +3,7 @@
 \alias{madlib.lm}
 
 \title{
-  Linear regression with grouping support, heteroskedasticity 
+  Linear regression with grouping support, heteroskedasticity
 }
 
 \description{
@@ -25,7 +25,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     fitted. The details of model specification are given under
     'Details'.
   }
-  
+
   \item{data}{
     An object of \code{db.obj} class. Currently, this parameter is
   mandatory. If it is an object of class \code{db.Rquery} or
@@ -51,17 +51,17 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 
   \item{...}{
     More parameters can be passed into this function. Currently, it is
-  just a place holder and any parameter here is not used.
+    just a place holder and any parameter here is not used.
   }
 }
 
 \details{
-  explain the formula, especially '|' 
+  explain the formula, especially '|'
 }
 
 \value{
   A list which contains the following items:
-  
+
   \item{grouping column(s)}{
     When there are grouping columns in the formula, the resulting list
     has multiple items, each of which has the same name as one of the
@@ -147,7 +147,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
-  
+
   Maintainer: Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
 }
@@ -161,7 +161,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 
 \seealso{
-  \code{\link{madlib.glm}} logistic regression 
+  \code{\link{madlib.glm}} logistic regression
 }
 \examples{
 \dontrun{

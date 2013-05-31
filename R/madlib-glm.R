@@ -15,13 +15,13 @@ madlib.glm <- function (formula, data, family = "gaussian",
     if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
         .madlib.version.number(conn.id(data)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
-    
+
     args <- control
     args$formula <- formula
     args$data <- data
     args$na.action <- na.action
     call <- deparse(match.call())
-    
+
     if (tolower(family) == "gaussian" || tolower(family) == "linear")
     {
         fit <- do.call(madlib.lm, args)
@@ -64,7 +64,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     options(warn = -1)
 
     params <- .analyze.formula(formula, data)
-    
+
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
     if (is(params$data, "db.Rquery"))
@@ -80,7 +80,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     params <- .analyze.formula(formula, data, params$data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)
-    
+
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL::text"
@@ -98,7 +98,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
                  grp, ", ", max_iter, ", '", method, "', ",
                  tolerance, ")", sep = "")
 
-    ## execute the linear regression
+    ## execute the logistic regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class))
         stop("Could not run MADlib logistic regression !")
@@ -107,15 +107,15 @@ madlib.glm <- function (formula, data, family = "gaussian",
     res <- try(.db.getQuery(paste("select * from", tbl.output), conn.id),
                silent = TRUE)
     if (is(res, .err.class))
-        stop("Could not retreive MADlib linear regression result !")
+        stop("Could not retreive MADlib logistic regression result !")
 
     ## drop temporary tables
     .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
-    
+
     msg.level <- .set.msg.level(msg.level) # reset message level
     options(warn = warn.r) # reset R warning level
-    
+
     ## organize the result
     n <- length(params$ind.vars)
     rst <- list()
@@ -187,7 +187,7 @@ print.logregr.madlib <- function (x,
         std.err <- format(x$std_err[i,], digits = digits)
         z.stats <- format(x$z_stats[i,], digits = digits)
         odds.ratios <- format(x$odds_ratios[i,], digits = digits)
-        
+
         stars <- rep("", length(x$p_values[i,]))
         for (j in seq(x$p_values[i,])) {
             if (is.na(x$p_values[i,j]) || is.nan(x$p_values)) {
@@ -205,7 +205,7 @@ print.logregr.madlib <- function (x,
             else
                 stars[j] <- " "
         }
-        
+
         p.values <- paste(format(x$p_values[i,], digits = digits),
                           stars)
         output <- data.frame(cbind(Estimate = coef,
