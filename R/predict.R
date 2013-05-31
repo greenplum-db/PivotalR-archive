@@ -43,8 +43,11 @@ predict.logregr.madlib <- function (object, newdata, ...)
         else where.str <- ""
         sort <- newdata@.sort
     }
-    ind.str <- .replace.col.with.expr(object$ind.str, names(newdata),
-                                      newdata@.expr)
+    if (!is(newdata, "db.data.frame"))
+        ind.str <- .replace.col.with.expr(object$ind.str, names(newdata),
+                                          newdata@.expr)
+    else
+        ind.str <- object$ind.str
     expr <- paste(madlib, ".", func.str, "(", coef, ", ",
                   ind.str, ")", sep = "")
     sql <- paste("select ", expr, " as madlib_predict from ",
