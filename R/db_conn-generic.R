@@ -276,10 +276,10 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
             }
         }
         
-        if (is.null(table_schema)) return (list(FALSE, table))
+        if (is.null(table_schema)) return (list(FALSE, c("", table))
         schema.str <- strsplit(table_schema, "_")[[1]]
         if (schema.str[1] != "pg" || schema.str[2] != "temp")
-            return (list(FALSE, table))
+            return (list(FALSE, c("", table)))
         table <- c(table_schema, table)
     }
     return (list(TRUE, table))
