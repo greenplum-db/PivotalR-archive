@@ -1,63 +1,76 @@
 \name{print.summary.madlib}
 \alias{print.summary.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-function to do ... ~~
-}
+\alias{show.summary.madlib}
+
+\title{Display the results from summary function in a pretty format}
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
-}
-\usage{
-\method{print}{summary.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
-}
-%- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{x}{
-Describe \code{x} here~~
-}
-  \item{digits}{
-Describe \code{digits} here~~
-}
-  \item{\dots}{
-Describe \code{\dots} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    This function prints the results from \code{madlib.summary} in a human-readable
+    format.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\usage{
+    \method{print}{summary.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+    \method{show}{summary.madlib}(object)
+}
+
+
+\arguments{
+    \item{x}{
+        The summary result object to be printed.
+    }
+
+    \item{digits}{
+        A non-null value for `digits' specifies the minimum number of
+          significant digits to be printed in values.  The default,
+          `NULL', uses `getOption("digits")'.  (For the interpretation
+          for complex numbers see \code{signif}.)  Non-integer values will
+          be rounded down, and only values greater than or equal to 1
+          and no greater than 22 are accepted.
+    }
+
+    \item{\dots}{
+      Further arguments passed to or from other methods.
+      This is currently not implemented.
+    }
+
+    \item{object}{
+        The summary result object to be printed.
+    }
+}
+
+\value{
+    No value is returned
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{madlib.summary}} Wrapper for MADlib linear and logistic regression
 }
+
 \examples{
 \dontrun{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+## Suppose that a valid connection with ID 1 exists
+## create a table from the example data.frame
 
-## The function is currently defined as
-"print.summary.madlib"
+x  <- db.data.frame("madlibtestdata.lin_ornstein")
+
+preview(x, 10)
+
+# madlib.summary
+summary_result  <- madlib.summary(x)
+print(summary_result)
+show(summary_result)
+    }
 }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ kwd1 }
-\keyword{ kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{IO}
+\keyword{print}
+\keyword{utilities}
+

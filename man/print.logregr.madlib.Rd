@@ -65,5 +65,5 @@ print(fit)
     }
 }
 
-\keyword{ madlib }
-\keyword{ utility }
+\keyword{IO}
+\keyword{print}

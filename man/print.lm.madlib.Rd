@@ -65,8 +65,10 @@ preview(x, 10)
 ## i.e. grouping
 fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
 print(fit)
+show(fit)
     }
 }
 
-\keyword{ madlib }
-\keyword{ utility }
+\keyword{IO}
+\keyword{print}
+\keyword{utilities}
