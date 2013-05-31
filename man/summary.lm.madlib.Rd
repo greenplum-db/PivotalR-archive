@@ -1,60 +1,63 @@
 \name{summary.lm.madlib}
 \alias{summary.lm.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-function to do ... ~~
-}
+
+\title{Summary information about Linear Regression output}
 \description{
- A concise (1-5 lines) description of what the function does. ~~
-}
-\usage{
-\method{summary}{lm.madlib}(object, ...)
-}
-%- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{object}{
-Describe \code{object} here~~
-}
-  \item{\dots}{
-Describe \code{\dots} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    The function prints information about the linear regression object with
+    the value for each returned element.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\usage{
+    \method{summary}{lm.madlib}(object, ...)
+}
+
+
+\arguments{
+    \item{object}{Linear regression object}
+
+    \item{...}{
+      Further arguments passed to or from other methods.
+      This is currently not implemented.}
+}
+
+\details{
+
+}
+
+\value{
+    The function returns the \code{lm.madlib} object passed to the function
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{madlib.lm}} Wrapper for MADlib linear regression
 }
-\examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"summary.lm.madlib"
-## End (Not run)
+\examples{
+    \dontrun{
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame
+x <- db.data.frame("madlibtestdata.lin_ornstein")
+preview(x, 10)
+
+## linear regression conditioned on nation value
+## i.e. grouping
+fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
+fit
+
+## use I(.) for expressions
+fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
+data = x, heteroskedasticity = T)
+summary(fit)
+       }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{madlib}
+\keyword{summary}

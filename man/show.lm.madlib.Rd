@@ -1,14 +1,12 @@
 \name{show.lm.madlib}
 \alias{show.lm.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-function to do ... ~~
-}
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+    TODO: add this function as alias of \code{\link{print.lm.madlib}} and
+    remove this file.
 }
 \usage{
-\method{show}{lm.madlib}(object)
+    \method{show}{lm.madlib}(object)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
