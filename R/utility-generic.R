@@ -280,6 +280,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     else
         intercept.str <- "1,"
 
+    labels <- .is.array(labels, data)
+    
     labels <- .replace.with.quotes(labels, data@.col.name)
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0)
@@ -342,4 +344,21 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     old.level <- .db.getQuery("select setting from pg_settings where name='client_min_messages'")
     .db.getQuery(paste("set client_min_messages to", level))
     old.level
+}
+
+## ------------------------------------------------------------------------
+
+.is.array <- function (labels, data)
+{
+    nlabels <- character(0)
+    for (i in seq_len(length(labels))) {
+        if (labels[i] %in% names(data) && data@.col.data_type == "ARRAY") {
+            n <- .db.getQuery(paste("select array_upper(", labels[i], ",1) from ",
+                              content(data), " limit 1", sep = ""), conn.id(data))[[1]]
+            nlabels <- c(nlabels, paste(labels[i], "[", seq_len(n), "]", sep = ""))
+        } else {
+            nlabels <- c(nlabels, labels[i])
+        }
+    }
+    nlabels
 }
