@@ -1,63 +1,54 @@
 \name{db.existsObject}
+
 \alias{db.existsObject}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  Test whether an object exists in the database
 }
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  Test whether a table or view exists in the database
 }
 \usage{
 db.existsObject(name, conn.id = 1, is.temp = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{name}{
-Describe \code{name} here~~
-}
+    A string, the name of table or view
+  }
+
   \item{conn.id}{
-Describe \code{conn.id} here~~
-}
+    An integer, default is 1. The ID of the database connection.
+  }
+  
   \item{is.temp}{
-Describe \code{is.temp} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    A logical, default is \code{FALSE}. Whether this table/view is
+    a temporary object.
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  This function returns different types of results depending the input.
+
+  
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+}
 
 \seealso{
 objects to See Also as \code{\link{help}}, ~~~
 }
+
 \examples{
 \dontrun{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"db.existsObject"
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ kwd1 }
-\keyword{ kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{ IO & database }
+\keyword{ utilities }

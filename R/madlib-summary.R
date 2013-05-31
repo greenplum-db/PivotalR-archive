@@ -22,7 +22,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         stop("target.cols or grouping.cols has columns that are not in ",
              "the data!")
 
-    msg.level <- .set.msg.level("panic") # suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
     ## disable warning in R, RPostgreSQL
     ## prints some unnessary warning messages
     warn.r <- getOption("warn")
@@ -85,7 +85,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
 
     class(res) <- "summary.madlib"
 
-    msg.level <- .set.msg.level(msg.level) # reset message level
+    msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
     options(warn = warn.r) # reset R warning level
     
     return (res)

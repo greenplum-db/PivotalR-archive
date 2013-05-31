@@ -86,6 +86,9 @@ y <- db.data.frame("abalone")
 
 ## x and y point to the same table
 eql(x, y) # returns TRUE
+
+## create an object pointing to a table in a schema
+z <- db.data.frame("myschema.mytable")
 }
 }
 

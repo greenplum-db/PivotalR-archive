@@ -94,7 +94,7 @@ setMethod (
                    distributed.by = distributed.by,
                    is.temp = is.temp, conn.id = conn.id, ...)
     if (length(table) == 1 && !is.temp) {
-        table_schema <- .db.getQuery("select current_schema()");
+        table_schema <- .db.getQuery("select current_schema()", conn.id);
         table.str <- paste(table_schema, ".", table, sep = "")
     } else
         table.str <- table.name
@@ -158,19 +158,21 @@ setMethod (
         is.factor <- x@.is.factor
         
         if (pivot && !all(x@.is.factor == FALSE)) {
-            cats <- x@.col.name[x@.is.factor]
+            cats <- x@.expr[x@.is.factor]
             sql <- "select "
             for (i in seq_len(length(cats))) {
-                sql <- paste(sql, "array_agg(distinct \"", cats[i], "\") as ",
-                             cats[i], sep = "")
+                sql <- paste(sql, "array_agg(distinct ", cats[i], ") as ",
+                             "distinct_", i, sep = "")
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
             ## scan through the table only once
             sql <- paste(sql, " from ", tbl, sep = "")
-            distincts <- .db.getQuery(sql)
+            distincts <- .db.getQuery(sql, conn.id)
+            idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- as.vector(arraydb.to.arrayr(distincts[[x@.col.name[i]]], "character"))
+                    idx <- idx + 1
+                    distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
                     suffix[i] <- .unique.string()
                     ## Produce a fixed order for distinct values
                     distinct <- distinct[order(distinct, decreasing = TRUE)]

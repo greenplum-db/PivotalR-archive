@@ -108,7 +108,7 @@ setMethod (
                 if (all(i@.col.data_type == "boolean")) {
                     return (i)
                 } else {
-                    i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"))))
+                    i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"), conn.id(x))))
                     if (length(i) > length(names(x)))
                         stop("Are you sure the column number is correct?")
                 }

@@ -47,8 +47,9 @@
 }
 
 \seealso{
-  \code{\link{sort}} Function to sort a table/view
-
+  \code{\link{by}} has similar syntax to this function.
+  
+  \code{\link{preview}} to view portion of the data table
 }
 
 \examples{
@@ -65,5 +66,6 @@ preview(y)
 }
 }
 
+\keyword{ IO & database }
 \keyword{methods}
-\keyword{operator}
+\keyword{utilities}

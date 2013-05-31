@@ -93,7 +93,7 @@ setMethod (
             }
         }
 
-        if (key %in% xy) key <- paste(key, suffixes[1], sep = "")
+        if (!identical(key, character(0)) && key %in% xy) key <- paste(key, suffixes[1], sep = "")
         
         expr <- c(by.str, others)
 

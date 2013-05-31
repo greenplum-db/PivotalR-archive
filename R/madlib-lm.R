@@ -20,7 +20,7 @@ madlib.lm <- function (formula, data, na.action,
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
 
-    msg.level <- .set.msg.level("panic") # suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id(data)) # suppress all messages
     ## disable warning in R, RPostgreSQL
     ## prints some unnessary warning messages
     warn.r <- getOption("warn")
@@ -75,7 +75,7 @@ madlib.lm <- function (formula, data, na.action,
     .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
     
-    msg.level <- .set.msg.level(msg.level) # reset message level
+    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
     options(warn = warn.r) # reset R warning level
     
     ## organize the result
@@ -134,7 +134,7 @@ print.lm.madlib <- function (x,
     for (i in seq_len(x$grps))
     {
         cat("\n---------------------------------------\n\n")
-        if (! is.null(x$grp.cols))
+        if (length(x$grp.cols) != 0)
         {
             cat("Group", i, "when\n")
             for (col in x$grp.cols)

@@ -339,10 +339,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 ## set/reset the message level
 ## returns the old message level
-.set.msg.level <- function (level)
+.set.msg.level <- function (level, conn.id)
 {
-    old.level <- .db.getQuery("select setting from pg_settings where name='client_min_messages'")
-    .db.getQuery(paste("set client_min_messages to", level))
+    old.level <- .db.getQuery("select setting from pg_settings where name='client_min_messages'", conn.id)
+    .db.getQuery(paste("set client_min_messages to", level), conn.id)
     old.level
 }
 

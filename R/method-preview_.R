@@ -44,7 +44,7 @@ setMethod (
     "preview",
     signature (x = "db.Rquery"),
     def = function (x, nrows = 100, interactive = FALSE) {
-        msg.level <- .set.msg.level("panic") # suppress all messages
+        msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
 
@@ -61,7 +61,7 @@ setMethod (
         res <- .db.getQuery(paste(content(x), "limit", nrows),
                             conn.id(x))
 
-        msg.level <- .set.msg.level(msg.level) # reset message level
+        msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
         options(warn = warn.r) # reset R warning level
            
         return (res)
