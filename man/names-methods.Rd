@@ -1,6 +1,5 @@
 \name{names-methods}
-\docType{methods}
-\alias{names.db.obj}
+
 \alias{names,db.obj-method}
 
 \title{The Names of an object}
@@ -10,7 +9,7 @@
 }
 
 \usage{
-    \S4method{names}{db.obj}(x)
+\S4method{names}{db.obj}(x)
 }
 
 
@@ -22,7 +21,8 @@
 }
 
 \value{
-    Returns a string with the list of the column names of data frame.
+    Returns a string with the list of the column names of data
+    frame. The names are ordered.
 }
 
 \author{
@@ -30,6 +30,13 @@
 
   Maintainer: Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
+}
+
+\seealso{
+  \code{\link{db.obj-class}}, \code{\link{db.data.frame-class}},
+  \code{\link{db.table-class}}, \code{\link{db.view-class}},
+  \code{\link{db.Rquery-class}} are the class hierarchy structure of
+  this package.
 }
 
 \examples{
