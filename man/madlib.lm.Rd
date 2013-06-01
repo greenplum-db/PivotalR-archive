@@ -125,6 +125,10 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     To be added ...
   }
 
+  \item{ind.str}{
+    To be added ...
+  }
+
   \item{call}{
     To be added ...
   }

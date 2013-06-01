@@ -131,6 +131,10 @@ If necessary, more details than the description above ~~
     To be added ...
   }
 
+  \item{ind.str}{
+    To be added ...
+  }
+
   \item{call}{
     To be added ...
   }
