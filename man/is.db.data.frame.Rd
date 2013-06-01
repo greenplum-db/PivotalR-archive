@@ -22,7 +22,7 @@ The input can be of any type.
 
 }
 \value{
-The return value is a boolean indicating the type of the input.  
+A logical.  Returns   \code{TRUE} if the input is of type \code{db.data.frame}
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
