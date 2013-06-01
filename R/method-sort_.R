@@ -16,7 +16,7 @@ setMethod (
             parent <- x@.parent
         if (is.null(INDICES)) { # order by random()
             sort <- list(by = NULL, order = "",
-                         str = "order by random()")
+                         str = " order by random()")
         } else {
             by <- character(0)
             if (!is.list(INDICES)) INDICES <- list(INDICES)
