@@ -22,22 +22,6 @@ predict.logregr.madlib <- function (object, newdata, ...)
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
 
-    ## deal with groups
-    coef.i <- which(names(object) == "coef")
-    grp.col <- names(object)[seq_len(coef.i - 1)]
-
-    if (length(grp.cols) == 0) {
-        coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
-                      sep = "")
-    } else {
-        terms <- .strip(strsplit(newdata@.where, "and")[[1]])
-        cond.str <- character(0)
-        for (i in seq_len(length(terms))) {
-            a <- terms[i]
-            b <- gsub("")
-        }
-    }
-    
     madlib <- schema.madlib(conn.id(newdata))
     if (is(newdata, "db.data.frame")) {
         tbl <- content(newdata)
@@ -63,8 +47,50 @@ predict.logregr.madlib <- function (object, newdata, ...)
                                           newdata@.expr)
     else
         ind.str <- object$ind.str
-    expr <- paste(madlib, ".", func.str, "(", coef, ", ",
-                  ind.str, ")", sep = "")
+    
+    ## deal with groups
+    coef.i <- which(names(object) == "coef")
+    grp.col <- names(object)[seq_len(coef.i - 1)]
+
+    if (length(object$grp.cols) == 0) {
+        coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
+                      sep = "")
+        expr <- paste(madlib, ".", func.str, "(", coef, ", ",
+                      ind.str, ")", sep = "")
+    } else {
+        l <- length(object$grp.cols)
+        expr <- "case when "
+        for (i in seq_len(object$grps)) {
+            tmp <- ""
+            if (i != object$grps) {
+                for (j in seq_len(l)) {
+                    tmp <- paste(tmp, object$grp.cols[j], " = '",
+                                 object[[object$grp.cols[j]]][i],
+                                 "'::",
+                                 newdata@.col.data_type[which(
+                                     names(newdata) == object$grp.cols[j])],
+                                 sep = "")
+                    if (j != l) tmp <- paste(tmp, " and ", sep = "")
+                }
+                if (!is(newdata, "db.data.frame"))
+                    tmp <- .replace.col.with.expr(tmp, names(newdata),
+                                                  newdata@.expr)
+                expr <- paste(expr, tmp, " then ", sep = "")
+            }
+            coef.i <- paste("array[", paste(object$coef[i,],
+                                            collapse = ", "),
+                            "]", sep = "")
+            expr <- paste(expr, madlib, ".", func.str, "(", coef.i, ", ",
+                          ind.str, ")", sep = "")
+            if (i < object$grps - 1)
+                expr <- paste(expr, " when ", sep = "")
+            else if (i == object$grps - 1)
+                expr <- paste(expr, " else ", sep = "")
+            else
+                expr <- paste(expr, " end", sep = "")
+        }    
+    }
+    
     sql <- paste("select ", expr, " as madlib_predict from ",
                  tbl, where.str, sort$str, sep = "")
 

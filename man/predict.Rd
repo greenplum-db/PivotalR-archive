@@ -1,12 +1,13 @@
 \name{predict}
 \alias{predict.lm.madlib}
 \alias{predict.logregr.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  Generate the \code{db.Rquery} object that can calculate the predictions
 }
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  
 }
 \usage{
 \method{predict}{lm.madlib}(object, newdata, ...)
