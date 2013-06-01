@@ -12,7 +12,9 @@
   \code{\link{db.data.frame-class}}, which points to an existing
   table/view in the database. The operations that can be applied
   onto this class of objects are very similar to those of
-  \code{data.frame}. 
+  \code{data.frame}. No real data is loaded into R. The data transfered
+  between the database and R is minimized, which is necessary when we
+  deal with large data sets.
 }
 
 \usage{

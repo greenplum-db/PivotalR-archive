@@ -7,59 +7,91 @@
 }
 
 \description{
-  
+  Generate the \code{db.Rquery} object that can calculate the
+  predictions for linear/logistic regressions. The actual result can be
+  viewed using \code{\link{preview}}.
 }
 \usage{
 \method{predict}{lm.madlib}(object, newdata, ...)
 
 \method{predict}{logregr.madlib}(object, newdata, ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{object}{
-Describe \code{object} here~~
-}
-\item{newdata}{
-  newdata
-}
+    A \code{lm.madlib} or \code{logregr.madlib} object, which are the
+  results of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}
+  respectively. 
+  }
+  
+  \item{newdata}{
+    A \code{db.obj} object, which contains the information about the
+    real data in the database.
+  }
+  
   \item{\dots}{
-Describe \code{\dots} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-~Describe the value returned
-If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    Extra parameters. Not implemented yet.
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A \code{db.Rquery} object, which contains the SQL query to compute the
+    predictions. 
+}
+
+\author{
+ Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{madlib.lm}} linear regression
+
+  \code{\link{madlib.glm}} logistic regression
+
+  \code{\link{preview}} view the actual result
 }
 \examples{
-##Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+db.connect(port = 5433)
 
-## The function is currently defined as
-"predict"
+## create db.table object pointing to a data table
+delete("abalone")
+x <- as.db.data.frame(abalone, "abalone")
+
+## Example 1 --------
+
+fit <- madlib.lm(rings ~ . - sex - id, data = x)
+
+fit
+
+pred <- predict(fit, x) # prediction
+
+content(pred)
+
+ans <- x$rings # the actual value
+
+preview((ans - pred)^2, 10) # squared error
+
+preview(mean((ans - pred)^2)) # mean squared error
+
+## Example 2 ---------
+
+fit <- madlib.lm(rings ~ . - id | sex, data = x)
+
+fit
+
+pred <- predict(fit, x)
+
+content(pred)
+
+ans <- x$rings
+
+preview(mean((ans - pred)^2))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{ methods }
+\keyword{ math }
