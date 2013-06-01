@@ -1,7 +1,5 @@
-\name{is.na-methods}
+\name{is.na-method}
 
-\alias{is.na-methods}
-\alias{is.na,ANY-method}
 \alias{is.na,db.obj-method}
 \title{Query if the entries in a table are NULL}
 \description{

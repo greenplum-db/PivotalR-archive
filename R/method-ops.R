@@ -28,7 +28,7 @@ setMethod (
         if (class(e1)[1] != class(e2)[1])
             return (FALSE)
         if (is(e1, "db.data.frame")) {
-            if (all(e1@.name == e1@.name) &&
+            if (all(e1@.name == e2@.name) &&
                 e1@.content == e2@.content &&
                 conn.eql(e1@.conn.id, e2@.conn.id) &&
                 e1@.table.type == e2@.table.type)
@@ -38,8 +38,8 @@ setMethod (
         } else {
             if (e1@.content == e2@.content &&
                 length(e1@.expr) == length(e2@.expr) &&
-                all(e1@.expr == e1@.expr) &&
-                e1@.source == e1@.source &&
+                all(e1@.expr == e2@.expr) &&
+                e1@.source == e2@.source &&
                 e1@.parent == e2@.parent &&
                 conn.eql(e1@.conn.id, e2@.conn.id) &&
                 all(e1@.col.data_type == e2@.col.data_type) &&

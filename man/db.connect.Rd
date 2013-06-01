@@ -5,7 +5,7 @@
   Create a connection to a database
 }
 \description{
-  Create a connection to a database. One can create multiple connections
+  Create a connection to a PostgreSQL or Greenplum (Pivotal) database. One can create multiple connections
   to multiple databases. The connections are indexed by an integer
   starting from 1.
 }
@@ -59,7 +59,9 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
   Right only MADlib 0.6 or later is supported. If you have an older
   version of MADlib, you will not be able to use all the functions whose
   names start with "madlib.". However you can still use all the other
-  functions. 
+  functions.
+
+  Also, right now only PostgreSQL and Greenplum databases are supported.
 }
 
 \seealso{
@@ -80,6 +82,6 @@ db.connect(host = "localhost", user = "me", dbname = "me", password =
 }
 }
 
-\keyword{utility}
-\keyword{ database }
-\keyword{ connection }
+\keyword{utilities}
+\keyword{ IO & database }
+\keyword{ misc }

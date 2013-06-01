@@ -1,69 +1,57 @@
 \name{db.list}
+
 \alias{db.list}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-  ++function to do ... ++
+  List all the currently active connections with their information
 }
 \description{
-  ++ A concise (1-5 lines) description of what the function does. ++
+  List all the currently active connections with their information
+  including the connection ID, host, user, database, DBMS (database
+  management system), MADlib schema name in the database, and the R
+  package name used to connect to the database.
 }
 \usage{
 db.list()
 }
-%- maybe also 'usage' for other objects documented here.
-\details{
-  ++ If necessary, more details than the description above ++
-}
+
 \value{
-  +Describe the value returned
-  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
- +put references to the literature/web site here +
-}
-\author{
-  ++who you are++
-}
-\note{
- ++further notes++
+  No value is returned.
 }
 
-%% +Make other sections like Warning with \section{Warning }{....} +
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
+
+\note{
+  Currently, only connection to PostgreSQL and Greenplum databases are
+  supported. Support for other types of DBMS's will be added in the future.
+}
 
 \seealso{
-++objects to See Also as \code{\link{help}}, +++
+  \code{\link{db.connect}} connects to database.
+  
+  \code{\link{db.disconnect}} disconnects a connection.
+
+  \code{\link{connection info}} the functions that extract information
+  about the connection.
+  
+  \code{\link{conn.eql}} tests whether two connections are the same.
 }
+
 \examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+## connect to multiple databases
+db.connect(dbname = "mydb", port = 5433, madlib = "madlib")
+db.connect(dbname = "otherdb", port = 5432, madlib = "madlib07")
 
-## The function is currently defined as
-function () 
-{
-    n.conn <- length(.localVars$db)
-    cat("Database Connection Info\n")
-    for (i in seq(n.conn)) {
-        cat("\n## -------------------------------\n")
-        cat(paste("[Connection ID ", i, "]\n", sep = ""))
-        cat(paste("Host :     ", .localVars$db[[i]]$host, "\n", 
-            sep = ""))
-        cat(paste("User :     ", .localVars$db[[i]]$user, "\n", 
-            sep = ""))
-        cat(paste("Database : ", .localVars$db[[i]]$dbname, "\n", 
-            sep = ""))
-        cat(paste("Conn pkg : ", .localVars$db[[i]]$conn.pkg, 
-            "\n", sep = ""))
-    }
-  }
-
-## End (Not run)
+db.list() # list the two connections
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{utilities}
+\keyword{ IO & database }
+\keyword{ misc }
