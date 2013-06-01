@@ -56,5 +56,11 @@ db.existsObject(name, conn.id = 1, is.temp = FALSE)
 objects to See Also as \code{\link{help}}, ~~~
 }
 
-\keyword{ IO & database }
+\examples{
+\dontrun{
+db.existsObject("madlibtestdata.lin_ornstein", 1)
+}
+}
+
+\keyword{ database }
 \keyword{ utilities }

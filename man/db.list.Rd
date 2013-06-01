@@ -53,5 +53,5 @@ db.list() # list the two connections
 }
 
 \keyword{utilities}
-\keyword{ IO & database }
+\keyword{ database }
 \keyword{ misc }

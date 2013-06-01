@@ -261,28 +261,28 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
         schema.str <- strsplit(table[1], "_")[[1]]
         if (schema.str[1] != "pg" || schema.str[2] != "temp")
             return (list(FALSE, table))
+        else
+            return (list(TRUE, table))
     }
     else
     {
         schemas <- arraydb.to.arrayr(
             .db.getQuery("select current_schemas(True)", conn.id),
             type = "character")
-        table_schema <- NULL
+        table_schema <- character(0)
         for (schema in schemas)
-        {
-            if (.db.existsTable(c(schema, table), conn.id)) {
-                table_schema <- schema
-                break
-            }
-        }
+            if (.db.existsTable(c(schema, table), conn.id)) 
+                table_schema <- c(table_schema, schema)
         
-        if (is.null(table_schema)) return (list(FALSE, c("", table)))
-        schema.str <- strsplit(table_schema, "_")[[1]]
-        if (schema.str[1] != "pg" || schema.str[2] != "temp")
-            return (list(FALSE, c("", table)))
-        table <- c(table_schema, table)
+        if (identical(table_schema, character(0))) return (list(FALSE, c("", table)))
+        schema.str <- strsplit(table_schema, "_")
+        for (i in seq_len(length(schema.str))) {
+            str <- schema.str[[i]]
+            if (str[1] == "pg" && str[2] == "temp")
+                return (list(TRUE, c(table_schema[i], table)))
+        }
+        return (list(FALSE, c("", table)))        
     }
-    return (list(TRUE, table))
 }
 
 ## ------------------------------------------------------------------------

@@ -83,5 +83,5 @@ db.connect(host = "localhost", user = "me", dbname = "me", password =
 }
 
 \keyword{utilities}
-\keyword{ IO & database }
+\keyword{ database }
 \keyword{ misc }

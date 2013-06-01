@@ -66,6 +66,6 @@ preview(y)
 }
 }
 
-\keyword{ IO & database }
+\keyword{ database }
 \keyword{methods}
 \keyword{utilities}
