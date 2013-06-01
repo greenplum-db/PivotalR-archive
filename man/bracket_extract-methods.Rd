@@ -4,24 +4,67 @@
 \alias{[,ANY-method}
 \alias{[,db.obj-method}
 \alias{[,nonStructure-method}
-\title{ ~~ Methods for Function \code{[} in Package \pkg{base} ~~}
+
+\title{Extract a subset of a table or view}
+
 \description{
- ~~ Methods for function \code{[} in package \pkg{base} ~~
-}
-\section{Methods}{
-\describe{
-
-\item{\code{signature(x = "ANY")}}{
-%%  ~~describe this method here~~
+    This function extracts a subset of a \code{db.obj}(a \code{db.table} or
+    \code{db.view} object, or a \code{db.Rquery}).
 }
 
-\item{\code{signature(x = "db.obj")}}{
-%%  ~~describe this method here~~
+\usage{
+    \S4method{[}{db.obj}(x, i, j, ..., drop = TRUE)
+    \S4method{[}{ANY}(x, i, j, ..., drop = TRUE)
+    \S4method{[}{nonStructure}(x, i, j, ..., drop = TRUE)
 }
 
-\item{\code{signature(x = "nonStructure")}}{
-%%  ~~describe this method here~~
+\arguments{
+    \item{x}{
+        A \code{db.obj} (either \code{db.table}, \code{db.view},
+        or \code{db.Rquery}) from which to extract element(s).
+    }
+
+    \item{i, j, ...}{
+        Indices specifying elements to extract or replace.  Indices
+          are `numeric' or `character' vectors or empty (missing) or
+          `NULL'.  Numeric values are coerced to integer as by
+          `as.integer' (and hence truncated towards zero).
+    }
+
+    \item{drop}{
+      For matrices and arrays.  If `TRUE' the result is coerced to
+          the lowest possible dimension (see the examples).
+      This is currently not implemented.
+    }
 }
-}}
-\keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
+
+\value{
+    A \code{db.Rquery} object is returned, a SQL query to extract the
+    requested subset.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
+
+\seealso{
+    \code{\link{subset-methods}} Operator to extract elements
+}
+
+\examples{
+\dontrun{
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame
+x  <- db.data.frame("madlibtestdata.lin_ornstein")
+preview(x, 10)
+
+preview(x[1:3])
+preview(x[c('assets', 'nation')])
+    }
+}
+
+\keyword{manip}

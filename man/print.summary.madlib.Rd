@@ -16,7 +16,7 @@
 
 
 \arguments{
-    \item{x}{
+    \item{x, object}{
         The summary result object to be printed.
     }
 
@@ -32,10 +32,6 @@
     \item{\dots}{
       Further arguments passed to or from other methods.
       This is currently not implemented.
-    }
-
-    \item{object}{
-        The summary result object to be printed.
     }
 }
 

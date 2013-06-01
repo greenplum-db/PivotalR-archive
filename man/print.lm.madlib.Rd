@@ -14,7 +14,7 @@
 }
 
 \arguments{
-    \item{x}{
+    \item{x, object}{
         The linear regression result object to be printed.
     }
 
@@ -31,11 +31,6 @@
       Further arguments passed to or from other methods.
       This is currently not implemented.
     }
-
-    \item{object}{
-        The linear regression result object to be printed.
-    }
-
 }
 
 \value{
