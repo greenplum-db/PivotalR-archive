@@ -61,7 +61,7 @@ is.temp = FALSE)
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
   Maintainer: Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+  Inc. \email{user@madlib.net}
 }
 
 \seealso{

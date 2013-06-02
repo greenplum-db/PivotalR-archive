@@ -43,7 +43,7 @@ setMethod (
                 e1@.parent == e2@.parent &&
                 conn.eql(e1@.conn.id, e2@.conn.id) &&
                 all(e1@.col.data_type == e2@.col.data_type) &&
-                e1@.where == e2@.where &&
+                .eql.where(e1@.where, e2@.where) &&
                 all(e1@.is.factor == e2@.is.factor) &&
                 all(e1@.col.name == e2@.col.name))
                 return (TRUE)
@@ -553,7 +553,7 @@ setMethod (
     else
         l <- l2
 
-    if (e1@.parent != e2@.parent || e1@.where != e2@.where)
+    if (e1@.parent != e2@.parent || !.eql.where(e1@.where, e2@.where))
         stop("How can you match the rows of two objects",
              " if they are not derived from the same thing!")
     

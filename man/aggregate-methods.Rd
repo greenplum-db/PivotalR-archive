@@ -1,6 +1,6 @@
 \name{Aggregate functions}
 
-\alias{aggregate functions}
+\alias{Aggregate functions}
 \alias{mean,db.obj-method}
 \alias{sum,db.obj-method}
 \alias{length,db.obj-method}

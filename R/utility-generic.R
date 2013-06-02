@@ -363,3 +363,24 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     }
     nlabels
 }
+
+## ------------------------------------------------------------------------
+
+## whether two where strings are equivalent
+.eql.where <- function (where1, where2)
+{
+    s1 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\1", where1, perl = TRUE)
+    if (s1 == where1)
+        return (where1 == where2)
+    s2 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\3", where1, perl = TRUE)
+
+    t1 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\1", where2, perl = TRUE)
+    if (t1 == where2) return (FALSE)
+    t2 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\3", where2, perl = TRUE)
+
+    if ((.eql.where(s1, t1) && .eql.where(s2, t2)) ||
+        (.eql.where(s1, t2) && .eql.where(s2, t1)))
+        TRUE
+    else
+        FALSE
+}

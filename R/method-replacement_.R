@@ -21,8 +21,8 @@
 
     if ((is.null(left.where) &&
         ((is(x, "db.data.frame") && value@.where != "") ||
-        (is(x, "db.Rquery") && .strip(x@.where) != .strip(value@.where))))
-        || (!is.null(left.where) && .strip(left.where) != .strip(value@.where)))
+        (is(x, "db.Rquery") && !.eql.where(.strip(x@.where), .strip(value@.where)))))
+        || (!is.null(left.where) && !.eql.where(.strip(left.where), .strip(value@.where))))
         stop("The where parts that do not match!")
     
     if (is(x, "db.data.frame")) {
@@ -340,7 +340,7 @@ setMethod (
                 if (is(x, "db.data.frame") || x@.where == "")
                     where.str <- str
                 else
-                    where.str <- paste(x@.where, "and", str)
+                    where.str <- paste("(", x@.where, ") and (", str, ")", sep = "")
                 if (missing(j))
                     .replacement(x, names(x), value, str, where.str)
                 else

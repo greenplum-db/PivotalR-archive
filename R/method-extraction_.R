@@ -45,8 +45,15 @@ setMethod(
                         " with each row of the table!")
                 stop()
             }
-            if (x.where != "") x.where <- paste(x.where, "and")
-            where.str <- paste(x@.key, "=", i)
+            if (x.where != "") {
+                x.where <- paste("(", x.where, ") and ", sep = "")
+                lb <- "("
+                rb <- ")"
+            } else {
+                lb <- ""
+                rb <- ""
+            }
+            where.str <- paste(lb, x@.key, " = ", i, rb, sep = "")
             .create.db.Rquery(x, cols.i = j,
                               where = paste(x.where, where.str))
         }
@@ -121,8 +128,16 @@ setMethod (
                 where.str <- i@.expr
                 if (length(where.str) != 1)
                     stop("More than 2 boolean expressions in selecting row!")
-                if (x.where != "") x.where <- paste(x.where, " and ", sep = "")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
+                if (x.where != "") {
+                    x.where <- paste("(", x.where, ") and ", sep = "")
+                    lb <- "("
+                    rb <- ")"
+                } else {
+                    lb <- ""
+                    rb <- ""
+                }
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, lb,
+                                                 where.str, rb, sep = ""))
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
                     message("Error : there is no unique ID associated",
@@ -133,8 +148,16 @@ setMethod (
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
                 where.str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                                    ")", sep = "")
-                if (x.where != "") x.where <- paste(x.where, "and ")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
+                if (x.where != "") {
+                    x.where <- paste(x.where, "and ")
+                    lb <- "("
+                    rb <- ")"
+                } else {
+                    lb <- ""
+                    rb <- ""
+                }
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, lb, where.str,
+                                                 rb, sep = ""))
             }
         }
     },

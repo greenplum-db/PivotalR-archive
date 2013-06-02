@@ -53,7 +53,7 @@
 }
 
 \seealso{
-  \code{\link{aggregate functions}} lists all the supported aggregate
+  \code{\link{Aggregate functions}} lists all the supported aggregate
   functions.
 
   \code{\link{preview}} can display the actual result of this function.
