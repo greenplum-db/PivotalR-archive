@@ -1,9 +1,6 @@
 \name{[-methods}
-\docType{methods}
-\alias{[-methods}
-\alias{[,ANY-method}
+
 \alias{[,db.obj-method}
-\alias{[,nonStructure-method}
 
 \title{Extract a subset of a table or view}
 
@@ -13,9 +10,7 @@
 }
 
 \usage{
-    \S4method{[}{db.obj}(x, i, j, ..., drop = TRUE)
-    \S4method{[}{ANY}(x, i, j, ..., drop = TRUE)
-    \S4method{[}{nonStructure}(x, i, j, ..., drop = TRUE)
+\S4method{[}{db.obj}(x, i, j, ..., drop = TRUE)
 }
 
 \arguments{
@@ -51,7 +46,7 @@
 }
 
 \seealso{
-    \code{\link{subset-methods}} Operator to extract elements
+    \code{\link{subset,db.obj-method}} Operator to extract elements
 }
 
 \examples{

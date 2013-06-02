@@ -1,7 +1,5 @@
 \name{subset-methods}
-\docType{methods}
-\alias{subset-methods}
-\alias{subset,ANY-method}
+
 \alias{subset,db.obj-method}
 
 \title{Extract a subset of a table or view}
@@ -11,8 +9,7 @@
 }
 
 \usage{
-    \S4method{subset}{db.obj}(x, subset, select)
-    \S4method{subset}{ANY}(x, subset, select)
+\S4method{subset}{db.obj}(x, subset, select)
 }
 
 \arguments{

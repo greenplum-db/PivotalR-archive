@@ -1,6 +1,5 @@
 \name{[[-methods}
-\docType{methods}
-\alias{[[.db.obj}
+
 \alias{[[,db.obj-method}
 
 \title{Extract an element (column) of a database object}
@@ -11,7 +10,7 @@
 }
 
 \usage{
-    \S4method{[[}{db.obj}(x, i, j, ...)
+\S4method{[[}{db.obj}(x, i, j, ...)
 }
 
 \arguments{
@@ -40,7 +39,7 @@
 }
 
 \seealso{
-    \code{\link{subset-methods}} Operator to extract elements
+    \code{\link{subset,db.obj-method}} Operator to extract elements
     \code{\link{[-methods}} Operator to extract elements
 }
 

@@ -385,6 +385,25 @@ setMethod (
     },
     valueClass = "db.Rquery")
 
+setMethod (
+    "&",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 & e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "|",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 | e1
+    },
+    valueClass = "db.Rquery")
+
+
 ## ------------------------------------------------------------------------
 
 setMethod (

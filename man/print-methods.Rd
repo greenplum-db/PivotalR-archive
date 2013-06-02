@@ -1,4 +1,5 @@
 \name{print}
+
 \alias{print,db.data.frame-method}
 \alias{print,db.Rquery-method}
 
@@ -13,11 +14,13 @@ information associated with a \code{db.table} or \code{db.view} object.
 }
 
 \usage{
-  \S4method{print}{db.data.frame}(x)
-  \S4method{print}{db.Rquery}(x)
-  \S4method{show}{db.data.frame}(object)
-  \S4method{show}{db.Rquery}(object)
+\S4method{print}{db.data.frame}(x)
 
+\S4method{print}{db.Rquery}(x)
+
+\S4method{show}{db.data.frame}(object)
+
+\S4method{show}{db.Rquery}(object)
 }
 
 \arguments{
