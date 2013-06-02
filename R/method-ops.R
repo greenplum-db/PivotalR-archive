@@ -371,7 +371,7 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "::boolean")
+        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -381,7 +381,7 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "::boolean")
+        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -779,7 +779,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " and ", list(c("boolean")),
-                     res.type = "boolean", cast = "::boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -790,7 +790,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " or ", list(c("boolean")),
-                     res.type = "boolean", cast = "::boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -800,8 +800,8 @@ setMethod (
     "!",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", "", c("boolean"), prefix = "not",
-                 res.type = "boolean", cast = "::boolean")
+        .compare(x, "", "", c("boolean"), prefix = "not ",
+                 res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 

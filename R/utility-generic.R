@@ -369,17 +369,27 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 ## whether two where strings are equivalent
 .eql.where <- function (where1, where2)
 {
-    s1 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\1", where1, perl = TRUE)
-    if (s1 == where1)
-        return (where1 == where2)
-    s2 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\3", where1, perl = TRUE)
+    s <- gsub("^not \\((.*)\\)$", "\\1", where1, perl = TRUE)
+    t <- gsub("^not \\((.*)\\)$", "\\1", where2, perl = TRUE)
+    if (s != where1 && t != where2) {
+        return (.eql.where(s, t))
+    } else if ((s != where1 && t == where2) ||
+               (s == where1 && t != where2)) {
+        return (FALSE)
+    }
+    
+    s1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", s, perl = TRUE)
+    if (s1 == s) return (s == t)
+    s2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", s, perl = TRUE)
+    ss <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", s, perl = TRUE)
 
-    t1 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\1", where2, perl = TRUE)
-    if (t1 == where2) return (FALSE)
-    t2 <- gsub("\\((.*)\\) (and|or) \\((.*)\\)", "\\3", where2, perl = TRUE)
+    t1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", t, perl = TRUE)
+    if (t1 == t) return (FALSE)
+    t2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", t, perl = TRUE)
+    tt <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", t, perl = TRUE)
 
-    if ((.eql.where(s1, t1) && .eql.where(s2, t2)) ||
-        (.eql.where(s1, t2) && .eql.where(s2, t1)))
+    if ((.eql.where(s1, t1) && .eql.where(s2, t2) && ss == tt) ||
+        (.eql.where(s1, t2) && .eql.where(s2, t1) && ss == tt))
         TRUE
     else
         FALSE
