@@ -110,9 +110,10 @@ the sum of each column.}
   Inc. \email{user@madlib.net}
 }
 
-% \seealso{
-%     \code{\link{}} description
-% }
+\seealso{
+    \code{\link{by,db.obj-method}} is usually used together with
+    aggregate functions.
+}
 
 \examples{
 \dontrun{
