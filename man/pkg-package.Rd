@@ -127,7 +127,73 @@ db.connect(dbname = "test", user = "qianh1", password = "", host =
 
 db.list() # list the info for all the connections
 
+## create a table and the R object pointing to the table
+## using the example data that comes with this package
+delete("abalone")
+x <- as.db.data.frame(abalone, "abalone")
 
+dim(x) # dimension of the data table
+
+names(x) # column names of the data table
+
+madlib.summary(x) # look at a summary for each column
+
+preview(x, 20) # look at a sample of the data
+preview(sort(x, FALSE, x$id), 20) # look at a sample sorted by id column
+preview(sort(x, FALSE, NULL), 20) # look at a sample ordered randomly 
+
+## linear regression Examples --------
+
+## fit one different model to each group of data with the same sex
+fit1 <- madlib.lm(rings ~ . - id | sex, data = x)
+
+fit1 # view the result
+
+## fit a single model to all data treating sex as a categorial variable
+y <- x # make a copy, y is now a db.data.frame object
+y$sex <- as.factor(y$sex) # y becomes a db.Rquery object now
+fit2 <- madlib.lm(rings ~ . - id, data = y)
+
+fit2 # view the result
+
+## logistic regression Examples --------
+
+## fit one different model to each group of data with the same sex
+fit3 <- madlib.glm(rings ~ . - id | sex, data = x, family = "binomial")
+
+fit3 # view the result
+
+## fit a single model to all data treating sex as a categorial variable
+y <- x # make a copy, y is now a db.data.frame object
+y$sex <- as.factor(y$sex) # y becomes a db.Rquery object now
+fit4 <- madlib.glm(rings ~ . - id, data = y, family = "binomial")
+
+fit4 # view the result
+
+## Group by Examples --------
+
+## mean value of each column except the "id" column
+preview(by(x[,-1], x$sex, mean))
+
+## standard deviation of each column except the "id" column
+preview(by(x[,-1], x$sex, sd))
+
+## Merge Examples --------
+
+## create two objects with different rows and columns
+y <- x[1:200, 1:6]
+z <- x[201:400, c(1,2,4,5)]
+
+m <- merge(y, z, by = c("id", "sex"))
+
+preview(m, 20)
+
+## operator Examples --------
+
+y <- x$length + x$height + 2.3
+z <- x$length * x$height / 3
+
+preview(y < z, 20)
 }
 }
 
