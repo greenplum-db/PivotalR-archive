@@ -11,11 +11,8 @@ This function checks if two \code{db.obj} objects are the equivalent.  For objec
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{e1}{
- The signature of the method. A db.obj object.   
-}
-\item{e2}{
- The signature of the method. A db.obj object.   
+  \item{e1, e2}{
+ The signature of the method. Both arguments are db.obj objects to be checked for equality.   
 }
 }
 \details{
