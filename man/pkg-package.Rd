@@ -28,7 +28,7 @@ Depends: \tab methods, DBI, RPostgreSQL\cr
 This package enables R users to easily develop, refine and deploy R
 scripts that leverage the 
 parallelism and scalability of the database as well as in-database analytics libraries to 
-operate on big data sets that would otherwise not fit in R memory – all this without 
+operate on big data sets that would otherwise not fit in R memory - all this without 
 having to learn SQL because the package provides an interface that they are familiar with.
 
   The package also provides a wrapper for MADlib. MADlib is an open-source
@@ -55,17 +55,17 @@ This current version of PivotalR provides the core R infrastructure and data fra
 as well as over 50 analytical functions in R that leverage in-database execution. These 
 include
 
-* Data Connectivity – db.connect, db.disconnect, db.Rquery
+* Data Connectivity - db.connect, db.disconnect, db.Rquery
 
-* Data Exploration – db.data.frame, subsets
+* Data Exploration - db.data.frame, subsets
 
-* R language features – dim, names, min, max, nrow, ncol, summary etc
+* R language features - dim, names, min, max, nrow, ncol, summary etc
 
-* Reorganization Functions – merge, by (group-by), samples
+* Reorganization Functions - merge, by (group-by), samples
 
-* Transformations – as.factor, null replacement
+* Transformations - as.factor, null replacement
 
-* Algorithms – linear regression and logistic regression wrappers for MADlib,
+* Algorithms - linear regression and logistic regression wrappers for MADlib,
 }
 
 \note{
@@ -106,8 +106,6 @@ include
   [5] MADlib on GitHub, \url{https://github.com/madlib/madlib}
 }
 
-\keyword{ package }
-
 \seealso{
   \code{\link{madlib.lm}} Linear regression
 
@@ -117,3 +115,20 @@ include
   \code{\link{madlib.summary}} summary of a table in the database.
 }
 
+\examples{
+\dontrun{
+## get the help for one method
+help("preview,db.Rquery-method")
+
+## create multiple connections to different databases
+db.connect(port = 5433) # connection 1, use default values for the parameters
+db.connect(dbname = "test", user = "qianh1", password = "", host =
+"remote.machine.com", madlib = "madlib07", port = 5432) # connection 2
+
+db.list() # list the info for all the connections
+
+
+}
+}
+
+\keyword{ package }
