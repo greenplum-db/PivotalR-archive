@@ -63,7 +63,7 @@
     A \code{data.frame} object. Each column in the table (or \code{target.cols})
     is a row in the result data frame. Each column of the data frame is described below:
 
-    \item{group_by}{character. Group-by column names (NA if none provided)
+    \item{group_by}{character. Group-by column names (NA if none provided)}
     \item{group_by_value}{character. Values of the group-by columns (NA if no grouping)}
     \item{target_column}{character. Targeted column values for which summary is requested}
     \item{column_number}{integer. Physical column number for the target column in the database}
