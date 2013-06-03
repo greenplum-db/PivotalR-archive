@@ -90,6 +90,18 @@ content(pred)
 ans <- x$rings
 
 preview(mean((ans - pred)^2))
+
+## Example 3 --------
+
+## plot the predicted values v.s. the true values
+ap <- ans # true values
+ap$pred <- pred # add a column which is the predicted values
+
+## If the data set is very big, you do not want to load all the 
+## data points into R and plot. We can just plot a random sample.
+random.sample <- preview(sort(ap, FALSE, NULL), 1000) # sort randomly
+
+plot(random.sample)
 }
 }
 
