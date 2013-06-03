@@ -50,7 +50,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   for more details.
   }
 
-  \item{...}{
+  \item{\dots}{
     More parameters can be passed into this function. Currently, it is
     just a place holder and any parameter here is not used.
   }

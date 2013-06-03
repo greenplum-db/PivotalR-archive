@@ -49,7 +49,7 @@ the sum of each column.}
         The signature of the method.
     }
 
-    \item{...}{
+    \item{\dots}{
         further arguments passed to or from other methods
         This is currently not implemented.
     }

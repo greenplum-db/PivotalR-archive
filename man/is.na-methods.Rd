@@ -42,6 +42,12 @@ x <- db.data.frame('abalone')
 
 #Query which entries of x are NULL
 is.na(x)
+
+y <- x
+y[is.na(y)] <- 3
+
+z <- x
+z[is.na(x$height),"height"] <- 23
 }
 }
 

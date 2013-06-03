@@ -74,7 +74,7 @@
     threshold for the iteration algorithms.
     }
 
-    \item{...}{
+    \item{\dots}{
         Further arguments passed to or from other methods. Currently, no
         more parameters can be passed to the linear regression and
         logistic regression.

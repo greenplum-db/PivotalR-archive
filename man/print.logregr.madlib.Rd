@@ -9,8 +9,9 @@
 }
 
 \usage{
-    \method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
-    \method{show}{logregr.madlib}(object)
+\method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+
+\method{show}{logregr.madlib}(object)
 }
 
 \arguments{

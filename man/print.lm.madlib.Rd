@@ -9,8 +9,9 @@
 }
 
 \usage{
-    \method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
-    \method{show}{lm.madlib}(object)
+\method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+
+\method{show}{lm.madlib}(object)
 }
 
 \arguments{

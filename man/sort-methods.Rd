@@ -9,7 +9,7 @@
 }
 
 \usage{
-    \S4method{sort}{db.obj}(x, decreasing = FALSE, INDICES, ...)
+\S4method{sort}{db.obj}(x, decreasing = FALSE, INDICES, ...)
 }
 
 \arguments{

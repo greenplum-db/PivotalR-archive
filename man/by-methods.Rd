@@ -31,7 +31,7 @@
     An aggregate function, which will be applied onto each group of the data.
   }
 
-  \item{...}{
+  \item{\dots}{
     Extra arguments passed to \code{FUN}, currently not implemented.
   }
 

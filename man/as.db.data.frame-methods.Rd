@@ -83,7 +83,7 @@ is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
     be a temporary table/view.
   }
 
-  \item{...}{
+  \item{\dots}{
     Extra parameters used to create the table inside the database. We
     support the following parameters: \code{header = FALSE}, \code{nrows
     = 50}, \code{sep = ","}, \code{eol = "\n"}, \code{skip = 0}.

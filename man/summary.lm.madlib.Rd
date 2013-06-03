@@ -15,7 +15,7 @@
 \arguments{
     \item{object}{Linear regression object}
 
-    \item{...}{
+    \item{\dots}{
       Further arguments passed to or from other methods.
       This is currently not implemented.}
 }

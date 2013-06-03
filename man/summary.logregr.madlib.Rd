@@ -7,13 +7,13 @@
     Regression output object.}
 
 \usage{
-    \method{summary}{logregr.madlib}(object, ...)
+\method{summary}{logregr.madlib}(object, ...)
 }
 
 \arguments{
     \item{object}{Logistic regression object}
 
-    \item{...}{
+    \item{\dots}{
       Further arguments passed to or from other methods.
       This is currently not implemented.}
 }

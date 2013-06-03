@@ -10,8 +10,9 @@
 }
 
 \usage{
-    \method{print}{summary.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
-    \method{show}{summary.madlib}(object)
+\method{print}{summary.madlib}(x, digits = max(3L,getOption("digits") - 3L),...)
+
+\method{show}{summary.madlib}(object)
 }
 
 
