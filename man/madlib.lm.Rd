@@ -11,7 +11,8 @@
   can be detected using the Breusch-Pagan test. One or multiple columns of
   data can be used to separated the data set into multiple groups
   according to the values of the grouping columns. Linear regression is
-  applied onto each group, which has fixed values of the grouping columns.
+  applied onto each group, which has fixed values of the grouping
+  columns. Categorial variables are supported, see details below.
 }
 
 \usage{
@@ -37,13 +38,13 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 
   \item{na.action}{
     A string which indicates what should happen when the data
-    contain \code{NA}s. Currently not implemented yet. Future possible
+    contain \code{NA}s. Future possible
   values include \code{"na.omit"}, \code{"na.exclude"}, \code{"na.fail"}
-  and \code{NULL}.
+  and \code{NULL}. Currently not implemented yet. 
   }
 
   \item{hetero}{
-    A boolean value with default value \code{FALSE}. If it is
+    A logical value with default value \code{FALSE}. If it is
   \code{TRUE}, then Breusch-Pagan test is performed on the fitting model
   and the corresponding test statistic and p-value are computed. See [1]
   for more details.
@@ -56,7 +57,18 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 
 \details{
-  explain the formula, especially '|'
+  For details about how to write a formula, see \code{\link{formula}}
+  for details. "|" can be used at the end of the formula to denote that
+  the fitting is done conditioned on the values of one or more
+  variables. For example, \code{y ~ x + sin(z) | v + w} will do the
+  fitting each distinct combination of the values of \code{v} and
+  \code{w}. 
+
+  Both the linear regression (this function) and the logistic regression
+  (\code{\link{madlib.glm}}) support categorial variables. Use
+  \code{\link{as.factor,db.obj-method}} to denote that a variable is categorial, and
+  the corresponding dummy variables are created and fitted. See
+  \code{\link{as.factor,db.obj-method}} for more.
 }
 
 \value{
@@ -77,35 +89,43 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     A numeric matrix, the fitting coefficients. Each row contains the
     coefficients for the linear regression of each group of data. So the
     number of rows is equal to the number of distinct combinations of
-    all the grouping column values.
+    all the grouping column values. The number of columns is equal to
+    the number features (including intercept if it presents in the
+    formula). 
   }
 
   \item{r2}{
-    To be added ...
+    A numeric array. R2 values for all combinations of the grouping
+    column values.
   }
 
   \item{std_err}{
-    To be added ...
+    A numeric matrix, the standard error for each coefficients. 
   }
 
   \item{t_stats}{
-    To be added ...
+    A numeric matrix, the t-statistics for each coefficient, which is
+    the absolute value of the ratio of \code{std_err} and \code{coef}.
   }
 
   \item{p_values}{
-    To be added ...
+    A numeric matrix, the p-values of \code{t_stats}. Each row is for a
+    fitting to a group of the data.
   }
 
   \item{condition_no}{
-    To be added ...
+    A numeric array, the condition number for all combinations of the
+    grouping column values.
   }
 
   \item{bp_stats}{
-    To be added ...
+    A numeric array when \code{hetero = TRUE}, the Breusch-Pagan test
+    statistics for each combination of the grouping column values.
   }
 
   \item{bp_p_value}{
-    To be added ...
+    A numeric array when \code{hetero = TRUE}, the Breusch-Pagan test p
+    value for each combination of the grouping column values.
   }
 
   \item{grps}{
@@ -114,31 +134,37 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   }
 
   \item{grp.cols}{
-    To be added ...
+    An array of strings. The column names of the grouping columns.
   }
 
   \item{has.intercept}{
-    To be added ...
+    A logical, whether the intercept is included in the fitting.
   }
 
   \item{ind.vars}{
-    To be added ...
+    An array of strings, all the different terms used as independent
+    variables in the fitting.
   }
 
   \item{ind.str}{
-    To be added ...
+    A string. The independent variables in an array format string.
   }
 
   \item{call}{
-    To be added ...
+    A string. The function call that generates this result.
   }
 
   \item{col.name}{
-    To be added ...
+    An array of strings. The column names used in the fitting.
   }
 
   \item{appear}{
-    To be added ...
+    An array of strings, the same length as the number of independent
+    variables. The strings are used to print a clean result, especially when
+    we are dealing with the factor variables, where the dummy variable
+    names can be very long due to the inserting of a random string to
+    avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
+    for details.
   }
 }
 
@@ -166,6 +192,8 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 
 \seealso{
   \code{\link{madlib.glm}} logistic regression
+
+  \code{\link{as.factor}} creates categorial variables for fitiing.
 }
 \examples{
 \dontrun{
@@ -184,6 +212,10 @@ fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
 data = x, heteroskedasticity = T)
 fit # display the result
 
+## Another example
+x <- as.db.data.frame(abalone, "abalone")
+
+fit <- madlib.lm(rings ~ . - id | sex + length + height, data = x)
 }
 }
 

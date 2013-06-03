@@ -70,7 +70,7 @@ help("|,db.obj,db.obj-method")
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone")
 
-preview(x$rings[x$length > 10 & x$width < 2,])
+preview(x$rings[x$length > 10 & x$height < 2,])
 }
 }
 

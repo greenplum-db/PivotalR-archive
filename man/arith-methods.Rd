@@ -95,7 +95,7 @@ x <- as.db.data.frame(abalone, "abalone")
 
 x$rings <- (x$rings + 2.3) * 3 # change the values
 
-x$area <- x$length * x$width # add a new column
+x$area <- x$length * x$height # add a new column
 
 preview(x$area, 10) # view the actual values computed in database
 

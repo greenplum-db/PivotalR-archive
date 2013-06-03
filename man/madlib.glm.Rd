@@ -9,7 +9,7 @@
   columns of data can be used to separate the data set into multiple groups
   according to the values of the grouping columns. The requested regression
   method is applied onto each group,  which has fixed values of the grouping
-  columns.
+  columns. Multinomial logistic regression is not implemented yet. Categorial variables are supported
 }
 
 \usage{
@@ -43,27 +43,55 @@
 
     \item{na.action}{
         A string which indicates what should happen when the data
-        contain \code{NA}s. Currently not implemented yet. Future possible
-        values include \code{"na.omit"}, \code{"na.exclude"}, \code{"na.fail"}
-        and \code{NULL}.
+        contain \code{NA}s.  Future possible
+        values include \code{"na.omit"}, \code{"na.exclude"},
+        \code{"na.fail"} 
+        and \code{NULL}. Currently not implemented yet.
     }
 
     \item{control}{
-        Describe \code{control} here~~
+        A list, extra parameters to be passed to linear or logistic
+        regressions.
+
+        For the linear regressions, the extra parameter is
+        \code{hetero}. A logical, deafult is \code{FALSE}. If it is
+  \code{TRUE}, then Breusch-Pagan test is performed on the fitting model
+  and the corresponding test statistic and p-value are computed.
+        
+        For logistic regression, one can pass the following
+        extra parameters:
+
+        \code{method}: A string, default is \code{"irls"} (iteratively
+        reweighted least squares [3]), other choices
+        are \code{"cgd"} (conjugate gradient descent algorithm [4]) and \code{"igd"}
+        (stochastic gradient descent algorithm [5]). The algorithm names for
+        logistic regression.
+
+        \code{max_iter}: An integer, default is 10000. The maximum
+        number of iterations that the algorithms will run.
+
+        \code{tolerance}: A numeric value, default is 1e-5. The stopping
+    threshold for the iteration algorithms.
     }
 
     \item{...}{
-        Further arguments passed to or from other methods.
+        Further arguments passed to or from other methods. Currently, no
+        more parameters can be passed to the linear regression and
+        logistic regression.
     }
 }
 
 \details{
-If necessary, more details than the description above ~~
+  See \code{\link{madlib.lm}} for more details.
 }
 
 \value{
-~~~~~~~~~~~
-  A list which contains the following items:
+  For the return value of linear regression see \code{\link{madlib.lm}}
+  for details.
+
+  For the logistic regression, the returned value is similar to that of
+  the linear regression, and is
+  a list which contains the following items:
 
   \item{grouping column(s)}{
     When there are grouping columns in the formula, the resulting list
@@ -83,35 +111,38 @@ If necessary, more details than the description above ~~
     all the grouping column values.
   }
 
-  \item{r2}{
-        A numeric vector, the coefficient of determination. Each element is
-        the coefficient of determination of regression model for each group of data.
-        It is a measure of how well observed outcomes are replicated by the model,
-        as the proportion of total variation of outcomes explained by the model.
+  \item{log_likelihood}{
+    A numeric array, the log-likelihood for each fitting to the
+    groups. Thus the length of the array is equal to \code{grps}.
   }
 
   \item{std_err}{
-    To be added ...
+    A numeric matrix, the standard error for each coefficients. The row
+    number is equal to \code{grps}.
   }
 
-  \item{t_stats}{
-    To be added ...
+  \item{z_stats}{
+    A numeric matrix, the z-statistics for each coefficient. Each row is
+    for a 
+    fitting to a group of the data. 
   }
 
   \item{p_values}{
-    To be added ...
+    A numeric matrix, the p-values of \code{z_stats}. Each row is for a
+    fitting to a group of the data.
   }
 
+  \item{odds_ratios}{
+    A numeric array, the odds ratios [6] for the fittings for all groups.
+  }
+  
   \item{condition_no}{
-    To be added ...
+      A numeric array, the condition number for all combinations of the
+    grouping column values.
   }
 
-  \item{bp_stats}{
-    Only if ``gaussian'' family is used.
-  }
-
-  \item{bp_p_value}{
-    Only if ``gaussian'' family is used.
+  \item{num_iterations}{
+    An integer array, the itertion number used by each fitting group.
   }
 
   \item{grps}{
@@ -120,40 +151,58 @@ If necessary, more details than the description above ~~
   }
 
   \item{grp.cols}{
-    To be added ...
+    An array of strings. The column names of the grouping columns.
   }
 
   \item{has.intercept}{
-    To be added ...
+    A logical, whether the intercept is included in the fitting.
   }
 
   \item{ind.vars}{
-    To be added ...
+       An array of strings, all the different terms used as independent
+    variables in the fitting.
   }
 
   \item{ind.str}{
-    To be added ...
+    A string. The independent variables in an array format string.
   }
 
   \item{call}{
-    To be added ...
+    A string. The function call that generates this result.
   }
 
   \item{col.name}{
-    To be added ...
+    An array of strings. The column names used in the fitting.
   }
 
   \item{appear}{
-    To be added ...
+       An array of strings, the same length as the number of independent
+    variables. The strings are used to print a clean result, especially when
+    we are dealing with the factor variables, where the dummy variable
+    names can be very long due to the inserting of a random string to
+    avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
+    for details.
   }
-  ~~~~~~~~~~~
 }
 
 \references{
     [1] Documentation of linear regression in MADlib v0.6,
-        \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}
+    \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}
+    
     [2] Documentation of logistic regression in MADlib v0.6,
-        \url{http://doc.madlib.net/v0.6/group__grp__logreg.html}
+    \url{http://doc.madlib.net/v0.6/group__grp__logreg.html}
+
+    [3] Wikipedia: Iteratively reweighted least squares,
+    \url{http://en.wikipedia.org/wiki/IRLS}
+
+    [4] Wikipedia: Conjugate gradient method,
+    \url{http://en.wikipedia.org/wiki/Conjugate_gradient_method}
+
+    [5] Wikipedia: Stochastic gradient descent,
+    \url{http://en.wikipedia.org/wiki/Stochastic_gradient_descent}
+
+    [6] Wikipedia: Odds ratio,
+    \url{http://en.wikipedia.org/wiki/Odds_ratio} 
 }
 
 \author{
@@ -164,15 +213,16 @@ If necessary, more details than the description above ~~
 }
 
 \note{
-  \code{|} is not part of standard R formula object, but many R packages
-  use \code{|} to add their own functionalities into formula
-  object. However, \code{|} has different meanings and usages
-  in different packages. The user must be careful that usage of \code{|} in
-  \code{\link{PivotalR-package}} may not be the same as the others.
+  See \code{\link{madlib.lm}}'s note for more about the formula format.
+
+  For logistic regression, the dependent variable MUST be a logical
+  variable with values being \code{TRUE} or \code{FALSE}.
 }
 
 \seealso{
-    \code{\link{madlib.lm}} Linear Regression
+  \code{\link{madlib.lm}} Linear Regression
+
+  \code{\link{as.factor}} creates categorial variables for fitiing.
 }
 
 \examples{
@@ -188,13 +238,13 @@ fit <- madlib.glm(interlocks ~ . | nation, data = source_data, heteroskedasticit
 fit
 
 ## logistic regression
-## create a table from the example data.frame
-source_data <- db.data.frame("madlibtestdata.log_breast_cancer_wisconsin")
-preview(source_data, 10)
 
 ## logistic regression
-fit <- madlib.logregr(y ~ x - 1 , data = source_data)
-fit
+## The dependent variable must be a logical variable
+## Here it is y < 10.
+fit <- madlib.glm(interlocks < 10 ~ . - 1 , data = source_data)
+
+fit <- madlib.glm(interlocks < 10 ~ assets + as.factor(nation) + sector, data = source_data)
     }
 }
 

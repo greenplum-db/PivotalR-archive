@@ -112,7 +112,7 @@ db.connect(port = 5433)
 
 x <- as.db.data.frame(abalone, "abalone")
 
-x$area <- x[["length"]] * x[,"width"] # add a new column
+x$area <- x[["length"]] * x[,"height"] # add a new column
 
 y <- x[,-c(1,2)] # use all columns except the first two
 }
