@@ -8,33 +8,46 @@ setGeneric ("sort")
 setMethod (
     "sort",
     signature(x = "db.obj"),
-    function (x, decreasing = FALSE, by = character(0), ...)
+    function (x, decreasing = FALSE, INDICES, ...)
     {
-        if (identical(by, character(0)) && !identical(x@.key, character(0)))
-            by <- x@.key
-
-        if (!is.character(by) || length(by) == 0 ||
-            !all(by %in% names(x)))
-            stop("must sort by the column names!")
-        if (decreasing)
-            order <- "desc"
+        if (is(x, "db.data.frame"))
+            parent <- content(x)
         else
-            order <- ""
+            parent <- x@.parent
+        if (is.null(INDICES)) { # order by random()
+            sort <- list(by = NULL, order = "",
+                         str = " order by random()")
+        } else {
+            by <- character(0)
+            if (!is.list(INDICES)) INDICES <- list(INDICES)
+            for (i in seq_len(length(INDICES))) {
+                if (!is(INDICES[[i]], "db.Rquery") ||
+                    INDICES[[i]]@.parent != parent)
+                    stop("Only objects derived from the same table can match each other!")
+                by <- c(by, INDICES[[i]]@.expr)
+            }
+            by <- unique(by)
+            
+            if (decreasing)
+                order <- "desc"
+            else
+                order <- ""
 
-        sort <- list(by = by, order = order)
+            sort <- list(by = by, order = order,
+                         str = paste(" order by ",
+                         paste("(", by, ")", collapse = ", ",
+                               sep = ""), order, sep = ""))
+        }
 
         if (is(x, "db.data.frame")) {
-            content <- paste("select * from \"", content(x), "\" order by ",
-                             paste("\"", by, "\"", collapse = ", ",
-                                   sep = ""), order, sep = "")
+            content <- paste("select * from ", content(x),
+                             sort$str, sep = "")
             expr <- names(x)
             src <- content(x)
             parent <- src
             where <- ""
         } else {
-            content <- paste(content(x), " order by ",
-                             paste("\"", by, "\"", collapse = ", ",
-                                   sep = ""), order, sep = "")
+            content <- paste(content(x), sort$str, sep = "")
             expr <- x@.expr
             src <- x@.source
             parent <- x@.parent

@@ -21,8 +21,8 @@
 
     if ((is.null(left.where) &&
         ((is(x, "db.data.frame") && value@.where != "") ||
-        (is(x, "db.Rquery") && .strip(x@.where) != .strip(value@.where))))
-        || (!is.null(left.where) && .strip(left.where) != .strip(value@.where)))
+        (is(x, "db.Rquery") && !.eql.where(.strip(x@.where), .strip(value@.where)))))
+        || (!is.null(left.where) && !.eql.where(.strip(left.where), .strip(value@.where))))
         stop("The where parts that do not match!")
     
     if (is(x, "db.data.frame")) {
@@ -82,7 +82,7 @@
 
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, where.str, sort$sort.str, sep = ""),
+        tbl, where.str, sort$str, sep = ""),
         .expr = x.names,
         .source = value@.source,
         .parent = value@.parent,
@@ -93,7 +93,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -164,7 +164,7 @@
     
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
-        tbl, where.str, sort$sort.str, sep = ""),
+        tbl, where.str, sort$str, sep = ""),
         .expr = x.names,
         .source = src,
         .parent = parent,
@@ -175,7 +175,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -340,7 +340,7 @@ setMethod (
                 if (is(x, "db.data.frame") || x@.where == "")
                     where.str <- str
                 else
-                    where.str <- paste(x@.where, "and", str)
+                    where.str <- paste("(", x@.where, ") and (", str, ")", sep = "")
                 if (missing(j))
                     .replacement(x, names(x), value, str, where.str)
                 else

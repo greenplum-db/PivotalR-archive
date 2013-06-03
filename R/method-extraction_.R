@@ -45,8 +45,15 @@ setMethod(
                         " with each row of the table!")
                 stop()
             }
-            if (x.where != "") x.where <- paste(x.where, "and")
-            where.str <- paste(x@.key, "=", i)
+            if (x.where != "") {
+                x.where <- paste("(", x.where, ") and ", sep = "")
+                lb <- "("
+                rb <- ")"
+            } else {
+                lb <- ""
+                rb <- ""
+            }
+            where.str <- paste(lb, x@.key, " = ", i, rb, sep = "")
             .create.db.Rquery(x, cols.i = j,
                               where = paste(x.where, where.str))
         }
@@ -67,6 +74,11 @@ setMethod (
         if (n == 1) {
             message("Error : argument is missing!")
             stop()
+        }
+
+        if (length(names(x)) == 1) {
+            n <- 3
+            j <- 1
         }
         
         if (missing(i))
@@ -103,7 +115,7 @@ setMethod (
                 if (all(i@.col.data_type == "boolean")) {
                     return (i)
                 } else {
-                    i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"))))
+                    i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"), conn.id(x))))
                     if (length(i) > length(names(x)))
                         stop("Are you sure the column number is correct?")
                 }
@@ -116,8 +128,16 @@ setMethod (
                 where.str <- i@.expr
                 if (length(where.str) != 1)
                     stop("More than 2 boolean expressions in selecting row!")
-                if (x.where != "") x.where <- paste(x.where, " and ", sep = "")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
+                if (x.where != "") {
+                    x.where <- paste("(", x.where, ") and ", sep = "")
+                    lb <- "("
+                    rb <- ")"
+                } else {
+                    lb <- ""
+                    rb <- ""
+                }
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, lb,
+                                                 where.str, rb, sep = ""))
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
                     message("Error : there is no unique ID associated",
@@ -128,8 +148,16 @@ setMethod (
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
                 where.str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                                    ")", sep = "")
-                if (x.where != "") x.where <- paste(x.where, "and ")
-                .create.db.Rquery(x, cols.i = j, where = paste(x.where, where.str, sep = ""))
+                if (x.where != "") {
+                    x.where <- paste(x.where, "and ")
+                    lb <- "("
+                    rb <- ")"
+                } else {
+                    lb <- ""
+                    rb <- ""
+                }
+                .create.db.Rquery(x, cols.i = j, where = paste(x.where, lb, where.str,
+                                                 rb, sep = ""))
             }
         }
     },
@@ -215,7 +243,7 @@ setMethod (
 
     new("db.Rquery",
         .content = paste("select ", i.str, " from ", tbl, where.str,
-        sort$sort.str, sep = ""),
+        sort$str, sep = ""),
         .expr = expr,
         .source = src,
         .parent = parent,
@@ -226,7 +254,7 @@ setMethod (
         .col.udt_name = x@.col.udt_name[cols.i],
         .where = where,
         .is.factor = is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -235,8 +263,13 @@ setGeneric ("subset")
 
 setMethod ("subset",
     signature(x = "db.obj"),
-    function (x, subset, select)
-    {
-        x[subset, select]
-    }
-)
+    function (x, subset, select) {
+        n <- nargs()
+        if (n == 1) return (x[,])
+        if (n == 2) return (x[subset])
+        if (n == 3) {
+            if (missing(subset) && missing(select)) return (x[,])
+            if (missing(subset)) return (x[,select])
+            if (missing(select)) return (x[subset,])
+        }
+    })

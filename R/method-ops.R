@@ -28,7 +28,7 @@ setMethod (
         if (class(e1)[1] != class(e2)[1])
             return (FALSE)
         if (is(e1, "db.data.frame")) {
-            if (all(e1@.name == e1@.name) &&
+            if (all(e1@.name == e2@.name) &&
                 e1@.content == e2@.content &&
                 conn.eql(e1@.conn.id, e2@.conn.id) &&
                 e1@.table.type == e2@.table.type)
@@ -38,12 +38,12 @@ setMethod (
         } else {
             if (e1@.content == e2@.content &&
                 length(e1@.expr) == length(e2@.expr) &&
-                all(e1@.expr == e1@.expr) &&
-                e1@.source == e1@.source &&
+                all(e1@.expr == e2@.expr) &&
+                e1@.source == e2@.source &&
                 e1@.parent == e2@.parent &&
                 conn.eql(e1@.conn.id, e2@.conn.id) &&
                 all(e1@.col.data_type == e2@.col.data_type) &&
-                e1@.where == e2@.where &&
+                .eql.where(e1@.where, e2@.where) &&
                 all(e1@.is.factor == e2@.is.factor) &&
                 all(e1@.col.name == e2@.col.name))
                 return (TRUE)
@@ -57,7 +57,8 @@ setMethod (
 
 ## operation between an db.obj and a single value
 .compare <- function (e1, e2, cmp, data.types,
-                      prefix = "", res.type = "boolean")
+                      prefix = "", res.type = "boolean",
+                      cast = "::double precision")
 {
     if (is(e1, "db.data.frame")) e1 <- e1[,]    
     expr <- rep("", length(names(e1)))
@@ -66,7 +67,8 @@ setMethod (
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
-            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cmp, e2, sep = "")
+            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
+                             cmp, e2, sep = "")
         } else {
             expr[i] <- "NULL"
         }
@@ -93,7 +95,7 @@ setMethod (
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
-        where.str, sort$sort.str, sep = ""),
+        where.str, sort$str, sep = ""),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -104,7 +106,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -249,7 +251,7 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " > ", .txt.types)
+        .compare(e1, e2, " > ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -269,7 +271,7 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " < ", .txt.types)
+        .compare(e1, e2, " < ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -289,7 +291,7 @@ setMethod (
     ">=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " >= ", .txt.types)
+        .compare(e1, e2, " >= ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -309,7 +311,7 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " <= ", .txt.types)
+        .compare(e1, e2, " <= ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -329,7 +331,7 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " = ", .txt.types)
+        .compare(e1, e2, " = ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -349,7 +351,7 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        .compare(e1, e2, " <> ", .txt.types)
+        .compare(e1, e2, " <> ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -369,7 +371,7 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean")
+        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -379,9 +381,28 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean")
+        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
+
+setMethod (
+    "&",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 & e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "|",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 | e1
+    },
+    valueClass = "db.Rquery")
+
 
 ## ------------------------------------------------------------------------
 
@@ -450,7 +471,7 @@ setMethod (
     "/",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " / ", .num.types, res.type = "double precision")
+        .compare(e1, e2, " / ", .num.types, res.type = "double precision", cast = "::double precision")
     },
     valueClass = "db.Rquery")
 
@@ -493,7 +514,7 @@ setMethod (
     "%%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " % ", .num.types, res.type = "double precision")
+        .compare(e1, e2, " % ", .num.types, res.type = "double precision", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -505,7 +526,7 @@ setMethod (
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "% "),
-                 res.type = "double precision")
+                 res.type = "double precision", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -515,7 +536,7 @@ setMethod (
     "%/%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, as.integer(e2), " / ", .int.types, res.type = "integer")
+        .compare(e1, as.integer(e2), " / ", .int.types, res.type = "integer", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -527,7 +548,7 @@ setMethod (
     function (e1, e2) {
         .compare(e2, "", "", .num.types,
                  prefix = paste(e1, "%"),
-                 res.type = "integer")
+                 res.type = "integer", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -537,7 +558,8 @@ setMethod (
 
 ## operator for two db.obj objects
 .operate.two <- function (e1, e2, op, data.types, 
-                          res.type = "boolean")
+                          res.type = "boolean",
+                          cast = "::double precision")
 {
     ## convert db.data.frame into db.Rquery
     if (is(e1, "db.data.frame")) e1 <- e1[,]
@@ -550,7 +572,7 @@ setMethod (
     else
         l <- l2
 
-    if (e1@.parent != e2@.parent || e1@.where != e2@.where)
+    if (e1@.parent != e2@.parent || !.eql.where(e1@.where, e2@.where))
         stop("How can you match the rows of two objects",
              " if they are not derived from the same thing!")
     
@@ -568,7 +590,7 @@ setMethod (
                 break
             }
         if (v > 0 && e2@.col.data_type[i2] %in% data.types[[v]]) {
-            expr[i] <- paste("(", e1@.expr[i1], ")", op, "(",
+            expr[i] <- paste("(", e1@.expr[i1], ")", cast, op, "(",
                              e2@.expr[i2], ")", sep = "")
         } else {
             expr[i] <- "NULL"
@@ -593,7 +615,7 @@ setMethod (
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
-        where.str, sort$sort.str, sep = ""),
+        where.str, sort$str, sep = ""),
         .expr = expr,
         .source = e1@.source,
         .parent = e1@.parent,
@@ -604,7 +626,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = e1@.is.factor & e2@.is.factor,
-        .sort = sort$sort)
+        .sort = sort)
 }
 
 ## ------------------------------------------------------------------------
@@ -669,7 +691,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " % ", list(.num.types),
-                     res.type = "double precision")
+                     res.type = "double precision", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -680,7 +702,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " / ", list(.int.types),
-                     res.type = "integer")
+                     res.type = "integer", cast = "::integer")
     },
     valueClass = "db.Rquery")
 
@@ -691,7 +713,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " > ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -702,7 +724,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " < ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -713,7 +735,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " >= ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -724,7 +746,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " <= ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -735,7 +757,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " = ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -746,7 +768,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " <> ", list(.num.types, .txt.types),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -757,7 +779,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " and ", list(c("boolean")),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -768,7 +790,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
         .operate.two(e1, e2, " or ", list(c("boolean")),
-                     res.type = "boolean")
+                     res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -778,8 +800,8 @@ setMethod (
     "!",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", "", c("boolean"), prefix = "not",
-                 res.type = "boolean")
+        .compare(x, "", "", c("boolean"), prefix = "not ",
+                 res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
 
@@ -791,6 +813,6 @@ setMethod (
     "is.na",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", " is NULL", NA, "", "boolean")
+        .compare(x, "", " is NULL", NA, "", "boolean", "")
     },
     valueClass = "db.Rquery")

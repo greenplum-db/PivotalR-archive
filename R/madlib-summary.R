@@ -22,7 +22,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         stop("target.cols or grouping.cols has columns that are not in ",
              "the data!")
 
-    msg.level <- .set.msg.level("panic") # suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
     ## disable warning in R, RPostgreSQL
     ## prints some unnessary warning messages
     warn.r <- getOption("warn")
@@ -83,7 +83,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
 
     class(res) <- "summary.madlib"
 
-    msg.level <- .set.msg.level(msg.level) # reset message level
+    msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
     options(warn = warn.r) # reset R warning level
     
     return (res)
@@ -106,7 +106,9 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     if (is.null(str))
         "NULL::TEXT"
     else 
-        paste("'", paste(str, collapse = ","),
+        ## paste("'", paste("\"", str, "\"", collapse = ", ", sep = ""),
+        ##       "'", sep = "")
+        paste("'", paste(str, collapse = ", ", sep = ""),
               "'", sep = "")
 }
 
@@ -140,32 +142,28 @@ print.summary.madlib <- function (x,
                               ":", sep = "")
 
     first.group <- TRUE
-    for (g in u.group) {
-        if (is.na(g))
-            gb <- is.na(x$group_by)
+    for (g in seq_len(length(x$group_by))) {
+        if (!first.group)
+            cat("------------------------------------------------\n")
         else
-            gb <- x$group_by == g
-        for (v in u.value) {
-            if (!first.group)
-                cat("------------------------------------------------\n")
-            else
-                first.group <- FALSE
-            if (is.na(v)) {
-                vb <- is.na(x$group_by_value)
-                if (!is.na(g)) cat("When", g, "= NA\n\n")
+            first.group <- FALSE
+        if (!is.na(x$group_by[g])) {
+            if (is.na(x$group_by_value[g])) {
+                cat("When", x$group_by[g], "= NA\n\n")
             } else {
-                vb <- x$group_by_value == v
-                if (!is.na(g)) cat("When", g, "=", v, "\n\n")
+                cat("When", x$group_by[g], "=", x$group_by_value[g], "\n\n")
             }
-
-            dat <- x[gb & vb, -(1:2)]
-            dat.col <- dat[,1]
-            dat <- dat[,-1]
-
-            output <- .arrange.summary(dat, dat.col, dat.names,
-                                       digits = digits)
-            print(format(output, justify = "left"), row.names = F)
+        } else {
+            cat("For all data:\n\n")
         }
+
+        dat <- x[g, -(1:2)]
+        dat.col <- dat[,1]
+        dat <- dat[,-1]
+        
+        output <- .arrange.summary(dat, dat.col, dat.names,
+                                   digits = digits)
+        print(format(output, justify = "left"), row.names = F, right = FALSE)
     }
 }
 

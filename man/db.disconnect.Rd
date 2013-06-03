@@ -1,71 +1,65 @@
 \name{db.disconnect}
+
 \alias{db.disconnect}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-  function to do ... 
+  Disconnect a connection to a database
 }
 \description{
-   A concise (1-5 lines) description of what the function does. 
+   Although all the database connections will be automatically closed
+  when this package is unloaded, one can choose to disconnect a database
+  connection himself.
 }
+
 \usage{
 db.disconnect(conn.id = 1, verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{conn.id}{
-     Describe \code{conn.id} here
+    An integer, the ID of the connection that you want to disconnect.
    }
+
    \item{verbose}{
-     verbose
+     A logical, default is \code{TRUE}. Whether to print a message
+     during disconnection.
    }
-}
-\details{
-  ++ If necessary, more details than the description above ++
-}
-\value{
-  +Describe the value returned
-  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
- +put references to the literature/web site here +
-}
-\author{
-  ++who you are++
-}
-\note{
-  ++further notes++
 }
 
-%% +Make other sections like Warning with \section{Warning }{....} +
+\value{
+  A logical, \code{TRUE} if the connection is successfully disconnected.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
- ++objects to See Also as \code{\link{help}}, +++
+  \code{\link{db.connect}} creates the database connection.
+
+  \code{\link{db.list}} lists all active connections.
+
+  \code{\link{connection info}} the functions that extract information
+  about the connection.
+
+  \code{\link{conn.eql}} tests whether two connections are the same.
 }
 \examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+## connect to a database
+conid <- db.connect(host = "localhost", user = "me", dbname = "me", password =
+"", port = 5432, madlib = "madlib")
 
-## The function is currently defined as
-function (conn.id = 1) 
-{
-    if (!.is.conn.id.valid(conn.id)) 
-        stop("There is no such connection!")
-    conn.pkg <- .localVars$db[[conn.id]]$conn.pkg
-    command <- paste(".db.disconnect.", conn.pkg, "(conn.id=", 
-        conn.id, ")", sep = "")
-    eval(parse(text = command))
-    .localVars$db[[conn.id]] <- NULL
-    .localVars$conn.type[[conn.pkg]] <- .localVars$conn.type[[conn.pkg]][-which(.localVars$conn.type[[conn.pkg]] == 
-        conn.id)]
-  }
-## End (Not run)
+## disconnect the connection
+db.disconnect(conid)
+
+db.list() 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{utility}
+\keyword{ database }
+\keyword{ connection }

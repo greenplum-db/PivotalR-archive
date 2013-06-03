@@ -8,7 +8,7 @@ setGeneric ("by")
 setMethod (
     "by",
     signature(data = "db.obj"),
-    function (data, INDICES = NULL, FUN, ...) {
+    function (data, INDICES, FUN, ..., simplify = TRUE) {
         if (is(data, "db.data.frame")) {
             parent <- content(data)
             src <- parent
@@ -31,12 +31,12 @@ setMethod (
                 if (!is(INDICES[[i]], "db.Rquery") ||
                     INDICES[[i]]@.parent != parent)
                     stop("Only objects derived from the same table can match each other!")
-                by.name <- c(by.name, names(INDICES[[i]]))
+                by.name <- c(by.name, INDICES[[i]]@.expr)
             }
             by.name <- unique(by.name)
 
             parent <- paste(parent, where.str, " group by ",
-                            paste("\"", by.name, "\"", collapse = ", ",
+                            paste("(", by.name, ")", collapse = ", ",
                                   sep = ""),
                             sep = "")
             where.str <- ""
@@ -74,6 +74,6 @@ setMethod (
             .col.udt_name = col.udt_name,
             .where = where,
             .is.factor = rep(FALSE, length(names(data))),
-            .sort = list(by = "", order = ""))
+            .sort = list(by = "", order = "", str = ""))
     },
     valueClass = "db.Rquery")

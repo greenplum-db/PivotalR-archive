@@ -5,23 +5,34 @@
 
 \title{Class \code{"db.table"}}
 \description{
-A concise (1-5 lines) description of what the class is. ~~
+  A sub-class of \code{\linkS4class{db.data.frame}} which points to
+  tables in the database
 }
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("db.table", ...)}.
-describe objects here ~~ 
+Objects can be created by calls of \code{\link{db.data.frame}} or
+\code{\link{as.db.data.frame}} 
 }
 \section{Slots}{
+  As a sub-class, this class has all the slots of
+  \code{\linkS4class{db.data.frame}}. Here we list the extra slots.
   \describe{
-    \item{\code{.key}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.dim}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{.name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.content}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.conn.id}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{.col.name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.col.data_type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.col.udt_name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.table.type}:}{Object of class \code{"character"} ~~ }
+    \item{\code{.key}:}{
+      Object of class \code{"character"}. The name of the primary key
+      column name. Currently only one primary key column is
+      supported. This value can be set during the creation of the object
+      when using the function \code{\link{db.data.frame}}. The functions
+      \code{\link{key}} and \code{\link{key<-}} can be used to get and
+      set this value.
+    }
+
+    \item{\code{.dim}:}{
+      Object of class \code{"numeric"}. A two-integer array, the
+      dimension information of the table that this object points to. The
+      first 
+      integer is the total row number of the table, and the second is
+      the number of columns of the
+      table. \code{\link{dim,db.obj-method}} gets this value.
+    }
   }
 }
 \section{Extends}{
@@ -29,26 +40,34 @@ Class \code{"\linkS4class{db.data.frame}"}, directly.
 Class \code{"\linkS4class{db.obj}"}, by class "db.data.frame", distance 2.
 }
 \section{Methods}{
-No methods defined with class "db.table" in the signature.
-}
-\references{
-put references to the literature/web site here~~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+See \code{\linkS4class{db.data.frame}} for all the methods that can take
+      this class of object as an object.xs
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-  objects to See Also as
-  %\code{\link{~~fun~~}}, ~~~
-%%  ~~or \code{\linkS4class{CLASSNAME}} for links to other classes ~~~
+  \code{\link{db.data.frame}} creates a \code{db.data.frame} object.
+
+  \code{\link{as.db.data.frame}} converts \code{db.Rquery} object,
+  \code{data.frame}, or a data file into a \code{db.data.frame} object
+  and at the same time creates a new table in the database.
+
+  \code{\linkS4class{db.data.frame}} is the superclass.
+
+  \code{\linkS4class{db.view}} is the other subclass of 
+  \code{\linkS4class{db.data.frame}}
+
+  \code{\linkS4class{db.Rquery}} is another sub-class of
+  \code{\linkS4class{db.obj}}.
+
+  \code{\link{preview}} display a part of the table
 }
-\examples{
-showClass("db.table")
-}
+
 \keyword{classes}
+\keyword{database}

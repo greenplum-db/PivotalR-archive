@@ -53,7 +53,7 @@ setMethod (
         parent <- paste(x.content, join.str, y.content, on.str)
         src <- parent
 
-        by.str <- paste("s.", by.x, sep = "")
+        by.str <- paste("s.\"", .strip(by.x, "\""), "\"", sep = "")
         col.idx <- .gwhich(names(x), by.x)
         col.data_type <- x@.col.data_type[col.idx]
         col.udt_name <- x@.col.udt_name[col.idx]
@@ -72,10 +72,10 @@ setMethod (
             col.udt_name <- c(col.udt_name, x@.col.udt_name[idx])
             is.factor <- c(is.factor, x@.is.factor[idx])
             if (col %in% xy) {
-                others <- c(others, paste("s.", col, sep = ""))
+                others <- c(others, paste("s.\"", col, "\"", sep = ""))
                 col.name <- c(col.name, paste(col, suffixes[1], sep = ""))
             } else {
-                others <- c(others, col)
+                others <- c(others, paste("\"", col, "\"", sep = ""))
                 col.name <- c(col.name, col)
             }
         }
@@ -85,15 +85,15 @@ setMethod (
             col.udt_name <- c(col.udt_name, y@.col.udt_name[idx])
             is.factor <- c(is.factor, y@.is.factor[idx])
             if (col %in% xy) {
-                others <- c(others, paste("t.", col, sep = ""))
+                others <- c(others, paste("t.\"", col, "\"", sep = ""))
                 col.name <- c(col.name, paste(col, suffixes[2], sep = ""))
             } else {
-                others <- c(others, col)
+                others <- c(others, paste("\"", col, "\"", sep = ""))
                 col.name <- c(col.name, col)
             }
         }
 
-        if (key %in% xy) key <- paste(key, suffixes[1], sep = "")
+        if (!identical(key, character(0)) && key %in% xy) key <- paste(key, suffixes[1], sep = "")
         
         expr <- c(by.str, others)
 
@@ -114,6 +114,6 @@ setMethod (
             .col.udt_name = col.udt_name,
             .where = "",
             .is.factor = is.factor,
-            .sort = list(by = "", order = ""))
+            .sort = list(by = "", order = "", str = ""))
     },
     valueClass = "db.Rquery")

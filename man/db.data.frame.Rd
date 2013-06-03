@@ -1,70 +1,98 @@
 \name{db.data.frame}
+
 \alias{db.data.frame}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  Create a \code{db.data.frame} object pointing to a table/view in the
+  database 
 }
+
 \description{
- A concise (1-5 lines) description of what the function does. ~~
+  This function creates an object of
+  \code{\linkS4class{db.data.frame}}, which points to an existing
+  table/view in the database. The operations that can be applied
+  onto this class of objects are very similar to those of
+  \code{data.frame}. No real data is loaded into R. The data transfered
+  between the database and R is minimized, which is necessary when we
+  deal with large data sets.
 }
+
 \usage{
 db.data.frame(x, conn.id = 1, key = character(0), verbose = TRUE,
 is.temp = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{x}{
-Describe \code{x} here~~
-}
+    A string. It is the name of an existing table/view in the database. 
+  }
+  
   \item{conn.id}{
-Describe \code{conn.id} here~~
-}
+    An integer, default is 1. The ID number of the database connection
+    where the table resides.
+  }
+  
   \item{key}{
-Describe \code{key} here~~
-}
-\item{verbose}{
-  verbose
-}
-\item{is.temp}{
-  is temp object?
-}
-}
-\details{
- If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    A string, default is \code{character(0)}. The name of the primary
+    key column. A primary key is a column in a table which must contain a
+    unique value which can be used to identify each and every row of a
+    table uniquely. 
+  }
+  
+  \item{verbose}{
+    A logical, default is \code{TRUE}. Whether to print a short message
+    when the object in the database is created.
+  }
+  
+  \item{is.temp}{
+    A logical, default is \code{FALSE}. Whether the existing table/view
+    in the database is temporary.
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A \code{db.data.frame} object. More precisely, a \code{db.table}
+  object if it points to an existing table in the database, and a
+  \code{db.view} object 
+  if it points to an existing view in the database.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+  \code{\link{db.objects}} lists all tables and views in a database
+  together with their schema.
 
-## The function is currently defined as
-"db.data.frame"
-## End (Not run)
+  \code{\link{db.existsObject}} tests whether a table/view exists in the
+  database.
+
+  \code{\link{as.db.data.frame}} creates a \code{db.data.frame} from a
+  \code{data.frame}, a data file or a \code{db.Rquery}.
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\examples{
+\dontrun{
+## create connection to a database
+db.connect(port = 5433) # using default values
+
+## create a table using as.db.data.frame
+x <- as.db.data.frame(abalone, "abalone")
+
+## create an object pointing to the table
+y <- db.data.frame("abalone")
+
+## x and y point to the same table
+eql(x, y) # returns TRUE
+
+## create an object pointing to a table in a schema
+z <- db.data.frame("myschema.mytable")
+}
+}
+
+\keyword{ utilities }
+\keyword{ misc }

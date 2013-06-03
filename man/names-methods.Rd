@@ -1,17 +1,56 @@
 \name{names-methods}
-\docType{methods}
-\alias{names.db.obj}
-\alias{names,db.obj-method}
-\title{ ~~ Methods for Function \code{names} in Package \pkg{base} ~~}
-\description{
- ~~ Methods for function \code{names} in package \pkg{base} ~~
-}
-\section{Methods}{
-\describe{
 
-\item{\code{signature(x = "db.obj")}}{
-%%  ~~describe this method here~~
+\alias{names,db.obj-method}
+
+\title{The Names of an object}
+\description{
+    This function gives the names of a \code{db.obj}, which are the column
+    names of a \code{db.table} or \code{db.view}. The names are returned as a list
 }
-}}
+
+\usage{
+\S4method{names}{db.obj}(x)
+}
+
+
+\arguments{
+    \item{x}{
+        A \code{db.obj}.
+        The input data frame for which the column names are required.
+    }
+}
+
+\value{
+    Returns a string with the list of the column names of data
+    frame. The names are ordered.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
+
+\seealso{
+  \code{\linkS4class{db.obj}}, \code{\linkS4class{db.data.frame}},
+  \code{\linkS4class{db.table}}, \code{\linkS4class{db.view}},
+  \code{\linkS4class{db.Rquery}} are the class hierarchy structure of
+  this package.
+}
+
+\examples{
+    \dontrun{
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone, "abalone")
+## preview of a table
+preview(x, nrows = 10) # extract 10 rows of data
+
+## get names of all columns
+names(x)
+    }
+}
+
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

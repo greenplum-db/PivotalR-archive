@@ -1,10 +1,12 @@
 \name{Extract database connection info}
 
+\alias{connection info}
 \alias{user}
 \alias{host}
 \alias{dbname}
 \alias{dbms}
 \alias{conn}
+\alias{port}
 \alias{madlib}
 \alias{madlib.version}
 \alias{schema.madlib}
@@ -32,6 +34,8 @@ dbname(conn.id = 1)
 dbms(conn.id = 1)
 
 conn(conn.id = 1)
+
+port(conn.id = 1)
 
 madlib(conn.id = 1)
 
@@ -61,6 +65,8 @@ conn.pkg(conn.id = 1)
   For \code{conn}, an object of DBI connection, which can be directly
   used with packages such as RPostgreSQL.
 
+  For \code{port}, an integer, which is the port number of the connection.
+
   For \code{madlib}, a string, which is the MADlib version information.
 
   For \code{madlib.version}, a string, exactly the same as \code{madlib}.
@@ -75,13 +81,24 @@ conn.pkg(conn.id = 1)
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+}
+
+\seealso{
+  \code{\link{db.connect}} creates connections to the databases.
+
+  \code{\link{db.disconnect}} disconnects an existing connection.
+
+  \code{\link{db.list}} lists all the current connections with their
+  information.
+
+  \code{\link{conn.eql}} tests whether two connections are actually the
+  same one.
 }
 
 \examples{
 \dontrun{
-
 user(1)
 host(2)
 dbname() # use default connection 1
@@ -91,8 +108,12 @@ madlib.version()
 schema.madlib()
 conn.pkg()
 
+## conn is mostly for other packages
 con <- conn(1) # get the connection object
-dbListTables(con) # directly use functions in RPostgreSQL
+dbListTables(con) # directly use functions in package RPostgreSQL
+
+## This package provides a better function to list all tables/views
+db.objects(1) # list all tables/views with their schema in connection 1
 }
 }
 

@@ -28,6 +28,7 @@
         conn.id = conn.id,
         host = host,
         user = user,
+        port = port,
         dbname = dbname, # database name
         # which R package is used to connected to database
         conn.pkg = "rpostgresql",
@@ -133,7 +134,7 @@
         obj <- as.data.frame(obj)
     if(!is.null(add.row.names) && add.row.names){
         obj  <- cbind(row.names(obj), obj)  ## can't use row.names= here
-        names(obj)[1] <- "row.names"
+        names(obj)[1] <- "row_names"
     }
     if(is.null(field.types)){
         ## the following mapping should be coming from some kind of table
@@ -158,7 +159,7 @@
                                         overwrite, append, distributed.by,
                                         is.temp, 
                                         idx, header, nrows = 50, sep = ",",
-                                        eol="\n", skip = 0, quote = '"',
+                                        eol="\n", skip = 0, quote = "\"",
                                         field.types, ...)
 {
     conn <- .localVars$db[[idx]]$conn
@@ -253,7 +254,7 @@
                     return(FALSE)
                 }
                 else
-                    func1(rs)
+                    func1(rs$res)
             }
             else if(!append)
             {
@@ -308,7 +309,7 @@
                 }
                 else
                 {
-                    func1(rs)#######
+                    func1(rs$res)#######
                 }
             }
 

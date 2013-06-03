@@ -15,7 +15,7 @@
 }
 
 \usage{
-arraydb.to.arrayr(str, type = "double")
+arraydb.to.arrayr(str, type = "double", n = 1)
 }
 
 \arguments{
@@ -30,6 +30,12 @@ arraydb.to.arrayr(str, type = "double")
   \code{"numeric"} etc. All types other than \code{"character"},
   \code{"logical"} and 
   \code{"integer"} will be treated as \code{"numeric"}.
+  }
+  \item{n}{
+    An integer, default is 1. If the input has \code{NA} instead of a string as
+   one element of a string array, how many \code{NA}'s should be returned so that 
+    a valid array can be returned. There should be as many \code{NA} as the number 
+  of elements in other output rows without \code{NA}.  
   }
 }
 
@@ -57,7 +63,7 @@ arraydb.to.arrayr(str, type = "double")
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
 }
 

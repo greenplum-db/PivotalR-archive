@@ -5,7 +5,26 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, ...) standardGeneric("as.db.data.frame"),
+    def = function (x, table.name, verbose = FALSE, ...) {
+        x.str <- deparse(substitute(x))
+        res <- standardGeneric("as.db.data.frame")
+        if (verbose) {
+            if (is.data.frame(x)) {
+                cat("\nThe data in the data.frame", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else if (is.character(x)) {
+                cat("\nThe data in the file", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else {
+                cat("\nThe data created by ", x.str,
+                    "is stored into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            }
+        }
+        return (res$res)
+    },
     signature = "x")
 
 ## ------------------------------------------------------------------------
@@ -15,13 +34,14 @@ setMethod (
     "as.db.data.frame",
     signature (x = "data.frame"),
     def = function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
-    is.temp = FALSE, ...)
-    .method.as.db.data.frame.1(x, table.name, conn.id,
-                               add.row.names, key,
-                               distributed.by, is.temp, ...),
-    valueClass = "db.data.frame")
+    is.temp = FALSE, ...) {
+         .method.as.db.data.frame.1(x, 
+                                   table.name, verbose, conn.id,
+                                   add.row.names, key,
+                                   distributed.by, is.temp, ...)
+    })
 
 ## ------------------------------------------------------------------------
 
@@ -31,18 +51,19 @@ setMethod (
     "as.db.data.frame",
     signature (x = "character"),
     def = function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
-    is.temp = FALSE, ...)
-    .method.as.db.data.frame.1(x, table.name, conn.id,
-                               add.row.names, key,
-                               distributed.by, is.temp, ...),
-    valueClass = "db.data.frame")
+    is.temp = FALSE, ...) {
+        .method.as.db.data.frame.1(x,
+                                   table.name, verbose, conn.id,
+                                   add.row.names, key,
+                                   distributed.by, is.temp, ...)
+    })
 
 ## ------------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
-    x, table.name, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
@@ -73,7 +94,7 @@ setMethod (
                    distributed.by = distributed.by,
                    is.temp = is.temp, conn.id = conn.id, ...)
     if (length(table) == 1 && !is.temp) {
-        table_schema <- .db.getQuery("select current_schema()");
+        table_schema <- .db.getQuery("select current_schema()", conn.id);
         table.str <- paste(table_schema, ".", table, sep = "")
     } else
         table.str <- table.name
@@ -82,20 +103,13 @@ setMethod (
                            " add primary key (\"",
                            key, "\")", sep = ""), conn.id)
 
-    if (is.data.frame(x)) {
-        cat("\nThe data in the data.frame", deparse(substitute(x)),
-            "is stored into the table", table.name, "in database",
-            dbname(conn.id), "on", host(conn.id), "!\n\n")
-    } else {
-        cat("\nThe data in the file", x,
-            "is stored into the table", table.name, "in database",
-            dbname(conn.id), "on", host(conn.id), "!\n\n")
-    }
-    cat("\nAn R object pointing to", table.name,
-        "in database", dbname(conn.id), "on", host(conn.id),
-        "is created !\n\n")
+    ## cat("\nAn R object pointing to", table.name,
+    ##     "in database", dbname(conn.id), "on", host(conn.id),
+    ##     "is created !\n\n")
     
-    db.data.frame(table.name, conn.id, key)
+    list(res = db.data.frame(x = table.name, conn.id = conn.id, key = key,
+         verbose = verbose, is.temp = is.temp),
+         conn.id = conn.id)
 }
 
 ## ------------------------------------------------------------------------
@@ -105,8 +119,9 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, is.view = FALSE,
-    is.temp = FALSE, verbose = FALSE, pivot = TRUE,
+    def = function (x, table.name, verbose = FALSE,
+    is.view = FALSE,
+    is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL) {
         conn.id <- conn.id(x)
 
@@ -125,8 +140,8 @@ setMethod (
         else
             obj.str <- "table"
 
-        if (x@.parent == x@.source)
-            tbl <- paste("\"", x@.parent, "\"", sep = "")
+        if (x@.source == x@.parent)
+            tbl <- x@.parent
         else
             tbl <- paste("(", x@.parent, ") s", sep = "")
 
@@ -140,58 +155,60 @@ setMethod (
         ## suffix used to avoid conflicts
         suffix <- rep("", length(x@.is.factor))
         appear <- x@.col.name
-
+        is.factor <- x@.is.factor
+        
         if (pivot && !all(x@.is.factor == FALSE)) {
-            cats <- x@.col.name[x@.is.factor]
+            cats <- x@.expr[x@.is.factor]
             sql <- "select "
             for (i in seq_len(length(cats))) {
-                sql <- paste(sql, "array_agg(distinct \"", cats[i], "\") as ",
-                             cats[i], sep = "")
+                sql <- paste(sql, "array_agg(distinct ", cats[i], ") as ",
+                             "distinct_", i, sep = "")
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
             ## scan through the table only once
             sql <- paste(sql, " from ", tbl, sep = "")
-            distincts <- .db.getQuery(sql)
+            distincts <- .db.getQuery(sql, conn.id)
+            idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- as.vector(arraydb.to.arrayr(distincts[[x@.col.name[i]]], "character"))
+                    idx <- idx + 1
+                    distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
                     suffix[i] <- .unique.string()
                     ## Produce a fixed order for distinct values
                     distinct <- distinct[order(distinct, decreasing = TRUE)]
                     for (j in seq_len(length(distinct) - 1)) {
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
+                        is.factor <- c(is.factor, FALSE)
                         if (extra != "") extra <- paste(extra, ", ")
-                        extra <- paste(extra, " (case when ", x@.expr[i], " = ",
-                                    distinct[j], " then 1 else 0 end) as ",
-                                    "\"", new.col, "\"", sep = "")
+                        extra <- paste(extra, " (case when ", x@.expr[i], " = '",
+                                       distinct[j], "'::", x@.col.data_type[i],
+                                       " then 1 else 0 end) as ",
+                                       "\"", new.col, "\"", sep = "")
                         appear <- c(appear, paste(x@.col.name[i],":",
                                                   distinct[j], sep = ""))
                     }
                 } 
             }
         }
-
-        if (x@.source == x@.parent)
-            tbl <- x@.parent
-        else
-            tbl <- paste("(", x@.parent, ") s", sep = "")
+        
         if (x@.where != "")
-            where <- paste("where", x@.where)
+            where <- paste(" where", x@.where)
         else
             where <- ""
         
-        content.str <- paste("select", extra, "from", tbl, where)
+        content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " \"",
                             table.name,
                             "\" as (", content.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
-        res <- db.data.frame(table.name, conn.id, x@.key, verbose, is.temp)
-        res@.is.factor <- x@.is.factor
+        ## print(create.str)
+        res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
+                             verbose = verbose, is.temp = is.temp)
+        res@.is.factor <- is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
-        res
-    },
-    valueClass = "db.data.frame")
+        list(res = res, conn.id = conn.id)
+    })

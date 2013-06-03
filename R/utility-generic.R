@@ -6,7 +6,7 @@
 ## ------------------------------------------------------------------------
 
 ## convert {...} string into an arrayparams$grp.str
-arraydb.to.arrayr <- function (str, type = "double")
+arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     if (is.null(str)) return (NULL)
     
@@ -21,8 +21,13 @@ arraydb.to.arrayr <- function (str, type = "double")
     
     for (i in seq(str))
     {
+        if (is.na(str[i])) {
+            res <- rbind(res, rep(NA, n))
+            next
+        }
+        
         elm <- regmatches(str[i],
-                          gregexpr("[^,\"\\s\\{\\}]+|\"(\\\"|[^\"])*\"",
+                          gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
                                    str[i], perl=T))[[1]]
         if (type == "character")
             elm <- as.character(elm)
@@ -179,23 +184,49 @@ arraydb.to.arrayr <- function (str, type = "double")
 ## -----------------------------------------------------------------------
 
 ## strip the leading and trailing white spaces
-.strip <- function (str)
+.strip <- function (str, rm = "\\s")
 {
-    gsub("^\\s*(.*\\S)\\s*$", "\\1", str)
+    rm.str <- paste("^", rm, "*(.*[^", rm, "])", rm, "*$", sep = "")
+    gsub(rm.str, "\\1", str, perl = TRUE)
 }
 
 ## ------------------------------------------------------------------------
 
 ## analyze formula
-.analyze.formula <- function (formula, data, refresh = FALSE,
+.analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
                               is.factor = NA, cols = NA, suffix = NA)
 {
     f.str <- strsplit(deparse(formula), "\\|")[[1]]
-
     fstr <- f.str[1]
-    right.hand <- .strip(gsub("^[^~]*~(.*)", "\\1", fstr))
-    left.hand <- .strip(gsub("^([^~]*)~.*", "\\1", fstr))
-    if (refresh) { # replace all factor
+    f1 <- formula(fstr) # formula
+    f2 <- f.str[2] # grouping columns, might be NA
+    if (!is.na(f2)) {
+        f2.terms <- terms(formula(paste("~", f2)))
+        f2.labels <- attr(f2.terms, "term.labels")
+        inter <- intersect(f2.labels, names(fdata))
+        if (length(inter) != length(f2.labels))
+            stop("The grouping part of the formula is not quite right!")
+        ## grouping column do not use factor
+        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
+        grp <- paste(f2.labels, collapse = ", ")
+    } else {
+        f2.labels <- NULL
+        grp <- NULL
+    }
+
+    ## create a fake data.frame only to extract
+    ## terms when there is "." in formula
+    fake.data <- data.frame(t(names(fdata)))
+    colnames(fake.data) <- names(fdata)
+    f.terms <- terms(f1, data = fake.data) # formula terms
+    ## the 1st row is the dependent variable
+    f.factors <- attr(f.terms, "factors")
+    f.labels <- attr(f.terms, "term.labels") # each terms on the right side
+
+    right.hand <- paste(f.labels, collapse = "+")
+    if (refresh) {
         replace.cols <- cols[is.factor]
         suffix <- suffix[is.factor]
         n.order <- order(nchar(replace.cols), decreasing = TRUE)
@@ -207,74 +238,54 @@ arraydb.to.arrayr <- function (str, type = "double")
                                         names(data))]
             new.col <- paste("(", paste(new.col, collapse = " + "), ")",
                              sep = "")
-            right.hand <- gsub(paste(col, "([^__]*)", sep = ""),
+            right.hand <- gsub(paste(col, "([^_\\w]+|$)", sep = ""),
                                paste(new.col, "\\1", sep = ""),
-                               right.hand)
+                               right.hand, perl = TRUE)
         }
-        fstr <- paste(left.hand, "~", right.hand)
     } else {
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
-                           "factor(\\1)", right.hand)
+                           "factor(\\1)", right.hand, perl = T)
         elm <- regmatches(right.hand,
                           gregexpr("factor\\s*\\([^\\(\\)]+\\)",
                                    right.hand, perl=T))[[1]]
-        col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm))
+        col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
+                           perl = T))
         if (!all(col %in% names(data)))
             stop("You can only make a existing column of",
                  " the data into factor!")
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
     }
 
-    fstr <- gsub("as.factor\\((.*)\\)", "\\1", fstr)
-    fstr <- gsub("factor\\((.*)\\)", "\\1", fstr)
-    f1 <- formula(fstr) # formula
-    f2 <- f.str[2] # grouping columns, might be NA
-    if (!is.na(f2)) {
-        f2.terms <- terms(formula(paste("~", f2)))
-        f2.labels <- attr(f2.terms, "term.labels")
-        inter <- intersect(f2.labels, names(data))
-        if (length(inter) != length(f2.labels))
-            stop("The grouping part of the formula is not quite right!")
-        ## grouping column do not use factor
-        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels)
-        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels)
-        grp <- paste(f2.labels, collapse = ", ")
-    } else {
-        f2.labels <- NULL
-        grp <- NULL
-    }
-
-    ## create a fake data.frame only to extract
-    ## terms when there is "." in formula
-    fake.data <- data.frame(t(names(data)))
-    colnames(fake.data) <- names(data)
-    f.terms <- terms(f1, data = fake.data) # formula terms
-    ## the 1st row is the dependent variable
-    f.factors <- attr(f.terms, "factors")
-    f.labels <- attr(f.terms, "term.labels") # each terms on the right side
-    f.intercept <- attr(f.terms, "intercept")
-    labels <- gsub(":", "*", f.labels) # replace interaction : with *
-    labels <- gsub("I\\((.*)\\)", "\\1", labels) # remove I()
-    ## remove grouping columns, when there is no intercept term
-    if (!is.null(f2.labels) && f.intercept != 0) 
-        labels <- setdiff(labels, f2.labels)
-
-    ## labels <- gsub("as.factor\\((.*)\\)", "\\1", labels)
-    ## labels <- gsub("factor\\((.*)\\)", "\\1", labels)
+    right.hand <- gsub("as.factor\\((.*)\\)", "\\1", right.hand, perl = T)
+    right.hand <- gsub("factor\\((.*)\\)", "\\1", right.hand, perl = T)
     
+    f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
+    f.labels <- attr(f.terms1, "term.labels")
+
+    f.intercept <- attr(f.terms, "intercept")
+    labels <- gsub(":", "*", f.labels, perl = T) # replace interaction : with *
+    labels <- gsub("I\\((.*)\\)", "\\1", labels, perl = T) # remove I()
+
     ## dependent variable
     ## factor does not play a role in dependent variable
-    dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1])
-    dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var)
-    dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var)
+    dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
+    dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var, perl = T)
+    dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
+    dep.var <- .replace.with.quotes(dep.var, data@.col.name)
     
     ## with or without intercept
     if (f.intercept == 0)
         intercept.str <- ""
     else
         intercept.str <- "1,"
+
+    labels <- .is.array(labels, data)
     
+    labels <- .replace.with.quotes(labels, data@.col.name)
+    ## remove grouping columns, when there is no intercept term
+    if (!is.null(f2.labels) && f.intercept != 0)
+        labels <- setdiff(labels, f2.labels)
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
@@ -283,6 +294,34 @@ arraydb.to.arrayr <- function (str, type = "double")
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data)
+}
+
+## ------------------------------------------------------------------------
+
+.replace.with.quotes <- function (vars, cols)
+{
+    n.order <- order(nchar(cols), decreasing = TRUE)
+    cols <- cols[n.order]
+    for (i in seq_len(length(cols))) {
+        col <- cols[i]
+        vars <- gsub(paste(col, "([^_\\w]+)", sep = ""),
+                     paste("\"", col, "\"\\1", sep = ""),
+                     vars, perl = TRUE)
+        vars <- gsub(paste("([_\\w]+)\"", col, "\"", sep = ""),
+                     paste("\\1", col, sep = ""),
+                     vars, perl = TRUE)
+        vars <- gsub(paste("([^_\\w\"]+)", col, sep = ""),
+                     paste("\\1\"", col, "\"", sep = ""),
+                     vars, perl = TRUE)
+        vars <- gsub(paste("\"", col, "\"([_\\w]+)", sep = ""),
+                     paste(col, "\\1", sep = ""),
+                     vars, perl = TRUE)
+        vars <- gsub(paste("^", col, "$", sep = ""),
+                     paste("\"", col, "\"", sep = ""),
+                     vars, perl = TRUE)
+    }
+    ## vars <- gsub("([\\w_]+)", "\"\\1\"", vars, perl = T)
+    vars
 }
 
 ## ------------------------------------------------------------------------
@@ -300,9 +339,58 @@ arraydb.to.arrayr <- function (str, type = "double")
 
 ## set/reset the message level
 ## returns the old message level
-.set.msg.level <- function (level)
+.set.msg.level <- function (level, conn.id)
 {
-    old.level <- .db.getQuery("select setting from pg_settings where name='client_min_messages'")
-    .db.getQuery(paste("set client_min_messages to", level))
+    old.level <- .db.getQuery("select setting from pg_settings where name='client_min_messages'", conn.id)
+    .db.getQuery(paste("set client_min_messages to", level), conn.id)
     old.level
+}
+
+## ------------------------------------------------------------------------
+
+## If an independent variable is an array, it needs special treatment
+.is.array <- function (labels, data)
+{
+    nlabels <- character(0)
+    for (i in seq_len(length(labels))) {
+        if (labels[i] %in% names(data) && data@.col.data_type == "ARRAY") {
+            n <- .db.getQuery(paste("select array_upper(", labels[i], ",1) from ",
+                              content(data), " limit 1", sep = ""), conn.id(data))[[1]]
+            nlabels <- c(nlabels, paste(labels[i], "[", seq_len(n), "]", sep = ""))
+        } else {
+            nlabels <- c(nlabels, labels[i])
+        }
+    }
+    nlabels
+}
+
+## ------------------------------------------------------------------------
+
+## whether two where strings are equivalent
+.eql.where <- function (where1, where2)
+{
+    s <- gsub("^not \\((.*)\\)$", "\\1", where1, perl = TRUE)
+    t <- gsub("^not \\((.*)\\)$", "\\1", where2, perl = TRUE)
+    if (s != where1 && t != where2) {
+        return (.eql.where(s, t))
+    } else if ((s != where1 && t == where2) ||
+               (s == where1 && t != where2)) {
+        return (FALSE)
+    }
+    
+    s1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", s, perl = TRUE)
+    if (s1 == s) return (s == t)
+    s2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", s, perl = TRUE)
+    ss <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", s, perl = TRUE)
+
+    t1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", t, perl = TRUE)
+    if (t1 == t) return (FALSE)
+    t2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", t, perl = TRUE)
+    tt <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", t, perl = TRUE)
+
+    if ((.eql.where(s1, t1) && .eql.where(s2, t2) && ss == tt) ||
+        (.eql.where(s1, t2) && .eql.where(s2, t1) && ss == tt))
+        TRUE
+    else
+        FALSE
 }

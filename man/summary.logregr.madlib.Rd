@@ -1,60 +1,58 @@
 \name{summary.logregr.madlib}
 \alias{summary.logregr.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-function to do ... ~~
-}
+
+\title{Summary information for Logistic Regression output}
 \description{
- A concise (1-5 lines) description of what the function does. ~~
-}
+    The function prints the value of each element in the Logistic
+    Regression output object.}
+
 \usage{
 \method{summary}{logregr.madlib}(object, ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{object}{
-Describe \code{object} here~~
-}
-  \item{\dots}{
-Describe \code{\dots} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    \item{object}{Logistic regression object}
+
+    \item{\dots}{
+      Further arguments passed to or from other methods.
+      This is currently not implemented.}
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+    The function returns the \code{logregr.madlib} object passed to the function.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
+  
+  \code{\link{madlib.lm}} wrapper for MADlib linear regression
 }
-\examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"summary.logregr.madlib"
-## End (Not run)
+
+\examples{
+    \dontrun{
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame
+source_data <- db.data.frame("madlibtestdata.log_breast_cancer_wisconsin")
+preview(source_data, 10)
+
+## logistic regression
+fit <- madlib.logregr(y ~ x - 1 , data = source_data)
+summary(fit)
+
+## use I(.) for expressions
+fit <- madlib.logregr(y ~ x + I(x^2) - 1, data = source_data)
+summary(fit)
+       }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{madlib}
+\keyword{summary}

@@ -1,35 +1,53 @@
 \name{preview}
-
-\alias{preview.db.view}
+\alias{preview}
 \alias{preview,db.view-method}
+\alias{preview,db.table-method}
+\alias{preview,db.Rquery-method}
 
 \title{
-  Read the actual data stored in the table of database
+  Read the actual data stored in a table of database.
 }
 \description{
-  The function reads the actual data from the table in the database.
+  The function reads the actual data from a table in the database, it
+  can also preview the actual result of some operations on a table.
 }
 \usage{
+\S4method{preview}{db.table}(x, nrows = 100)
+
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
+
+\S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
 }
 
 \arguments{
   \item{x}{
-    A \code{db.data.frame} object, which points to a table or view in
-    the database.
+    The signature of the method. 
+    A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
+  object, which points to a table or view in
+    the database; or a \code{db.Rquery} object, which represents some
+  operations on a \code{db.data.frame} object.
   }
   \item{nrows}{
-    An integer, default is 100, how many rows of data 
+    An integer, default is 100, how many rows of data.
   }
   \item{interactive}{
-    A boolean, default is TRUE. If \code{x} is a view, then extracting
+    A boolean, default is FALSE. If \code{x} is a view, then extracting
   data from it would actually compute the view, which might take a
   longer time, especially for large data sets. When \code{interactive}
   is TRUE, this function will ask the user whether to continue to
   extract data from the view. 
   }
-  
 }
+
+\details{
+  When the signature \code{x} is a \code{db.data.frame} object, this
+  function reads the data in a table or view in the connected database.
+
+  When the signature \code{x} is a \code{db.Rquery} object, this
+  function reads the result of some operations on a \code{db.data.frame}
+  object. 
+}
+
 \value{
   A \code{data.frame} object. Each column in the table becomes a column
   of the returned \code{data.frame}. A column of arrays is converted into
@@ -40,21 +58,36 @@
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
 }
 
 \seealso{
   \code{\link{arraydb.to.arrayr}} convert strings extracted form
-  database into arrays
+  database into arrays.
 }
 \examples{
 \dontrun{
+## get the help for a method
+help("preview,db.Rquery-method")
 
-x <- db.data.frame("table_in_database", conn.id = 1)
-preview(x, nrows = 10, interactive = FALSE) # extract 10 rows of data
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone, "abalone")
+
+## preview of a table
+preview(x, nrows = 10) # extract 10 rows of data
+
+## do some operations and preview the result
+y <- (x[,1:2] + 1.2) * 2
+preview(y, 20, FALSE)
+
+## table abalone has a column named "id"
+preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 }
 }
 
-\keyword{ database }
-\keyword{ utility }
+\keyword{methods}
+\keyword{database}
+\keyword{utility}

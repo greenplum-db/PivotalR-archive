@@ -3,32 +3,40 @@
 \docType{class}
 \alias{db.obj-class}
 
-\title{Class \code{"db.obj"}}
+\title{Abstract Class \code{"db.obj"}}
 \description{
-A concise (1-5 lines) description of what the class is. ~~
-}
-\section{Objects from the Class}{A virtual Class: No objects may be created from it.}
-\section{Methods}{
-No methods defined with class "db.obj" in the signature.
-}
-\references{
-put references to the literature/web site here~~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+  The super class of \code{\linkS4class{db.data.frame}} and
+  \code{\linkS4class{db.Rquery}} 
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\section{Objects from the Class}{
+  A virtual Class: No objects may be created from it.
+}
+
+\section{Methods}{
+  See \code{\linkS4class{db.data.frame}} for all the available methods
+  and functions.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-  objects to See Also
-  %as \code{\link{~~fun~~}}, ~~~
-%or \code{\linkS4class{CLASSNAME}} for links to other classes ~~~
+  \code{\link{db.data.frame}} creates a \code{db.data.frame} object.
+
+  \code{\link{as.db.data.frame}} converts \code{db.Rquery} object,
+  \code{data.frame}, or a data file into a \code{db.data.frame} object
+  and at the same time creates a new table in the database.
+
+  \code{\linkS4class{db.data.frame}} and \code{\linkS4class{db.Rquery}}
+  are the sub-classes. 
+
+  \code{\link{preview}} display a part of the table
 }
-\examples{
-showClass("db.obj")
-}
+
 \keyword{classes}
+\keyword{database}

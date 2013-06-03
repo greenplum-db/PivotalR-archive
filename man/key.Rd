@@ -1,62 +1,64 @@
 \name{key}
 \alias{key}
 \alias{key<-}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+Get or set the primary key for a table
 }
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+This function gets or sets the primary key for a \code{db.obj} table.  
 }
 \usage{
 key(x)
+
 key(x) <- value
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-Describe \code{x} here~~
+ is a db.obj object.   
 }
 \item{value}{
-    value
+     must be a string.  
 }
 }
 \details{
-If necessary, more details than the description above ~~
+\code{key()} will return the primary key of a table.  If the primary key is not set, \code{key()} will return the character \code{0}.  If \code{key()} is being used to set the primary key, then \code{value} must be a string, and it must match one of the column names in the table.  
+
+If this function is used to change the primary key to a new column name, this function does NOT check if all the values in that column are unique. 
 }
 \value{
-Describe the value returned
-If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
+The return value is the primary key of the table.  
 }
 \author{
-who you are~~
-}
-\note{
-further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+} 
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{preview}} Displays the contents of a \code{db.obj} object.
 }
 \examples{
 \dontrun{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"key"
+## Suppose that a valid connection with ID 1 exists
+
+## create a table from the example data.frame "abalone"
+x <- db.data.frame('abalone', key = 'id')
+
+## getting the primary key
+key(x) # Display the primary key for x
+
+## Changing the primary key
+key(x) <- 'length'
+
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ kwd1 }
-\keyword{ kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{data}
+\keyword{attribute}
+
+

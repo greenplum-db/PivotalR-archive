@@ -19,7 +19,7 @@
             length(udt.name) != length(names(x)))
             stop("data.type or udt_name does not match column names!")
     }
-    
+
     if (is(x, "db.data.frame")) {
         expr <- paste(func, "(\"", names(x), "\")", sep = "")
         if (!is.null(input.types)) {
@@ -37,7 +37,7 @@
     } else {
         expr <- paste(func, "(", x@.expr, ")", sep = "")
         if (!is.null(input.types)) {
-            for (i in seq_len(length(expr))) 
+            for (i in seq_len(length(expr)))
                 if (! (x@.col.data_type %in% input.types)) {
                     expr[i] <- paste("NULL::", x@.col.data_type[i], sep = "")
                     data.type[i] <- x@.col.data_type[i]
@@ -55,16 +55,16 @@
         else
             where.str <- ""
     }
-    
+
     col.name <- paste(names(x), "_", func, sep = "")
-    
+
     content <- paste("select ", paste(expr,
                                      paste("\"", col.name, "\"", sep = ""),
                                      sep = " as ",
                                      collapse = ", "),
                      " from ", parent,
                      where.str, sep = "")
-    
+
     new("db.Rquery",
         .content = content,
         .expr = expr,
@@ -77,7 +77,7 @@
         .col.udt_name = udt.name,
         .where = where,
         .is.factor = rep(FALSE, length(names(x))),
-        .sort = list(by = "", order = ""))
+        .sort = list(by = "", order = "", str = ""))
 }
 
 ## ------------------------------------------------------------------------
@@ -99,7 +99,7 @@ setGeneric ("sum")
 setMethod (
     "sum",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, ..., na.rm = FALSE) {
         .aggregate(x, "sum", TRUE, .num.types, x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -123,7 +123,7 @@ setGeneric ("max")
 setMethod (
     "max",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, ..., na.rm = FALSE) {
         .aggregate(x, "max", TRUE, .num.types, x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -135,7 +135,7 @@ setGeneric ("min")
 setMethod (
     "min",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, ..., na.rm = FALSE) {
         .aggregate(x, "min", TRUE, .num.types, x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -171,7 +171,7 @@ setGeneric ("colMeans")
 setMethod (
     "colMeans",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, na.rm = FALSE, dims = 1, ...) {
         .aggregate(x, "avg", FALSE, .num.types, "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -183,7 +183,7 @@ setGeneric ("colSums")
 setMethod (
     "colSums",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, na.rm = FALSE, dims = 1, ...) {
         .aggregate(x, "sum", FALSE, .num.types, x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -195,7 +195,7 @@ setGeneric ("c")
 setMethod (
     "c",
     signature(x = "db.obj"),
-    function (x, ...) {
+    function (x, ..., recursive = FALSE) {
         .aggregate(x, "array_agg", FALSE, NULL, "ARRAY",
                    paste("_", x@.col.udt_name, sep = ""))
     },

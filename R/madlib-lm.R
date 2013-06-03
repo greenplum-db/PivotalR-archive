@@ -20,7 +20,7 @@ madlib.lm <- function (formula, data, na.action,
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
 
-    msg.level <- .set.msg.level("panic") # suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id(data)) # suppress all messages
     ## disable warning in R, RPostgreSQL
     ## prints some unnessary warning messages
     warn.r <- getOption("warn")
@@ -40,7 +40,7 @@ madlib.lm <- function (formula, data, na.action,
 
     is.factor <- data@.is.factor
     cols <- names(data)
-    params <- .analyze.formula(formula, data, refresh = TRUE,
+    params <- .analyze.formula(formula, data, params$data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)
 
@@ -52,14 +52,14 @@ madlib.lm <- function (formula, data, na.action,
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- content(data)
+    tbl.source <- gsub("\"", "", content(data))
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select ", madlib, ".linregr_train('",
                  tbl.source, "', '", tbl.output, "', '",
                  params$dep.str, "', '", params$ind.str, "', ",
                  grp, ", ", hetero, ")", sep = "")
-
+    
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class))
@@ -75,25 +75,28 @@ madlib.lm <- function (formula, data, na.action,
     .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
     
-    msg.level <- .set.msg.level(msg.level) # reset message level
+    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
     options(warn = warn.r) # reset R warning level
     
     ## organize the result
+    n <- length(params$ind.vars)
     rst <- list()
     res.names <- names(res)
     for (i in seq(res.names))
         rst[[res.names[i]]] <- res[[res.names[i]]]
-    rst$coef <- arraydb.to.arrayr(res$coef, "double")
-    rst$std_err <- arraydb.to.arrayr(res$std_err, "double")
-    rst$t_stats <- arraydb.to.arrayr(res$t_stats, "double")
-    rst$p_values <- arraydb.to.arrayr(res$p_values, "double")
+    rst$coef <- arraydb.to.arrayr(res$coef, "double", n)
+    rst$std_err <- arraydb.to.arrayr(res$std_err, "double", n)
+    rst$t_stats <- arraydb.to.arrayr(res$t_stats, "double", n)
+    rst$p_values <- arraydb.to.arrayr(res$p_values, "double", n)
 
     ## other useful information
     rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- arraydb.to.arrayr(params$grp.str, "character")
+    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
+                                                     "character", n))
     rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- params$ind.vars
-    rst$col.name <- data@.col.name
+    rst$ind.vars <- gsub("\"", "", params$ind.vars)
+    rst$ind.str <- params$ind.str
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
     
@@ -132,11 +135,11 @@ print.lm.madlib <- function (x,
     for (i in seq_len(x$grps))
     {
         cat("\n---------------------------------------\n\n")
-        if (! is.null(x$grp.cols))
+        if (length(x$grp.cols) != 0)
         {
-            cat("When\n")
+            cat("Group", i, "when\n")
             for (col in x$grp.cols)
-                cat(col, ": ", x[[col]][i], "\n\n", sep = "")
+                cat(col, ": ", x[[col]][i], "\n", sep = "")
             cat("We have\n")
         }
 
@@ -146,7 +149,11 @@ print.lm.madlib <- function (x,
         t.stats <- format(x$t_stats[i,], digits = digits)
 
         stars <- rep("", length(x$p_values[i,]))
-        for (j in seq(x$p_values[i,]))
+        for (j in seq(x$p_values[i,])) {
+            if (is.na(x$p_values[i,j]) || is.nan(x$p_values)) {
+                stars[j] <- " "
+                next
+            }
             if (x$p_values[i,j] < 0.001)
                 stars[j] <- "***"
             else if (x$p_values[i,j] < 0.01)
@@ -157,6 +164,7 @@ print.lm.madlib <- function (x,
                 stars[j] <- "."
             else
                 stars[j] <- " "
+        }
         p.values <- paste(format(x$p_values[i,], digits = digits),
                           stars)
         output <- data.frame(cbind(Estimate = coef,

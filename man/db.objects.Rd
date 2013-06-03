@@ -1,57 +1,54 @@
 \name{db.objects}
+
 \alias{db.objects}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  List all the existing tables/views in a database with their schema names
 }
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  This function lists all the existing tables and views in a database,
+  together with their schema names
 }
+
 \usage{
 db.objects(conn.id = 1)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{conn.id}{
-Describe \code{conn.id} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    An integer, default is 1. The ID of the database connection.
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A character \code{data.frame}. It has two columns. The first column is
+  the schema name, and the second column is the names of the tables/views.
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{db.connect}} creates a connection to a database.
+
+  \code{\link{db.existsObject}} tests whether an object exists in the database
 }
 \examples{
 \dontrun{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+## create connection to a database
+conid <- db.connect(port = 5433) # using default values
 
-## The function is currently defined as
-"db.objects"
+## create a table using as.db.data.frame
+x <- as.db.data.frame(abalone, "abalone", conn.id = conid)
+
+db.objects(conid) # list all tables/views
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ kwd1 }
-\keyword{ kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{ utilities }
+\keyword{ misc }

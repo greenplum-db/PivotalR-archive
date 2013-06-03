@@ -1,108 +1,87 @@
 \name{db.connect}
 \alias{db.connect}
-%% - Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-  ++function to do ... ++
+  Create a connection to a database
 }
 \description{
-  ++ A concise (1-5 lines) description of what the function does. ++
+  Create a connection to a PostgreSQL or Greenplum (Pivotal) database. One can create multiple connections
+  to multiple databases. The connections are indexed by an integer
+  starting from 1.
 }
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
 password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{host}{
-     ++Describe \code{host} here++
+    A string, default is "localhost". The name or IP of the host where
+  the database is located.
 }
   \item{user}{
-     ++Describe \code{user} here++
+    A string, default is the user's username. The username used to
+  connect to the database.
 }
   \item{dbname}{
-     ++Describe \code{dbname} here++
+    A string,  default is the same as the username. The name of the
+  database that you want to connect to.
 }
   \item{password}{
-     ++Describe \code{password} here++
+    A string, default is "". The password string used to connect to the database.
    }
    \item{port}{
-     port number
+     An integer, default is 5432. The port number used to connect to the database.
    }
    \item{madlib}{
-     madlib
+     A string, default is "madlib". The name of the schema where MADlib
+  is installed.
    }
   \item{conn.pkg}{
-     ++Describe \code{conn.pkg} here++
+    A string, default is "RPostgreSQL". The name of the R package used
+  to connect to the database. Currently, only RPostgreSQL is supported,
+  but the support for other packages such as RODBC can be easily added.
    }
-}
-\details{
-  ++ If necessary, more details than the description above ++
-}
+ }
+
 \value{
-  +Describe the value returned
-  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
- +put references to the literature/web site here +
-}
-\author{
-  ++who you are++
-}
-\note{
-  ++further notes++
+  An integer, the ID number for the newly created connection.
 }
 
-%% +Make other sections like Warning with \section{Warning }{....} +
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
+
+\note{
+  Right only MADlib 0.6 or later is supported. If you have an older
+  version of MADlib, you will not be able to use all the functions whose
+  names start with "madlib.". However you can still use all the other
+  functions.
+
+  Also, right now only PostgreSQL and Greenplum databases are supported.
+}
 
 \seealso{
- ++objects to See Also as \code{\link{help}}, +++
+  \code{\link{db.disconnect}} disconnects a connection.
+
+  \code{\link{db.list}} lists all active connections.
+
+  \code{\link{connection info}} the functions that extract information
+  about the connection.
+  
+  \code{\link{conn.eql}} tests whether two connections are the same.
 }
 \examples{
-## Not run:
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (host, user, dbname, password = "", conn.pkg = "RPostgreSQL") 
-{
-    if (is.null(.localVars$installed.pkgs)) 
-        .localVars$installed.pkgs <- tolower(attr(installed.packages(), 
-            "dimnames")[[1]])
-    if (!.is.arg.string(host) || !.is.arg.string(user) || !.is.arg.string(dbname) || 
-        !.is.arg.string(password) || !.is.arg.string(conn.pkg)) 
-        stop("Host, user, dbname, password (could be an empty string) and the connection package should all be strings!")
-    conn.pkg.name <- tolower(conn.pkg)
-    if (conn.pkg.name \%in\% tolower(.supported.connections)) {
-        i <- which(tolower(.supported.connections) == conn.pkg.name)
-        pkg.to.load <- .supported.connections[i]
-        if (!(conn.pkg.name \%in\% .localVars$installed.pkgs)) {
-            print(paste("Package ", pkg.to.load, " is going to be installed so that ", 
-                .this.pkg.name, " could connect to databases.\n\n", 
-                sep = ""))
-            install.packages(pkgs = pkg.to.load, type = "source")
-        }
-        eval(parse(text = paste("library(", pkg.to.load, ")", 
-            sep = "")))
-        command <- paste(".db.connect.", conn.pkg.name, "(host=\"", 
-            host, "\", user=\"", user, "\", dbname=\"", dbname, 
-            "\", password=\"", password, "\")", sep = "")
-        result <- eval(parse(text = command))
-        return(paste("Created a connection to database with ID", 
-            result))
-    }
-    else {
-        stop(paste("Right now, only ", .supported.connections, 
-            " is supported to connected to database.\n", sep = ""))
-    }
-  }
-
-## End (Not run)
+\dontrun{
+## connect to a database
+db.connect(host = "localhost", user = "me", dbname = "me", password =
+"", port = 5432, madlib = "madlib")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{utilities}
+\keyword{ database }
+\keyword{ misc }

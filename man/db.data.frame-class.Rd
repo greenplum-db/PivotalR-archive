@@ -5,50 +5,142 @@
 
 \title{Class \code{"db.data.frame"}}
 \description{
- A concise (1-5 lines) description of what the class is. ~~
+  An object of this class points to a real table/view in the
+  database. No data is transfered into R. Only a minimal amount of
+  information is kept in the object.
 }
+
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("db.data.frame", ...)}.
- describe objects here ~~ 
+Objects can be created by calls of \code{\link{db.data.frame}} or
+\code{\link{as.db.data.frame}}. 
+
+The object represents a real table/view in the database. Usually it is
+NOT recommended to directly manipulate the internal slots of these objects.
 }
+
 \section{Slots}{
   \describe{
-    \item{\code{.name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.content}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.conn.id}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{.col.name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.col.data_type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.col.udt_name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.table.type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.is.factor}:}{Object of class \code{"character"} ~~ }
-    \item{\code{.factor.suffix}:}{Object of class \code{"character"} ~~}
-   \item{\code{.appear.name}:}{Object of class \code{"character"} ~~ }
+    \item{\code{.name}:}{
+      Object of class \code{"character"}. It is the table name if this
+      \code{db.data.frame} was created using just a table name. It can
+      also be a two-element array if this \code{db.data.frame} was
+      created. This slot is obsolete.
+    }
+
+    \item{\code{.content}:}{
+      Object of class \code{"character"}. The table
+      name. The function \code{\link{content}} can get this value.
+    }
+
+    \item{\code{.conn.id}:}{
+      Object of class \code{"numeric"}, an integer. The ID number of the
+      database 
+      connection where the table resides. The functions
+      \code{\link{conn.id}} and \code{\link{conn.id<-}} can get and set
+      this value.
+    }
+
+    \item{\code{.col.name}:}{
+      Object of class \code{"character"}. The 1D array of column names
+      of the table/view that this \code{db.data.frame} points to. The
+      S4 method \code{\link{names,db.obj-method}}} gets this value.
+
+    \item{\code{.col.data_type}:}{
+      Object of class \code{"character"}. The 1D array of column data
+      types of the table/view that this \code{db.data.frame} points
+      to. This is not supposed to be used by the normal user.}
+
+    \item{\code{.col.udt_name}:}{
+      Object of class \code{"character"}. The 1D array of column udt
+      names of 
+      the table/view that this \code{db.data.frame} points to. This is
+      not to used by normal users.
+    }
+
+    \item{\code{.table.type}:}{
+      Object of class \code{"character"}. The information about the type
+      of tha table/view that this \code{db.data.frame} points
+      to, for example, "BASE TABLE", "VIEW" or "LOCAL TEMPORARY".
+    }
+
+    \item{\code{.is.factor}:}{
+      Object of class \code{"logical"}. An array of logical values which
+      indicate whether each column of the table/view is a factor. This
+      is not to be used by the normal users.
+    }
+
+    \item{\code{.factor.suffix}:}{
+      Object of class \code{"character"}. An array of strings for
+      every column. When creating dummy columns
+      for a factor column, we add a random string in the names of the
+      dummy columns to avoid naming conflicts. So a factor column's
+      \code{.factor.suffix} is a random string, otherwise it is just an
+      empty string. This is not to be used by the normal users. It is
+      used only the MADlib wrapper functions that support categorial
+      variables. 
+    }
+
+    \item{\code{.appear.name}:}{Object of class \code{"character"}. This
+  is also related the factor columns. \code{\link{print.lm.madlib}} and
+  \code{\link{print.logregr.madlib}} use this value for printing the
+  names of the dummy columns. This is not to be used by the normal users.}
   }
 }
+
 \section{Extends}{
-Class \code{"\linkS4class{db.obj}"}, directly.
-}
-\section{Methods}{
-No methods defined with class "db.data.frame" in the signature.
-}
-\references{
-put references to the literature/web site here~~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+Class \code{\linkS4class{db.obj}}, directly.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\section{Methods}{
+\code{\link{Aggregate functions}}, \code{\link{by,db.obj-method}},
+\code{\link{dim,db.obj-method}}, \code{\link{names,db.obj-method}},
+\code{\link{conn.id}}, \code{\link{conn.id<-}},
+\code{\link{eql}}, \code{\link{key}}, \code{\link{key<-}},
+\code{\link{merge,db.obj,db.obj-method}}, 
+\code{\link{preview}}, \code{\link{print,db.data.frame-method}},
+\code{\link{show,db.data.frame-method}},
+\code{\link{sort,db.obj-method}}, \code{\link{subset,db.obj-method}},
+\code{\link{Arith methods}}, \code{\link{Compare methods}},
+\code{\link{Logical methods}}, \code{\link{Extraction methods}},
+\code{\link{Replacement methods}}, \code{\link{madlib.lm}},
+\code{\link{madlib.glm}}, \code{\link{madlib.summary}}
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-  objects to See Also
-  %as \code{\link{~~fun~~}}, ~~~
-%%  ~~or \code{\linkS4class{CLASSNAME}} for links to other classes ~~~
+  \code{\link{db.data.frame}} creates a \code{db.data.frame} object.
+
+  \code{\link{as.db.data.frame}} converts \code{db.Rquery} object,
+  \code{data.frame}, or a data file into a \code{db.data.frame} object
+  and at the same time creates a new table in the database.
+
+  \code{\linkS4class{db.obj}} is the superclass.
+
+  \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}} are the
+  sub-classes.
+
+  \code{\linkS4class{db.Rquery}} is another sub-class of
+  \code{\linkS4class{db.obj}}.
+
+  \code{\link{preview}} display a part of the table
 }
+
 \examples{
+\dontrun{
 showClass("db.data.frame")
+
+db.connect(port = 5433)
+x <- db.data.frame("abalone") # x points to table "abalone"
+
+preview(x)
 }
+}
+
 \keyword{classes}
+\keyword{database}
