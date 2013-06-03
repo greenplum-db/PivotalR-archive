@@ -9,7 +9,7 @@
 
 \description{
   This function creates an object of
-  \code{\link{db.data.frame-class}}, which points to an existing
+  \code{\linkS4class{db.data.frame}}, which points to an existing
   table/view in the database. The operations that can be applied
   onto this class of objects are very similar to those of
   \code{data.frame}. No real data is loaded into R. The data transfered

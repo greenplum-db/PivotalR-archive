@@ -37,9 +37,9 @@ content(x)
 
 
 \seealso{
-  \code{\link{db.obj-class}}, \code{\link{db.data.frame-class}},
-  \code{\link{db.table-class}}, \code{\link{db.view-class}},
-  \code{\link{db.Rquery-class}} explain the definitions of the class
+  \code{\linkS4class{db.obj}}, \code{\linkS4class{db.data.frame}},
+  \code{\linkS4class{db.table}}, \code{\linkS4class{db.view}},
+  \code{\linkS4class{db.Rquery}} explain the definitions of the class
   hierarchy of this package.
 }
 

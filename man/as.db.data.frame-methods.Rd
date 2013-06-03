@@ -38,7 +38,7 @@ is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
 
   When it is of type \code{db.Rquery}, it represents a series of
   operations on a existing \code{db.data.frame} object. See
-  \code{\link{db.Rquery-class}} for more.
+  \code{\linkS4class{db.Rquery}} for more.
   }
 
   \item{table.name}{
@@ -141,8 +141,8 @@ and it defaults to 0.
 
   \code{\link{preview}} reads data from the table
 
-  \code{\link{db.Rquery-class}} this type of object represents
-  operations on an existing \code{\link{db.data.frame-class}} object.
+  \code{\linkS4class{db.Rquery}} this type of object represents
+  operations on an existing \code{\linkS4class{db.data.frame}} object.
 }
 \examples{
 \dontrun{

@@ -33,9 +33,9 @@
 }
 
 \seealso{
-  \code{\link{db.obj-class}}, \code{\link{db.data.frame-class}},
-  \code{\link{db.table-class}}, \code{\link{db.view-class}},
-  \code{\link{db.Rquery-class}} are the class hierarchy structure of
+  \code{\linkS4class{db.obj}}, \code{\linkS4class{db.data.frame}},
+  \code{\linkS4class{db.table}}, \code{\linkS4class{db.view}},
+  \code{\linkS4class{db.Rquery}} are the class hierarchy structure of
   this package.
 }
 
