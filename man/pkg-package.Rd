@@ -2,8 +2,8 @@
 \alias{PivotalR-package}
 \docType{package}
 \title{
-  Wrapper for MADlib, an open-source library for scalable in-database
-  analytics
+  An R font-end to PostgreSQL and Greenplum database, and wrapper for in-database
+  parallel and distributed machine learning open-source library MADlib
 }
 \description{
   PivotalR is a package that enables users of R, the most popular open source statistical 
