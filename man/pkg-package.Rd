@@ -117,6 +117,9 @@ include
 
 \examples{
 \dontrun{
+## get the help for the package
+help("PivotalR-package")
+
 ## get the help for one method
 help("preview,db.Rquery-method")
 

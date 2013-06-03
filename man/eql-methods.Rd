@@ -47,9 +47,10 @@ y <- db.data.frame('abalone')
 ## Check for equality
 eql(x,y) # This returns true
 
-z <- x[,]
+## create a db.Rquery object
+z <- x[,] # x is a db.data.frame object, z is not
 
-eql(x,y) # This returns false
+eql(x,z) # This returns false
 }
 }
 
