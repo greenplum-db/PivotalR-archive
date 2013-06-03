@@ -109,7 +109,7 @@ Class \code{\linkS4class{db.obj}}, directly.
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 }
 

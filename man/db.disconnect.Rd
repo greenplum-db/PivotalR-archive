@@ -33,7 +33,7 @@ db.disconnect(conn.id = 1, verbose = TRUE)
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
 
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 }
 

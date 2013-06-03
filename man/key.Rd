@@ -34,7 +34,7 @@ The return value is the primary key of the table.
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 } 
 

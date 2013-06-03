@@ -48,7 +48,7 @@ db.existsObject(name, conn.id = 1, is.temp = FALSE)
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
 }
 

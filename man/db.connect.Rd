@@ -51,7 +51,7 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
 
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 }
 

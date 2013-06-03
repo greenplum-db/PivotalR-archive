@@ -27,7 +27,7 @@ A logical.  Returns   \code{TRUE} if the input is of type \code{db.data.frame}
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 } 
 

@@ -90,7 +90,7 @@ include
   Inc. \email{user@madlib.net},  with contributions
   from Woo Jung \email{Woo.Jung@gopivotal.com}
   
-  Maintainer: Predictive Analytics Team at Pivotal
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
 }
 \references{
