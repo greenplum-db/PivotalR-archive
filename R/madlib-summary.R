@@ -206,3 +206,19 @@ show.summary.madlib <- function(object)
     ## attr(res, "row.names") <- ""
     return (res)
 }
+
+## ------------------------------------------------------------------------
+
+setGeneric("summary")
+
+setMethod("summary",
+    signature(object = "db.obj"),
+    function (object, target.cols = NULL, grouping.cols = NULL,
+              get.distinct = TRUE, get.quartiles = TRUE,
+              ntile = NULL, n.mfv = 10, estimate = TRUE,
+              interactive = FALSE) {
+        madlib.summary(object, target.cols, grouping.cols,
+                       get.distinct, get.quartiles,
+                       ntile, n.mfv = 10, estimate,
+                       interactive)
+    })

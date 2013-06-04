@@ -1,6 +1,6 @@
 \name{madlib.summary}
 \alias{madlib.summary}
-
+\alias{summary,db.obj-method}
 \title{Data summary function}
 
 \description{
@@ -14,10 +14,15 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
                get.distinct = TRUE, get.quartiles = TRUE,
                ntile = NULL, n.mfv = 10, estimate = TRUE,
                interactive = FALSE)
+
+\S4method{summary}{db.obj}(object, target.cols = NULL, grouping.cols = NULL,
+               get.distinct = TRUE, get.quartiles = TRUE,
+               ntile = NULL, n.mfv = 10, estimate = TRUE,
+               interactive = FALSE)
 }
 
 \arguments{
-    \item{x}{
+    \item{x,object}{
         An object of \code{db.obj} class. Currently, this parameter is
         mandatory. If it is an object of class \code{db.Rquery} or
         \code{db.view}, a temporary table will be created, and further
