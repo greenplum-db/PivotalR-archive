@@ -190,8 +190,8 @@ print.logregr.madlib <- function (x,
         odds.ratios <- format(x$odds_ratios[i,], digits = digits)
 
         stars <- rep("", length(x$p_values[i,]))
-        for (j in seq(x$p_values[i,])) {
-            if (is.na(x$p_values[i,j]) || is.nan(x$p_values)) {
+        for (j in seq(length(x$p_values[i,]))) {
+            if (is.na(x$p_values[i,j]) || is.nan(x$p_values[i,j])) {
                 stars[j] <- " "
                 next
             }

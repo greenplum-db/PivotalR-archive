@@ -164,6 +164,10 @@ preview(y, 20, FALSE)
 
 ## table abalone has a column named "id"
 preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
+
+## create a copied table
+## x[,] converts x from db.data.frame object to db.Rquery object
+z <- as.db.data.frame(x[,], "abalone1") 
 }
 }
 
