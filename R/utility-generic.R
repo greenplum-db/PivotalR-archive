@@ -196,10 +196,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
                               is.factor = NA, cols = NA, suffix = NA)
 {
-    f.str <- strsplit(deparse(formula), "\\|")[[1]]
+    f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     fstr <- f.str[1]
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
+
     if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
         f2.labels <- attr(f2.terms, "term.labels")
@@ -259,7 +260,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     right.hand <- gsub("as.factor\\((.*)\\)", "\\1", right.hand, perl = T)
     right.hand <- gsub("factor\\((.*)\\)", "\\1", right.hand, perl = T)
-    
+
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
 
@@ -273,7 +274,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- .replace.with.quotes(dep.var, data@.col.name)
-    
+
     ## with or without intercept
     if (f.intercept == 0)
         intercept.str <- ""
@@ -281,7 +282,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         intercept.str <- "1,"
 
     labels <- .is.array(labels, data)
-    
+
     labels <- .replace.with.quotes(labels, data@.col.name)
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0)
