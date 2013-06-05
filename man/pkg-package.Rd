@@ -162,14 +162,14 @@ fit2 # view the result
 ## logistic regression Examples --------
 
 ## fit one different model to each group of data with the same sex
-fit3 <- madlib.glm(rings ~ . - id | sex, data = x, family = "binomial")
+fit3 <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family = "binomial")
 
 fit3 # view the result
 
 ## fit a single model to all data treating sex as a categorial variable
 y <- x # make a copy, y is now a db.data.frame object
 y$sex <- as.factor(y$sex) # y becomes a db.Rquery object now
-fit4 <- madlib.glm(rings ~ . - id, data = y, family = "binomial")
+fit4 <- madlib.glm(rings < 10 ~ . - id, data = y, family = "binomial")
 
 fit4 # view the result
 
