@@ -12,7 +12,8 @@ Database as well as Pivotal HD/HAWQ for Big Data analytics. It does so
 by providing an interface to the operations on tables/views in the
 database. These operations are almost the same as those of
 data.frame. Thus the users of R do not need to learn SQL when they
-operate on the objects in the database.
+operate on the objects in the database. The latest code is available at
+\url{https://github.com/madlib-internal/PivotalR}
 }
 
 \details{

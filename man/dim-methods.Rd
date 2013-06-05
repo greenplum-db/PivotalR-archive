@@ -47,7 +47,7 @@
 }
 
 \examples{
-    \dontrun{
+\dontrun{
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame "abalone"
@@ -57,7 +57,9 @@ preview(x, nrows = 10) # extract 10 rows of data
 
 ## get names of all columns
 dim(x)
-    }
+
+dim(x[,1:3])
+}
 }
 
 \keyword{methods}
