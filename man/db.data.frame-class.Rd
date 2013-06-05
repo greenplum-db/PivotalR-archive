@@ -93,7 +93,8 @@ Class \code{\linkS4class{db.obj}}, directly.
 
 \section{Methods}{
 \code{\link{Aggregate functions}}, \code{\link{by,db.obj-method}},
-\code{\link{dim,db.obj-method}}, \code{\link{names,db.obj-method}},
+\code{\link{dim,db.table-method}}, \code{\link{dim,db.view-method}},
+\code{\link{dim,db.Rquery-method}}, \code{\link{names,db.obj-method}},
 \code{\link{conn.id}}, \code{\link{conn.id<-}},
 \code{\link{eql}}, \code{\link{key}}, \code{\link{key<-}},
 \code{\link{merge,db.obj,db.obj-method}}, 

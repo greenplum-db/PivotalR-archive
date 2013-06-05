@@ -1,6 +1,8 @@
 \name{dim-methods}
 
-\alias{dim,db.obj-method}
+\alias{dim,db.table-method}
+\alias{dim,db.view-method}
+\alias{dim,db.Rquery-method}
 
 \title{Dimension of a table}
 
@@ -10,7 +12,11 @@
 }
 
 \usage{
-\S4method{dim}{db.obj}(x)
+\S4method{dim}{db.table}(x)
+
+\S4method{dim}{db.view}(x)
+
+\S4method{dim}{db.Rquery}(x)
 }
 
 \arguments{

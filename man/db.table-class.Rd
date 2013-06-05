@@ -31,7 +31,7 @@ Objects can be created by calls of \code{\link{db.data.frame}} or
       first 
       integer is the total row number of the table, and the second is
       the number of columns of the
-      table. \code{\link{dim,db.obj-method}} gets this value.
+      table. \code{\link{dim,db.table-method}} gets this value.
     }
   }
 }

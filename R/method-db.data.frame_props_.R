@@ -1,11 +1,35 @@
 
 setMethod (
     "dim",
-    signature(x = "db.obj"),
+    signature(x = "db.table"),
     function (x) {
-        if (!is(x, "db.table"))
-            stop("Dim information is only available for db.table object!")
+        ## if (!is(x, "db.table"))
+        ##     stop("Dim information is only available for db.table object!")
         x@.dim
+    })
+
+## ------------------------------------------------------------------------
+
+setMethod (
+    "dim",
+    signature(x = "db.view"),
+    function (x) {
+        ncol <- length(names(x))
+        nrow <- .db.getQuery(paste("select count(*) from ", content(x),
+                             sep = ""), conn.id(x))[[1]]
+        c(nrow, ncol)
+    })
+
+## ------------------------------------------------------------------------
+
+setMethod (
+    "dim",
+    signature(x = "db.Rquery"),
+    function (x) {
+        ncol <- length(names(x))
+        nrow <- .db.getQuery(paste("select count(*) from (", content(x), ") s",
+                             sep = ""), conn.id(x))[[1]]
+        c(nrow, ncol)
     })
 
 ## ------------------------------------------------------------------------
