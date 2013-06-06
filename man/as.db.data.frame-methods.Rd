@@ -22,7 +22,8 @@ conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
 NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = FALSE,
-is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
+is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL,
+nrow = NULL)
 }
 
 \arguments{
@@ -78,6 +79,12 @@ is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
     distribute the data according to that column.
   }
 
+  \item{nrow}{
+    An integer, default is \code{NULL}. How many rows of data extracted
+    from a \code{\linkS4class{db.Rquery}} object is used to create the
+    new table.
+  }
+
   \item{is.temp}{
     A logical, default is \code{FALSE}, whether the created table/view should
     be a temporary table/view.
@@ -94,9 +101,9 @@ is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL)
   and only if the first row has one fewer field that the number of
   columns.
 
-  \code{nrows}{When creating table from file or data.frame, the function
+  \code{nrows}When creating table from file or data.frame, the function
   will try to infer the data type of each column using the first
-  \code{nrows} rows of the data.}
+  \code{nrows} rows of the data.
 
 \code{sep} specifies the field separator, and its default is ",".
 

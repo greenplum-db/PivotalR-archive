@@ -122,7 +122,7 @@ setMethod (
     def = function (x, table.name, verbose = FALSE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
-    distributed.by = NULL) {
+    distributed.by = NULL, nrow = NULL) {
         conn.id <- conn.id(x)
 
         dist.str <- .get.distributed.by.str(conn.id, distributed.by)
@@ -196,12 +196,17 @@ setMethod (
             where <- paste(" where", x@.where)
         else
             where <- ""
+
+        if (!is.null(nrow))
+            nrow.str <- paste(" limit ", nrow, " ", sep = "")
+        else
+            nrow.str <- ""
         
         content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
                 
         create.str <- paste("create ", temp.str, " ", obj.str, " \"",
                             table.name,
-                            "\" as (", content.str, ") ", dist.str, sep = "")
+                            "\" as (", content.str, nrow.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
         ## print(create.str)
