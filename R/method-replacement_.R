@@ -33,6 +33,7 @@
         x.names <- x@.expr
     }
     is.factor <- x@.is.factor
+    factor.suffix <- x@.factor.suffix
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
     x.col.name <- x@.col.name
@@ -48,6 +49,7 @@
             x.col.data_type <- c(x.col.data_type, value@.col.data_type[i])
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name[i])
             is.factor <- c(is.factor, value@.is.factor[i])
+            factor.suffix <- c(factor.suffix, value@.factor.suffix[i])
         } else {
             if (is.null(case))
                 x.names[idx] <- value@.expr[i]
@@ -59,6 +61,7 @@
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
             is.factor[idx] <- value@.is.factor[i]
+            factor.suffix[idx] <- value@.factor.suffix[i]
         }
     }
 
@@ -93,6 +96,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
+        .factor.suffix = factor.suffix,
         .sort = sort)
 }
 
@@ -104,6 +108,7 @@
     if (is(x, "db.data.frame")) x <- x[,]
     x.names <- x@.expr
     is.factor <- x@.is.factor
+    factor.suffix <- x@.factor.suffix
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
     x.col.name <- x@.col.name
@@ -120,6 +125,7 @@
             x.col.data_type <- c(x.col.data_type, type)
             x.col.udt_name <- c(x.col.udt_name, udt)
             is.factor <- c(is.factor, FALSE)
+            factor.suffix <- c(factor.suffix, "")
         } else {
             if (is.null(case))
                 x.names[idx] <- as.character(value)
@@ -132,6 +138,7 @@
             x.col.data_type[idx] <- type
             x.col.udt_name[idx] <- udt
             is.factor[idx] <- FALSE
+            factor.suffix[idx] <- ""
         }
     }
     
@@ -175,6 +182,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
+        .factor.suffix = factor.suffix,
         .sort = sort)
 }
 

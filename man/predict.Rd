@@ -79,6 +79,14 @@ preview(mean((ans - pred)^2)) # mean squared error
 
 ## Example 2 ---------
 
+y <- x
+y$sex <- as.factor(y$sex)
+fit <- madlib.lm(rings ~ . - id, data = y)
+
+preview(mean((y$rings - predict(fit, y))^2))
+
+## Example 3 ---------
+
 fit <- madlib.lm(rings ~ . - id | sex, data = x)
 
 fit

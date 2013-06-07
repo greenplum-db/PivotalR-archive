@@ -236,8 +236,6 @@ setMethod (
         src <- content(x)
     }
 
-    is.factor <- x@.is.factor[cols.i]
-    
     if (where != "") where.str <- paste(" where", where)
     else where.str <- ""
 
@@ -253,7 +251,8 @@ setMethod (
         .col.data_type = x@.col.data_type[cols.i],
         .col.udt_name = x@.col.udt_name[cols.i],
         .where = where,
-        .is.factor = is.factor,
+        .is.factor = x@.is.factor[cols.i],
+        .factor.suffix = x@.factor.suffix[cols.i],
         .sort = sort)
 }
 

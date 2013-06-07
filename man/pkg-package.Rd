@@ -13,15 +13,17 @@ by providing an interface to the operations on tables/views in the
 database. These operations are almost the same as those of
 data.frame. Thus the users of R do not need to learn SQL when they
 operate on the objects in the database. The latest code is available at
-\url{https://github.com/madlib-internal/PivotalR}
+\url{https://github.com/madlib-internal/PivotalR}. A training video and
+a quick-start guide are
+available at \url{http://zimmeee.github.io/gp-r/#pivotalr}.
 }
 
 \details{
 \tabular{ll}{
 Package: \tab PivotalR\cr
 Type: \tab Package\cr
-Version: \tab 0.1.0\cr
-Date: \tab 2013-06-03\cr
+Version: \tab 0.1.1\cr
+Date: \tab 2013-06-07\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab methods, DBI, RPostgreSQL\cr
 }

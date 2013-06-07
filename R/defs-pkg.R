@@ -60,6 +60,8 @@ setClass("db.data.frame",
              .table.type = "character", # is the object temp ?
              .factor.suffix = "character",
              .appear.name = "character",
+             .dummy = "character",
+             .dummy.expr = "character",
              .is.factor = "logical"
              )
          )
@@ -104,6 +106,7 @@ setClass("db.Rquery",
              .col.udt_name = "character",
              .where = "character", # WHERE clause
              .is.factor = "logical", # a boolean vector
+             .factor.suffix = "character",
              .sort = "list" # order by
              )
          )

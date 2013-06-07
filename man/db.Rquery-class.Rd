@@ -101,6 +101,17 @@ NOT recommended to directly manipulate the internal slots of these objects.
       is not to be used by the normal users.
     }
 
+    \item{\code{.factor.suffix}:}{
+      Object of class \code{"character"}. An array of strings for
+      every column. When creating dummy columns
+      for a factor column, we add a random string in the names of the
+      dummy columns to avoid naming conflicts. So a factor column's
+      \code{.factor.suffix} is a random string, otherwise it is just an
+      empty string. This is not to be used by the normal users. It is
+      used only the MADlib wrapper functions that support categorial
+      variables. 
+    }
+
     \item{\code{.sort}:}{
       Object of class \code{"list"}. The list contains the information
       used for "order by" in the SQL query.

@@ -99,6 +99,8 @@ madlib.lm <- function (formula, data, na.action,
     rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
+    rst$dummy <- data@.dummy
+    rst$dummy.expr <- data@.dummy.expr
     
     class(rst) <- "lm.madlib" # use this to track summary
     rst
