@@ -66,6 +66,7 @@ setMethod (
             .col.udt_name = x@.col.udt_name,
             .where = where,
             .is.factor = x@.is.factor,
+            .factor.suffix = x@.factor.suffix,
             .sort = sort)
     },
     valueClass = "db.Rquery")

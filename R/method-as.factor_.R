@@ -11,6 +11,7 @@ setMethod (
     function (x) {
         if (length(x@.col.name) != 1)
             stop("Cannot coerce multiple columns into factor!")
+        if (x@.is.factor) return (x)
         if (is(x, "db.data.frame")) {
             new("db.Rquery",
                 .content = paste("select \"", x@.col.name, "\" from \"",
@@ -25,6 +26,7 @@ setMethod (
                 .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE,
+                .factor.suffix = .unique.string(),
                 .sort = x@.sort)
         } else {
             new("db.Rquery",
@@ -39,6 +41,7 @@ setMethod (
                 .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE,
+                .factor.suffix = .unique.string(),
                 .sort = x@.sort)
         }
     },

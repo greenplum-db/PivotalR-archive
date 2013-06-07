@@ -106,6 +106,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
+        .factor.suffix = rep("", length(col.name)),
         .sort = sort)
 }
 
@@ -567,7 +568,7 @@ setMethod (
 
     l1 <- length(names(e1))
     l2 <- length(names(e2))
-    if (length(names(e1)) > length(names(e2)))
+    if (l1 > l2)
         l <- l1
     else
         l <- l2
@@ -625,7 +626,8 @@ setMethod (
         .col.data_type = col.data_type,
         .col.udt_name = col.udt_name,
         .where = e1@.where,
-        .is.factor = e1@.is.factor & e2@.is.factor,
+        .is.factor = rep(FALSE, l),
+        .factor.suffix = rep("", l),
         .sort = sort)
 }
 

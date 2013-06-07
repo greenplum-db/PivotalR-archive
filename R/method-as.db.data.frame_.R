@@ -153,7 +153,7 @@ setMethod (
         extra <- paste(x@.expr, paste("\"", names(x), "\"", sep = ""),
                        sep = " as ", collapse = ",")
         ## suffix used to avoid conflicts
-        suffix <- rep("", length(x@.is.factor))
+        suffix <- x@.factor.suffix
         appear <- x@.col.name
         is.factor <- x@.is.factor
         
@@ -173,7 +173,6 @@ setMethod (
                 if (x@.is.factor[i]) {
                     idx <- idx + 1
                     distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
-                    suffix[i] <- .unique.string()
                     ## Produce a fixed order for distinct values
                     distinct <- distinct[order(distinct, decreasing = TRUE)]
                     for (j in seq_len(length(distinct) - 1)) {

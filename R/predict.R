@@ -106,6 +106,7 @@ predict.logregr.madlib <- function (object, newdata, ...)
         .col.udt_name = "float8",
         .where = where,
         .is.factor = FALSE,
+        .factor.suffix = "",
         .sort = sort)
 }
 

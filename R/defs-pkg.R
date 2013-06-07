@@ -104,6 +104,7 @@ setClass("db.Rquery",
              .col.udt_name = "character",
              .where = "character", # WHERE clause
              .is.factor = "logical", # a boolean vector
+             .factor.suffix = "character",
              .sort = "list" # order by
              )
          )
