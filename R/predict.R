@@ -94,6 +94,17 @@ predict.logregr.madlib <- function (object, newdata, ...)
     sql <- paste("select ", expr, " as madlib_predict from ",
                  tbl, where.str, sort$str, sep = "")
 
+    if (length(object$dummy) != 0) {
+        for (i in seq_len(length(object$dummy))) {
+            sql <- gsub(paste("(\"", object$dummy[i], "\"|",
+                              object$dummy[i], ")", sep = ""),
+                        object$dummy.expr[i], sql)
+            expr <- gsub(paste("(\"", object$dummy[i], "\"|",
+                               object$dummy[i], ")", sep = ""),
+                         object$dummy.expr[i], expr)
+        }
+    }
+
     new("db.Rquery",
         .content = sql,
         .expr = expr,

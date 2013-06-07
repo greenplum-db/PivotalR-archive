@@ -169,6 +169,8 @@ setMethod (
             sql <- paste(sql, " from ", tbl, sep = "")
             distincts <- .db.getQuery(sql, conn.id)
             idx <- 0
+            dummy <- character(0)
+            dummy.expr <- character(0)
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
                     idx <- idx + 1
@@ -180,12 +182,15 @@ setMethod (
                                         distinct[j], sep = "")
                         is.factor <- c(is.factor, FALSE)
                         if (extra != "") extra <- paste(extra, ", ")
-                        extra <- paste(extra, " (case when ", x@.expr[i], " = '",
-                                       distinct[j], "'::", x@.col.data_type[i],
-                                       " then 1 else 0 end) as ",
+                        dex <- paste("(case when ", x@.expr[i], " = '",
+                                     distinct[j], "'::", x@.col.data_type[i],
+                                     " then 1 else 0 end)", sep = "")
+                        extra <- paste(extra, " ", dex, " as ",
                                        "\"", new.col, "\"", sep = "")
                         appear <- c(appear, paste(x@.col.name[i],":",
                                                   distinct[j], sep = ""))
+                        dummy <- c(dummy, new.col)
+                        dummy.expr <- c(dummy.expr, dex)
                     }
                 } 
             }
@@ -214,5 +219,7 @@ setMethod (
         res@.is.factor <- is.factor
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
+        res@.dummy <- dummy
+        res@.dummy.expr <- dummy.expr
         list(res = res, conn.id = conn.id)
     })
