@@ -84,6 +84,18 @@ NOT recommended to directly manipulate the internal slots of these objects.
   is also related the factor columns. \code{\link{print.lm.madlib}} and
   \code{\link{print.logregr.madlib}} use this value for printing the
   names of the dummy columns. This is not to be used by the normal users.}
+
+  \item{\code{.dummy}:}{
+    Object of class \code{"character"}. An array of strings,
+    The dummy column names which are
+    used only for factor support.
+  }
+
+  \item{\code{.dummy.expr}:}{
+    Object of class \code{"character"}. The SQL expressions used to
+    create dummy column names which are
+    used only for factor support.
+  }
   }
 }
 
