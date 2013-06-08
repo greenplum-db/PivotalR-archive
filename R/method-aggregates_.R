@@ -143,7 +143,8 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("sd")
+setGeneric ("sd", def = function (x) standardGeneric("sd"),
+            signature = "x")
 
 setMethod (
     "sd",
@@ -155,7 +156,8 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("var")
+setGeneric ("var", def = function (x) standardGeneric("var"),
+            signature = "x")
 
 setMethod (
     "var",
