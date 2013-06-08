@@ -46,3 +46,17 @@ setMethod (
         }
     },
     valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("is.factor")
+
+setMethod (
+    "is.factor",
+    signature(x = "db.obj"),
+    function (x) {
+        if (all(x@.is.factor == TRUE))
+            TRUE
+        else
+            FALSE
+    })

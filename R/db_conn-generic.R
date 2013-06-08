@@ -247,9 +247,22 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
 .db.existsTable <- function (table, conn.id = 1)
 {
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
-    command <- paste(".db.existsTable.", .localVars$db[[id]]$conn.pkg,
-                     "(table=table, idx=id)", sep = "")
-    eval(parse(text = command))
+    ## command <- paste(".db.existsTable.", .localVars$db[[id]]$conn.pkg,
+    ##                  "(table=table, idx=id)", sep = "")
+    ## eval(parse(text = command))
+    if (length(table) == 1) {
+        schema.str <- ""
+        tbl.name <- table
+    } else {
+        schema.str <- paste(" and table_schema = '", table[1], "'", sep = "")
+        tbl.name <- table[2]
+    }
+    ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
+                             tbl.name, "'", schema.str, sep = ""), conn.id)
+    if (ct == 0)
+        FALSE
+    else
+        TRUE
 }
 
 ## ------------------------------------------------------------------------

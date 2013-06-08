@@ -14,11 +14,11 @@
 }
 
 \usage{
-\S4method{delete}{db.data.frame}(x)
+\S4method{delete}{db.data.frame}(x, cascade = FALSE)
 
 \S4method{delete}{db.Rquery}(x)
 
-\S4method{delete}{character}(x, conn.id = 1, is.temp = FALSE)
+\S4method{delete}{character}(x, conn.id = 1, is.temp = FALSE, cascade = FALSE)
 }
 
 \arguments{
@@ -41,6 +41,11 @@
 
 \item{is.temp}{
   A logical, default is \code{FALSE}. Whether the table/view is temporary.
+}
+
+\item{cascade}{
+  A logical, default is \code{FALSE}. Whether to delete objects together
+  with all the objects depending on it.
 }
 }
 

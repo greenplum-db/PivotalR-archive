@@ -1,7 +1,7 @@
-\name{as.factor}
+\name{as.factor-methods}
 \alias{as.factor,db.obj-method}
 
-\title{ Convert one column of a \code{db.obj} object into a categorial variable }
+\title{ Convert one column of a \code{\linkS4class{db.obj}} object into a categorial variable }
 
 \description{
   Convert one column of a \code{db.obj} object into a categorial
