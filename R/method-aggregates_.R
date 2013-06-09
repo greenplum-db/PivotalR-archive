@@ -143,8 +143,14 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("sd", def = function (x) standardGeneric("sd"),
-            signature = "x")
+setGeneric ("sd", signature = "x",
+            def = function (x, na.rm = FALSE) {
+                if (!is(x, "db.obj")) {
+                    stats::sd(x, na.rm)
+                } else {
+                    standardGeneric("sd")
+                }
+            })
 
 setMethod (
     "sd",
@@ -156,8 +162,14 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("var", def = function (x) standardGeneric("var"),
-            signature = "x")
+setGeneric ("var", signature = "x",
+            def = function (x, y = NULL, na.rm = FALSE, use) {
+                if (!is(x, "db.obj")) {
+                    stats::var(x, y, na.rm, use)
+                } else {
+                    standardGeneric("var")
+                }
+            })
 
 setMethod (
     "var",
