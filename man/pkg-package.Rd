@@ -227,10 +227,14 @@ dim(x)
 names(x)
 
 ## ERROR, because of NULL values
-fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + lnrenr3a, data = x)
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + 
+                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + 
+                 lnrenr3a, data = x)
 
 ## select columns
-y <- x[,c("sf_mrtg_pct_assets","ris_asset", "lncrcd","lnauto","lnconoth","lnconrp","intmsrfv","lnrenr1a","lnrenr2a","lnrenr3a")]
+y <- x[,c("sf_mrtg_pct_assets","ris_asset", "lncrcd","lnauto",
+          "lnconoth","lnconrp","intmsrfv","lnrenr1a","lnrenr2a",
+          "lnrenr3a")]
 
 dim(y)
 
