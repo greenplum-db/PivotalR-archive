@@ -12,10 +12,15 @@
 }
 
 \usage{
-db.objects(conn.id = 1)
+db.objects(search = NULL, conn.id = 1)
 }
 
 \arguments{
+  \item{search}{
+    A string, default is \code{NULL}. List all database objects whose
+  names have the string in them.
+  }
+  
   \item{conn.id}{
     An integer, default is 1. The ID of the database connection.
   }
@@ -47,6 +52,10 @@ conid <- db.connect(port = 5433) # using default values
 x <- as.db.data.frame(abalone, "abalone", conn.id = conid)
 
 db.objects(conid) # list all tables/views
+
+## list all tables/views start with "madlibtestdata.lin"
+## where "madlibtestdata" is the schema name
+db.objects("^madlibtestdata.lin") 
 }
 }
 

@@ -157,9 +157,19 @@ db.list <- function ()
 ## ------------------------------------------------------------------------
 
 ## list tables and views in the connection
-db.objects <- function (conn.id = 1)
+db.objects <- function (search = NULL, conn.id = 1)
 {
-    .db.getQuery("select table_schema, table_name from information_schema.tables")
+    res <- .db.getQuery("select table_schema, table_name from information_schema.tables")
+    if (is.null(search)) return (res)
+    search <- gsub("\\.", "\\\\.", search)
+    final.res <- character(0)
+    for (i in seq_len(dim(res)[1])) {
+        name <- paste(res[i,1], ".", res[i,2], sep = "")
+        find <- gsub(search, "", name)
+        if (find != name)
+            final.res <- rbind(final.res, res[i,])
+    }
+    final.res
 }
 
 ## ------------------------------------------------------------------------

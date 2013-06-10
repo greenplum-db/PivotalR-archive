@@ -133,6 +133,12 @@ db.connect(dbname = "test", user = "qianh1", password = "", host =
 
 db.list() # list the info for all the connections
 
+## list all tables/views that has "ornst" in the name
+db.objects("ornst")
+
+## list all tables/views
+db.objects(conn.id = 1)
+
 ## create a table and the R object pointing to the table
 ## using the example data that comes with this package
 delete("abalone")
