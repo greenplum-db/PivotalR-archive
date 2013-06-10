@@ -155,12 +155,16 @@ fit1 <- madlib.lm(rings ~ . - id | sex, data = x)
 
 fit1 # view the result
 
+preview(mean((x$rings - predict(fit1, x))^2)) # mean square error
+
 ## fit a single model to all data treating sex as a categorial variable
 y <- x # make a copy, y is now a db.data.frame object
 y$sex <- as.factor(y$sex) # y becomes a db.Rquery object now
 fit2 <- madlib.lm(rings ~ . - id, data = y)
 
 fit2 # view the result
+
+preview(mean((y$rings - predict(fit2, y))^2)) # mean square error
 
 ## logistic regression Examples --------
 
@@ -169,12 +173,18 @@ fit3 <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family = "binomial")
 
 fit3 # view the result
 
+## the percentage of correct prediction
+preview(mean((x$rings < 10) == predict(fit3, x)))
+
 ## fit a single model to all data treating sex as a categorial variable
 y <- x # make a copy, y is now a db.data.frame object
 y$sex <- as.factor(y$sex) # y becomes a db.Rquery object now
 fit4 <- madlib.glm(rings < 10 ~ . - id, data = y, family = "binomial")
 
 fit4 # view the result
+
+## the percentage of correct prediction
+preview(mean((y$rings < 10) == predict(fit4, y)))
 
 ## Group by Examples --------
 
@@ -200,6 +210,35 @@ y <- x$length + x$height + 2.3
 z <- x$length * x$height / 3
 
 preview(y < z, 20)
+
+## ------------------------------------------------------------------------
+## Deal with NULL values
+
+x <- db.data.frame("null_lower")
+
+dim(x)
+
+names(x)
+
+## ERROR, because of NULL values
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + lnrenr3a, data = x)
+
+## select columns
+y <- x[,c("sf_mrtg_pct_assets","ris_asset", "lncrcd","lnauto","lnconoth","lnconrp","intmsrfv","lnrenr1a","lnrenr2a","lnrenr3a")]
+
+dim(y)
+
+## remove NULL values
+for (i in 1:10) y <- y[!is.na(y[i]),]
+
+dim(y)
+
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ., data = y)
+
+fit
+
+## Or we can replace all NULL values
+x[is.na(x)] <- 45
 }
 }
 

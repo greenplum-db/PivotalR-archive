@@ -5,19 +5,19 @@
 
 predict.lm.madlib <- function (object, newdata, ...)
 {
-    .predict(object, newdata, "linregr_predict")
+    .predict(object, newdata, "linregr_predict", "double precision", "float8")
 }
 
 ## ------------------------------------------------------------------------
 
 predict.logregr.madlib <- function (object, newdata, ...)
 {
-    .predict(object, newdata, "logregr_predict")
+    .predict(object, newdata, "logregr_predict", "boolean", "bool")
 }
 
 ## ------------------------------------------------------------------------
 
-.predict <- function (object, newdata, func.str)
+.predict <- function (object, newdata, func.str, data.type, udt.name)
 {
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
@@ -113,8 +113,8 @@ predict.logregr.madlib <- function (object, newdata, ...)
         .conn.id = conn.id(newdata),
         .col.name = "madlib_predict",
         .key = character(0),
-        .col.data_type = "double precision",
-        .col.udt_name = "float8",
+        .col.data_type = data.type,
+        .col.udt_name = udt.name,
         .where = where,
         .is.factor = FALSE,
         .factor.suffix = "",

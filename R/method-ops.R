@@ -758,7 +758,7 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
-        .operate.two(e1, e2, " = ", list(.num.types, .txt.types),
+        .operate.two(e1, e2, " = ", list(.num.types, .txt.types, "boolean"),
                      res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
@@ -769,7 +769,7 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
-        .operate.two(e1, e2, " <> ", list(.num.types, .txt.types),
+        .operate.two(e1, e2, " <> ", list(.num.types, .txt.types, "boolean"),
                      res.type = "boolean", cast = "")
     },
     valueClass = "db.Rquery")
