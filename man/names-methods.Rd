@@ -1,6 +1,7 @@
 \name{names-methods}
 
 \alias{names,db.obj-method}
+\alias{names<-,db.obj-method}
 
 \title{The Names of an object}
 \description{
@@ -10,6 +11,7 @@
 
 \usage{
 \S4method{names}{db.obj}(x)
+\S4method{names}{db.obj}(x) <- value
 }
 
 
@@ -17,7 +19,11 @@
     \item{x}{
         A \code{db.obj}.
         The input data frame for which the column names are required.
-    }
+      }
+
+      \item{value}{
+        An array of strings. New names to replace the names of \code{x}.
+      }
 }
 
 \value{

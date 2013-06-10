@@ -82,7 +82,7 @@ nrow = NULL)
   \item{nrow}{
     An integer, default is \code{NULL}. How many rows of data extracted
     from a \code{\linkS4class{db.Rquery}} object is used to create the
-    new table.
+    new table. \code{NULL} means using all the rows.
   }
 
   \item{is.temp}{
