@@ -126,6 +126,9 @@ help("PivotalR-package")
 ## get the help for one method
 help("preview,db.Rquery-method")
 
+## get help for a function
+help(madlib.lm)
+
 ## create multiple connections to different databases
 db.connect(port = 5433) # connection 1, use default values for the parameters
 db.connect(dbname = "test", user = "qianh1", password = "", host =
@@ -144,6 +147,9 @@ db.objects(conn.id = 1)
 delete("abalone")
 x <- as.db.data.frame(abalone, "abalone")
 
+## OR if the table already exists, you can create the wrapper directly
+## x <- db.data.frame("abalone")
+
 dim(x) # dimension of the data table
 
 names(x) # column names of the data table
@@ -151,7 +157,10 @@ names(x) # column names of the data table
 madlib.summary(x) # look at a summary for each column
 
 preview(x, 20) # look at a sample of the data
-preview(sort(x, FALSE, x$id), 20) # look at a sample sorted by id column
+
+## look at a sample sorted by id column
+preview(sort(x, decreasing = FALSE, x$id), 20) 
+
 preview(sort(x, FALSE, NULL), 20) # look at a sample ordered randomly 
 
 ## linear regression Examples --------
@@ -220,7 +229,10 @@ preview(y < z, 20)
 ## ------------------------------------------------------------------------
 ## Deal with NULL values
 
-x <- db.data.frame("null_lower")
+x <- as.db.data.frame(null.data, "null_data")
+
+## OR if the table already exists, you can create the wrapper directly
+## x <- db.data.frame("null_data")
 
 dim(x)
 
