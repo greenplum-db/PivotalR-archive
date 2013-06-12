@@ -1,4 +1,5 @@
 \name{preview}
+\alias{lookat}
 \alias{preview}
 \alias{preview,db.view-method}
 \alias{preview,db.table-method}
@@ -9,14 +10,19 @@
 }
 \description{
   The function reads the actual data from a table in the database, it
-  can also preview the actual result of some operations on a table.
+  can also preview the actual result of some operations on a
+  table. \code{lookat} is actually the same as \code{preview} with
+  \code{interactive} always being \code{FALSE}.
 }
+
 \usage{
 \S4method{preview}{db.table}(x, nrows = 100)
 
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
 
 \S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
+
+lookat(x, nrows = 100)
 }
 
 \arguments{
@@ -28,7 +34,10 @@
   operations on a \code{db.data.frame} object.
   }
   \item{nrows}{
-    An integer, default is 100, how many rows of data.
+    An integer, default is 100, how many rows of data. If it is
+  \code{NULL} or \code{"all"}, then all data in the table will be send
+  into R. Be careful, you do not want to do this if the data table is
+  very large.
   }
   \item{interactive}{
     A boolean, default is FALSE. If \code{x} is a view, then extracting

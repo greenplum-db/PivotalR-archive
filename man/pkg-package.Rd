@@ -159,9 +159,9 @@ madlib.summary(x) # look at a summary for each column
 preview(x, 20) # look at a sample of the data
 
 ## look at a sample sorted by id column
-preview(sort(x, decreasing = FALSE, x$id), 20) 
+lookat(sort(x, decreasing = FALSE, x$id), 20) 
 
-preview(sort(x, FALSE, NULL), 20) # look at a sample ordered randomly 
+lookat(sort(x, FALSE, NULL), 20) # look at a sample ordered randomly 
 
 ## linear regression Examples --------
 
@@ -170,7 +170,7 @@ fit1 <- madlib.lm(rings ~ . - id | sex, data = x)
 
 fit1 # view the result
 
-preview(mean((x$rings - predict(fit1, x))^2)) # mean square error
+lookat(mean((x$rings - predict(fit1, x))^2)) # mean square error
 
 ## fit a single model to all data treating sex as a categorial variable
 y <- x # make a copy, y is now a db.data.frame object
@@ -179,7 +179,7 @@ fit2 <- madlib.lm(rings ~ . - id, data = y)
 
 fit2 # view the result
 
-preview(mean((y$rings - predict(fit2, y))^2)) # mean square error
+lookat(mean((y$rings - predict(fit2, y))^2)) # mean square error
 
 ## logistic regression Examples --------
 
@@ -189,7 +189,7 @@ fit3 <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family = "binomial")
 fit3 # view the result
 
 ## the percentage of correct prediction
-preview(mean((x$rings < 10) == predict(fit3, x)))
+lookat(mean((x$rings < 10) == predict(fit3, x)))
 
 ## fit a single model to all data treating sex as a categorial variable
 y <- x # make a copy, y is now a db.data.frame object
@@ -199,7 +199,7 @@ fit4 <- madlib.glm(rings < 10 ~ . - id, data = y, family = "binomial")
 fit4 # view the result
 
 ## the percentage of correct prediction
-preview(mean((y$rings < 10) == predict(fit4, y)))
+lookat(mean((y$rings < 10) == predict(fit4, y)))
 
 ## Group by Examples --------
 
@@ -207,17 +207,18 @@ preview(mean((y$rings < 10) == predict(fit4, y)))
 preview(by(x[,-1], x$sex, mean))
 
 ## standard deviation of each column except the "id" column
-preview(by(x[,-1], x$sex, sd))
+lookat(by(x[,-1], x$sex, sd))
 
 ## Merge Examples --------
 
 ## create two objects with different rows and columns
+key(x) <- "id"
 y <- x[1:200, 1:6]
 z <- x[201:400, c(1,2,4,5)]
 
 m <- merge(y, z, by = c("id", "sex"))
 
-preview(m, 20)
+lookat(m, 20)
 
 ## operator Examples --------
 
@@ -229,6 +230,7 @@ preview(y < z, 20)
 ## ------------------------------------------------------------------------
 ## Deal with NULL values
 
+delete("null_data")
 x <- as.db.data.frame(null.data, "null_data")
 
 ## OR if the table already exists, you can create the wrapper directly
@@ -239,18 +241,10 @@ dim(x)
 names(x)
 
 ## ERROR, because of NULL values
-fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + 
-                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + 
-                 lnrenr3a, data = x)
-
-## select columns
-y <- x[,c("sf_mrtg_pct_assets","ris_asset", "lncrcd","lnauto",
-          "lnconoth","lnconrp","intmsrfv","lnrenr1a","lnrenr2a",
-          "lnrenr3a")]
-
-dim(y)
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ., data = x)
 
 ## remove NULL values
+y <- x # make a copy
 for (i in 1:10) y <- y[!is.na(y[i]),]
 
 dim(y)

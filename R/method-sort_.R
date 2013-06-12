@@ -14,7 +14,9 @@ setMethod (
             parent <- content(x)
         else
             parent <- x@.parent
-        if (is.null(INDICES)) { # order by random()
+        if (is.null(INDICES) ||
+            (is.character(INDICES) && INDICES == "random")) {
+            ## order by random()
             sort <- list(by = NULL, order = "",
                          str = " order by random()")
         } else {
