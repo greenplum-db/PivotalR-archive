@@ -59,7 +59,7 @@ madlib.lm <- function (formula, data, na.action,
                  tbl.source, "', '", tbl.output, "', '",
                  params$dep.str, "', '", params$ind.str, "', ",
                  grp, ", ", hetero, ")", sep = "")
-    
+
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class))
@@ -74,10 +74,10 @@ madlib.lm <- function (formula, data, na.action,
     ## drop temporary tables
     .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
-    
+
     msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
     options(warn = warn.r) # reset R warning level
-    
+
     ## organize the result
     n <- length(params$ind.vars)
     rst <- list()
@@ -93,12 +93,14 @@ madlib.lm <- function (formula, data, na.action,
     rst$grps <- dim(rst$coef)[1] # how many groups
     rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
                                                      "character", n))
+
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- gsub("\"", "", params$ind.vars)
     rst$ind.str <- params$ind.str
     rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- data@.appear.name
     rst$call <- deparse(match.call()) # the current function call itself
+
     rst$dummy <- data@.dummy
     rst$dummy.expr <- data@.dummy.expr
     

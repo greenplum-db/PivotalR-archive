@@ -156,7 +156,9 @@ setMethod (
         suffix <- x@.factor.suffix
         appear <- x@.col.name
         is.factor <- x@.is.factor
-        
+
+        dummy <- character(0)
+        dummy.expr <- character(0)
         if (pivot && !all(x@.is.factor == FALSE)) {
             cats <- x@.expr[x@.is.factor]
             sql <- "select "
@@ -169,8 +171,6 @@ setMethod (
             sql <- paste(sql, " from ", tbl, sep = "")
             distincts <- .db.getQuery(sql, conn.id)
             idx <- 0
-            dummy <- character(0)
-            dummy.expr <- character(0)
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
                     idx <- idx + 1
