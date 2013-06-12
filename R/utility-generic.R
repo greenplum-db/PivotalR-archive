@@ -291,10 +291,27 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
 
+    dep.var <- .consistent.func(dep.var)
+    ind.var <- .consistent.func(ind.var)
+    labels <- .consistent.func(labels)
+    
     list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data)
+}
+
+## ------------------------------------------------------------------------
+
+## R's log is SQL's log(exp(1.), x)
+## R's log10 is SQL's log
+.consistent.func <- function (strs)
+{
+    res <- gsub("log\\s*\\(", "ln(", strs)
+    res <- gsub("log10\\s*\\(", "log(", res)
+    ## res <- gsub("log2\\s*\\(", "log(2.,", res)
+    ## res <- gsub("logb\\s*\\(()", "log(", res)
+    res
 }
 
 ## ------------------------------------------------------------------------
