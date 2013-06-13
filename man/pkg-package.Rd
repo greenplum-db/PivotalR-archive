@@ -213,9 +213,10 @@ lookat(by(x[,-1], x$sex, sd))
 
 ## create two objects with different rows and columns
 key(x) <- "id"
-y <- x[1:200, 1:6]
+y <- x[1:300, 1:6]
 z <- x[201:400, c(1,2,4,5)]
 
+## get 100 rows
 m <- merge(y, z, by = c("id", "sex"))
 
 lookat(m, 20)
