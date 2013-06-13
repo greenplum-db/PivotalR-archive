@@ -24,6 +24,10 @@ setMethod (
                 where.str <- ""
         }
 
+        grp.expr <- character(0)
+        grp.col.name <- character(0)
+        grp.col.data_type <- character(0)
+        grp.col.udt_name <- character(0)
         if (!is.null(INDICES)) {
             by.name <- character(0)
             if (!is.list(INDICES)) INDICES <- list(INDICES)
@@ -31,10 +35,18 @@ setMethod (
                 if (!is(INDICES[[i]], "db.Rquery") ||
                     INDICES[[i]]@.parent != parent)
                     stop("Only objects derived from the same table can match each other!")
-                by.name <- c(by.name, INDICES[[i]]@.expr)
+                for (j in seq_len(length(INDICES[[i]]@.expr))) {
+                    if (! INDICES[[i]]@.expr[j] %in% by.name) {
+                        by.name <- c(by.name, INDICES[[i]]@.expr[j])
+                        grp.col.name <- c(grp.col.name, INDICES[[i]]@.col.name[j])
+                        grp.col.data_type <- c(grp.col.data_type, INDICES[[i]]@.col.data_type[j])
+                        grp.col.udt_name <- c(grp.col.udt_name, INDICES[[i]]@.col.udt_name[j])
+                    }
+                }
             }
-            by.name <- unique(by.name)
-
+            ## by.name <- unique(by.name)
+            grp.expr <- by.name
+            
             parent <- paste(parent, where.str, " group by ",
                             paste("(", by.name, ")", collapse = ", ",
                                   sep = ""),
@@ -42,6 +54,8 @@ setMethod (
             where.str <- ""
             where <- ""
             src <- parent
+
+            
         }
 
         expr <- rep("", length(names(data)))
@@ -55,6 +69,11 @@ setMethod (
             col.data_type <- tmp@.col.data_type
             col.udt_name <- tmp@.col.udt_name
         }
+
+        expr <- c(grp.expr, expr)
+        col.name <- c(grp.col.name, col.name)
+        col.data_type <- c(grp.col.data_type, col.data_type)
+        col.udt_name <- c(grp.col.udt_name, col.udt_name)
 
         content <- paste("select ",
                          paste(expr, paste("\"", col.name, "\"", sep = ""),

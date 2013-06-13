@@ -42,7 +42,8 @@
 
 \value{
   A \code{db.Rquery} object, which is actually the SQL query that does
-  the "GROUP BY".  
+  the "GROUP BY". It computes the group-by values. The result can be
+  viewed using \code{\link{preview}} or \code{\link{lookat}}.
 }
 
 \author{
