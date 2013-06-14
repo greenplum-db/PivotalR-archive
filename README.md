@@ -10,9 +10,10 @@ analytics. It does so by providing an interface to the operations on tables/view
 operations are almost the same as those of data.frame. Thus the users of R do not need to learn SQL when they 
 operate on the objects in the database. 
 
-A training video and a quick-start guide are available at [Quick Start](http://zimmeee.github.io/gp-r/#pivotalr).
+A training video and a quick-start guide are available at [Quick Start](http://zimmeee.github.io/gp-r/#pivotalr). 
+Also introduction slides are available at [Pivotal Demo Slides](https://docs.google.com/presentation/d/103dv1h4VBCBAixqpezJzWmffyrcRR2h9MCJBTfMOBIM/edit?usp=sharing).
 
-See [Example](https://github.com/madlib-internal/PivotalR/wiki/Example) to get some flavour of PivotalR
+See [Example](https://github.com/madlib-internal/PivotalR/wiki/Example) to get some flavour of PivotalR.
 
 
 This package enables R users to easily develop, refine and deploy R scripts that leverage the parallelism and 
