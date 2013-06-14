@@ -48,4 +48,4 @@ This current version of PivotalR provides the core R infrastructure and data fra
 
 * Transformations - as.factor, null replacement
 
-* Algorithms - linear regression and logistic regression wrappers for MADlib,
+* Algorithms - linear regression and logistic regression wrappers for MADlib
