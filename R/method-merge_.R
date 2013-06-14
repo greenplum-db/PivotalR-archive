@@ -45,7 +45,7 @@ setMethod (
             else if (all.x == TRUE && all.y == FALSE)
                 join.str <- "left join"
             else if (all.x == FALSE && all.y == TRUE)
-                joi.str <- "right join"
+                join.str <- "right join"
             else
                 join.str <- "full join"
         }
