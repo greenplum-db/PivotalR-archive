@@ -32,81 +32,58 @@
           On <strong>GitHub</strong></a></li> 
         </ul>
       </header>
+      
       <section>
-        <h3>
-          <a name="welcome-to-github-pages" class="anchor"
-          href="#welcome-to-github-pages"><span class="octicon
-          octicon-link"></span></a>Introduction</h3> 
+        <!-- Start here -->
+
+        <h2>Introduction</h2>
+
+<p>PivotalR is a package that enables users of R, the most popular open source statistical programming language
+and environment to interact with the <a href="http://www.greenplum.com/products/greenplum-database">Pivotal (Greenplum) Database</a>
+as well as <a href="http://www.greenplum.com/products/pivotal-hd">Pivotal HD</a> / <a href="http://www.greenplum.com/blog/dive-in/hawq-the-new-benchmark-for-sql-on-hadoop">HAWQ</a> for Big Data
+analytics. It does so by providing an interface to the operations on tables/views in the database. These
+operations are almost the same as those of data.frame. Thus the users of R do not need to learn SQL when they
+operate on the objects in the database.</p>
+
+<p>A training video and a quick-start guide are available at <a href="http://zimmeee.github.io/gp-r/#pivotalr">Quick Start</a>.</p>
+
+<p>See <a href="https://github.com/madlib-internal/PivotalR/wiki/Example">Example</a> to get some flavour of PivotalR</p>
+
+<p>This package enables R users to easily develop, refine and deploy R scripts that leverage the parallelism and
+scalability of the database as well as in-database analytics libraries to operate on big data sets that would
+otherwise not fit in R memory - all this without having to learn SQL because the package provides an interface
+that they are familiar with.</p>
+
+<p>The package also provides a wrapper for <a href="http://madlib.net/">MADlib</a>. <a href="http://madlib.net/">MADlib</a> is an open-source library for scalable in-database
+analytics. It provides data-parallel implementations of mathematical, statistical and machine-learning
+algorithms for structured and unstructured data. The number of machine learning algorithms that MADlib covers
+is quickly increasing.</p>
+
+<p>As an R front-end to the PostgreSQL-like databases, this package minimizes the amount of data transferred
+between the database and R. All the big data is stored in the database. The user enters their familiar R
+syntax, and the package translates it into SQL queries and sends the SQL query into database for parallel
+execution. The computation result, which is small (if it is as big as the original data, what is the point
+of big data analytics?), is returned to R to the user.</p>
+
+<p>On the other hand, this package also gives the usual SQL users the access of utilizing the powerful analytics
+and graphics functionalities of R. Although the database itself has difficulty in plotting, the result can be
+analyzed and presented beautifully with R.</p>
+
+<p>This current version of PivotalR provides the core R infrastructure and data frame functions as well as over
+50 analytical functions in R that leverage in-database execution. These include</p>
+
+<ul>
+<li><p>Data Connectivity - db.connect, db.disconnect, db.Rquery</p></li>
+<li><p>Data Exploration - db.data.frame, subsets</p></li>
+<li><p>R language features - dim, names, min, max, nrow, ncol, summary etc</p></li>
+<li><p>Reorganization Functions - merge, by (group-by), samples</p></li>
+<li><p>Transformations - as.factor, null replacement</p></li>
+<li><p>Algorithms - linear regression and logistic regression wrappers for MADlib</p></li>
+</ul>
         
-        <p>This automatic page generator is the easiest way to create
-        beautiful pages for all of your projects. Author your page
-        content here using GitHub Flavored Markdown, select a template
-        crafted by a designer, and publish. After your page is
-        generated, you can check out the new branch:</p> 
-        
-        <pre><code>$ cd your_repo_root/repo_name
-            $ git fetch origin
-            $ git checkout gh-pages
-        </code></pre>
-
-        <p>If you're using the GitHub for Mac, simply sync your
-        repository and you'll see the new branch.</p> 
-
-        <h3>
-          <a name="designer-templates" class="anchor"
-          href="#designer-templates"><span class="octicon
-          octicon-link"></span></a>Designer Templates</h3> 
-
-        <p>We've crafted some handsome templates for you to use. Go
-        ahead and continue to layouts to browse through them. You can
-        easily go back to edit your page before publishing. After
-        publishing your page, you can revisit the page generator and
-        switch to another theme. Your Page content will be preserved
-        if it remained markdown format.</p> 
-
-        <h3>
-          <a name="rather-drive-stick" class="anchor"
-          href="#rather-drive-stick"><span class="octicon
-          octicon-link"></span></a>Rather Drive Stick?</h3> 
-
-        <p>If you prefer to not use the automatic generator, push a
-        branch named <code>gh-pages</code> to your repository to
-        create a page manually. In addition to supporting regular HTML
-        content, GitHub Pages support Jekyll, a simple, blog aware
-        static site generator written by our own Tom
-        Preston-Werner. Jekyll makes it easy to create site-wide
-        headers and footers without having to copy them across every
-        page. It also offers intelligent blog support and other
-        advanced templating features.</p> 
-
-        <h3>
-          <a name="authors-and-contributors" class="anchor"
-          href="#authors-and-contributors"><span class="octicon
-          octicon-link"></span></a>Authors and Contributors</h3> 
-
-        <p>You can <a href="https://github.com/blog/821"
-        class="user-mention">@mention</a> a GitHub username to
-        generate a link to their profile. The
-        resulting <code>&lt;a&gt;</code> element will link to the
-        contributor's GitHub Profile. For example: In 2007, Chris
-        Wanstrath (<a href="https://github.com/defunkt"
-        class="user-mention">@defunkt</a>), PJ Hyett
-        (<a href="https://github.com/pjhyett"
-        class="user-mention">@pjhyett</a>), and Tom Preston-Werner
-        (<a href="https://github.com/mojombo"
-        class="user-mention">@mojombo</a>) founded GitHub.</p> 
-
-        <h3>
-          <a name="support-or-contact" class="anchor"
-          href="#support-or-contact"><span class="octicon
-          octicon-link"></span></a>Support or Contact</h3> 
-
-        <p>Having trouble with Pages? Check out the documentation
-        at <a href="http://help.github.com/pages">http://help.github.com/pages</a>
-        or
-        contact <a href="mailto:support@github.com">support@github.com</a>
-        and we’ll help you sort it out.</p> 
+        <!-- End here -->
       </section>
+      
       <footer>
         <p>This project is maintained
         by <a href="https://github.com/madlib-internal">madlib-internal</a></p> 
@@ -114,6 +91,7 @@
         by <a href="https://github.com/orderedlist">orderedlist</a></small></p> 
       </footer>
     </div>
+    
     <script src="javascripts/scale.fix.js"></script>
 
                   <script type="text/javascript">
