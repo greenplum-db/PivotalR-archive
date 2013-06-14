@@ -2,7 +2,8 @@ PivotalR
 =======
 
 PivotalR is a package that enables users of R, the most popular open source statistical programming language 
-and environment to interact with the Pivotal (Greenplum) Database as well as Pivotal HD/HAWQ for Big Data 
+and environment to interact with the [Pivotal (Greenplum) Database](http://www.greenplum.com/products/greenplum-database) 
+as well as [Pivotal HD](http://www.greenplum.com/products/pivotal-hd) / [HAWQ](http://www.greenplum.com/blog/dive-in/hawq-the-new-benchmark-for-sql-on-hadoop) for Big Data 
 analytics. It does so by providing an interface to the operations on tables/views in the database. These 
 operations are almost the same as those of data.frame. Thus the users of R do not need to learn SQL when they 
 operate on the objects in the database. 
@@ -17,7 +18,7 @@ scalability of the database as well as in-database analytics libraries to operat
 otherwise not fit in R memory - all this without having to learn SQL because the package provides an interface 
 that they are familiar with.
 
-The package also provides a wrapper for MADlib. MADlib is an open-source library for scalable in-database 
+The package also provides a wrapper for [MADlib](http://madlib.net/). [MADlib](http://madlib.net/) is an open-source library for scalable in-database 
 analytics. It provides data-parallel implementations of mathematical, statistical and machine-learning 
 algorithms for structured and unstructured data. The number of machine learning algorithms that MADlib covers 
 is quickly increasing.
