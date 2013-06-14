@@ -1,6 +1,8 @@
 PivotalR
 =======
 
+Please see [PivotalR](http://madlib-internal.github.io/PivotalR) for more information.
+
 PivotalR is a package that enables users of R, the most popular open source statistical programming language 
 and environment to interact with the [Pivotal (Greenplum) Database](http://www.greenplum.com/products/greenplum-database) 
 as well as [Pivotal HD](http://www.greenplum.com/products/pivotal-hd) / [HAWQ](http://www.greenplum.com/blog/dive-in/hawq-the-new-benchmark-for-sql-on-hadoop) for Big Data 
