@@ -12,7 +12,9 @@
   data can be used to separated the data set into multiple groups
   according to the values of the grouping columns. Linear regression is
   applied onto each group, which has fixed values of the grouping
-  columns. Categorial variables are supported, see details below.
+  columns. Categorial variables are supported, see details below. The
+  computation is parallelized by MADlib if the connected database is
+  Greenplum database.
 }
 
 \usage{

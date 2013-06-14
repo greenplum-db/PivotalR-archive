@@ -5,8 +5,10 @@
 
 \description{
 `summary' is a generic function used to produce summary statistics of any data
-`table.  The function invokes particular methods' from the MADlib library to
-`provide an overview of the data.
+table.  The function invokes particular methods' from the MADlib library to
+provide an overview of the data. The
+  computation is parallelized by MADlib if the connected database is
+  Greenplum database.
 }
 
 \usage{

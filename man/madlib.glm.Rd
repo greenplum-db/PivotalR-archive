@@ -9,7 +9,10 @@
   columns of data can be used to separate the data set into multiple groups
   according to the values of the grouping columns. The requested regression
   method is applied onto each group,  which has fixed values of the grouping
-  columns. Multinomial logistic regression is not implemented yet. Categorial variables are supported
+  columns. Multinomial logistic regression is not implemented
+  yet. Categorial variables are supported. The
+  computation is parallelized by MADlib if the connected database is
+  Greenplum database.
 }
 
 \usage{

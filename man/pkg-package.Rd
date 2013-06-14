@@ -68,7 +68,7 @@ include
 
 * Transformations - as.factor, null replacement
 
-* Algorithms - linear regression and logistic regression wrappers for MADlib,
+* Algorithms - linear regression and logistic regression wrappers for MADlib
 }
 
 \note{
