@@ -13,15 +13,15 @@
 }
 
 \usage{
-\S4method{as.db.data.frame}{character}(x, table.name, verbose = FALSE,
+\S4method{as.db.data.frame}{character}(x, table.name, verbose = TRUE,
 conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
 NULL, is.temp = FALSE, ...)
 
-\S4method{as.db.data.frame}{data.frame}(x, table.name, verbose = FALSE,
+\S4method{as.db.data.frame}{data.frame}(x, table.name, verbose = TRUE,
 conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
 NULL, is.temp = FALSE, ...)
 
-\S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = FALSE,
+\S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = TRUE,
 is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL,
 nrow = NULL)
 }
@@ -48,7 +48,7 @@ nrow = NULL)
   }
 
   \item{verbose}{
-    A logical, default is \code{FALSE}, whether to print some prompt messages.
+    A logical, default is \code{TRUE}, whether to print some prompt messages.
   }
 
   \item{conn.id}{

@@ -5,7 +5,7 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, table.name, verbose = FALSE, ...) {
+    def = function (x, table.name, verbose = TRUE, ...) {
         x.str <- deparse(substitute(x))
         res <- standardGeneric("as.db.data.frame")
         if (verbose) {
@@ -34,7 +34,7 @@ setMethod (
     "as.db.data.frame",
     signature (x = "data.frame"),
     def = function (
-    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
          .method.as.db.data.frame.1(x, 
@@ -51,7 +51,7 @@ setMethod (
     "as.db.data.frame",
     signature (x = "character"),
     def = function (
-    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
         .method.as.db.data.frame.1(x,
@@ -63,7 +63,7 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
-    x, table.name, verbose = FALSE, conn.id = 1, add.row.names = FALSE,
+    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
@@ -119,7 +119,7 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, verbose = FALSE,
+    def = function (x, table.name, verbose = TRUE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL, nrow = NULL) {

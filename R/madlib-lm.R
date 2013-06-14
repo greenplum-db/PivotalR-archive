@@ -123,7 +123,7 @@ print.lm.madlib <- function (x,
             cat("Group", i, "when\n")
             for (col in x$grp.cols)
                 cat(col, ": ", x[[col]][i], "\n", sep = "")
-            cat("We have\n")
+            cat("\n")
         }
 
         cat("Coefficients:\n")
