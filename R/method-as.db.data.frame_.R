@@ -61,6 +61,10 @@ setMethod (
     x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
+        f <- paste0(getwd(), "/", x)
+        if (file.exists(f)) x <- f
+        else if (!file.exists(x))
+            stop("the file does not exist!")
         .method.as.db.data.frame.1(x,
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
