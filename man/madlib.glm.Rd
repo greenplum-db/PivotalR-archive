@@ -12,7 +12,8 @@
   columns. Multinomial logistic regression is not implemented
   yet. Categorial variables are supported. The
   computation is parallelized by MADlib if the connected database is
-  Greenplum database.
+  Greenplum database. The regression computation can also be done on a
+  column that is an array in the data table.
 }
 
 \usage{
@@ -247,7 +248,16 @@ fit
 ## Here it is y < 10.
 fit <- madlib.glm(interlocks < 10 ~ . - 1 , data = source_data)
 
-fit <- madlib.glm(interlocks < 10 ~ assets + as.factor(nation) + sector, data = source_data)
+fit <- madlib.glm(interlocks < 10 ~ assets + as.factor(nation) + sector,
+data = source_data)
+
+## 3rd example
+## The table has two columns: x is an array, y is double precision
+array.data <- db.data.frame("tbl_has_array_column")
+
+## Fit to y using every element of x
+## This does not work in R's lm, but works in madlib.lm
+fit <- madlib.lm(y < 10 ~ x, data = array.data)
     }
 }
 
