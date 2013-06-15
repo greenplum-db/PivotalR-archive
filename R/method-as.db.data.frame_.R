@@ -12,15 +12,22 @@ setGeneric (
             if (is.data.frame(x)) {
                 cat("\nThe data in the data.frame", x.str,
                     "is stored into the table", table.name, "in database",
-                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n")
             } else if (is.character(x)) {
                 cat("\nThe data in the file", x.str,
                     "is stored into the table", table.name, "in database",
-                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
-            } else {
-                cat("\nThe data created by ", x.str,
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n")
+            } else if (is(x, "db.Rquery")) {
+                cat("\nThe data created by", x.str,
                     "is stored into the table", table.name, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else {
+                cat("\nThe data contained in table", content(x),
+                    "which is wrapped by", x.str,
+                    "is copied into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+                cat("An R object pointing to", table.name,
+                    "in connection", conn.id(x), "is created !\n")
             }
         }
         return (res$res)
@@ -222,4 +229,21 @@ setMethod (
         res@.dummy <- dummy
         res@.dummy.expr <- dummy.expr
         list(res = res, conn.id = conn.id)
+    })
+
+## ------------------------------------------------------------------------
+
+## Make a copy of a table/view
+
+setMethod (
+    "as.db.data.frame",
+    signature (x = "db.data.frame"),
+    def = function (x, table.name, verbose = TRUE,
+    is.view = FALSE, is.temp = FALSE,
+    distributed.by = NULL, nrow = NULL) {
+        if (table.name == content(x))
+            stop("cannot copy an object into itself!")
+        list(res = as.db.data.frame(x[,], table.name, FALSE,
+             is.view, is.temp, FALSE, distributed.by, nrow),
+             conn.id = conn.id(x))
     })

@@ -3,13 +3,19 @@
 \alias{as.db.data.frame,character-method}
 \alias{as.db.data.frame,data.frame-method}
 \alias{as.db.data.frame,db.Rquery-method}
+\alias{as.db.data.frame,db.data.frame-method}
 
 \title{
   Convert other objects into a \code{db.data.frame} object
 }
 
 \description{
-  Methods for function \code{as.db.data.frame} in package \pkg{PivotalR}
+  Methods for function \code{as.db.data.frame} in package
+  \pkg{PivotalR}. When \code{x} is a file name or \code{data.frame}, the
+  method puts the data into a table in the database. When \code{x} is a
+  \code{\linkS4class{db.Rquery}} object, it is converted into a
+  table. When \code{x} is a \code{\linkS4class{db.data.frame}} object, a
+  copy of the table/view that \code{x} points to is created.
 }
 
 \usage{
@@ -24,6 +30,9 @@ NULL, is.temp = FALSE, ...)
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = TRUE,
 is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL,
 nrow = NULL)
+
+\S4method{as.db.data.frame}{db.data.frame}(x, table.name, verbose = TRUE,
+is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow = NULL)
 }
 
 \arguments{
