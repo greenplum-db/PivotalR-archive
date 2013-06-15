@@ -55,7 +55,7 @@ setMethod (
                 options(warn = warn.r) # reset R warning level
                 return (FALSE)
             } else {
-                x <- strsplit(x, "\\.")[[1]]
+                if (length(x) == 1) x <- strsplit(x, "\\.")[[1]]
                 if (length(x) != 2) {
                     schemas <- arraydb.to.arrayr(
                         .db.getQuery("select current_schemas(True)", conn.id),
