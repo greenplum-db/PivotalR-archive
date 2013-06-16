@@ -52,8 +52,9 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 ## Create an intermediate temp table with index
-.create.inter.table <- function (x)
+.create.inter.table <- function (x, random = FALSE)
 {
+    if (random) x <- sort(x, FALSE, "random")
     tmp <- .unique.string()
     if (is(x, "db.data.frame"))
         y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE,
