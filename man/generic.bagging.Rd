@@ -51,6 +51,9 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 }
 
 \seealso{
+  \code{\link{predict.bagging.model}} makes predictions using the result
+  of this function.
+  
   \code{\link{generic.cv}} for cross-validation
 
   \code{\link{sample,db.obj-method}} samples data from a table
@@ -74,3 +77,5 @@ lookat(mean((y$rings - pred)^2)) # mean squared error
 }
 
 \keyword{utility}
+\keyword{ math }
+\keyword{ stats }

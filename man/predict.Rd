@@ -115,3 +115,4 @@ plot(random.sample)
 
 \keyword{ methods }
 \keyword{ math }
+\keyword{ stats }

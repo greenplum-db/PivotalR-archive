@@ -1,65 +1,78 @@
 \name{predict.bagging.model}
 \alias{predict.bagging.model}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  Make predictions using the result of \code{\link{generic.bagging}}
 }
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  Make predictions using boostrap aggregating models
 }
 \usage{
 \method{predict}{bagging.model}(object, newdata, combine = "mean", ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{object}{
-Describe \code{object} here~~
-}
+    A \code{bagging.model}, which is the result of
+  \code{\link{generic.bagging}}.
+  }
+  
   \item{newdata}{
-Describe \code{newdata} here~~
-}
+    A \code{\linkS4class{db.obj}} object, which wraps the data in the
+    database. 
+  }
+  
   \item{combine}{
-Describe \code{combine} here~~
-}
+    A string, default is "mean". The other choice is "vote". How to
+    summarize the predictions of the multiple models in the fitting result
+    of \code{\link{generic.bagging}}. "mean" will produce the average of
+    the predictions, while "vote" will select the prediction with the
+    most votes.
+  }
+  
   \item{\dots}{
     Extra parameters. Not implemented yet.
   }
+}
 
-}
-\details{
-If necessary, more details than the description above ~~
-}
 \value{
-Describe the value returned
-If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+  A \code{\linkS4class{db.Rquery}} object, which contains the SQL query
+  to compute the prediction.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{generic.bagging}} generates the models of boostrap
+  aggregating.
+
+  \code{\link{predict.lm.madlib}} and
+  \code{\link{predict.logregr.madlib}} produce predictions for linear
+  and logistic models.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+## set up the database connection
+db.connect(port = 14526, dbname = "madlib")
 
-## The function is currently defined as
-"predict.bagging.model"
+y <- db.data.frame("abalone")
+
+fit <- generic.bagging(function(data) {
+                           madlib.lm(rings ~ . - id - sex, data = data)
+                       }, data = y, nbags = 25, fraction = 0.7)
+
+pred <- predict(fit, newdata = y) # make prediction
+
+lookat(mean((y$rings - pred)^2)) # mean squared error
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{ methods }
+\keyword{ math }
+\keyword{ stats }
