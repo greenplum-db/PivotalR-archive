@@ -24,10 +24,11 @@
   }
   
   \item{combine}{
-    A string, default is "mean". The other choice is "vote". How to
+    A string, default is \code{"mean"}. The other choice is
+    \code{"vote"}. How to 
     summarize the predictions of the multiple models in the fitting result
-    of \code{\link{generic.bagging}}. "mean" will produce the average of
-    the predictions, while "vote" will select the prediction with the
+    of \code{\link{generic.bagging}}. \code{"mean"} will produce the average of
+    the predictions, while \code{"vote"} will select the prediction with the
     most votes.
   }
   

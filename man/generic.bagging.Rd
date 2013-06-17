@@ -2,6 +2,10 @@
 \alias{generic.bagging}
 
 \title{
+  This function runs boostrap aggregating for a given training function.
+}
+
+\description{
   A generic function to do boostrap aggregating for a given machine
   learning model. The user might need to write a wrapper
   for the training function so that they could satisfy the format
@@ -9,9 +13,6 @@
   desceribed in the following.
 }
 
-\description{
-  This function runs boostrap aggregating for a given training function.
-}
 \usage{
 generic.bagging(train, data, nbags = 10, fraction = 1)
 }
