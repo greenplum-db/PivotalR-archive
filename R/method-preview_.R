@@ -27,9 +27,13 @@ setMethod (
     "preview",
     signature (x = "db.table"),
     def = function (x, nrows = 100) {
-        .db.getQuery(paste("select * from ", content(x),
-                           .limit.str(nrows), sep = ""),
-                     conn.id(x))
+        warn.r <- getOption("warn")
+        options(warn = -1)
+        res <- .db.getQuery(paste("select * from ", content(x),
+                                  .limit.str(nrows), sep = ""),
+                            conn.id(x))
+        options(warn = warn.r) # reset R warning level
+        res
     })
 
 ## ------------------------------------------------------------------------
@@ -38,6 +42,8 @@ setMethod (
     "preview",
     signature (x = "db.view"),
     def = function (x, nrows = 100, interactive = FALSE) {
+        warn.r <- getOption("warn")
+        options(warn = -1)
         if (interactive) {
             cat(deparse(substitute(x)),
                 "points to a view in the database",
@@ -48,9 +54,11 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        .db.getQuery(paste("select * from ", content(x),
-                           .limit.str(nrows), sep = ""),
-                     conn.id(x))
+        res <- .db.getQuery(paste("select * from ", content(x),
+                                  .limit.str(nrows), sep = ""),
+                            conn.id(x))
+        options(warn = warn.r) # reset R warning level
+        res
     })
 
 ## ------------------------------------------------------------------------
