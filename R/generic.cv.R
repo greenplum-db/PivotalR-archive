@@ -28,6 +28,13 @@ generic.cv <- function (train, predict, metric, data,
             pred <- predict(fits, data = cuts$valid[i])
             err <- c(err, metric(predicted = pred, data = cuts$valid[i]))
         }
+        
+        for (i in 1:k) {
+            delete(cuts$train[i])
+            delete(cuts$valid[i])
+        }
+        delete(cuts$inter)
+        
         data.frame(err = mean(err), err.std = sd(err))
     } else {
         arg.names <- names(params)
@@ -47,6 +54,13 @@ generic.cv <- function (train, predict, metric, data,
             }
             err <- rbind(err, err.k)
         }
+
+        for (i in 1:k) {
+            delete(cuts$train[i])
+            delete(cuts$valid[i])
+        }
+        delete(cuts$inter)
+        
         data.frame(err = colMeans(err), err.std = .colSds(err))
     }
 }
