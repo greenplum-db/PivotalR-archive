@@ -1,64 +1,76 @@
 \name{generic.bagging}
 \alias{generic.bagging}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  A generic function to do boostrap aggregating for a given machine
+  learning model
 }
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  This function runs boostrap aggregating for a given training function.
 }
 \usage{
 generic.bagging(train, data, nbags = 10, fraction = 1)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{train}{
-Describe \code{train} here~~
-}
+    A training function. It must have only one argument named
+  \code{data}. Given the data, it produces the model.
+  }
+  
   \item{data}{
-Describe \code{data} here~~
-}
+    A \code{\linkS4class{db.obj}} object, which wraps the data in the
+    database. 
+  }
+  
   \item{nbags}{
-Describe \code{nbags} here~~
-}
+    An integer, default is 10. The number of bagging sampling.
+  }
+  
   \item{fraction}{
-Describe \code{fraction} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    A double, default is 1. The fraction of data in each bagging
+    sample. 
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A \code{bagging.model} object, which is actually an array of fitted
+  models. 
+}
+
+\references{
+  [1] Wiki: bagging \url{http://en.wikipedia.org/wiki/Bootstrap_aggregating}
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+  \code{\link{generic.cv}} for cross-validation
 
-## The function is currently defined as
-"generic.bagging"
+  \code{\link{sample,db.obj-method}} samples data from a table
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\examples{
+\dontrun{
+## set up the database connection
+db.connect(port = 14526, dbname = "madlib")
+
+y <- db.data.frame("abalone")
+
+fit <- generic.bagging(function(data) {
+                           madlib.lm(rings ~ . - id - sex, data = data)
+                       }, data = y, nbags = 25, fraction = 0.7)
+
+pred <- predict(fit, newdata = y) # make prediction
+
+lookat(mean((y$rings - pred)^2)) # mean squared error
+}
+}
+
+\keyword{utility}

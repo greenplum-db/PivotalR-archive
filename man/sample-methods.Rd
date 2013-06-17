@@ -44,7 +44,8 @@
 
 \details{
   When \code{replace} is \code{FALSE}, the data is just sorted randomly
-  (see \code{\link{sort,db.obj-method}}) and selected. When
+  (see \code{\link{sort,db.obj-method}}) and selected, which is similar
+to \code{sort(x, FALSE, "random")}. When
   \code{replace} is \code{TRUE}, we have to scan the table multiple
   times to select repeated items.
 }

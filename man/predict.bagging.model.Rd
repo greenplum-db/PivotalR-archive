@@ -8,7 +8,7 @@ function to do ... ~~
 A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-\method{predict}{bagging.model}(object, newdata, combine = "average", ...)
+\method{predict}{bagging.model}(object, newdata, combine = "mean", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

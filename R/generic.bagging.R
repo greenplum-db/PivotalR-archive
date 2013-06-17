@@ -25,7 +25,7 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 
 ## ------------------------------------------------------------------------
 
-predict.bagging.model <- function (object, newdata, combine = "average",
+predict.bagging.model <- function (object, newdata, combine = "mean",
                                    ...)
 {
     l <- length(object)
@@ -36,7 +36,7 @@ predict.bagging.model <- function (object, newdata, combine = "average",
             pred <- c(pred, predict(object[i], newdata))
     }
 
-    if (combine == "average") {
+    if (combine == "mean") {
         for (i in seq_len(l)) {
             if (i == 1)
                 res <- pred[i]
@@ -111,7 +111,7 @@ predict.bagging.model <- function (object, newdata, combine = "average",
             .factor.suffix = "",
             .sort = sort)
     } else
-        stop("combine method must be \"average\" or \"vote\"!")
+        stop("combine method must be \"mean\" or \"vote\"!")
 }
 
 ## ------------------------------------------------------------------------
