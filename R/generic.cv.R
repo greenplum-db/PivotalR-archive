@@ -12,6 +12,14 @@ generic.cv <- function (train, predict, metric, data,
         stop("params must be a list!")
     
     cuts <- .cut.data(data, k)
+    for (i in 1:k) {
+        cuts$train[i] <- as.db.data.frame(cuts$train[i], .unique.string(),
+                                          FALSE, FALSE, TRUE, FALSE, NULL,
+                                          NULL)
+        cuts$valid[i] <- as.db.data.frame(cuts$valid[i], .unique.string(),
+                                          FALSE, FALSE, TRUE, FALSE, NULL,
+                                          NULL)
+    }
 
     if (is.null(params)) {
         err <- numeric(0)
