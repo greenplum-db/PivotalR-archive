@@ -54,4 +54,4 @@ export("db.objects", "db.existsObject")
 
 exportMethods("mean", "sum", "length", "max", "min")
 export("sd", "var")
-exportMethods("colMeans", "colSums", "c")
+exportMethods("colMeans", "colSums", "cagg")

@@ -222,12 +222,12 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
-setGeneric ("c")
+setGeneric ("cagg", signature = "x", def = function(x) standardGeneric("cagg"))
 
 setMethod (
-    "c",
+    "cagg",
     signature(x = "db.obj"),
-    function (x, ..., recursive = FALSE) {
+    function (x) {
         .aggregate(x, "array_agg", TRUE, NULL, FALSE, "ARRAY",
                    paste("_", x@.col.udt_name, sep = ""))
     },

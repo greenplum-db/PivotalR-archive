@@ -42,7 +42,7 @@ the sum of each column.}
 
 \S4method{colSums}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
 
-\S4method{c}{db.obj}(x, ..., recursive = FALSE)
+\S4method{cagg}{db.obj}(x)
 }
 
 \arguments{
@@ -75,10 +75,11 @@ the sum of each column.}
 }
 
 \details{
-    For aggregate functions: mean, sum, length, max, min, sd, and var, the signature
+    For aggregate functions: \code{mean}, \code{sum}, \code{length},
+    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
     \code{x} must be a reference to a single column in a table.
 
-    For aggregate functions: colMeans, colSums, and c the signature
+    For aggregate functions: \code{colMeans}, \code{colSums}, and \code{cagg} the signature
     \code{x} can be a \code{db.obj} referencing to a single column or a single
     table, or can be a \code{db.Rquery} referencing to multiple columns in a table.
 }
@@ -102,7 +103,8 @@ the sum of each column.}
 
     For \code{colSums}, a \code{db.Rquery} which is a SQL query to extract the sum of multiple columns of a table.
 
-    For \code{c}, a \code{db.Rquery} which is a SQL query to extract the values as an array aggregate.
+    For \code{cagg}, a \code{db.Rquery} which is a SQL query to extract
+    the column values as an array aggregate.
 }
 
 \author{
@@ -154,10 +156,10 @@ colMeans(x)
 colSums(x)
 
 # get the array aggregate of a specific column in the table
-c(x$diameter)
+cagg(x$diameter)
 
 # get the array aggregate of all columns in the table
-c(x)
+cagg(x)
     }
 }
 
