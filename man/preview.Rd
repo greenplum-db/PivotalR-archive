@@ -28,10 +28,12 @@ lookat(x, nrows = 100)
 \arguments{
   \item{x}{
     The signature of the method. 
-    A \code{db.data.frame} (includes \code{db.table} and \code{db.view})
+    A \code{\linkS4class{db.data.frame}} (includes
+  \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}})
   object, which points to a table or view in
-    the database; or a \code{db.Rquery} object, which represents some
-  operations on a \code{db.data.frame} object.
+    the database; or a \code{\linkS4class{db.Rquery}} object, which
+  represents some 
+  operations on a \code{\linkS4class{db.data.frame}} object.
   }
   \item{nrows}{
     An integer, default is 100, how many rows of data. If it is
