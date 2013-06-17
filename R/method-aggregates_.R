@@ -228,7 +228,7 @@ setMethod (
     "c",
     signature(x = "db.obj"),
     function (x, ..., recursive = FALSE) {
-        .aggregate(x, "array_agg", FALSE, NULL, FALSE, "ARRAY",
+        .aggregate(x, "array_agg", TRUE, NULL, FALSE, "ARRAY",
                    paste("_", x@.col.udt_name, sep = ""))
     },
     valueClass = "db.Rquery")
