@@ -13,14 +13,13 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     n <- dim(data)[1]
     size <- as.integer(n * fraction)
 
+    res <- list()
     for (i in 1:nbags) {
         data.use <- sample(data, size, replace = TRUE)
-        if (i == 1) 
-            res <- train(data = data.use)
-        else
-            res <- c(res, train(data = data.use))
+        res[[i]] <- train(data = data.use)
     }
     class(res) <- "bagging.model"
+    res
 }
 
 ## ------------------------------------------------------------------------
@@ -29,24 +28,21 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
                                    ...)
 {
     l <- length(object)
-    for (i in seq_len(l)) {
-        if (i == 1)
-            pred <- predict(object[i], newdata)
-        else
-            pred <- c(pred, predict(object[i], newdata))
-    }
+    pred <- list()
+    for (i in seq_len(l))
+        pred[[i]] <- predict(object[[i]], newdata)
 
     if (combine == "mean") {
         for (i in seq_len(l)) {
             if (i == 1)
-                res <- pred[i]
+                res <- pred[[i]]
             else
-                res <- res + pred[i]
+                res <- res + pred[[i]]
         }
         res / l
     } else if (combine == "vote") {
-        res.type <- pred[1]@.col.data_type
-        res.udt.name <- pred[1]@.col.udt_name
+        res.type <- pred[[1]]@.col.data_type
+        res.udt.name <- pred[[1]]@.col.udt_name
         if (res.type %in% .int.types)
             func.suffix <- "integer"
         else if (res.type %in% .num.types)
@@ -65,7 +61,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         
         arr.str <- "array["
         for (i in seq_len(l)) {
-            arr.str <- paste(arr.str, "(", pred@.expr, ")::",
+            arr.str <- paste(arr.str, "(", pred[[i]]@.expr, ")::",
                              func.suffix, sep = "")
             if (i < l) arr.str <- paste(arr.str, ", ", sep = "")
             else arr.str <- paste(arr.str, "]", sep = "")

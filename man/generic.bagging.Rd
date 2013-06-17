@@ -39,7 +39,7 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 }
 
 \value{
-  A \code{bagging.model} object, which is actually an array of fitted
+  A \code{bagging.model} object, which is actually a list of fitted
   models. 
 }
 

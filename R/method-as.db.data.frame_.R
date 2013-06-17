@@ -235,7 +235,7 @@ setMethod (
 
         msg.level <- .set.msg.level(msg.level, conn.id(x)) 
         options(warn = warn.r) # reset R warning level
-        
+
         res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)
         res@.is.factor <- is.factor

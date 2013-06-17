@@ -10,30 +10,38 @@ generic.cv <- function (train, predict, metric, data,
         stop("data must be a db.obj!")
     if (!is.null(params) && (!is.list(params) || is.data.frame(params)))
         stop("params must be a list!")
+
+    msg.level <- .set.msg.level("panic", conn.id(x))
+    warn.r <- getOption("warn")
+    options(warn = -1)
     
     cuts <- .cut.data(data, k)
     for (i in 1:k) {
-        cuts$train[i] <- as.db.data.frame(cuts$train[i], .unique.string(),
+        cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
                                           FALSE, FALSE, TRUE, FALSE, NULL,
                                           NULL)
-        cuts$valid[i] <- as.db.data.frame(cuts$valid[i], .unique.string(),
+        cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
                                           FALSE, FALSE, TRUE, FALSE, NULL,
                                           NULL)
     }
+    conn.id <- conn.id(cuts$train[[1]])
 
     if (is.null(params)) {
         err <- numeric(0)
         for (i in 1:k) {
-            fits <- train(data = cuts$train[i])
-            pred <- predict(fits, newdata = cuts$valid[i])
-            err <- c(err, metric(predicted = pred, data = cuts$valid[i]))
+            fits <- train(data = cuts$train[[i]])
+            pred <- predict(fits, newdata = cuts$valid[[i]])
+            err <- c(err, as.numeric(metric(predicted = pred, data = cuts$valid[[i]])))
         }
-        
+
         for (i in 1:k) {
-            delete(cuts$train[i])
-            delete(cuts$valid[i])
+            delete(content(cuts$train[[i]]), conn.id, TRUE)
+            delete(content(cuts$valid[[i]]), conn.id, TRUE)
         }
-        delete(cuts$inter)
+        delete(content(cuts$inter), conn.id, TRUE)
+
+        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
+        options(warn = warn.r) # reset R warning level
         
         data.frame(err = mean(err), err.std = sd(err))
     } else {
@@ -52,11 +60,11 @@ generic.cv <- function (train, predict, metric, data,
                     else
                         args <- rbind(args, as.vector(unlist(arg.list)))
                 }
-                arg.list$data <- cuts$train[i]
+                arg.list$data <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
-                pred <- predict(fits, newdata = cuts$valid[i])
-                err.k <- c(err.k, metric(predicted = pred,
-                                         data = cuts$valid[i]))
+                pred <- predict(fits, newdata = cuts$valid[[i]])
+                err.k <- c(err.k, as.numeric(metric(predicted = pred,
+                                                    data = cuts$valid[[i]])))
             }
             err <- rbind(err, err.k)
         }
@@ -65,10 +73,13 @@ generic.cv <- function (train, predict, metric, data,
         names(args) <- arg.names
 
         for (i in 1:k) {
-            delete(cuts$train[i])
-            delete(cuts$valid[i])
+            delete(cuts$train[[i]])
+            delete(cuts$valid[[i]])
         }
         delete(cuts$inter)
+
+        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
+        options(warn = warn.r) # reset R warning level
         
         cbind(args,
               data.frame(err = colMeans(err), err.std = .colSds(err)))
