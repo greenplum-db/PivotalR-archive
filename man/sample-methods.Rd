@@ -2,10 +2,11 @@
 
 \alias{sample,db.obj-method}
 
-\title{ Methods for Function \code{sample} in Package \pkg{base} ~~}
+\title{Methods for sampling rows of data from a table/view randomly}
 
 \description{
- Methods for function \code{sample} in package \pkg{base} ~~
+  This method samples rows of data from a table/view randomly. The
+  sampled result is stored in a temporary table.
 }
 
 \usage{
@@ -14,15 +15,21 @@
 
 \arguments{
   \item{x}{
-    A \code{\linkS4class{db.obj}} object.
+    A \code{\linkS4class{db.obj}} object, which is the wrapper to the
+  data table.
   }
 
   \item{size}{
-    An integer.
+    An integer. The size of the random sample. When \code{replace} is
+    \code{FALSE}, \code{size} must be smaller than the data table/view's
+    total row number.
   }
 
   \item{replace}{
-    A logical value, default is \code{FALSE}.
+    A logical value, default is \code{FALSE}. When it is \code{TRUE},
+    the data is sampled with replacement, which means a row might be
+    sampled for multiple times. When it is \code{FALSE}, each row can
+    only be sampled at most once.
   }
 
   \item{prob}{
@@ -31,16 +38,20 @@
   }
 
   \item{\dots}{
-    Extra parameters
+    Extra parameters. Not implemented.
   }
 }
 
 \details{
-  Some details
+  When \code{replace} is \code{FALSE}, the data is just sorted randomly
+  (see \code{\link{sort,db.obj-method}}) and selected. When
+  \code{replace} is \code{TRUE}, we have to scan the table multiple
+  times to select repeated items.
 }
 
 \value{
-  A \code{\linkS4class{db.data.frame}} object.
+  A \code{\linkS4class{db.data.frame}} object, which is a wrapper to a
+  temporary table. The table contains the sampled data.
 }
 
 \author{
@@ -51,15 +62,33 @@
 }
 
 \seealso{
-  see also
+  \code{\link{generic.bagging}} uses \code{sample}
 }
 
 \examples{
 \dontrun{
-## Example 1
-}
-}
+## set up the database connection
+db.connect(port = 14526, dbname = "madlib")
 
+y <- db.data.frame("abalone")
+
+dim(y)
+
+a <- sample(y, 20)
+
+dim(a)
+
+lookat(a)
+
+b <- sample(y, 40, replace = TRUE)
+
+dim(b)
+
+lookat(b)
+
+delete(b)
+}
+}
 \keyword{methods}
 \keyword{database}
 \keyword{utility}
