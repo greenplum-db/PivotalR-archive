@@ -25,7 +25,7 @@ generic.cv <- function (train, predict, metric, data,
         err <- numeric(0)
         for (i in 1:k) {
             fits <- train(data = cuts$train[i])
-            pred <- predict(fits, data = cuts$valid[i])
+            pred <- predict(fits, newdata = cuts$valid[i])
             err <- c(err, metric(predicted = pred, data = cuts$valid[i]))
         }
         
@@ -46,14 +46,23 @@ generic.cv <- function (train, predict, metric, data,
             err.k <- numeric(0)
             for (j in 1:l) {
                 arg.list <- .create.args(arg.names, j)
+                if (i == 1) {
+                    if (j == 1)
+                        args <- as.vector(unlist(arg.list))
+                    else
+                        args <- rbind(args, as.vector(unlist(arg.list)))
+                }
                 arg.list$data <- cuts$train[i]
                 fits <- do.call(train, arg.list)
-                pred <- predict(fits, data = cuts$valid[i])
+                pred <- predict(fits, newdata = cuts$valid[i])
                 err.k <- c(err.k, metric(predicted = pred,
                                          data = cuts$valid[i]))
             }
             err <- rbind(err, err.k)
         }
+
+        args <- as.data.frame(args)
+        names(args) <- arg.names
 
         for (i in 1:k) {
             delete(cuts$train[i])
@@ -61,7 +70,8 @@ generic.cv <- function (train, predict, metric, data,
         }
         delete(cuts$inter)
         
-        data.frame(err = colMeans(err), err.std = .colSds(err))
+        cbind(args,
+              data.frame(err = colMeans(err), err.std = .colSds(err)))
     }
 }
 

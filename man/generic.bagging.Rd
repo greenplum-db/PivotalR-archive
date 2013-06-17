@@ -3,7 +3,10 @@
 
 \title{
   A generic function to do boostrap aggregating for a given machine
-  learning model
+  learning model. The user might need to write a wrapper
+  for the training function so that they could satisfy the format
+  requirements 
+  desceribed in the following.
 }
 
 \description{

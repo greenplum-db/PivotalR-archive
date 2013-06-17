@@ -1,69 +1,93 @@
 \name{generic.cv}
 \alias{generic.cv}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-function to do ... ~~
+  Generic cross-validation for supervised learning algorithms
 }
+
 \description{
-A concise (1-5 lines) description of what the function does. ~~
+  This function runs cross-validation for a given supervised learning
+  model, which is specified by the training function, prediction
+  function, and metric function. The user might need to write wrappers
+  for the functions so that they satisfy the format requirements
+  desceribed in the following.
 }
+
 \usage{
 generic.cv(train, predict, metric, data, params = NULL, k = 10)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{train}{
-Describe \code{train} here~~
-}
+    A training function. It must have at least one argument named
+    \code{data}. Given the data, it produces the model. It can also have
+  other parameters that specifies the model, and these parameters must
+  appear in the list \code{params}.
+  }
+  
   \item{predict}{
-Describe \code{predict} here~~
-}
+    A prediction function. It must have only two arguments named
+    \code{object} and \code{newdata}, which are the fitted model and
+    the new data input for prediction.
+  }
+  
   \item{metric}{
-Describe \code{metric} here~~
-}
+    A metric function. It must have only two arguments named
+    \code{predicted} and \code{data}, where \code{predicted} is the
+    redictions. 
+  }
+  
   \item{data}{
-Describe \code{data} here~~
-}
+    A \code{\linkS4class{db.obj}} object, which wraps the data in the
+    database, used for cross-validation.
+  }
+  
   \item{params}{
-Describe \code{params} here~~
-}
+    A list, default is \code{NULL}. The values of each parameters used
+    by the training function. An array of values for each parameter is
+    an element 
+    in the list. The value arrays for different parameters do not have
+    to be the same length. The arrays of shorter lengths are circularly
+    expanded to the length of the longest element. 
+  }
+  
   \item{k}{
-Describe \code{k} here~~
-}
-}
-\details{
-If necessary, more details than the description above ~~
-}
-\value{
-If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-put references to the literature/web site here ~
-}
-\author{
-who you are~~
-}
-\note{
-further notes~~
+    An integer, default is 10. The cross-validation fold number.
+  }
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\value{
+  A \code{data.frame}, which contains two elements: \code{err} and
+  \code{err.std}, which are the errors and 
+}
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+}
 
 \seealso{
-objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{generic.bagging}} does the boostrap aggregate computation.
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-"generic.cv"
+\examples{
+\dontrun{
+## set up the database connection
+db.connect(port = 14526, dbname = "madlib")
+
+y <- db.data.frame("abalone")
+
+err <- generic.cv(function(data) {
+                      madlib.lm(rings ~ . - id - sex, data = data)
+                  },
+                  predict,
+                  function(predicted, data) {
+                      lookat(mean((data$rings - predicted)^2))
+                  })
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+
+\keyword{ utility }
+\keyword{ math }
