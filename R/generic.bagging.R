@@ -25,14 +25,15 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 
 ## ------------------------------------------------------------------------
 
-predict.bagging.model <- function (model, newdata, combine = "average")
+predict.bagging.model <- function (object, newdata, combine = "average",
+                                   ...)
 {
-    l <- length(model)
-    for (i in seq_Len(l)) {
+    l <- length(object)
+    for (i in seq_len(l)) {
         if (i == 1)
-            pred <- predict(model[i], newdata)
+            pred <- predict(object[i], newdata)
         else
-            pred <- c(pred, predict(model[i], newdata))
+            pred <- c(pred, predict(object[i], newdata))
     }
 
     if (combine == "average") {
@@ -58,8 +59,8 @@ predict.bagging.model <- function (model, newdata, combine = "average")
             stop("the result type ", res.type,
                  " is not supported for vote!")
         
-        func <- .load.func("find_majority_",
-                           strsplit(func.suffix, " ")[[1]][1],
+        func <- .load.func(paste("find_majority_",
+                           strsplit(func.suffix, " ")[[1]][1], sep = ""),
                            conn.id(newdata))
         
         arr.str <- "array["
@@ -92,7 +93,7 @@ predict.bagging.model <- function (model, newdata, combine = "average")
 
         expr <- paste(func, "(", arr.str, ")", sep = "")
         
-        sql <- paste("select ", expr " as bagging_predict from ",
+        sql <- paste("select ", expr, " as bagging_predict from ",
                      tbl, where.str, sort$str, sep = "")
 
         new("db.Rquery",

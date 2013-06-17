@@ -57,3 +57,5 @@ export("sd", "var")
 exportMethods("colMeans", "colSums", "cagg")
 
 exportMethods("sample")
+
+export("generic.cv", "generic.bagging", "predict.bagging.model")
