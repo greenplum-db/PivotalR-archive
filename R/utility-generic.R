@@ -371,7 +371,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     nlabels <- character(0)
     for (i in seq_len(length(labels))) {
-        if (labels[i] %in% names(data) && data@.col.data_type == "ARRAY") {
+        if (labels[i] %in% names(data) && data@.col.data_type == "array") {
             n <- .db.getQuery(paste("select array_upper(", labels[i], ",1) from ",
                               content(data), " limit 1", sep = ""), conn.id(data))[[1]]
             nlabels <- c(nlabels, paste(labels[i], "[", seq_len(n), "]", sep = ""))
