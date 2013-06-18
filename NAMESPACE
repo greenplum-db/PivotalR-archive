@@ -54,8 +54,9 @@ export("db.objects", "db.existsObject")
 
 exportMethods("mean", "sum", "length", "max", "min")
 export("sd", "var")
-exportMethods("colMeans", "colSums", "cagg")
 
 exportMethods("sample")
 
 export("generic.cv", "generic.bagging", "predict.bagging.model")
+exportMethods("colMeans", "colSums")
+export("colAgg", "rowAgg")
