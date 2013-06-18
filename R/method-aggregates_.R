@@ -237,64 +237,75 @@ colAgg <- function (x)
 rowAgg <- function (x, ...)
 {
     n <- nargs()
-    if (!is(x, "db.obj")) stop("this function only works with db.obj!")
-    if (!all(x@.col.data_type %in% .num.types) ||
-        !all(x@.col.data_type %in% .txt.types) ||
-        !all(x@.col.data_type %in% c('boolean')))
-        stop("columns cannot be put into the same array!")
-    for (i in seq_len(n-1)) {
-        y <- eval(parse(text = paste0("..", i)))
-        if (!is(y, "db.obj")) stop("this function only works with db.obj!")
-        if (!.eql.parent(x, y))
-            stop("all the objects must originate from the same source!")
-        data.types <- c(x@.col.data_type[1], y@.col.data_type)
-        if (!all(data.types %in% .num.types) ||
-            !all(data.types %in% .txt.types) ||
-            !all(data.types %in% c('boolean')))
-            stop("columns cannot be put into the same array!")
-    }
+    base <- NULL
+    if (is(x, "db.obj")) base <- x
+    else
+        for (i in seq_len(n-1)) {
+            y <- eval(parse(text = paste0("..", i)))
+            if (is(y, "db.obj")) {
+                base <- y
+                break
+            }
+        }
+    if (is.null(base)) return (c(x, ...))
 
-    if (x@.col.data_type %in% .num.types)
+    if (!all(base@.col.data_type %in% .num.types) ||
+        !all(base@.col.data_type %in% .txt.types) ||
+        !all(base@.col.data_type %in% c('boolean')))
+        stop("columns cannot be put into the same array!")
+
+    if (base@.col.data_type %in% .num.types)
         udt.name <- "_float8"
-    else if (x@.col.data_type %in% .txt.types)
+    else if (base@.col.data_type %in% .txt.types)
         udt.name <- "_text"
     else
         udt.name <- "_bool"
+    else
+        stop("data type not supported!")
     
-    if (is(x, "db.data.frame")) {
-        tbl <- content(x)
+    if (is(base, "db.data.frame")) {
+        tbl <- content(base)
         src <- tbl
         parent <- tbl
     } else {
-        if (x@.parent != x@.source)
-            tbl <- paste("(", x@.parent, ") s", sep = "")
+        if (base@.parent != base@.source)
+            tbl <- paste("(", base@.parent, ") s", sep = "")
         else
-            tbl <- x@.parent
-        parent <- x@.parent
-        src <- x@.source
+            tbl <- base@.parent
+        parent <- base@.parent
+        src <- base@.source
     }
 
-    if (is(x, "db.Rquery") && x@.where != "") {
-        where.str <- paste(" where", x@.where)
-        where <- x@.where
+    if (is(base, "db.Rquery") && base@.where != "") {
+        where.str <- paste(" where", base@.where)
+        where <- base@.where
     } else {
         where.str <- ""
         where <- ""
     }
 
-    sort <- .generate.sort(x)
+    sort <- .generate.sort(base)
 
+    ## if (!is(base, "db.obj")) stop("this function only works with db.obj!")
     expr <- "array["
+    x <- .check.consistent(base, x, udt.name)
     if (is(x, "db.data.frame"))
         expr <- paste(expr, paste(names(x), collapse = ", "), sep = "")
-    else
+    else if (is(x, "db.Rquery"))
         expr <- paste(expr, paste(x@.expr, collapse = ", "), sep = "")
+    else
+        expr <- paste(expr, paste(x, collapse = ", "), sep = "")
+        
     for (i in seq_len(n-1)) {
         y <- eval(parse(text = paste0("..", i)))
+        ## if (!is(y, "db.obj")) stop("this function only works with db.obj!")
+        y <- .check.consistent(base, y, udt.name)
         if (is(y, "db.data.frame"))
             expr <- paste(expr, paste(names(y), collapse = ", "), sep = "")
-        else
+        else if (is(y, "db.Rquery"))
             expr <- paste(expr, paste(y@.expr, collapse = ", "), sep = "")
+        else
+            expr <- paste(expr, paste(y, collapse = ", "), sep = "")
     }
     expr <- paste(expr, "]", sep = "")
 
@@ -331,4 +342,24 @@ rowAgg <- function (x, ...)
         return (x1@.parent == x2@.parent && x1@.where == x2@.where &&
                 conn.eql(conn.id(x1), conn.id(x2)))
     }
+}
+
+## ------------------------------------------------------------------------
+
+.check.consistent <- function (base, x, udt.name)
+{
+    if (is(x, "db.obj")) {
+        if (!.eql.parent(base, x))
+            stop("all the objects must originate from the same source!")
+        data.types <- c(base@.col.data_type[1], x@.col.data_type)
+        if (!all(data.types %in% .num.types) ||
+            !all(data.types %in% .txt.types) ||
+            !all(data.types %in% c('boolean')))
+            stop("columns cannot be put into the same array!")
+    } else {
+        if (udt.name == "_float") x <- as.numeric(x)
+        else if (udt.name == "_text") x <- as.character(x)
+        else if (udt.name == "_bool") x <- as.logical(x)
+    }
+    x
 }

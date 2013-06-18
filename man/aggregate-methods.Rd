@@ -52,6 +52,9 @@ rowAgg(x, ...)
     \item{x}{
         A \code{db.obj} object.
         The signature of the method.
+
+        For \code{rowAgg}, \code{x} can also be a normal R object like
+    double value.
     }
 
     \item{\dots}{
@@ -162,8 +165,8 @@ colAgg(x$diameter)
 ## get the array aggregate of all columns in the table
 colAgg(x)
 
-## put everything into an array
-rowAgg(x, x, x)
+## put everything into an array plus a constant 1 as the first element
+rowAgg(1, x, x, x)
 }
 }
 
