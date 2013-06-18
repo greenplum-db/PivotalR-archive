@@ -12,7 +12,8 @@
 \alias{var,db.obj-method}
 \alias{colMeans,db.obj-method}
 \alias{colSums,db.obj-method}
-\alias{c,db.obj-method}
+\alias{colAgg}
+\alias{rowAgg}
 
 \title{Functions to perform a calculation on multiple values and return a single value}
 \description{
@@ -42,7 +43,9 @@ the sum of each column.}
 
 \S4method{colSums}{db.obj}(x, na.rm = FALSE, dims = 1, ...)
 
-\S4method{cagg}{db.obj}(x)
+colAgg(x)
+
+rowAgg(x, ...)
 }
 
 \arguments{
@@ -67,11 +70,6 @@ the sum of each column.}
           This is currently not implemented and the default behavior is to
           sum over columns
     }
-
-    \item{recursive}{
-        logical. This is currently not implemented.
-    }
-
 }
 
 \details{
@@ -79,7 +77,7 @@ the sum of each column.}
     \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
     \code{x} must be a reference to a single column in a table.
 
-    For aggregate functions: \code{colMeans}, \code{colSums}, and \code{cagg} the signature
+    For aggregate functions: \code{colMeans}, \code{colSums}, and \code{colAgg} the signature
     \code{x} can be a \code{db.obj} referencing to a single column or a single
     table, or can be a \code{db.Rquery} referencing to multiple columns in a table.
 }
@@ -103,8 +101,11 @@ the sum of each column.}
 
     For \code{colSums}, a \code{db.Rquery} which is a SQL query to extract the sum of multiple columns of a table.
 
-    For \code{cagg}, a \code{db.Rquery} which is a SQL query to extract
+    For \code{colAgg}, a \code{db.Rquery} which is a SQL query to retreive
     the column values as an array aggregate.
+
+    For \code{rowAgg}, a \code{db.Rquery} which is a SQL query which
+    combine all columns into an array.
 }
 
 \author{
@@ -128,39 +129,42 @@ help("mean,db.obj-method")
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone")
 
-# get the mean of a column
+## get the mean of a column
 mean(x$diameter)
 
-# get the sum of a column
+## get the sum of a column
 sum(x$height)
 
-# get the number of entries in a column
+## get the number of entries in a column
 length(x$id)
 
-# get the max value of a column
+## get the max value of a column
 max(x$diameter)
 
-# get the min value of a column
+## get the min value of a column
 min(x$diameter)
 
-# get the standard deviation of the values in column
+## get the standard deviation of the values in column
 sd(x$diameter)
 
-# get the variance of the values in column
+## get the variance of the values in column
 var(x$diameter)
 
-# get the mean of all columns in the table
+## get the mean of all columns in the table
 colMeans(x)
 
-# get the sum of all columns in the table
+## get the sum of all columns in the table
 colSums(x)
 
-# get the array aggregate of a specific column in the table
-cagg(x$diameter)
+## get the array aggregate of a specific column in the table
+colAgg(x$diameter)
 
-# get the array aggregate of all columns in the table
-cagg(x)
-    }
+## get the array aggregate of all columns in the table
+colAgg(x)
+
+## put everything into an array
+rowAgg(x, x, x)
+}
 }
 
 \keyword{database}

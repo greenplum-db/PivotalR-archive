@@ -323,12 +323,12 @@ rowAgg <- function (x, ...)
         return (content(x1) == content(x2) &&
                 conn.eql(conn.id(x1), conn.id(x2)))
     } else if (is(x1, "db.data.frame") && is(x2, "db.Rquery")) {
-        return (content(x1) == x2@.parent && x2@.where = "" &&
+        return (content(x1) == x2@.parent && x2@.where == "" &&
                 conn.eql(conn.id(x1), conn.id(x2)))
     } else if (is(x1, "db.Rquery") && is(x2, "db.data.frame"))
         .eql.parent(x2, x1)
     else {
-        return (x1@.parent == x2@.parent && x1@.where = x2@.where &&
+        return (x1@.parent == x2@.parent && x1@.where == x2@.where &&
                 conn.eql(conn.id(x1), conn.id(x2)))
     }
 }
