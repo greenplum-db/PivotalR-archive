@@ -249,16 +249,16 @@ rowAgg <- function (x, ...)
         }
     if (is.null(base)) return (c(x, ...))
 
-    if (!all(base@.col.data_type %in% .num.types) ||
-        !all(base@.col.data_type %in% .txt.types) ||
+    if (!all(base@.col.data_type %in% .num.types) &&
+        !all(base@.col.data_type %in% .txt.types) &&
         !all(base@.col.data_type %in% c('boolean')))
         stop("columns cannot be put into the same array!")
 
-    if (base@.col.data_type %in% .num.types)
+    if (base@.col.data_type[1] %in% .num.types)
         udt.name <- "_float8"
-    else if (base@.col.data_type %in% .txt.types)
+    else if (base@.col.data_type[1] %in% .txt.types)
         udt.name <- "_text"
-    else
+    else if (base@.col.data_type[1] %in% c("boolean")) 
         udt.name <- "_bool"
     else
         stop("data type not supported!")
@@ -295,7 +295,7 @@ rowAgg <- function (x, ...)
         expr <- paste(expr, paste(x@.expr, collapse = ", "), sep = "")
     else
         expr <- paste(expr, paste(x, collapse = ", "), sep = "")
-        
+    if (n > 1) expr <- paste(expr, ", ", sep = "")
     for (i in seq_len(n-1)) {
         y <- eval(parse(text = paste0("..", i)))
         ## if (!is(y, "db.obj")) stop("this function only works with db.obj!")
@@ -306,6 +306,7 @@ rowAgg <- function (x, ...)
             expr <- paste(expr, paste(y@.expr, collapse = ", "), sep = "")
         else
             expr <- paste(expr, paste(y, collapse = ", "), sep = "")
+        if (i != n-1) expr <- paste(expr, ", ", sep = "")
     }
     expr <- paste(expr, "]", sep = "")
 
@@ -315,7 +316,7 @@ rowAgg <- function (x, ...)
         .expr = expr,
         .source = src,
         .parent = parent,
-        .conn.id = conn.id(x),
+        .conn.id = conn.id(base),
         .col.name = "agg_opr",
         .key = character(0),
         .where = "",
@@ -352,8 +353,8 @@ rowAgg <- function (x, ...)
         if (!.eql.parent(base, x))
             stop("all the objects must originate from the same source!")
         data.types <- c(base@.col.data_type[1], x@.col.data_type)
-        if (!all(data.types %in% .num.types) ||
-            !all(data.types %in% .txt.types) ||
+        if (!all(data.types %in% .num.types) &&
+            !all(data.types %in% .txt.types) &&
             !all(data.types %in% c('boolean')))
             stop("columns cannot be put into the same array!")
     } else {
