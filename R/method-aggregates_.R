@@ -290,9 +290,11 @@ rowAgg <- function (x, ...)
     expr <- "array["
     x <- .check.consistent(base, x, udt.name)
     if (is(x, "db.data.frame"))
-        expr <- paste(expr, paste(names(x), collapse = ", "), sep = "")
+        expr <- paste(expr, paste("(\"", names(x), "\")", sep = "",
+                                  collapse = ", "), sep = "")
     else if (is(x, "db.Rquery"))
-        expr <- paste(expr, paste(x@.expr, collapse = ", "), sep = "")
+        expr <- paste(expr, paste("(", x@.expr, ")", sep = "",
+                                  collapse = ", "), sep = "")
     else
         expr <- paste(expr, paste(x, collapse = ", "), sep = "")
     if (n > 1) expr <- paste(expr, ", ", sep = "")
@@ -301,9 +303,11 @@ rowAgg <- function (x, ...)
         ## if (!is(y, "db.obj")) stop("this function only works with db.obj!")
         y <- .check.consistent(base, y, udt.name)
         if (is(y, "db.data.frame"))
-            expr <- paste(expr, paste(names(y), collapse = ", "), sep = "")
+            expr <- paste(expr, paste("(\"", names(y), "\")", sep = "",
+                                      collapse = ", "), sep = "")
         else if (is(y, "db.Rquery"))
-            expr <- paste(expr, paste(y@.expr, collapse = ", "), sep = "")
+            expr <- paste(expr, paste("(", y@.expr, ")", sep = "",
+                                      collapse = ", "), sep = "")
         else
             expr <- paste(expr, paste(y, collapse = ", "), sep = "")
         if (i != n-1) expr <- paste(expr, ", ", sep = "")

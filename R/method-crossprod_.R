@@ -40,27 +40,28 @@ setMethod (
             where <- ""
         }
         sort <- .generate.sort(x)
-        
-        if (is(x, "db.data.frame"))
-            tblx <- paste0(content(x), " s1")
-        else
-            tblx <- paste0("(", content(x), ") s1")
-        if (is(y, "db.data.frame"))
-            tbly <- paste0(content(y), " s2")
-        else
-            tbly <- paste0("(", content(y), ") s2")
 
-        a <- paste0("\"", names(x), "\"")
-        m <- as.integer(.db.getQuery(paste0("select array_upper(", a, ", 1) from ",
-                                            tblx, " limit 1"), conn.id))
-        b <- paste0("\"", names(y), "\"")
-        n <- as.integer(.db.getQuery(paste0("select array_upper(", b, ", 1) from ",
-                                            tbly, " limit 1"), conn.id))
+        if (is(x, "db.data.frame")) s <- names(x)
+        else s <- x@.expr
+        if (x@.col.data_type == "array") {
+            a <- .get.array.elements(s, tbl, where.str, conn.id)
+        } else
+            a <- paste("(", s, ")", sep = "")
+        m <- length(a)
 
+        if (is(y, "db.data.frame")) s <- names(y)
+        else s <- y@.expr
+        if (y@.col.data_type == "array") {
+            b <- .get.array.elements(s, tbl, where.str, conn.id)
+        } else
+            b <- paste("(", s, ")", sep = "")
+        n <- length(b)
+ 
         expr <- "array["
         for (j in seq_len(n)) {
             for (i in seq_len(m)) {
-                expr <- paste(expr, "sum(s1.", a, "[", i, "] * s2.", b, "[", j, "])", sep = "")
+                expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
+                              sep = "")
                 if (i != m) expr <- paste0(expr, ", ")
             }
             if (j != n) expr <- paste0(expr, ", ")
@@ -79,8 +80,23 @@ setMethod (
             .where = where,
             .col.data_type = "array",
             .col.udt_name = "_float",
-            .is.factor = FALSE<
-            .factor.suffix = "".
+            .is.factor = FALSE,
+            .factor.suffix = "",
             .sort = sort,
             .dim = c(m,n))
     })
+
+## ------------------------------------------------------------------------
+
+.get.array.elements <- function (expr, tbl, where.str, conn.id)
+{
+    s <- gsub("array\\[(.*)\\]", "\\1", expr)
+    if (s == expr) {
+        n <- as.integer(.db.getQuery(paste0(
+            "select array_upper(", s, ", 1) from ",
+            tbl, where.str, " limit 1"), conn.id))
+        paste(s, "[", seq_len(n), "]", sep = "")
+    } else {
+        regmatches(s, gregexpr("\\([^(\\),)]*\\)", s, perl=T))[[1]]
+    }
+}
