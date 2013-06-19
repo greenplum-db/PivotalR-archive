@@ -43,18 +43,22 @@ setMethod (
 
         if (is(x, "db.data.frame")) s <- names(x)
         else s <- x@.expr
-        if (x@.col.data_type == "array") {
+        if (length(s) == 1 && x@.col.data_type == "array") {
             a <- .get.array.elements(s, tbl, where.str, conn.id)
-        } else
+        } else if (all(x@.col.data_type != "array"))
             a <- paste("(", s, ")", sep = "")
+        else
+            stop(deparse(substitute(x)), " is not a proper matrix!")
         m <- length(a)
 
         if (is(y, "db.data.frame")) s <- names(y)
         else s <- y@.expr
-        if (y@.col.data_type == "array") {
+        if (length(s) == 1 && y@.col.data_type == "array") {
             b <- .get.array.elements(s, tbl, where.str, conn.id)
-        } else
+        } else if (all(y@.col.data_type != "array"))
             b <- paste("(", s, ")", sep = "")
+        else
+            stop(deparse(substitute(y)), " is not a proper matrix!")
         n <- length(b)
  
         expr <- "array["

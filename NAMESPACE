@@ -8,7 +8,7 @@ export ("conn.pkg", "host", "dbname", "user", "dbms",
 export ("db.data.frame", "as.db.data.frame")
 
 exportClasses ("db.obj", "db.Rquery", "db.data.frame",
-               "db.table", "db.view")
+               "db.table", "db.view", "db.Rmatrix")
 
 exportMethods ("dim", "names", "names<-")
 
