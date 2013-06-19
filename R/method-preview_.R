@@ -94,7 +94,7 @@ setMethod (
 
 setMethod (
     "preview",
-    signature (x = "db.Rmatrix"),
+    signature (x = "db.Rcrossprod"),
     def = function (x, interactive = FALSE) {
         msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
@@ -131,6 +131,6 @@ lookat <- function (x, nrows = 100)
 {
     
     if (is(x, "db.table")) return (preview(x, nrows))
-    if (is(x, "db.Rmatrix")) return (preview(x, FALSE))
+    if (is(x, "db.Rcrossprod")) return (preview(x, FALSE))
     preview(x, nrows, FALSE)
 }

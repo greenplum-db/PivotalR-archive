@@ -11,12 +11,15 @@ setMethod (
     signature(x = "db.obj"),
     function (x, y = NULL) {
         if (is.null(y)) y <- x
+        if (is(x, "db.Rcrossprod") || is(y, "db.Rcrossprod"))
+            stop("Right now, db.Rcrossprod object is not supported!")
         if (!is(y, "db.obj"))
             stop("y must also be a db.obj just like x!")
         if (! conn.eql(conn.id(x), conn.id(y)))
             stop("x and y are not on the same database!")
         if (!.eql.parent(x, y))
-            stop("x and y cannot match because they originate from different sources!")
+            stop("x and y cannot match because they originate",
+                 " from different sources!")
         conn.id <- conn.id(x)
 
         if (is(x, "db.data.frame")) {
@@ -72,7 +75,7 @@ setMethod (
         }
         expr <- paste0(expr, "]")
 
-        new("db.Rmatrix",
+        new("db.Rcrossprod",
             .content = paste0("select ", expr, " as cross_prod from ",
             tbl, where.str, sort$str, sep = ""),
             .expr = expr,

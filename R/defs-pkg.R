@@ -114,7 +114,7 @@ setClass("db.Rquery",
 ## ------------------------------------------------------------------------
 
 ## matrix representation
-setClass("db.Rmatrix",
+setClass("db.Rcrossprod",
          representation(.dim = "numeric"),
          contains = "db.Rquery")
 

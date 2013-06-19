@@ -1,9 +1,9 @@
-\name{db.Rmatrix-class}
+\name{db.Rcrossprod-class}
 \Rdversion{1.1}
 \docType{class}
-\alias{db.Rmatrix-class}
+\alias{db.Rcrossprod-class}
 
-\title{Class \code{"db.Rmatrix"}}
+\title{Class \code{"db.Rcrossprod"}}
 \description{
   An object of this class represents a series of operations applied onto
   an existing \code{\linkS4class{db.data.frame}} object. These
@@ -148,7 +148,7 @@ this class.
 \seealso{
   \code{\link{db.data.frame}} creates a \code{db.data.frame} object.
 
-  \code{\link{as.db.data.frame}} converts \code{db.Rmatrix} object,
+  \code{\link{as.db.data.frame}} converts \code{db.Rcrossprod} object,
   \code{data.frame}, or a data file into a \code{db.data.frame} object
   and at the same time creates a new table in the database.
 
@@ -162,12 +162,12 @@ this class.
 
 \examples{
 \dontrun{
-showClass("db.Rmatrix")
+showClass("db.Rcrossprod")
 
 db.connect(port = 5433)
 x <- db.data.frame("abalone") # x points to table "abalone"
 
-## create several db.Rmatrix objects
+## create several db.Rcrossprod objects
 y <- x[,1:2]
 z <- x[x$rings > 10,]
 
@@ -177,7 +177,7 @@ preview(y)
 
 preview(z)
 
-## materialize a db.Rmatrix object
+## materialize a db.Rcrossprod object
 z <- as.db.data.frame(z, "abalone_rings_larger_10")
 
 dim(z) # no error

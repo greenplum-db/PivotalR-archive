@@ -4,7 +4,7 @@
 \alias{preview,db.view-method}
 \alias{preview,db.table-method}
 \alias{preview,db.Rquery-method}
-\alias{preview,db.Rmatrix-method}
+\alias{preview,db.Rcrossprod-method}
 
 \title{
   Read the actual data stored in a table of database.
@@ -23,7 +23,7 @@
 
 \S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
 
-\S4method{preview}{db.Rmatrix}(x, interactive = FALSE)
+\S4method{preview}{db.Rcrossprod}(x, interactive = FALSE)
 
 lookat(x, nrows = 100)
 }
@@ -64,7 +64,7 @@ object, this
   \code{\linkS4class{db.data.frame}} 
   object. 
 
-  When the signature \code{x} is a \code{\linkS4class{db.Rmatrix}}
+  When the signature \code{x} is a \code{\linkS4class{db.Rcrossprod}}
   object, this function output a matrix to R.
 }
 
