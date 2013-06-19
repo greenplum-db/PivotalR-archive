@@ -296,7 +296,8 @@ rowAgg <- function (x, ...)
         expr <- paste(expr, paste("(", x@.expr, ")", sep = "",
                                   collapse = ", "), sep = "")
     else
-        expr <- paste(expr, paste(x, collapse = ", "), sep = "")
+        expr <- paste(expr, paste("(", x, ")", collapse = ", ",
+                                  sep = ""), sep = "")
     if (n > 1) expr <- paste(expr, ", ", sep = "")
     for (i in seq_len(n-1)) {
         y <- eval(parse(text = paste0("..", i)))
@@ -309,7 +310,8 @@ rowAgg <- function (x, ...)
             expr <- paste(expr, paste("(", y@.expr, ")", sep = "",
                                       collapse = ", "), sep = "")
         else
-            expr <- paste(expr, paste(y, collapse = ", "), sep = "")
+            expr <- paste(expr, paste("(", y, ")", collapse = ", ",
+                                      sep = ""), sep = "")
         if (i != n-1) expr <- paste(expr, ", ", sep = "")
     }
     expr <- paste(expr, "]", sep = "")
