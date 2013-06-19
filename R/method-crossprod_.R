@@ -15,7 +15,31 @@ setMethod (
             stop("y must also be a db.obj just like x!")
         if (! conn.eql(conn.id(x), conn.id(y)))
             stop("x and y are not on the same database!")
+        if (!.eql.parent(x, y))
+            stop("x and y cannot match because they originate from different sources!")
         conn.id <- conn.id(x)
+
+        if (is(x, "db.data.frame")) {
+            tbl <- content(x)
+            src <- tbl
+            parent <- tbl
+        } else {
+            if (x@.parent != x@.source)
+                tbl <- paste("(", x@.parent, ") s", sep = "")
+            else
+                tbl <- x@.parent
+            parent <- x@.parent
+            src <- x@.source
+        }
+        
+        if (is(x, "db.Rquery") && x@.where != "") {
+            where.str <- paste(" where", x@.where)
+            where <- x@.where
+        } else {
+            where.str <- ""
+            where <- ""
+        }
+        sort <- .generate.sort(x)
         
         if (is(x, "db.data.frame"))
             tblx <- paste0(content(x), " s1")
@@ -33,17 +57,30 @@ setMethod (
         n <- as.integer(.db.getQuery(paste0("select array_upper(", b, ", 1) from ",
                                             tbly, " limit 1"), conn.id))
 
-        sql <- "array["
+        expr <- "array["
         for (j in seq_len(n)) {
             for (i in seq_len(m)) {
-                sql <- paste(sql, "sum(s1.", a, "[", i, "] * s2.", b, "[", j, "])", sep = "")
-                if (i != m) sql <- paste0(sql, ", ")
+                expr <- paste(expr, "sum(s1.", a, "[", i, "] * s2.", b, "[", j, "])", sep = "")
+                if (i != m) expr <- paste0(expr, ", ")
             }
-            if (j != n) sql <- paste0(sql, ", ")
+            if (j != n) expr <- paste0(expr, ", ")
         }
-        sql <- paste0(sql, "]")
+        expr <- paste0(expr, "]")
 
-        res <- new("db.Rquery",
-                   .content = paste0("select ", sql, " as cross_prod from ", ),
-                   )
+        new("db.Rmatrix",
+            .content = paste0("select ", expr, " as cross_prod from ",
+            tbl, where.str, sort$str, sep = ""),
+            .expr = expr,
+            .source = src,
+            .parent = parent,
+            .conn.id = conn.id,
+            .col.name = "cross_prod",
+            .key = character(0),
+            .where = where,
+            .col.data_type = "array",
+            .col.udt_name = "_float",
+            .is.factor = FALSE<
+            .factor.suffix = "".
+            .sort = sort,
+            .dim = c(m,n))
     })

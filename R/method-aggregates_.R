@@ -319,7 +319,7 @@ rowAgg <- function (x, ...)
         .conn.id = conn.id(base),
         .col.name = "agg_opr",
         .key = character(0),
-        .where = "",
+        .where = where,
         .col.data_type = "array",
         .col.udt_name = udt.name,
         .is.factor = FALSE,
