@@ -93,17 +93,3 @@ setMethod (
             .dim = c(m,n))
     })
 
-## ------------------------------------------------------------------------
-
-.get.array.elements <- function (expr, tbl, where.str, conn.id)
-{
-    s <- gsub("array\\[(.*)\\]", "\\1", expr)
-    if (s == expr) {
-        n <- as.integer(.db.getQuery(paste0(
-            "select array_upper(", s, ", 1) from ",
-            tbl, where.str, " limit 1"), conn.id))
-        paste(s, "[", seq_len(n), "]", sep = "")
-    } else {
-        regmatches(s, gregexpr("\\([^(\\),)]*\\)", s, perl=T))[[1]]
-    }
-}
