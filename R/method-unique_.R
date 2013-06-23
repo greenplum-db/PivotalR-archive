@@ -18,7 +18,10 @@ setMethod(
             expr <- paste("distinct ", x@.expr, sep = "")
             res@.expr <- expr
             res@.col.udt_name <- gsub("^_", "", res@.col.udt_name)
-            res@.content <- gsub("^select (.*) as", expr, res@.content)
+            res@.content <- gsub("^select (.*) as", paste("select ",
+                                                          expr, " as",
+                                                          sep = ""),
+                                 res@.content)
         }        
 
         return (res)

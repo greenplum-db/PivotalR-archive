@@ -44,7 +44,7 @@
         where.str <- ""
         where <- ""
     } else {
-        expr <- paste(func, "((", x@.expr, ")", cast.bool, ")", sep = "")
+        expr <- paste(func, "((", inside, x@.expr, ")", cast.bool, ")", sep = "")
         if (!is.null(input.types)) {
             for (i in seq_len(length(expr)))
                 if (! (x@.col.data_type[i] %in% input.types)) {
