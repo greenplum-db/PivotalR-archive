@@ -15,11 +15,17 @@
 {
     s <- gsub("array\\[(.*)\\]", "\\1", expr)
     if (s == expr) {
-        n <- as.integer(.db.getQuery(paste0(
-            "select array_upper(\"", s, "\", 1) - array_lower(\"",
-            s, "\", 1) + 1 from ",
+        n1 <- as.integer(.db.getQuery(paste0(
+            "select array_upper(\"", .strip(s, "\""),
+            "\", 1) from ",
             tbl, where.str, " limit 1"), conn.id))
-        paste("\"", s, "\"[", seq_len(n), "]", sep = "")
+        n2 <- as.integer(.db.getQuery(paste0(
+            "select array_lower(\"",
+            .strip(s, "\""), "\", 1) from ",
+            tbl, where.str, " limit 1"), conn.id))
+        n <- n1 - n2 + 1
+        paste("\"", .strip(s, "\""), "\"[", seq_len(n) - 1 + n2,
+              "]", sep = "")
     } else {
         regmatches(s, gregexpr("\\([^(\\),)]*\\)", s, perl=T))[[1]]
     }

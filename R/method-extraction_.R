@@ -76,10 +76,10 @@ setMethod (
             stop()
         }
 
-        if (length(names(x)) == 1) {
-            n <- 3
-            j <- 1
-        }
+        ## if (length(names(x)) == 1) {
+        ##     n <- 3
+        ##     j <- 1
+        ## }
         
         if (missing(i))
             i.missing <- TRUE
@@ -188,7 +188,7 @@ setMethod (
         message("Error : column missing or format wrong!")
         stop()
     }
-
+    
     sort <- .generate.sort(x)
     
     if (is(x, "db.Rquery")) {
@@ -208,9 +208,10 @@ setMethod (
     else where.str <- ""
     
     if (is.character(cols.i)) {
-        if (all(cols.i %in% names(x)))
+        if (all(cols.i %in% names(x))) {
             cols.i <- .gwhich(names(x), cols.i)
-        else {
+            nss <- names(x)
+        } else {
             message("Error : column does not exist!")
             stop()
         }            
@@ -220,11 +221,11 @@ setMethod (
             message("Error : no column is selected!")
             stop()
         }
-        if (length(names(x)) == 1 && x@.col.data_type == "array")
+        if (length(names(x)) == 1 && x@.col.data_type == "array") {
             if (is(x, "db.data.frame")) ep <- x@.col.name
             else ep <- x@.expr
             nss <- .get.array.elements(ep, tbl, where.str, conn.id(x))
-        else
+        } else
             nss <- names(x)
         idxs <- seq_len(length(nss))
         if ((all(cols.i > 0) && !all(cols.i %in% idxs)) ||
@@ -238,7 +239,7 @@ setMethod (
     }
 
     if (length(names(x)) == 1 && x@.col.data_type == "array") {
-        expr <- nss
+        expr <- nss[cols.i]
         col.name <- paste(x@.col.name, "[", cols.i, "]", sep = "")
     } else {
         if (is(x, "db.data.frame"))
@@ -260,7 +261,7 @@ setMethod (
         idx <- which(paste("_", .array.udt, sep = "") == x@.col.udt_name)
         col.data_type <- rep(.array.dat[idx], length(cols.i))
         col.udt_name <- rep(.array.udt[idx], length(cols.i))
-        is.factor <- rep(x@.factor.suffix, length(cols.i))
+        is.factor <- rep(x@.is.factor, length(cols.i))
         factor.suffix <- rep(x@.factor.suffix, length(cols.i))
     }
 

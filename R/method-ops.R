@@ -577,10 +577,10 @@ setMethod (
 
     if (! conn.eql(conn.id(e1), conn.id(e2)))
         stop("The two objects are not in the same database!")
-    if (!.eql.parent(x, y))
+    if (!.eql.parent(e1, e2))
         stop("x and y cannot match because they originate",
              " from different sources!")
-    conn.id <- conn.id(x)
+    conn.id <- conn.id(e1)
 
     if (e1@.source == e1@.parent)
         tbl <- e1@.source
