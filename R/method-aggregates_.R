@@ -33,7 +33,8 @@
             for (i in seq_len(length(expr)))
                 if (!(x@.col.data_type[i] %in% input.types)) {
                     if (allow.bool && x@.col.data_type == "boolean") next
-                    expr[i] <-paste( "NULL::", x@.col.data_type[i], sep = "")
+                    expr[i] <-paste( "NULL::", x@.col.data_type[i],
+                                    sep = "")
                     data.type[i] <- x@.col.data_type[i]
                     udt.name[i] <- x@.col.udt_name[i]
                 }
@@ -48,7 +49,8 @@
             for (i in seq_len(length(expr)))
                 if (! (x@.col.data_type[i] %in% input.types)) {
                     if (allow.bool && x@.col.data_type == "boolean") next
-                    expr[i] <- paste("NULL::", x@.col.data_type[i], sep = "")
+                    expr[i] <- paste("NULL::", x@.col.data_type[i],
+                                     sep = "")
                     data.type[i] <- x@.col.data_type[i]
                     udt.name[i] <- x@.col.udt_name[i]
                 }
@@ -98,7 +100,7 @@ setMethod (
     "mean",
     signature(x = "db.obj"),
     function (x, ...) {
-        .aggregate(x, "avg", TRUE, .num.types, TRUE,
+        .aggregate(x, "avg", FALSE, .num.types, TRUE,
                    "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -111,7 +113,7 @@ setMethod (
     "sum",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "sum", TRUE, .num.types, TRUE,
+        .aggregate(x, "sum", FALSE, .num.types, TRUE,
                    x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -124,7 +126,7 @@ setMethod (
     "length",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "count", TRUE, NULL, FALSE, "integer", "int4")
+        .aggregate(x, "count", FALSE, NULL, FALSE, "integer", "int4")
     },
     valueClass = "db.Rquery")
 
@@ -136,7 +138,7 @@ setMethod (
     "max",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "max", TRUE, .num.types, FALSE,
+        .aggregate(x, "max", FALSE, .num.types, FALSE,
                    x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -149,7 +151,7 @@ setMethod (
     "min",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "min", TRUE, .num.types, FALSE,
+        .aggregate(x, "min", FALSE, .num.types, FALSE,
                    x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
@@ -169,7 +171,7 @@ setMethod (
     "sd",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "stddev", TRUE, .num.types, TRUE,
+        .aggregate(x, "stddev", FALSE, .num.types, TRUE,
                    "double precision", "float8")
     },
     valueClass = "db.Rquery")
@@ -189,7 +191,7 @@ setMethod (
     "var",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "variance", TRUE, .num.types, TRUE,
+        .aggregate(x, "variance", FALSE, .num.types, TRUE,
                    "double precision", "float8")
     },
     valueClass = "db.Rquery")

@@ -189,38 +189,6 @@ setMethod (
         stop()
     }
 
-    if (is.character(cols.i)) {
-        if (all(cols.i %in% names(x)))
-            cols.i <- .gwhich(names(x), cols.i)
-        else {
-            message("Error : column does not exist!")
-            stop()
-        }            
-    } else if (is(cols.i, "numeric")) {
-        cols.i <- cols.i[cols.i != 0]
-        if (length(cols.i) == 0) {
-            message("Error : no column is selected!")
-            stop()
-        }
-        idxs <- seq_len(length(names(x)))
-        if ((all(cols.i > 0) && !all(cols.i %in% idxs)) ||
-            (all(cols.i < 0) && !all(-cols.i %in% idxs))) {
-            message("Error : subscript out of range!")
-            stop()
-        }
-
-        if (cols.i[1] < 0)
-            cols.i <- setdiff(idxs, -cols.i)
-    }
-
-    if (is(x, "db.data.frame"))
-        expr <- paste("\"", x@.col.name[cols.i], "\"", sep = "")
-    else
-        expr <- x@.expr[cols.i]
-    if (length(expr) == 0) return (new("db.Rquery"))
-    i.str <- paste(expr, paste("\"", names(x)[cols.i], "\"", sep = ""),
-                   sep = " as ", collapse = ", ")
-
     sort <- .generate.sort(x)
     
     if (is(x, "db.Rquery")) {
@@ -238,6 +206,51 @@ setMethod (
 
     if (where != "") where.str <- paste(" where", where)
     else where.str <- ""
+    
+    if (is.character(cols.i)) {
+        if (all(cols.i %in% names(x)))
+            cols.i <- .gwhich(names(x), cols.i)
+        else {
+            message("Error : column does not exist!")
+            stop()
+        }            
+    } else if (is(cols.i, "numeric")) {
+        cols.i <- cols.i[cols.i != 0]
+        if (length(cols.i) == 0) {
+            message("Error : no column is selected!")
+            stop()
+        }
+        if (length(names(x)) == 1 && x@.col.data_type == "array")
+            if (is(x, "db.data.frame")) ep <- x@.col.name
+            else ep <- x@.expr
+            nss <- .get.array.elements(ep, tbl, where.str, conn.id(x))
+        else
+            nss <- names(x)
+        idxs <- seq_len(length(nss))
+        if ((all(cols.i > 0) && !all(cols.i %in% idxs)) ||
+            (all(cols.i < 0) && !all(-cols.i %in% idxs))) {
+            message("Error : subscript out of range!")
+            stop()
+        }
+
+        if (cols.i[1] < 0)
+            cols.i <- setdiff(idxs, -cols.i)
+    }
+
+    if (length(names(x)) == 1 && x@.col.data_type == "array") {
+        expr <- nss
+        col.name <- paste(x@.col.name, "[", cols.i, "]", sep = "")
+    } else {
+        if (is(x, "db.data.frame"))
+            expr <- paste("\"", x@.col.name[cols.i], "\"", sep = "")
+        else
+            expr <- x@.expr[cols.i]
+        col.name <- names(x)[cols.i]
+    }
+    
+    if (length(expr) == 0) return (new("db.Rquery"))
+    i.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
+                   sep = " as ", collapse = ", ")
 
     new("db.Rquery",
         .content = paste("select ", i.str, " from ", tbl, where.str,
@@ -246,7 +259,7 @@ setMethod (
         .source = src,
         .parent = parent,
         .conn.id = conn.id(x),
-        .col.name = names(x)[cols.i],
+        .col.name = col.name,
         .key = x@.key,
         .col.data_type = x@.col.data_type[cols.i],
         .col.udt_name = x@.col.udt_name[cols.i],
