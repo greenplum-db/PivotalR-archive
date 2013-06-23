@@ -252,6 +252,18 @@ setMethod (
     i.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                    sep = " as ", collapse = ", ")
 
+    col.data_type <- x@.col.data_type[cols.i]
+    col.udt_name <- x@.col.udt_name[cols.i]
+    is.factor <- x@.is.factor[cols.i]
+    factor.suffix <- x@.factor.suffix[cols.i]
+    if (length(names(x)) == 1 && x@.col.data_type == "array") {
+        idx <- which(paste("_", .array.udt, sep = "") == x@.col.udt_name)
+        col.data_type <- rep(.array.dat[idx], length(cols.i))
+        col.udt_name <- rep(.array.udt[idx], length(cols.i))
+        is.factor <- rep(x@.factor.suffix, length(cols.i))
+        factor.suffix <- rep(x@.factor.suffix, length(cols.i))
+    }
+
     new("db.Rquery",
         .content = paste("select ", i.str, " from ", tbl, where.str,
         sort$str, sep = ""),
@@ -261,11 +273,11 @@ setMethod (
         .conn.id = conn.id(x),
         .col.name = col.name,
         .key = x@.key,
-        .col.data_type = x@.col.data_type[cols.i],
-        .col.udt_name = x@.col.udt_name[cols.i],
+        .col.data_type = col.data_type,
+        .col.udt_name = col.udt_name,
         .where = where,
-        .is.factor = x@.is.factor[cols.i],
-        .factor.suffix = x@.factor.suffix[cols.i],
+        .is.factor = is.factor,
+        .factor.suffix = factor.suffix,
         .sort = sort)
 }
 

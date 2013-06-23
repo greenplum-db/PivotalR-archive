@@ -3,6 +3,12 @@
 ## Array operation utilities
 ## ------------------------------------------------------------------------
 
+.array.udt <- c("_int4", "_bool", "_float8", "_text", "_varchar", "_int8",
+               "int2")
+
+.array.dat <- c("integer", "boolean", "double precision", "text", "bigint",
+               "smallint")
+
 ## get each element in an array expression
 ## returns an array of string
 .get.array.elements <- function (expr, tbl, where.str, conn.id)

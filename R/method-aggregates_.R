@@ -6,7 +6,7 @@
 .aggregate <- function (x, func, vector = TRUE, input.types = .num.types,
                         allow.bool = FALSE,
                         data.type = "double precision",
-                        udt.name = "float8")
+                        udt.name = "float8", inside = "")
 {
     if (vector && length(names(x)) != 1)
         stop(func, " only works on a single column!")
@@ -27,7 +27,7 @@
             if (x@.col.data_type == "boolean") cast.bool[i] <- "::integer"
     
     if (is(x, "db.data.frame")) {
-        expr <- paste(func, "(\"", names(x), "\"", cast.bool, ")",
+        expr <- paste(func, "(\"", inside, names(x), "\"", cast.bool, ")",
                       sep = "")
         if (!is.null(input.types)) {
             for (i in seq_len(length(expr)))
@@ -229,7 +229,7 @@ colAgg <- function (x)
 {
     if (!is(x, "db.obj"))
         stop("this function only works with db.obj!")
-    .aggregate(x, "array_agg", FALSE, NULL, FALSE, "ARRAY",
+    .aggregate(x, "array_agg", FALSE, NULL, FALSE, "array",
                paste("_", x@.col.udt_name, sep = ""))
 }
 
