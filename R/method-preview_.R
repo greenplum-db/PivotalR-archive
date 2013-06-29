@@ -86,6 +86,19 @@ setMethod (
 
         msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
         options(warn = warn.r) # reset R warning level
+
+        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+            if (gsub("int", "", x@.col.udt_name) != x@.col.udt_name)
+                res <- arraydb.to.arrayr(res[[1]], "integer")
+            else if (gsub("float", "", x@.col.udt_name) != x@.col.udt_name)
+                res <- arraydb.to.arrayr(res[[1]], "double")
+            else if (x@.col.udt_name %in% c("_bool"))
+                res <- arraydb.to.arrayr(res[[1]], "logical")
+            else
+                res <- arraydb.to.arrayr(res[[1]], "character")
+            if (dim(res)[1] == 1)
+                res <- as.vector(res)
+        }
            
         return (res)
     })
