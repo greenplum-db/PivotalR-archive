@@ -22,9 +22,15 @@
     }
 
     cast.bool <- rep("", length(names(x)))
+    prebra <- ""
+    apbra <- ""
     if (allow.bool)
         for (i in seq_len(length(names(x))))
-            if (x@.col.data_type == "boolean") cast.bool[i] <- "::integer"
+            if (x@.col.data_type == "boolean") {
+                cast.bool[i] <- "::integer"
+                prebra <- "("
+                apbra <- ")"
+            }
     
     if (is(x, "db.data.frame")) {
         expr <- paste(func, "(\"", inside, names(x), "\"", cast.bool, ")",
@@ -44,7 +50,7 @@
         where.str <- ""
         where <- ""
     } else {
-        expr <- paste(func, "((", inside, x@.expr, ")", cast.bool, ")", sep = "")
+        expr <- paste(func, "(", prebra, inside, x@.expr, apbra, cast.bool, ")", sep = "")
         if (!is.null(input.types)) {
             for (i in seq_len(length(expr)))
                 if (! (x@.col.data_type[i] %in% input.types)) {
