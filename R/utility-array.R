@@ -112,9 +112,9 @@
     if (gsub("int", "", udt) != udt)
         "integer"
     else if (gsub("float", "", udt) != udt)
-        "double"
+        "double precision"
     else if (udt %in% c("_bool"))
-        "logical"
+        "boolean"
     else
-        "character"
+        "text"
 }

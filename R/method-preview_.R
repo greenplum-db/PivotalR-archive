@@ -26,12 +26,18 @@ setGeneric (
 setMethod (
     "preview",
     signature (x = "db.table"),
-    def = function (x, nrows = 100) {
+    def = function (x, nrows = 100, array = FALSE) {
         warn.r <- getOption("warn")
         options(warn = -1)
-        res <- .db.getQuery(paste("select * from ", content(x),
-                                  .limit.str(nrows), sep = ""),
-                            conn.id(x))
+        if (array) {
+            x <- .expand.array(x)
+            res <- .db.getQuery(paste("select * from (", content(x), ") s",
+                                      .limit.str(nrows), sep = ""),
+                                conn.id(x))
+        } else 
+            res <- .db.getQuery(paste("select * from ", content(x),
+                                      .limit.str(nrows), sep = ""),
+                                conn.id(x))
         options(warn = warn.r) # reset R warning level
         res
     })
@@ -41,7 +47,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.view"),
-    def = function (x, nrows = 100, interactive = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE, array = FALSE) {
         warn.r <- getOption("warn")
         options(warn = -1)
         if (interactive) {
@@ -54,9 +60,15 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        res <- .db.getQuery(paste("select * from ", content(x),
-                                  .limit.str(nrows), sep = ""),
-                            conn.id(x))
+        if (array) {
+            x <- .expand.array(x)
+            res <- .db.getQuery(paste("select * from (", content(x), ") s",
+                                      .limit.str(nrows), sep = ""),
+                                conn.id(x))
+        } else 
+            res <- .db.getQuery(paste("select * from ", content(x),
+                                      .limit.str(nrows), sep = ""),
+                                conn.id(x))
         options(warn = warn.r) # reset R warning level
         res
     })
@@ -66,7 +78,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rquery"),
-    def = function (x, nrows = 100, interactive = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE, array = FALSE) {
         msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -81,8 +93,9 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        res <- .db.getQuery(paste(content(x), .limit.str(nrows), sep = ""),
-                            conn.id(x))
+        if (array) x <- .expand.array(x)
+        res <- .db.getQuery(paste(content(x), .limit.str(nrows),
+                                  sep = ""), conn.id(x))
 
         msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
         options(warn = warn.r) # reset R warning level
@@ -140,10 +153,10 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 ## same as preview
-lookat <- function (x, nrows = 100)
+lookat <- function (x, nrows = 100, array = FALSE)
 {
     
-    if (is(x, "db.table")) return (preview(x, nrows))
+    if (is(x, "db.table")) return (preview(x, nrows, array = array))
     if (is(x, "db.Rcrossprod")) return (preview(x, FALSE))
-    preview(x, nrows, FALSE)
+    preview(x, nrows, FALSE, array)
 }
