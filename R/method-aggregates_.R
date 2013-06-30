@@ -26,7 +26,7 @@
     apbra <- ""
     if (allow.bool)
         for (i in seq_len(length(names(x))))
-            if (x@.col.data_type == "boolean") {
+            if (x@.col.data_type[i] == "boolean") {
                 cast.bool[i] <- "::integer"
                 prebra <- "("
                 apbra <- ")"
@@ -38,7 +38,7 @@
         if (!is.null(input.types)) {
             for (i in seq_len(length(expr)))
                 if (!(x@.col.data_type[i] %in% input.types)) {
-                    if (allow.bool && x@.col.data_type == "boolean") next
+                    if (allow.bool && x@.col.data_type[i] == "boolean") next
                     expr[i] <-paste( "NULL::", x@.col.data_type[i],
                                     sep = "")
                     data.type[i] <- x@.col.data_type[i]
@@ -54,7 +54,7 @@
         if (!is.null(input.types)) {
             for (i in seq_len(length(expr)))
                 if (! (x@.col.data_type[i] %in% input.types)) {
-                    if (allow.bool && x@.col.data_type == "boolean") next
+                    if (allow.bool && x@.col.data_type[i] == "boolean") next
                     expr[i] <- paste("NULL::", x@.col.data_type[i],
                                      sep = "")
                     data.type[i] <- x@.col.data_type[i]
@@ -245,11 +245,18 @@ colAgg <- function (x)
 rowAgg <- function (x, ...)
 {
     n <- nargs()
+    dat <- list()
+    dat[[1]] <- .expand.array(x)
+    for (i in seq_len(n-1)) {
+        y <- eval(parse(text = paste0("..", i)))
+        dat[[i+1]] <- .expand.array(y)
+    }
+    
     base <- NULL
-    if (is(x, "db.obj")) base <- x
+    if (is(dat[[1]], "db.obj")) base <- dat[[1]]
     else
         for (i in seq_len(n-1)) {
-            y <- eval(parse(text = paste0("..", i)))
+            y <- dat[[i+1]]
             if (is(y, "db.obj")) {
                 base <- y
                 break
@@ -296,6 +303,7 @@ rowAgg <- function (x, ...)
 
     ## if (!is(base, "db.obj")) stop("this function only works with db.obj!")
     expr <- "array["
+    x <- dat[[1]]
     x <- .check.consistent(base, x, udt.name)
     if (is(x, "db.data.frame"))
         expr <- paste(expr, paste("(\"", names(x), "\")", sep = "",
@@ -308,7 +316,7 @@ rowAgg <- function (x, ...)
                                   sep = ""), sep = "")
     if (n > 1) expr <- paste(expr, ", ", sep = "")
     for (i in seq_len(n-1)) {
-        y <- eval(parse(text = paste0("..", i)))
+        y <- dat[[i+1]]
         ## if (!is(y, "db.obj")) stop("this function only works with db.obj!")
         y <- .check.consistent(base, y, udt.name)
         if (is(y, "db.data.frame"))
