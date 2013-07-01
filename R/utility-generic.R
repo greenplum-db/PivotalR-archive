@@ -66,40 +66,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 ## ------------------------------------------------------------------------
 
-## It is a little bit more complicated when schema name is not given.
-## The table might be a temporary table, or a normal table. 
-## .db.obj.info <- function (db.obj_name, conn.id = 1)
-## {
-##     parts <- strsplit(db.obj_name, "\\.")[[1]]
-##     if (length(parts) == 2) {
-##         table_schema <- parts[1]
-##         table_name <- parts[2]
-##     } else if (length(parts) == 1) {
-##         table_name <- parts[1]
-   
-##         schemas <- arraydb.to.arrayr(.db.getQuery("select current_schemas(True)", conn.id),
-##                                type = "character")
-##         table_schema <- NULL
-##         for (schema in schemas)
-##         {
-##             if (.db.existsTable(c(schema, table_name), conn.id)) {
-##                 table_schema <- schema
-##                 break
-##             }
-##         }
-        
-##         ## No such table, going to create a new one
-##         ## usually in public
-##         if (is.null(table_schema))
-##             table_schema <- .db.getQuery("select current_schema()", conn.id)        
-##     } else {
-##         stop("The database object name is not valid!")
-##     }
-##     return (c(table_schema, table_name))
-## }
-
-## ------------------------------------------------------------------------
-
 ## get the distributed by string
 .get.distributed.by.str <- function(conn.id, distributed.by)
 {
@@ -195,12 +161,14 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 ## analyze formula
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
                               is.factor = NA, cols = NA, suffix = NA)
-{
+{    
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     fstr <- f.str[1]
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
 
+    fdata <- .expand.array(fdata)
+    
     if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
         f2.labels <- attr(f2.terms, "term.labels")
@@ -211,6 +179,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
+        ## f2.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f2.labels)
         grp <- paste(f2.labels, collapse = ", ")
     } else {
         f2.labels <- NULL
@@ -225,7 +194,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## the 1st row is the dependent variable
     f.factors <- attr(f.terms, "factors")
     f.labels <- attr(f.terms, "term.labels") # each terms on the right side
-
+    ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)    
+    
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) {
         replace.cols <- cols[is.factor]
@@ -269,6 +239,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
+    ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
 
     f.intercept <- attr(f.terms, "intercept")
     labels <- gsub(":", "*", f.labels, perl = T) # replace interaction : with *
@@ -280,6 +251,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- .replace.with.quotes(dep.var, data@.col.name)
+    ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
 
     ## with or without intercept
     if (f.intercept == 0)
@@ -300,6 +272,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- .consistent.func(dep.var)
     ind.var <- .consistent.func(ind.var)
     labels <- .consistent.func(labels)
+
+    ##
+    ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
+    ## ind.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", ind.var)
+    ## grp <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", grp)
+    ## labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", labels)
+    dep.var <- gsub("`", "", dep.var)
+    ind.var <- gsub("`", "", ind.var)
+    grp <- gsub("`", "", grp)
+    labels <- gsub("`", "", labels)
+    ##
     
     list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
