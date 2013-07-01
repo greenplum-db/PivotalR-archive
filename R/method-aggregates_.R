@@ -3,10 +3,50 @@
 ## several aggregate methods, can be used with by
 ## ------------------------------------------------------------------------
 
+.apply.func.array <- function (x, func, vector, input.types, allow.bool,
+                               data.type, udt.name, inside)
+{
+    x <- .expand.array(x)
+    y <- .sub.aggregate(x, func, vector, input.types, allow.bool,
+                        x@.col.data_type, x@.col.udt_name, inside)
+    return (rowAgg(y))
+}
+
+## ------------------------------------------------------------------------
+
+## support the operations on array columns
 .aggregate <- function (x, func, vector = TRUE, input.types = .num.types,
                         allow.bool = FALSE,
                         data.type = "double precision",
                         udt.name = "float8", inside = "")
+{
+    l <- length(names(x))
+    col.name <- paste(names(x), "_", func, sep = "")
+    if ((x[[1]])@.col.data_type != "array")
+        res <- .sub.aggregate(x[[1]], func, vector, input.types, allow.bool,
+                              data.type[1], udt.name[1], inside)
+    else
+        res <- .apply.func.array(x[[1]], func, vector, input.types, allow.bool,
+                                 data.type[1], udt.name[1], inside)
+    res@.col.name <- col.name[1]
+    for (i in seq_len(l-1)+1) {
+        if (x[[i]]@.col.data_type != "array")
+            res[[col.name[i]]] <- .sub.aggregate(x[[i]], func, vector, input.types, allow.bool,
+                                                 data.type[i], udt.name[i], inside)
+        else
+            res[[col.name[i]]] <- .apply.func.array(x[[i]], func, vector,
+                                                    input.types, allow.bool,
+                                                    data.type[i], udt.name[i], inside)
+    }
+    res
+}
+
+## ------------------------------------------------------------------------
+
+.sub.aggregate <- function (x, func, vector = TRUE, input.types = .num.types,
+                            allow.bool = FALSE,
+                            data.type = "double precision",
+                            udt.name = "float8", inside = "")
 {
     if (vector && length(names(x)) != 1)
         stop(func, " only works on a single column!")
