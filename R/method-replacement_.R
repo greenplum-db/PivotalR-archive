@@ -337,7 +337,19 @@ setMethod (
     "[<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
-        n <- nargs()
+        n <- length(sys.calls()[[1]]) - 1
+        if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
+            x <- .expand.array(x)
+            if (n == 3)
+                x[i] <- value
+            else
+                if (missing(i) && missing(j)) x[i,j] <- value
+                else if (missing(i)) x[,j] <- value
+                else if (missing(j)) x[i,] <- value
+                else x[i,j] <- value
+            return (rowAgg(x))
+        }
+        
         if (n == 4) {
             if (missing(i) && missing(j))
                 .replacement(x, names(x), value)
@@ -367,7 +379,19 @@ setMethod (
     signature (x = "db.obj", value = "character"),
     function (x, i, j, value) {
         value <- paste("'", value, "'", sep = "")
-        n <- nargs()
+        n <- length(sys.calls()[[1]]) - 1
+        if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
+            x <- .expand.array(x)
+            if (n == 3)
+                x[i] <- value
+            else
+                if (missing(i) && missing(j)) x[i,j] <- value
+                else if (missing(i)) x[,j] <- value
+                else if (missing(j)) x[i,] <- value
+                else x[i,j] <- value
+            return (rowAgg(x))
+        }
+ 
         if (n == 4) {
             if (missing(i) && missing(j))
                 .replace.single(x, names(x), value, "text", "text")
@@ -394,11 +418,24 @@ setMethod (
     },
     valueClass = "db.Rquery")
 
+## ------------------------------------------------------------------------
+
 setMethod (
     "[<-",
     signature (x = "db.obj", value = "integer"),
     function (x, i, j, value) {
-        n <- nargs()
+        n <- length(sys.calls()[[1]]) - 1
+        if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
+            x <- .expand.array(x)
+            if (n == 3)
+                x[i] <- value
+            else
+                if (missing(i) && missing(j)) x[i,j] <- value
+                else if (missing(i)) x[,j] <- value
+                else if (missing(j)) x[i,] <- value
+                else x[i,j] <- value
+            return (rowAgg(x))
+        }
         if (n == 4) {
             if (missing(i) && missing(j))
                 .replace.single(x, names(x), value, "integer", "int4")
@@ -424,11 +461,24 @@ setMethod (
     },
     valueClass = "db.Rquery")
 
+## ------------------------------------------------------------------------
+
 setMethod (
     "[<-",
     signature (x = "db.obj", value = "numeric"),
     function (x, i, j, value) {
-        n <- nargs()
+        n <- length(sys.calls()[[1]]) - 1
+        if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
+            x <- .expand.array(x)
+            if (n == 3)
+                x[i] <- value
+            else
+                if (missing(i) && missing(j)) x[i,j] <- value
+                else if (missing(i)) x[,j] <- value
+                else if (missing(j)) x[i,] <- value
+                else x[i,j] <- value
+            return (rowAgg(x))
+        }
         if (n == 4) {
             if (missing(i) && missing(j)) {
                 .replace.single(x, names(x), value, "double precision",
@@ -458,11 +508,24 @@ setMethod (
     },
     valueClass = "db.Rquery")
 
+## ------------------------------------------------------------------------
+
 setMethod (
     "[<-",
     signature (x = "db.obj", value = "logical"),
     function (x, i, j, value) {
-        n <- nargs()
+        n <- length(sys.calls()[[1]]) - 1
+        if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
+            x <- .expand.array(x)
+            if (n == 3)
+                x[i] <- value
+            else
+                if (missing(i) && missing(j)) x[i,j] <- value
+                else if (missing(i)) x[,j] <- value
+                else if (missing(j)) x[i,] <- value
+                else x[i,j] <- value
+            return (rowAgg(x))
+        }
         if (n == 4) {
             if (missing(i) && missing(j))
                 .replace.single(x, names(x), value, "boolean", "bool")
