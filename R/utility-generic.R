@@ -281,7 +281,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", labels)
     dep.var <- gsub("`", "", dep.var)
     ind.var <- gsub("`", "", ind.var)
-    grp <- gsub("`", "", grp)
+    if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
     ##
     
