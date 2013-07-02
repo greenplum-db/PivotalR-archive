@@ -273,9 +273,9 @@ setMethod (
 setGeneric ("log")
 
 setMethod (
-    "colSums",
+    "log",
     signature(x = "db.obj"),
-    function (x, na.rm = FALSE, dims = 1, ...) {
+    function (x, ...) {
         .aggregate(x, "ln", FALSE, .num.types, TRUE,
                    x@.col.data_type, x@.col.udt_name)
     },
@@ -286,9 +286,9 @@ setMethod (
 setGeneric ("log10")
 
 setMethod (
-    "colSums",
+    "log10",
     signature(x = "db.obj"),
-    function (x, na.rm = FALSE, dims = 1, ...) {
+    function (x) {
         .aggregate(x, "log", FALSE, .num.types, TRUE,
                    x@.col.data_type, x@.col.udt_name)
     },
@@ -299,10 +299,62 @@ setMethod (
 setGeneric ("exp")
 
 setMethod (
-    "colSums",
+    "exp",
     signature(x = "db.obj"),
-    function (x, na.rm = FALSE, dims = 1, ...) {
+    function (x) {
         .aggregate(x, "exp", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("abs")
+
+setMethod (
+    "abs",
+    signature(x = "db.obj"),
+    function (x) {
+        .aggregate(x, "abs", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("factorial")
+
+setMethod (
+    "factorial",
+    signature(x = "db.obj"),
+    function (x) {
+        .aggregate(x, "factorial", FALSE, .int.types,
+                   TRUE, x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("sqrt")
+
+setMethod (
+    "sqrt",
+    signature(x = "db.obj"),
+    function (x) {
+        .aggregate(x, "sqrt", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("sign")
+
+setMethod (
+    "sign",
+    signature(x = "db.obj"),
+    function (x) {
+        .aggregate(x, "sign", FALSE, .num.types, TRUE,
                    x@.col.data_type, x@.col.udt_name)
     },
     valueClass = "db.Rquery")
