@@ -163,6 +163,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                               is.factor = NA, cols = NA, suffix = NA)
 {    
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
+    f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
@@ -359,16 +360,71 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 .is.array <- function (labels, data)
 {
     nlabels <- character(0)
+    data <- data[,]
+    if (data@.parent == data@.source)
+        tbl <- data@.parent
+    else
+        tbl <- paste("(", data@.parent, ") s", sep = "")
+    if (data@.where != "") where.str <- paste(" where", data@.where)
+    else where.str <- ""
+    conn.id <- conn.id(data)
+    
     for (i in seq_len(length(labels))) {
-        if (labels[i] %in% names(data) && data@.col.data_type == "array") {
-            n <- .db.getQuery(paste("select array_upper(", labels[i], ",1) from ",
-                              content(data), " limit 1", sep = ""), conn.id(data))[[1]]
-            nlabels <- c(nlabels, paste(labels[i], "[", seq_len(n), "]", sep = ""))
+        if (labels[i] %in% names(data) &&
+            data@.col.data_type[i] == "array") {
+            n <- .db.getQuery(paste("select array_upper(\"", labels[i],
+                                    "\",1) from ",
+                                    tbl, where.str, " limit 1", sep = ""),
+                              conn.id)[[1]]
+            n0 <- .db.getQuery(paste("select array_lower(\"", labels[i],
+                                    "\",1) from ",
+                                    tbl, where.str, " limit 1", sep = ""),
+                              conn.id)[[1]]
+            nlabels <- c(nlabels, paste(labels[i], "[",
+                                        seq_len(n-n0+1) -1 + n0,
+                                        "]", sep = ""))
         } else {
             nlabels <- c(nlabels, labels[i])
         }
     }
     nlabels
+}
+
+## ------------------------------------------------------------------------
+
+## replace array in the formula
+.replace.array <- function (fstr, data)
+{
+    data <- data[,]
+    if (data@.parent == data@.source)
+        tbl <- data@.parent
+    else
+        tbl <- paste("(", data@.parent, ") s", sep = "")
+    if (data@.where != "") where.str <- paste(" where", data@.where)
+    else where.str <- ""
+    conn.id <- conn.id(data)
+    
+    for (i in seq_len(length(data@.col.name))) {
+        if (data@.col.data_type[i] == "array") {
+            n <- .db.getQuery(paste("select array_upper(\"",
+                                    data@.col.name[i], "\",1) from ",
+                                    tbl, where.str, " limit 1", sep = ""),
+                              conn.id)[[1]]
+            n0 <- .db.getQuery(paste("select array_lower(\"",
+                                     data@.col.name[i],
+                                     "\",1) from ",
+                                     tbl, where.str, " limit 1", sep = ""),
+                              conn.id)[[1]]
+            l <- n - n0 + 1
+            s <- paste("`", data@.col.name[i], "[", seq_len(l) - 1 + n0,
+                       "]`",
+                       sep = "", collapse = " + ")
+            fstr <- gsub(paste(data@.col.name[i], "\\s*([^\\[]|$)",
+                               sep = ""),
+                         paste("(", s, ")\\1", sep = ""), fstr)
+        }
+    }
+    fstr
 }
 
 ## ------------------------------------------------------------------------
