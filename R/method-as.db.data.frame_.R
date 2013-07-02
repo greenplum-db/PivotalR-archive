@@ -12,17 +12,25 @@ setGeneric (
             if (is.data.frame(x)) {
                 cat("\nThe data in the data.frame", x.str,
                     "is stored into the table", table.name, "in database",
-                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n")
             } else if (is.character(x)) {
                 cat("\nThe data in the file", x.str,
                     "is stored into the table", table.name, "in database",
-                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
-            } else {
-                cat("\nThe data created by ", x.str,
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n")
+            } else if (is(x, "db.Rquery")) {
+                cat("\nThe data created by", x.str,
                     "is stored into the table", table.name, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+            } else {
+                cat("\nThe data contained in table", content(x),
+                    "which is wrapped by", x.str,
+                    "is copied into the table", table.name, "in database",
+                    dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
+                cat("An R object pointing to", table.name,
+                    "in connection", conn.id(x), "is created !\n")
             }
         }
+
         return (res$res)
     },
     signature = "x")
@@ -54,6 +62,10 @@ setMethod (
     x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
+        f <- paste0(getwd(), "/", x)
+        if (file.exists(f)) x <- f
+        else if (!file.exists(x))
+            stop("the file does not exist!")
         .method.as.db.data.frame.1(x,
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
@@ -89,6 +101,10 @@ setMethod (
     if ((!is.temp && .db.existsTable(table, conn.id)) ||
         (is.temp && .db.existsTempTable(table, conn.id)[[1]]))
         stop("Table already exists!")
+
+    msg.level <- .set.msg.level("panic", conn.id)
+    warn.r <- getOption("warn")
+    options(warn = -1)
     
     .db.writeTable(table, x, add.row.names = add.row.names,
                    distributed.by = distributed.by,
@@ -103,9 +119,8 @@ setMethod (
                            " add primary key (\"",
                            key, "\")", sep = ""), conn.id)
 
-    ## cat("\nAn R object pointing to", table.name,
-    ##     "in database", dbname(conn.id), "on", host(conn.id),
-    ##     "is created !\n\n")
+    msg.level <- .set.msg.level(msg.level, conn.id) 
+    options(warn = warn.r) # reset R warning level
     
     list(res = db.data.frame(x = table.name, conn.id = conn.id, key = key,
          verbose = verbose, is.temp = is.temp),
@@ -130,6 +145,10 @@ setMethod (
         exists <- db.existsObject(table.name, conn.id, is.temp)
         if (is.temp) exists <- exists[[1]]
         if (exists) stop("The table already exists in connection ", conn.id, "!")
+
+        msg.level <- .set.msg.level("panic", conn.id(x))
+        warn.r <- getOption("warn")
+        options(warn = -1)
         
         if (is.temp) 
             temp.str <- "temp"
@@ -213,7 +232,10 @@ setMethod (
                             "\" as (", content.str, nrow.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
-        ## print(create.str)
+
+        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
+        options(warn = warn.r) # reset R warning level
+
         res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)
         res@.is.factor <- is.factor
@@ -222,4 +244,21 @@ setMethod (
         res@.dummy <- dummy
         res@.dummy.expr <- dummy.expr
         list(res = res, conn.id = conn.id)
+    })
+
+## ------------------------------------------------------------------------
+
+## Make a copy of a table/view
+
+setMethod (
+    "as.db.data.frame",
+    signature (x = "db.data.frame"),
+    def = function (x, table.name, verbose = TRUE,
+    is.view = FALSE, is.temp = FALSE,
+    distributed.by = NULL, nrow = NULL) {
+        if (table.name == content(x))
+            stop("cannot copy an object into itself!")
+        list(res = as.db.data.frame(x[,], table.name, FALSE,
+             is.view, is.temp, FALSE, distributed.by, nrow),
+             conn.id = conn.id(x))
     })

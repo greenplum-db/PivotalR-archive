@@ -5,7 +5,13 @@
 
 setGeneric (
     "delete",
-    def = function (x, ...) standardGeneric("delete"),
+    def = function (x, ...) {
+        res <- standardGeneric("delete")
+        if (res && !is.character(x)) {
+            rm(list = deparse(substitute(x)), pos = 1)
+        }
+        res
+    },
     signature = "x")
 
 ## ------------------------------------------------------------------------
@@ -17,11 +23,7 @@ setMethod (
         ## .db.removeTable(content(x), conn.id(x))
         s <- delete(content(x), conn.id(x), x@.table.type == "LOCAL TEMPORARY",
                     cascade)
-        if (s) {
-            rm(x)
-            return (TRUE)
-        } else
-            return (FALSE)
+        s
     })
 
 ## ------------------------------------------------------------------------
@@ -30,7 +32,7 @@ setMethod (
     "delete",
     signature (x = "db.Rquery"),
     def = function (x) {
-        rm(x)
+        TRUE
     })
 
 ## ------------------------------------------------------------------------
@@ -55,7 +57,7 @@ setMethod (
                 options(warn = warn.r) # reset R warning level
                 return (FALSE)
             } else {
-                x <- strsplit(x, "\\.")[[1]]
+                if (length(x) == 1) x <- strsplit(x, "\\.")[[1]]
                 if (length(x) != 2) {
                     schemas <- arraydb.to.arrayr(
                         .db.getQuery("select current_schemas(True)", conn.id),

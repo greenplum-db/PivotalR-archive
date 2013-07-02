@@ -9,45 +9,26 @@ is.db.data.frame <- function (x)
 }
 
 ## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-## Sampling function
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
 
-setGeneric ("sample")
+## cut the data into k pieces
+## mainly used for cross-validation
+.cut.data <- function (x, k)
+{
+    ## randomize the data when creating serial index
+    y <- .create.inter.table(x, TRUE)
+    n <- dim(y)[1]
 
-setMethod(
-    "sample",
-    signature(x = "db.table"),
-    function (x, size, replace = FALSE, prob = NULL) {
-        if (!identical(x@.key, character(0))) # has a valid key
-        {
+    if (n < k) stop("data dimension is even smaller than k!")
 
-        }
-        cat("To be implemented !\n")
-        return (0)
-    })
+    id <- y@.dim[2]
+    size <- n %/% k
+    tick <- c(0, seq(size, length.out = k-1, by = size), n)
+    valid <- list()
+    train <- list()
+    for (i in 1:k) {
+        valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
+        train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
+    }
 
-## ------------------------------------------------------------------------
-
-setMethod(
-    "sample",
-    signature(x = "db.view"),
-    function (x, size, replace = FALSE, prob = NULL) {
-        cat("To be implemented !\n")
-        return (0)
-    })
-
-## ------------------------------------------------------------------------
-
-setMethod(
-    "sample",
-    signature(x = "db.Rquery"),
-    function (x, size, replace = FALSE, prob = NULL) {
-        cat("To be implemented !\n")
-        return (0)
-    })
-
-## ------------------------------------------------------------------------
-
-
+    list(train = train, valid = valid, inter = y)
+}

@@ -18,7 +18,7 @@ db.objects(search = NULL, conn.id = 1)
 \arguments{
   \item{search}{
     A string, default is \code{NULL}. List all database objects whose
-  names have the string in them.
+  names have the string in them. You can put regular expression here.
   }
   
   \item{conn.id}{
@@ -27,8 +27,8 @@ db.objects(search = NULL, conn.id = 1)
 }
 
 \value{
-  A character \code{data.frame}. It has two columns. The first column is
-  the schema name, and the second column is the names of the tables/views.
+  A character array. Each element has the format of
+  'schema_name.table_name'. 
 }
 
 \author{

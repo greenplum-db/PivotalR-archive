@@ -255,6 +255,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         if (!all(col %in% names(data)))
             stop("You can only make a existing column of",
                  " the data into factor!")
+
+        ## make sure the returned object is always db.Rquery
+        for (i in seq_len(length(data@.col.name)))
+            if (data@.is.factor[i]) data[[i]] <- as.factor(data[[i]])
+
+        ## factors added by formula
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
     }
 

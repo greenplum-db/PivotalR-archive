@@ -160,7 +160,7 @@ db.list <- function ()
 db.objects <- function (search = NULL, conn.id = 1)
 {
     res <- .db.getQuery("select table_schema, table_name from information_schema.tables")
-    if (is.null(search)) return (res)
+    if (is.null(search)) return (paste(res[,1], res[,2], sep = "."))
     search <- gsub("\\.", "\\\\.", search)
     final.res <- character(0)
     for (i in seq_len(dim(res)[1])) {
@@ -169,7 +169,10 @@ db.objects <- function (search = NULL, conn.id = 1)
         if (find != name)
             final.res <- rbind(final.res, res[i,])
     }
-    final.res
+    if (!identical(final.res, character(0)))
+        paste(final.res[,1], final.res[,2], sep = ".")
+    else
+        NULL
 }
 
 ## ------------------------------------------------------------------------
@@ -177,14 +180,16 @@ db.objects <- function (search = NULL, conn.id = 1)
 ## does an object exist?
 db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
 {
-    name <- strsplit(name, "\\.")[[1]]
+    if (length(name) == 1) name <- strsplit(name, "\\.")[[1]]
     if (length(name) != 1 && length(name) != 2)
         stop("The formation of object name is wrong!")
     if (length(name) == 2) {
         schema <- name[1]
         table <- name[2]
         ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
-                                 table, "' and table_schema = '", schema, "'", sep = ""), conn.id)
+                                 .strip(table, "\""),
+                                 "' and table_schema = '",
+                                 .strip(schema, "\""), "'", sep = ""), conn.id)
         if (ct == 0)
             FALSE
         else
