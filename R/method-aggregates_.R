@@ -270,6 +270,45 @@ setMethod (
 
 ## ------------------------------------------------------------------------
 
+setGeneric ("log")
+
+setMethod (
+    "colSums",
+    signature(x = "db.obj"),
+    function (x, na.rm = FALSE, dims = 1, ...) {
+        .aggregate(x, "ln", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("log10")
+
+setMethod (
+    "colSums",
+    signature(x = "db.obj"),
+    function (x, na.rm = FALSE, dims = 1, ...) {
+        .aggregate(x, "log", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
+setGeneric ("exp")
+
+setMethod (
+    "colSums",
+    signature(x = "db.obj"),
+    function (x, na.rm = FALSE, dims = 1, ...) {
+        .aggregate(x, "exp", FALSE, .num.types, TRUE,
+                   x@.col.data_type, x@.col.udt_name)
+    },
+    valueClass = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
 ## array_agg each column
 colAgg <- function (x)
 {
