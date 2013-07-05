@@ -8,7 +8,7 @@ export ("conn.pkg", "host", "dbname", "user", "dbms",
 export ("db.data.frame", "as.db.data.frame")
 
 exportClasses ("db.obj", "db.Rquery", "db.data.frame",
-               "db.table", "db.view")
+               "db.table", "db.view", "db.Rcrossprod")
 
 exportMethods ("dim", "names", "names<-")
 
@@ -54,8 +54,11 @@ export("db.objects", "db.existsObject")
 
 exportMethods("mean", "sum", "length", "max", "min")
 export("sd", "var")
-exportMethods("colMeans", "colSums", "cagg")
 
 exportMethods("sample")
 
 export("generic.cv", "generic.bagging", "predict.bagging.model")
+exportMethods("colMeans", "colSums")
+export("colAgg", "rowAgg")
+export("crossprod", "unique")
+export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")

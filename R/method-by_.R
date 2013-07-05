@@ -54,21 +54,14 @@ setMethod (
             where.str <- ""
             where <- ""
             src <- parent
-
-            
         }
 
-        expr <- rep("", length(names(data)))
-        col.name <- rep("", length(names(data)))
-        col.data_type <- rep("", length(names(data)))
-        col.udt_name <- rep("", length(names(data)))
-        for (i in seq_len(length(names(data)))) {
-            tmp <- FUN(data[[names(data)[i]]])
-            expr[i] <- tmp@.expr
-            col.name[i] <- tmp@.col.name
-            col.data_type <- tmp@.col.data_type
-            col.udt_name <- tmp@.col.udt_name
-        }
+        tmp <- FUN(data)
+
+        expr <- tmp@.expr
+        col.name <- tmp@.col.name
+        col.data_type <- tmp@.col.data_type
+        col.udt_name <- tmp@.col.udt_name
 
         expr <- c(grp.expr, expr)
         col.name <- c(grp.col.name, col.name)

@@ -113,6 +113,13 @@ setClass("db.Rquery",
 
 ## ------------------------------------------------------------------------
 
+## matrix representation
+setClass("db.Rcrossprod",
+         representation(.dim = "numeric"),
+         contains = "db.Rquery")
+
+## ------------------------------------------------------------------------
+
 ## Abstract interface, which is the parent of both classes
 ## defined in the above.
 ## Many functions in this package should operate on both classes.

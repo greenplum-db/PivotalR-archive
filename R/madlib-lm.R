@@ -16,7 +16,7 @@ madlib.lm <- function (formula, data, na.action,
     
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
-
+    
     ## suppress all messages
     msg.level <- .set.msg.level("panic", conn.id(data)) 
     ## disable warning in R, RPostgreSQL

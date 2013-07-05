@@ -60,23 +60,8 @@ setMethod (
                       prefix = "", res.type = "boolean",
                       cast = "::double precision")
 {
-    if (is(e1, "db.data.frame")) e1 <- e1[,]    
-    expr <- rep("", length(names(e1)))
-    col.data_type <- rep("", length(names(e1)))
-    col.udt_name <- rep("", length(names(e1)))
-    col.name <- rep("", length(names(e1)))
-    for (i in seq_len(length(names(e1)))) {
-        if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
-            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
-                             cmp, e2, sep = "")
-        } else {
-            expr[i] <- "NULL"
-        }
-        col.data_type[i] <- res.type
-        col.udt_name[i] <- res.type
-        col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
-    }
-    
+    if (is(e1, "db.data.frame")) e1 <- e1[,]
+
     if (is(e1, "db.data.frame"))
         tbl <- content(e1)
     else {
@@ -91,6 +76,30 @@ setMethod (
 
     sort <- .generate.sort(e1)
     
+    expr <- rep("", length(names(e1)))
+    col.data_type <- rep("", length(names(e1)))
+    col.udt_name <- rep("", length(names(e1)))
+    col.name <- rep("", length(names(e1)))
+    for (i in seq_len(length(names(e1)))) {
+        col.data_type[i] <- res.type
+        col.udt_name[i] <- res.type
+        col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
+        if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
+            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
+                             cmp, e2, sep = "")
+        } else if (e1@.col.data_type[i] == "array") {
+            tmp <- .get.array.elements(e1@.expr[i], tbl, where.str,
+                                       conn.id(e1))
+            expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
+                             cmp, e2, sep = "", collapse = ", "), "]",
+                             sep = "")
+            col.data_type[i] <- "array"
+            col.udt_name[i] <- paste("_", res.type)
+        } else {
+            expr[i] <- "NULL"
+        }
+    }
+   
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
@@ -566,6 +575,23 @@ setMethod (
     if (is(e1, "db.data.frame")) e1 <- e1[,]
     if (is(e2, "db.data.frame")) e2 <- e2[,]
 
+    if (! conn.eql(conn.id(e1), conn.id(e2)))
+        stop("The two objects are not in the same database!")
+    if (!.eql.parent(e1, e2))
+        stop("x and y cannot match because they originate",
+             " from different sources!")
+    conn.id <- conn.id(e1)
+
+    if (e1@.source == e1@.parent)
+        tbl <- e1@.source
+    else
+        tbl <- paste("(", e1@.parent, ")", sep = "")
+
+    if (e1@.where != "") where.str <- paste(" where", e1@.where)
+    else where.str <- ""
+
+    sort <- .generate.sort(e1)
+
     l1 <- length(names(e1))
     l2 <- length(names(e2))
     if (l1 > l2)
@@ -585,6 +611,40 @@ setMethod (
         i1 <- (i-1) %% l1 + 1
         i2 <- (i-1) %% l2 + 1
         v <- 0
+        if (e1@.col.data_type[i1] == "array") {
+            tmp1 <- .get.array.elements(e1@.expr[i1], tbl, where.str,
+                                        conn.id)
+            if (e2@.col.data_type[i2] == "array") {
+                tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
+                                        conn.id)
+                if (length(tmp2) != length(tmp1) && length(tmp2) != 1)
+                    stop("Two arrays have to have the same length or one of them has length of 1!")
+                expr[i] <- paste("array[", paste("(", tmp1, ")",
+                                                 cast, op, "(",
+                                                 tmp2, ")", sep = "",
+                                                 collapse = ", "),
+                                 "]", sep = "")
+            } else {
+                expr[i] <- paste("array[", paste("(", tmp1, ")",
+                                                 cast, op, "(",
+                                                 e2@.expr[i2], ")",
+                                                 sep = "",
+                                                 collapse = ", "),
+                                 "]", sep = "")
+            }
+            break
+        } else if (e2@.col.data_type[i2] == "array") {
+            tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
+                                        conn.id)
+            expr[i] <- paste("array[", paste("(", e1@.expr[i1], ")",
+                                             cast, op, "(",
+                                             tmp2, ")",
+                                             sep = "",
+                                             collapse = ", "),
+                             "]", sep = "")
+            break
+        }
+        
         for (k in seq_len(length(data.types)))
             if (e1@.col.data_type[i1] %in% data.types[[k]]) {
                 v <- k
@@ -601,16 +661,6 @@ setMethod (
         col.name[i] <- paste(names(e1)[i1], "_", names(e2)[i2],
                              "_opr", sep = "")
     }
-    
-    if (e1@.source == e1@.parent)
-        tbl <- e1@.source
-    else
-        tbl <- paste("(", e1@.parent, ")", sep = "")
-
-    if (e1@.where != "") where.str <- paste(" where", e1@.where)
-    else where.str <- ""
-
-    sort <- .generate.sort(e1)
     
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
