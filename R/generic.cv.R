@@ -11,7 +11,8 @@ generic.cv <- function (train, predict, metric, data,
     if (!is.null(params) && (!is.list(params) || is.data.frame(params)))
         stop("params must be a list!")
 
-    msg.level <- .set.msg.level("panic", conn.id(x))
+    conn.id <- conn.id(data)
+    msg.level <- .set.msg.level("panic", conn.id)
     warn.r <- getOption("warn")
     options(warn = -1)
     
@@ -40,7 +41,7 @@ generic.cv <- function (train, predict, metric, data,
         }
         delete(content(cuts$inter), conn.id, TRUE)
 
-        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
+        msg.level <- .set.msg.level(msg.level, conn.id) 
         options(warn = warn.r) # reset R warning level
         
         data.frame(err = mean(err), err.std = sd(err))
@@ -78,7 +79,7 @@ generic.cv <- function (train, predict, metric, data,
         }
         delete(cuts$inter)
 
-        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
+        msg.level <- .set.msg.level(msg.level, conn.id) 
         options(warn = warn.r) # reset R warning level
         
         cbind(args,
