@@ -26,7 +26,7 @@ setGeneric (
 setMethod (
     "preview",
     signature (x = "db.table"),
-    def = function (x, nrows = 100, array = FALSE) {
+    def = function (x, nrows = 100, array = TRUE) {
         warn.r <- getOption("warn")
         options(warn = -1)
         if (array) {
@@ -47,7 +47,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.view"),
-    def = function (x, nrows = 100, interactive = FALSE, array = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
         warn.r <- getOption("warn")
         options(warn = -1)
         if (interactive) {
@@ -78,7 +78,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rquery"),
-    def = function (x, nrows = 100, interactive = FALSE, array = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
         msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -153,7 +153,7 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 ## same as preview
-lookat <- function (x, nrows = 100, array = FALSE)
+lookat <- function (x, nrows = 100, array = TRUE)
 {
     
     if (is(x, "db.table")) return (preview(x, nrows, array = array))
