@@ -17,15 +17,17 @@
 }
 
 \usage{
-\S4method{preview}{db.table}(x, nrows = 100)
+\S4method{preview}{db.table}(x, nrows = 100, array = TRUE)
 
-\S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE)
+\S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE,
+array = TRUE)
 
-\S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE)
+\S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE,
+array = TRUE)
 
 \S4method{preview}{db.Rcrossprod}(x, interactive = FALSE)
 
-lookat(x, nrows = 100)
+lookat(x, nrows = 100, array = TRUE)
 }
 
 \arguments{
@@ -45,11 +47,18 @@ lookat(x, nrows = 100)
   very large.
   }
   \item{interactive}{
-    A boolean, default is FALSE. If \code{x} is a view, then extracting
-  data from it would actually compute the view, which might take a
-  longer time, especially for large data sets. When \code{interactive}
-  is TRUE, this function will ask the user whether to continue to
-  extract data from the view. 
+    A boolean, default is \code{FALSE}. If \code{x} is a view, then
+  extracting 
+    data from it would actually compute the view, which might take a
+    longer time, especially for large data sets. When \code{interactive}
+    is TRUE, this function will ask the user whether to continue to
+    extract data from the view. 
+  }
+  \item{array}{
+    A boolean, default is \code{TRUE}. This decides how to parse columns
+  that have array as their elements. When it is \code{TRUE}, each
+  element in the array is extracted and put into a new
+  column. Otherwise, the array is read in as a string.
   }
 }
 

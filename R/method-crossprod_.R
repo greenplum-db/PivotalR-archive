@@ -9,7 +9,7 @@ setGeneric ("crossprod")
 setMethod (
     "crossprod",
     signature(x = "db.obj"),
-    function (x, y = NULL) {
+    function (x, y = x) {
         if (is.null(y)) y <- x
         if (is(x, "db.Rcrossprod") || is(y, "db.Rcrossprod"))
             stop("Right now, db.Rcrossprod object is not supported!")
