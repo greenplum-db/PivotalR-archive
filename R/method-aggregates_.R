@@ -20,6 +20,19 @@
                         data.type = "double precision",
                         udt.name = "float8", inside = "")
 {
+    if (vector && length(names(x)) != 1)
+        stop(func, " only works on a single column!")
+
+    if (vector == FALSE) {
+        if (length(data.type) == 1)
+            data.type <- rep(data.type, length(names(x)))
+        if (length(udt.name) == 1)
+            udt.name <- rep(udt.name, length(names(x)))
+        if (length(data.type) != length(names(x)) ||
+            length(udt.name) != length(names(x)))
+            stop("data.type or udt_name does not match column names!")
+    }
+    
     l <- length(names(x))
     col.name <- paste(names(x), "_", func, sep = "")
     if ((x[[1]])@.col.data_type != "array")
@@ -48,19 +61,6 @@
                             data.type = "double precision",
                             udt.name = "float8", inside = "")
 {
-    if (vector && length(names(x)) != 1)
-        stop(func, " only works on a single column!")
-
-    if (vector == FALSE) {
-        if (length(data.type) == 1)
-            data.type <- rep(data.type, length(names(x)))
-        if (length(udt.name) == 1)
-            udt.name <- rep(udt.name, length(names(x)))
-        if (length(data.type) != length(names(x)) ||
-            length(udt.name) != length(names(x)))
-            stop("data.type or udt_name does not match column names!")
-    }
-
     cast.bool <- rep("", length(names(x)))
     prebra <- ""
     apbra <- ""
