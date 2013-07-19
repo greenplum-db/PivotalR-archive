@@ -160,7 +160,12 @@ db.list <- function ()
 db.objects <- function (search = NULL, conn.id = 1)
 {
     res <- .db.getQuery("select table_schema, table_name from information_schema.tables")
-    if (is.null(search)) return (paste(res[,1], res[,2], sep = "."))
+
+    if (is.null(search)) {
+        res <- paste(res[,1], res[,2], sep = ".")
+        return (res[order(res)])
+    }
+    
     search <- gsub("\\.", "\\\\.", search)
     final.res <- character(0)
     for (i in seq_len(dim(res)[1])) {
@@ -169,9 +174,10 @@ db.objects <- function (search = NULL, conn.id = 1)
         if (find != name)
             final.res <- rbind(final.res, res[i,])
     }
-    if (!identical(final.res, character(0)))
-        paste(final.res[,1], final.res[,2], sep = ".")
-    else
+    if (!identical(final.res, character(0))) {
+        res <- paste(final.res[,1], final.res[,2], sep = ".")
+        return (res[order(res)])
+    } else
         NULL
 }
 
