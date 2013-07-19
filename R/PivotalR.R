@@ -12,6 +12,8 @@ PivotalR <- function ()
                       " could connect to databases.\n\n", sep = ""))
         install.packages(pkgs = "shiny")
     }
+
+    library(shiny)
     
     ## PivotalR's installation path
     .localVars$pkg.path <- path.package(.this.pkg.name)
