@@ -46,10 +46,12 @@ shinyServer(function(input, output, session) {
 
     observe({
         id <- input$connection
-        db.objs <- db.objects(conn.id = as.integer(id))
-        updateSelectInput(session, "table", label = "Table",
-                          choices = c("", db.objs),
-                          selected = "")
+        if (!is.null(id)) {
+            db.objs <- db.objects(conn.id = as.integer(id))
+            updateSelectInput(session, "table", label = "Table",
+                              choices = c("", db.objs),
+                              selected = "")
+        }
     })
 
     output$con.info <- renderTable({
