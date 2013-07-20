@@ -5,6 +5,7 @@
 
 PivotalR <- function ()
 {
+    
     if (!("shiny" %in% .localVars$installed.pkgs)) {
         message(paste("Package shiny",
                       " is going to be installed so that ",

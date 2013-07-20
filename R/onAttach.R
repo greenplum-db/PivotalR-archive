@@ -29,4 +29,9 @@
     .localVars$conn.type <- list()
     for (i in seq(along=.supported.connections))
         .localVars$conn.type[[tolower(.supported.connections[i])]] <- integer(0)
+
+    ## available packages, to check whether RODBC and RPostgreSQL are
+    ## already installed
+    .localVars$installed.pkgs <- tolower(attr(installed.packages(),
+                                              "dimnames")[[1]])
 }
