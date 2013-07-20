@@ -24,7 +24,7 @@
 ## -----------------------------------------------------------------------
 
 ## Define server logic required to plot various variables against mpg
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     ## Return the requested dataset
     conInput <- reactive({
         as.integer(input$connection)
@@ -34,20 +34,33 @@ shinyServer(function(input, output) {
         input$table
     })
 
+    db.obj.list <- reactive({
+        db.objects(conn.id = conInput())
+    })
+
+   
     output$conn.controls <- renderUI({
-        selectInput("connection", "Connection:",
+        selectInput("connection", "Connection",
                     choices = .get.connection.list())
     })
 
-    output$table.controls <- renderUI({
-        selectInput("table", "Table:",
-                    choices = c("", db.objects(conn.id = conInput())),
-                    selected = "")
+    observe({
+        id <- input$connection
+        db.objs <- db.objects(conn.id = as.integer(id))
+        updateSelectInput(session, "table", label = "Table",
+                          choices = c("", db.objs),
+                          selected = "")
     })
 
     output$con.info <- renderTable({
        conn.id <- conInput()
        .get.connection.info(conn.id)
+    })
+
+    output$tblSelected <- reactive({
+        tbl <- tblInput()
+        if (!is.null(tbl) && tbl != "") 1
+        else 0
     })
 
     output$tbl.info <- renderTable({

@@ -10,7 +10,14 @@ shinyUI(pageWithSidebar(
     sidebarPanel(
         uiOutput("conn.controls"),
 
-        uiOutput("table.controls")
+        selectInput("table", "Table", choices = "", selected = "")
+
+        ## conditionalPanel(
+        ##     condition = "output.tblSelected",
+        ##     selectInput("model", "Model",
+        ##                 choices = c("", "Linear Regression",
+        ##                 "Logistic Regression"), selected = "")
+        ##     )
         ),
     
     ## Show the caption and plot of the requested variable against mpg
