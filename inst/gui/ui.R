@@ -15,6 +15,8 @@ shinyUI(pageWithSidebar(
     
     ## Show the caption and plot of the requested variable against mpg
     mainPanel(
-        verbatimTextOutput("con.info")
+        tableOutput("con.info"),
+
+        tableOutput("tbl.info")
         )
     ))

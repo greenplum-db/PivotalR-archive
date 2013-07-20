@@ -5,6 +5,22 @@
     as.character(id)
 }
 
+## ------------------------------------------------------------------------
+
+.get.connection.info <- function (conn.id)
+{
+    if (identical(conn.id, integer(0)))
+        data.frame(Host = "", User = "", Database = "", DBMS = "")
+    else {
+        idx <- PivotalR:::.localVars$conn.id[PivotalR:::.localVars$conn.id[,1] == conn.id, 2]
+        db <- PivotalR:::.get.dbms.str(conn.id)
+        data.frame(Host = PivotalR:::.localVars$db[[idx]]$host,
+                   User = PivotalR:::.localVars$db[[idx]]$user,
+                   Database = PivotalR:::.localVars$db[[idx]]$dbname,
+                   DBMS = paste(db$db.str, db$version.str))
+    }
+}
+
 ## -----------------------------------------------------------------------
 
 ## Define server logic required to plot various variables against mpg
@@ -14,20 +30,37 @@ shinyServer(function(input, output) {
         as.integer(input$connection)
     })
 
+    tblInput <- reactive({
+        input$table
+    })
+
     output$conn.controls <- renderUI({
         selectInput("connection", "Connection:",
                     choices = .get.connection.list())
     })
 
     output$table.controls <- renderUI({
-        selectInput("tables", "Tables:",
+        selectInput("table", "Table:",
                     choices = c("", db.objects(conn.id = conInput())),
                     selected = "")
     })
 
-    output$con.info <- renderPrint({
+    output$con.info <- renderTable({
        conn.id <- conInput()
-       conn.id
+       .get.connection.info(conn.id)
+    })
+
+    output$tbl.info <- renderTable({
+        conn.id <- conInput()
+        tbl <- tblInput()
+        if (is.null(tbl) || tbl == "") {
+            data.frame()
+        } else {
+            x <- db.data.frame(tbl, conn.id = conn.id, verbose = FALSE)
+            res <- madlib.summary(x)
+            class(res) <- "data.frame"
+            res
+        }
     })
 })
 
