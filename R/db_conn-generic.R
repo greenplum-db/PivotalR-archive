@@ -15,12 +15,7 @@
 db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = user,
                         password = "", port = 5432,
                         madlib = "madlib", conn.pkg = "RPostgreSQL")
-{
-    ## available packages, to check whether RODBC and RPostgreSQL are
-    ## already installed
-    .localVars$installed.pkgs <- tolower(attr(installed.packages(),
-                                              "dimnames")[[1]])
-    
+{    
     ## argument type check
     if (!.is.arg.string(host) ||
         !.is.arg.string(user) ||
@@ -36,13 +31,15 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         i <- which(tolower(.supported.connections) == conn.pkg.name)
         pkg.to.load <- .supported.connections[i]
         ## if the package is not installed, install it
-        if (!(conn.pkg.name %in% .localVars$installed.pkgs)) 
+        if (!(conn.pkg.name %in% .get.installed.pkgs())) 
         {
             message(paste("Package ", pkg.to.load,
                         " is going to be installed so that ",
                         .this.pkg.name,
                         " could connect to databases.\n\n", sep = ""))
             install.packages(pkgs = pkg.to.load)
+            if (!(conn.pkg.name %in% .get.installed.pkgs()))
+                stop("The package could not be installed!")
         }
 
         eval(parse(text = paste("library(", pkg.to.load, ")", sep = "")))

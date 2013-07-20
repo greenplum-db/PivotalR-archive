@@ -1,5 +1,13 @@
 ## Execute on attach
 
+## available packages, to check whether RODBC and RPostgreSQL are
+## already installed
+.get.installed.pkgs <- function () {
+    tolower(attr(installed.packages(), "dimnames")[[1]])
+}
+
+## ------------------------------------------------------------------------
+
 ## define local variables
 
 .onAttach <- function(libname, pkgname)
