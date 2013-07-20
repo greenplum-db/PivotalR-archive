@@ -15,7 +15,7 @@ shinyUI(pageWithSidebar(
         ## selectInput("table", "Table", choices = "", selected = ""),
 
         conditionalPanel(
-            condition = "output.tblSelected == '1'",
+            condition = "input.table != ''",
             selectInput("model", "Model",
                         choices = c("", "Linear Regression",
                         "Logistic Regression"), selected = "")

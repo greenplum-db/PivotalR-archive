@@ -39,13 +39,6 @@ shinyServer(function(input, output, session) {
             db.objects(conn.id = id)
     })
 
-    output$tblSelected <- reactive({
-        tbl <- input$table
-        print(tbl)
-        if (!is.null(tbl) && tbl != "") 1
-        else 0
-    })
-
     ## ------------------------------------------------
     
     output$conn.controls <- renderUI({
