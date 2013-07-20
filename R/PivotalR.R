@@ -25,7 +25,7 @@ PivotalR <- function ()
 
     message("\nWelcome to PivotalR GUI. It is free ...\n")
     message("Press Ctrl + c to stop.")
-    runApp(gui.dir)
+    shiny::runApp(gui.dir)
 }
 
 ## ------------------------------------------------------------------------

@@ -30,44 +30,55 @@ shinyServer(function(input, output, session) {
         as.integer(input$connection)
     })
 
-    tblInput <- reactive({
-        input$table
-    })
-
     db.obj.list <- reactive({
-        db.objects(conn.id = conInput())
+        id <- conInput()
+        if (identical(id, integer(0)) ||
+            !PivotalR:::.is.conn.id.valid(id))
+            ""
+        else
+            db.objects(conn.id = id)
     })
 
-   
+    ## ------------------------------------------------
+    
     output$conn.controls <- renderUI({
         selectInput("connection", "Connection",
                     choices = .get.connection.list())
     })
 
-    observe({
-        id <- input$connection
-        if (!is.null(id)) {
-            db.objs <- db.objects(conn.id = as.integer(id))
-            updateSelectInput(session, "table", label = "Table",
-                              choices = c("", db.objs),
-                              selected = "")
-        }
+    ## observe({
+    ##     id <- input$connection
+    ##     if (!is.null(id)) {
+    ##         db.objs <- db.objects(conn.id = as.integer(id))
+    ##         updateSelectInput(session, "table", label = "Table",
+    ##                           choices = c("", db.objs),
+    ##                           selected = "")
+    ##     }
+    ## })
+
+    output$tblSelected <- reactive({
+        tbl <- input$table
+        print()
+        if (!is.null(tbl) && tbl != "") 1
+        else 0
     })
 
+    output$tbl.controls <- renderUI({
+        selectInput("table", "Table",
+                    choices = c("", db.obj.list()),
+                    selected = "")
+    })
+
+    ## ------------------------------------------------
+    
     output$con.info <- renderTable({
        conn.id <- conInput()
        .get.connection.info(conn.id)
     })
 
-    output$tblSelected <- reactive({
-        tbl <- tblInput()
-        if (!is.null(tbl) && tbl != "") 1
-        else 0
-    })
-
     output$tbl.info <- renderTable({
         conn.id <- conInput()
-        tbl <- tblInput()
+        tbl <- input$table
         if (is.null(tbl) || tbl == "") {
             data.frame()
         } else {
