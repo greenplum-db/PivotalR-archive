@@ -6,12 +6,14 @@
 PivotalR <- function ()
 {
     
-    if (!("shiny" %in% .localVars$installed.pkgs)) {
+    if (!("shiny" %in% .get.installed.pkgs())) {
         message(paste("Package shiny",
                       " is going to be installed so that ",
                       .this.pkg.name,
                       " could connect to databases.\n\n", sep = ""))
         install.packages(pkgs = "shiny")
+        if (!("shiny" %in% .get.installed.pkgs()))
+            stop("The package shiny could not be installed!")
     }
 
     library(shiny)
