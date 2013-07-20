@@ -156,7 +156,7 @@ db.list <- function ()
 ## list tables and views in the connection
 db.objects <- function (search = NULL, conn.id = 1)
 {
-    res <- .db.getQuery("select table_schema, table_name from information_schema.tables")
+    res <- .db.getQuery("select table_schema, table_name from information_schema.tables", conn.id = conn.id)
 
     if (is.null(search)) {
         res <- paste(res[,1], res[,2], sep = ".")
