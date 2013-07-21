@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
     ## ------------------------------------------------
     
     output$conn.controls <- renderUI({
-        selectInput("connection", "Connection",
+        selectInput("connection", "Select a connection",
                     choices = .get.connection.list())
     })
 
@@ -57,7 +57,7 @@ shinyServer(function(input, output, session) {
     ## })
 
     output$tbl.controls <- renderUI({
-        selectInput("table", "Table",
+        selectInput("table", "Select a table:",
                     choices = c("", db.obj.list()),
                     selected = "")
     })
@@ -70,7 +70,7 @@ shinyServer(function(input, output, session) {
         else
             vars <- c("", names(db.data.frame(tbl, conn.id = id,
                                               verbose = FALSE)))
-        selectInput("dep", "Dependent Variable",
+        selectInput("dep", "Select the dependent Variable:",
                     choices = vars,
                     selected = "")
     })
@@ -83,7 +83,7 @@ shinyServer(function(input, output, session) {
         else
             vars <- names(db.data.frame(tbl, conn.id = id,
                                         verbose = FALSE))
-        checkboxGroupInput("ind", "Independent Variables",
+        checkboxGroupInput("ind", "Select the independent Variables:",
                            choices = vars)
     })
 
@@ -112,6 +112,7 @@ shinyServer(function(input, output, session) {
         tbl <- input$table
         dep <- input$dep
         ind <- input$ind
+        fml <- input$rformula
         empty.res <- "No model"
         class(empty.res) <- "none.obj"
         if (input$model == "Logistic Regression") return (empty.res)
@@ -119,7 +120,10 @@ shinyServer(function(input, output, session) {
             empty.res
         } else {
             x <- db.data.frame(tbl, conn.id = conn.id, verbose = FALSE)
-            f <- paste(dep, "~", paste(ind, collapse = " + "))
+            if (is.null(fml))
+                f <- paste(dep, "~", paste(ind, collapse = " + "))
+            else
+                f <- fml
             res <- madlib.lm(formula(f), data = x)
             res
         }

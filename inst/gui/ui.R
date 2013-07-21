@@ -16,24 +16,35 @@ shinyUI(pageWithSidebar(
 
         conditionalPanel(
             condition = "input.table != ''",
-            selectInput("model", "Model",
+            selectInput("model", "Select a model:",
                         choices = c("", "Linear Regression",
                         "Logistic Regression"), selected = "")),
 
         conditionalPanel(
             condition = "input.model != ''",
+            checkboxInput("formula", "Use R formula", value = FALSE)),
+
+        conditionalPanel(
+            condition = "input.model != '' && input.formula == false",
             uiOutput("dep.controls")),
 
         conditionalPanel(
-            condition = "input.model != ''",
-            uiOutput("ind.controls"))
+            condition = "input.model != '' && input.formula == false",
+            uiOutput("ind.controls")),
+
+        conditionalPanel(
+            condition = "input.model != '' && input.formula == true",
+            textInput("rformula", "Input the formula for the model:"))
         ),
     
     ## Show the caption and plot of the requested variable against mpg
     mainPanel(
         tabsetPanel(
             tabPanel("Summary",
+                     h4("Database connection"),
                      tableOutput("con.info"),
+                     conditionalPanel(condition = "input.table != ''",
+                                      h4("Table summary")),
                      tableOutput("tbl.info")),
             tabPanel("Model",
                      verbatimTextOutput("model.info"))
