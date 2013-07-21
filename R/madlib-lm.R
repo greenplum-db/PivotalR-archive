@@ -33,9 +33,12 @@ madlib.lm <- function (formula, data, na.action,
 
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
-        grp <- "NULL::text[]"
+        grp <- "NULL"
     else
-        grp <- paste("'{", params$grp.str, "}'::text[]")
+        if (.madlib.version.number(conn.id(data)) > 0.7)
+            grp <- paste0("'", params$grp.str, "'")
+        else
+            grp <- paste("'{", params$grp.str, "}'::text[]")
 
     ## construct SQL string
     conn.id <- conn.id(data)
