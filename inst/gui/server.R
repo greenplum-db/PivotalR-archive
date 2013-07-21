@@ -62,6 +62,31 @@ shinyServer(function(input, output, session) {
                     selected = "")
     })
 
+    output$dep.controls <- renderUI({
+        id <- conInput()
+        tbl <- input$table
+        if (identical(id, integer(0)) || is.null(tbl))
+            vars <- c("")
+        else
+            vars <- c("", names(db.data.frame(tbl, conn.id = id,
+                                              verbose = FALSE)))
+        selectInput("dep", "Dependent Variable",
+                    choices = vars,
+                    selected = "")
+    })
+
+    output$ind.controls <- renderUI({
+        id <- conInput()
+        tbl <- input$table
+        if (identical(id, integer(0)) || is.null(tbl))
+            vars <- c("")
+        else
+            vars <- names(db.data.frame(tbl, conn.id = id,
+                                        verbose = FALSE))
+        checkboxGroupInput("ind", "Independent Variables",
+                           choices = vars)
+    })
+
     ## ------------------------------------------------
     
     output$con.info <- renderTable({
@@ -79,6 +104,24 @@ shinyServer(function(input, output, session) {
             res <- madlib.summary(x)
             class(res) <- "data.frame"
             res[,-c(1,2)]
+        }
+    })
+
+    output$model.info <- renderPrint({
+        conn.id <- conInput()
+        tbl <- input$table
+        dep <- input$dep
+        ind <- input$ind
+        empty.res <- "No model"
+        class(empty.res) <- "none.obj"
+        if (input$model == "Logistic Regression") return (empty.res)
+        if (is.null(tbl) || tbl == "" || is.null(dep) || is.null(ind)) {
+            empty.res
+        } else {
+            x <- db.data.frame(tbl, conn.id = conn.id, verbose = FALSE)
+            f <- paste(dep, "~", paste(ind, collapse = " + "))
+            res <- madlib.lm(formula(f), data = x)
+            res
         }
     })
 })

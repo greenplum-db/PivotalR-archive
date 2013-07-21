@@ -18,14 +18,26 @@ shinyUI(pageWithSidebar(
             condition = "input.table != ''",
             selectInput("model", "Model",
                         choices = c("", "Linear Regression",
-                        "Logistic Regression"), selected = "")
-            )
+                        "Logistic Regression"), selected = "")),
+
+        conditionalPanel(
+            condition = "input.model != ''",
+            uiOutput("dep.controls")),
+
+        conditionalPanel(
+            condition = "input.model != ''",
+            uiOutput("ind.controls"))
         ),
     
     ## Show the caption and plot of the requested variable against mpg
     mainPanel(
-        tableOutput("con.info"),
-
-        tableOutput("tbl.info")
+        tabsetPanel(
+            tabPanel("Summary",
+                     tableOutput("con.info"),
+                     tableOutput("tbl.info")),
+            tabPanel("Model",
+                     verbatimTextOutput("model.info"))
+            
         )
+    )
     ))
