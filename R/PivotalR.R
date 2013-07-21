@@ -5,6 +5,10 @@
 
 PivotalR <- function ()
 {
+    if (length(.localVars$db) == 0)
+        stop("No database connections! ",
+             "You need at least one database connection before launching",
+             " the graphical interface!")
     
     if (!("shiny" %in% .get.installed.pkgs())) {
         message(paste("Package shiny",
