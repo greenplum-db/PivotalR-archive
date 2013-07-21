@@ -87,6 +87,18 @@ shinyServer(function(input, output, session) {
                            choices = vars)
     })
 
+    output$grp.controls <- renderUI({
+        id <- conInput()
+        tbl <- input$table
+        if (identical(id, integer(0)) || is.null(tbl))
+            vars <- c("")
+        else
+            vars <- names(db.data.frame(tbl, conn.id = id,
+                                        verbose = FALSE))
+        checkboxGroupInput("grp", "Select the grouping variables:",
+                           choices = vars)
+    })
+
     ## ------------------------------------------------
     
     output$con.info <- renderTable({
@@ -112,19 +124,29 @@ shinyServer(function(input, output, session) {
         tbl <- input$table
         dep <- input$dep
         ind <- input$ind
+        grp <- input$grp
         fml <- input$rformula
+        
         empty.res <- "No model"
         class(empty.res) <- "none.obj"
-        if (input$model == "Logistic Regression") return (empty.res)
-        if (is.null(tbl) || tbl == "" || is.null(dep) || is.null(ind)) {
+    
+        if (is.null(tbl) || tbl == "" ||
+            ((is.null(dep) || is.null(ind)) && fml == "")) {
             empty.res
         } else {
             x <- db.data.frame(tbl, conn.id = conn.id, verbose = FALSE)
-            if (is.null(fml))
+            if (fml == "") {
                 f <- paste(dep, "~", paste(ind, collapse = " + "))
-            else
+                if (!is.null(grp))
+                    f <- paste(f, "|", paste(grp, collapse = " + "))
+            } else
                 f <- fml
-            res <- madlib.lm(formula(f), data = x)
+            cat("\nf =", f, "\n--------------------------------------\n")
+            if (input$model == "Linear Regression")
+                res <- madlib.lm(formula(f), data = x)
+            else if (input$model == "Logistic Regression")
+                res <- madlib.glm(formula(f), data = x,
+                                  family = "binomial")
             res
         }
     })

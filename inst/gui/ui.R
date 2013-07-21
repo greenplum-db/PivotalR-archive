@@ -33,6 +33,10 @@ shinyUI(pageWithSidebar(
             uiOutput("ind.controls")),
 
         conditionalPanel(
+            condition = "input.model != '' && input.formula == false",
+            uiOutput("grp.controls")),
+
+        conditionalPanel(
             condition = "input.model != '' && input.formula == true",
             textInput("rformula", "Input the formula for the model:"))
         ),
