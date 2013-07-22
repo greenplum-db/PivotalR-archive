@@ -101,6 +101,24 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
 
 ## ------------------------------------------------------------------------
 
+.get.dbms.str <- function (conn.id)
+{
+    dbms.str <- dbms(conn.id = conn.id)
+    if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum")
+    {
+        db.str <- "Greenplum"
+        version.str <- gsub(".*Greenplum[^\\d]+([\\d\\.]+).*",
+                            "\\1", dbms.str, perl=T)
+    } else {
+        db.str <- "PostgreSQL"
+        version.str <- gsub(".*PostgreSQL[^\\d]+([\\d\\.]+).*",
+                            "\\1", dbms.str, perl=T)
+    }
+    list(db.str = db.str, version.str = version.str)
+}
+
+## ------------------------------------------------------------------------
+
 ## List all connection info
 db.list <- function ()
 {
@@ -125,17 +143,8 @@ db.list <- function ()
             cat(paste("Database :    ", .localVars$db[[idx[2]]]$dbname,
                       "\n", sep = ""))
 
-            dbms.str <- dbms(conn.id = idx[1])
-            if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum") {
-                db.str <- "Greenplum"
-                version.str <- gsub(".*Greenplum[^\\d]+([\\d\\.]+).*",
-                                    "\\1", dbms.str, perl=T)
-            } else {
-                db.str <- "PostgreSQL"
-                version.str <- gsub(".*PostgreSQL[^\\d]+([\\d\\.]+).*",
-                                    "\\1", dbms.str, perl=T)
-            }
-            cat("DBMS     :   ", db.str, version.str, "\n")
+            db <- .get.dbms.str(idx[1])
+            cat("DBMS     :   ", db$db.str, db$version.str, "\n")
 
             if (identical(.localVars$db[[idx[2]]]$madlib.v, numeric(0)))
                 cat("MADlib   :    not installed in schema", schema.madlib(idx[1]), "\n")
