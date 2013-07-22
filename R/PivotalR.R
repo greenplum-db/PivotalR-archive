@@ -41,4 +41,4 @@ pivotalr <- function ()
 
 ## ------------------------------------------------------------------------
 
-print.none.obj <- function (x) { cat("") }
+print.none.obj <- function (x, ...) { cat("") }
