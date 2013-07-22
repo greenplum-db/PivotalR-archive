@@ -107,6 +107,11 @@ shinyServer(function(input, output, session) {
             updateTabsetPanel(session, "tabset", selected = "Computation")
     })
 
+    ## observe({
+    ##     if (is.null(input$table) || input$table == "")
+    ##         textInput("model", "Update model value", value = "")
+    ## })    
+    
     ## ------------------------------------------------
     
     output$con.info <- renderTable({
