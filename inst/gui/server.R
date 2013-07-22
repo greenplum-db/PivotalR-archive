@@ -65,7 +65,7 @@ shinyServer(function(input, output, session) {
     output$dep.controls <- renderUI({
         id <- conInput()
         tbl <- input$table
-        if (identical(id, integer(0)) || is.null(tbl))
+        if (identical(id, integer(0)) || is.null(tbl) || tbl == "")
             vars <- c("")
         else
             vars <- c("", names(db.data.frame(tbl, conn.id = id,
@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
     output$ind.controls <- renderUI({
         id <- conInput()
         tbl <- input$table
-        if (identical(id, integer(0)) || is.null(tbl))
+        if (identical(id, integer(0)) || is.null(tbl) || tbl == "")
             vars <- c("")
         else
             vars <- names(db.data.frame(tbl, conn.id = id,
@@ -90,13 +90,21 @@ shinyServer(function(input, output, session) {
     output$grp.controls <- renderUI({
         id <- conInput()
         tbl <- input$table
-        if (identical(id, integer(0)) || is.null(tbl))
+        if (identical(id, integer(0)) || is.null(tbl) || tbl == "")
             vars <- c("")
         else
             vars <- names(db.data.frame(tbl, conn.id = id,
                                         verbose = FALSE))
         checkboxGroupInput("grp", "Select the grouping variables:",
                            choices = vars)
+    })
+
+    observe({
+        if (is.null(input$model) || input$model == "" ||
+            input$table == "")
+            updateTabsetPanel(session, "tabset", selected = "Summary")
+        else
+            updateTabsetPanel(session, "tabset", selected = "Computation")
     })
 
     ## ------------------------------------------------

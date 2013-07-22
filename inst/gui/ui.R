@@ -16,28 +16,28 @@ shinyUI(pageWithSidebar(
 
         conditionalPanel(
             condition = "input.table != ''",
-            selectInput("model", "Select a model:",
+            selectInput("model", "Select a model/operation:",
                         choices = c("", "Linear Regression",
                         "Logistic Regression"), selected = "")),
 
         conditionalPanel(
-            condition = "input.model != ''",
+            condition = "input.model != '' && input.table != ''",
             checkboxInput("formula", "Use R formula", value = FALSE)),
 
         conditionalPanel(
-            condition = "input.model != '' && input.formula == false",
+            condition = "input.model != '' && input.formula == false && input.table != ''",
             uiOutput("dep.controls")),
 
         conditionalPanel(
-            condition = "input.model != '' && input.formula == false",
+            condition = "input.model != '' && input.formula == false && input.table != ''",
             uiOutput("ind.controls")),
 
         conditionalPanel(
-            condition = "input.model != '' && input.formula == false",
+            condition = "input.model != '' && input.formula == false && input.table != ''",
             uiOutput("grp.controls")),
 
         conditionalPanel(
-            condition = "input.model != '' && input.formula == true",
+            condition = "input.model != '' && input.formula == true && input.table != ''",
             textInput("rformula", "Input the formula for the model:"))
         ),
     
@@ -50,9 +50,9 @@ shinyUI(pageWithSidebar(
                      conditionalPanel(condition = "input.table != ''",
                                       h4("Table summary")),
                      tableOutput("tbl.info")),
-            tabPanel("Model",
-                     verbatimTextOutput("model.info"))
-            
+            tabPanel("Computation",
+                     verbatimTextOutput("model.info")),
+            id = "tabset"            
         )
     )
     ))
