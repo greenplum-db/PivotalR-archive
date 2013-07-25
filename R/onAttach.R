@@ -30,5 +30,5 @@
     for (i in seq(along=.supported.connections))
         .localVars$conn.type[[tolower(.supported.connections[i])]] <- integer(0)
 
-    packageStartupMessage("To launch the graphical user interface, run the function pivotalr() !")
+    packageStartupMessage("\nTo launch the graphical user interface, run the function pivotalr() !")
 }

@@ -46,16 +46,6 @@ shinyServer(function(input, output, session) {
                     choices = .get.connection.list())
     })
 
-    ## observe({
-    ##     id <- input$connection
-    ##     if (!is.null(id)) {
-    ##         db.objs <- db.objects(conn.id = as.integer(id))
-    ##         updateSelectInput(session, "table", label = "Table",
-    ##                           choices = c("", db.objs),
-    ##                           selected = "")
-    ##     }
-    ## })
-
     output$tbl.controls <- renderUI({
         selectInput("table", "Select a table:",
                     choices = c("", db.obj.list()),
@@ -70,7 +60,7 @@ shinyServer(function(input, output, session) {
         else
             vars <- c("", names(db.data.frame(tbl, conn.id = id,
                                               verbose = FALSE)))
-        selectInput("dep", "Select the dependent Variable:",
+        selectInput("dep", "Select the dependent variable:",
                     choices = vars,
                     selected = "")
     })
@@ -83,7 +73,7 @@ shinyServer(function(input, output, session) {
         else
             vars <- names(db.data.frame(tbl, conn.id = id,
                                         verbose = FALSE))
-        checkboxGroupInput("ind", "Select the independent Variables:",
+        checkboxGroupInput("ind", "Select the independent variables:",
                            choices = vars)
     })
 
@@ -107,10 +97,14 @@ shinyServer(function(input, output, session) {
             updateTabsetPanel(session, "tabset", selected = "Computation")
     })
 
-    ## observe({
-    ##     if (is.null(input$table) || input$table == "")
-    ##         textInput("model", "Update model value", value = "")
-    ## })    
+    observe({
+        if (!is.null(input$table) && !is.null(input$model) &&
+            input$table == "")
+             updateSelectInput(session, "model",
+                               "Select a model/operation:",
+                               choices = c("", "Linear Regression",
+                               "Logistic Regression"), selected = "")
+    })
     
     ## ------------------------------------------------
     
@@ -139,6 +133,7 @@ shinyServer(function(input, output, session) {
         ind <- input$ind
         grp <- input$grp
         fml <- input$rformula
+        use.fml <- input$formula
         
         empty.res <- "No model"
         class(empty.res) <- "none.obj"
@@ -148,19 +143,25 @@ shinyServer(function(input, output, session) {
             empty.res
         } else {
             x <- db.data.frame(tbl, conn.id = conn.id, verbose = FALSE)
-            if (fml == "") {
+            if (is.null(use.fml) || !use.fml) {
                 f <- paste(dep, "~", paste(ind, collapse = " + "))
                 if (!is.null(grp))
                     f <- paste(f, "|", paste(grp, collapse = " + "))
-            } else
+            } else {
                 f <- fml
+            }
             cat("\nf =", f, "\n--------------------------------------\n")
             if (input$model == "Linear Regression")
-                res <- madlib.lm(formula(f), data = x)
+                res <- try(madlib.lm(formula(f), data = x),
+                           silent = TRUE)
             else if (input$model == "Logistic Regression")
-                res <- madlib.glm(formula(f), data = x,
-                                  family = "binomial")
-            res
+                res <- try(madlib.glm(formula(f), data = x,
+                                      family = "binomial"),
+                           silent = TRUE)
+            if (is(res, PivotalR:::.err.class))
+                return (empty.res)
+            else
+                res
         }
     })
 })
