@@ -96,31 +96,50 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## organize the result
     n <- length(params$ind.vars)
-    rst <- list()
     res.names <- names(res)
-    for (i in seq(res.names))
-        rst[[res.names[i]]] <- res[[res.names[i]]]
-    rst$coef <- arraydb.to.arrayr(res$coef, "double", n)
-    rst$std_err <- arraydb.to.arrayr(res$std_err, "double", n)
-    rst$z_stats <- arraydb.to.arrayr(res$z_stats, "double", n)
-    rst$p_values <- arraydb.to.arrayr(res$p_values, "double", n)
-    rst$odds_ratios <- arraydb.to.arrayr(res$odds_ratios, "double", n)
-    rst$ind.str <- params$ind.str
-
-    ## other useful information
-    rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
+    rst <- list()
+    r.coef <- arraydb.to.arrayr(res$coef, "double", n)
+    r.std_err <- arraydb.to.arrayr(res$std_err, "double", n)
+    r.z_stats <- arraydb.to.arrayr(res$z_stats, "double", n)
+    r.p_values <- arraydb.to.arrayr(res$p_values, "double", n)
+    n.grps <- dim(r.coef)[1] # how many groups
+    r.odds_ratios <- arraydb.to.arrayr(res$odds_ratios, "double", n)
+    r.ind.str <- params$ind.str
+    r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
                                                      "character", n))
-    rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- gsub("\"", "", params$ind.vars)
-    rst$col.name <- gsub("\"", "", data@.col.name)
-    rst$appear <- data@.appear.name
-    rst$call <- call # the current function call itself
-    rst$dummy <- data@.dummy
-    rst$dummy.expr <- data@.dummy.expr
+    r.has.intercept <- params$has.intercept # do we have an intercept
+    r.ind.vars <- gsub("\"", "", params$ind.vars)
+    r.col.name <- gsub("\"", "", data@.col.name)
+    r.appear <- data@.appear.name
+    r.call <- call # the current function call itself
+    r.dummy <- data@.dummy
+    r.dummy.expr <- data@.dummy.expr
+
+    for (i in seq_len(n.grps)) {
+        rst[[i]] <- list()
+        for (j in seq(res.names))
+            rst[[i]][[res.names[j]]] <- res[[res.names[j]]][[i]]
+        rst[[i]]$coef <- r.coef[i,]
+        rst[[i]]$std_err <- r.std_err[i,]
+        rst[[i]]$z_stats <- r.z_stats[i,]
+        rst[[i]]$p_values <- r.p_values[i,]
+        rst[[i]]$odds_ratios <- r.odds_ratios
+        rst[[i]]$grp.cols <- r.grp.cols
+        rst[[i]]$has.intercept <- r.has.intercept
+        rst[[i]]$ind.vars <- r.ind.vars
+        rst[[i]]$ind.str <- r.ind.str
+        rst[[i]]$col.name <- r.col.name
+        rst[[i]]$appear <- r.appear
+        rst[[i]]$call <- r.call
+        rst[[i]]$dummy <- r.dummy
+        rst[[i]]$dummy.expr <- r.dummy.expr
+        class(rst[[i]]) <- "logregr.madlib"
+    }
     
-    class(rst) <- "logregr.madlib" # use this to track summary
-    rst
+    class(rst) <- "logregr.madlib.grps" # use this to track summary
+
+    if (n.grps == 1) return (rst[[1]])
+    else return (rst)
 }
 
 ## ------------------------------------------------------------------------
@@ -128,6 +147,97 @@ madlib.glm <- function (formula, data, family = "gaussian",
 summary.logregr.madlib <- function (object, ...)
 {
     object
+}
+
+summary.logregr.madlib.grps <- function (object, ...)
+{
+    object
+}
+
+## ------------------------------------------------------------------------
+
+## Pretty format of linear regression result
+print.logregr.madlib.grps <- function (x,
+                                       digits = max(3L,
+                                       getOption("digits") - 3L),
+                                       ...)
+{
+    n.grps <- length(x)
+    
+    if (x[[1]]$has.intercept)
+        rows <- c("(Intercept)", x$ind.vars)
+    else
+        rows <- x[[1]]$ind.vars
+    for (i in seq_len(length(x[[1]]$col.name)))
+        if (x[[1]]$col.name[i] != x[[1]]$appear[i])
+            rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
+    ind.width <- .max.width(rows)
+
+    cat("\nMADlib Logistic Regression Result\n")
+    cat("\nCall:\n", paste(x[[1]]$call, sep = "\n", collapse = "\n"),
+        "\n", sep = "")
+    if (n.grps > 1)
+        cat("\nThe data is divided into", x$grps, "groups\n")
+    for (i in seq_len(n.grps))
+    {
+        cat("\n---------------------------------------\n\n")
+        if (length(x[[i]]$grp.cols) != 0)
+        {
+            cat("Group", i, "when\n")
+            for (col in x[[i]]$grp.cols)
+                cat(col, ": ", x[[i]][[col]], ",\n", sep = "")
+            cat("\n")
+        }
+
+        cat("Coefficients:\n")
+        coef <- format(x[[i]]$coef, digits = digits)
+        std.err <- format(x[[i]]$std_err, digits = digits)
+        z.stats <- format(x[[i]]$z_stats, digits = digits)
+        odds.ratios <- format(x[[i]]$odds_ratios, digits = digits)
+
+        stars <- rep("", length(x[[i]]$p_values))
+        for (j in seq(length(x[[i]]$p_values))) {
+            if (is.na(x[[i]]$p_values[j]) || is.nan(x[[i]]$p_values[j])) {
+                stars[j] <- " "
+                next
+            }
+            if (x[[i]]$p_values[j] < 0.001)
+                stars[j] <- "***"
+            else if (x[[i]]$p_values[j] < 0.01)
+                stars[j] <- "**"
+            else if (x[[i]]$p_values[j] < 0.05)
+                stars[j] <- "*"
+            else if (x[[i]]$p_values[j] < 0.1)
+                stars[j] <- "."
+            else
+                stars[j] <- " "
+        }
+
+        p.values <- paste(format(x[[i]]$p_values, digits = digits),
+                          stars)
+        output <- data.frame(cbind(Estimate = coef,
+                                   `Std. Error` = std.err,
+                                   `z value` = z.stats,
+                                   `Pr(>|t|)` = p.values,
+                                   `Odds ratio` = odds.ratios),
+                             row.names = rows, check.names = FALSE)
+        print(format(output, justify = "left"))
+
+        cat("---\n")
+        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+        cat("Log likelihood:", x[[i]]$log_likelihood, "\n")
+        cat("Condition Number:", x[[i]]$condition_no, "\n")
+        cat("Number of iterations:", x[[i]]$num_iterations, "\n")
+    }
+
+    cat("\n")
+}
+
+## ------------------------------------------------------------------------
+
+show.logregr.madlib.grps <- function (object)
+{
+    print(object)
 }
 
 ## ------------------------------------------------------------------------
@@ -141,69 +251,64 @@ print.logregr.madlib <- function (x,
     if (x$has.intercept)
         rows <- c("(Intercept)", x$ind.vars)
     else
-        rows <- x$ind.vars
-    for (i in seq_len(length(x$col.name)))
-        if (x$col.name[i] != x$appear[i])
-            rows <- gsub(x$col.name[i], x$appear[i], rows)
+        rows <- x[[1]]$ind.vars
+    for (i in seq_len(length(x[[1]]$col.name)))
+        if (x[[1]]$col.name[i] != x[[1]]$appear[i])
+            rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
     cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
         "\n", sep = "")
-    if (x$grps > 1)
-        cat("\nThe data is divided into", x$grps, "groups\n")
-    for (i in seq_len(x$grps))
+ 
+    cat("\n---------------------------------------\n\n")
+    if (length(x$grp.cols) != 0)
     {
-        cat("\n---------------------------------------\n\n")
-        if (length(x$grp.cols) != 0)
-        {
-            cat("Group", i, "when\n")
-            for (col in x$grp.cols)
-                cat(col, ": ", x[[col]][i], ",\n", sep = "")
-            cat("\n")
-        }
-
-        cat("Coefficients:\n")
-        coef <- format(x$coef[i,], digits = digits)
-        std.err <- format(x$std_err[i,], digits = digits)
-        z.stats <- format(x$z_stats[i,], digits = digits)
-        odds.ratios <- format(x$odds_ratios[i,], digits = digits)
-
-        stars <- rep("", length(x$p_values[i,]))
-        for (j in seq(length(x$p_values[i,]))) {
-            if (is.na(x$p_values[i,j]) || is.nan(x$p_values[i,j])) {
-                stars[j] <- " "
-                next
-            }
-            if (x$p_values[i,j] < 0.001)
-                stars[j] <- "***"
-            else if (x$p_values[i,j] < 0.01)
-                stars[j] <- "**"
-            else if (x$p_values[i,j] < 0.05)
-                stars[j] <- "*"
-            else if (x$p_values[i,j] < 0.1)
-                stars[j] <- "."
-            else
-                stars[j] <- " "
-        }
-
-        p.values <- paste(format(x$p_values[i,], digits = digits),
-                          stars)
-        output <- data.frame(cbind(Estimate = coef,
-                                   `Std. Error` = std.err,
-                                   `z value` = z.stats,
-                                   `Pr(>|t|)` = p.values,
-                                   `Odds ratio` = odds.ratios),
-                             row.names = rows, check.names = FALSE)
-        print(format(output, justify = "left"))
-
-        cat("---\n")
-        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
-        cat("Log likelihood:", x$log_likelihood[i], "\n")
-        cat("Condition Number:", x$condition_no[i], "\n")
-        cat("Number of iterations:", x$num_iterations[i], "\n")
+        for (col in x$grp.cols)
+            cat(col, ": ", x[[col]], ",\n", sep = "")
+        cat("\n")
     }
-
+    
+    cat("Coefficients:\n")
+    coef <- format(x$coef, digits = digits)
+    std.err <- format(x$std_err, digits = digits)
+    z.stats <- format(x$z_stats, digits = digits)
+    odds.ratios <- format(x$odds_ratios, digits = digits)
+    
+    stars <- rep("", length(x$p_values))
+    for (j in seq(length(x$p_values))) {
+        if (is.na(x$p_values[j]) || is.nan(x$p_values[j])) {
+            stars[j] <- " "
+            next
+        }
+        if (x$p_values[j] < 0.001)
+            stars[j] <- "***"
+        else if (x$p_values[j] < 0.01)
+            stars[j] <- "**"
+        else if (x$p_values[j] < 0.05)
+            stars[j] <- "*"
+        else if (x$p_values[j] < 0.1)
+            stars[j] <- "."
+        else
+            stars[j] <- " "
+    }
+    
+    p.values <- paste(format(x$p_values, digits = digits),
+                      stars)
+    output <- data.frame(cbind(Estimate = coef,
+                               `Std. Error` = std.err,
+                               `z value` = z.stats,
+                               `Pr(>|t|)` = p.values,
+                               `Odds ratio` = odds.ratios),
+                         row.names = rows, check.names = FALSE)
+    print(format(output, justify = "left"))
+    
+    cat("---\n")
+    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+    cat("Log likelihood:", x$log_likelihood, "\n")
+    cat("Condition Number:", x$condition_no, "\n")
+    cat("Number of iterations:", x$num_iterations, "\n")
+    
     cat("\n")
 }
 
@@ -213,6 +318,7 @@ show.logregr.madlib <- function (object)
 {
     print(object)
 }
+
 
 ## ------------------------------------------------------------------------
 
