@@ -68,7 +68,7 @@ madlib.lm <- function (formula, data, na.action,
     r.std_err <- arraydb.to.arrayr(res$std_err, "double", n)
     r.t_stats <- arraydb.to.arrayr(res$t_stats, "double", n)
     r.p_values <- arraydb.to.arrayr(res$p_values, "double", n)
-    n.grps <- dim(coef)[1]
+    n.grps <- dim(r.coef)[1]
     r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
                                                    "character", n))
     r.has.intercept <- params$has.intercept # do we have an intercept
@@ -112,6 +112,12 @@ summary.lm.madlib <- function (object, ...)
 {
     object
 }
+
+summary.lm.madlib.grps <- function (object, ...)
+{
+    object
+}
+
 
 ## ------------------------------------------------------------------------
 
