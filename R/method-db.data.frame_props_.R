@@ -67,6 +67,7 @@ setMethod (
             expr <- x@.expr[select]
             where <- x@.where
             if (where != "") where.str <- paste(" where", x@.where)
+            else where.str <- ""
             parent <- x@.parent
             src <- x@.source
         }
