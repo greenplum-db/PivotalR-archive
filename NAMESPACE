@@ -63,3 +63,5 @@ export("colAgg", "rowAgg")
 export("crossprod", "unique")
 export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
 export ("PivotalR", "pivotalr", "print.none.obj")
+
+exportMethods("scale")
