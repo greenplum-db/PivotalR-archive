@@ -94,12 +94,14 @@ setMethod (
         } else if (e1@.col.data_type[i] == "array") {
             tmp <- .get.array.elements(e1@.expr[i], tbl, where.str,
                                        conn.id(e1))
+            tn <- length(tmp)
             expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
-                                             cmp, e2[count %% l + 1],
+                                             cmp,
+                                             e2[(count + seq(tn) - 1) %% l + 1],
                                              sep = "",
                                              collapse = ", "), "]",
                              sep = "")
-            count <- count + 1
+            count <- count + tn
             col.data_type[i] <- "array"
             col.udt_name[i] <- paste("_", res.type)
         } else {
