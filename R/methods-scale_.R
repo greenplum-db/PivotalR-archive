@@ -67,7 +67,7 @@ setMethod (
             var <- (as.vector(arraydb.to.arrayr(res$std, "double"))^2 +
                     savg^2)
             if (scale)
-                std1 <- sqrt(var - avg1^2) * sqrt(n/(n-1))
+                std1 <- sqrt(var - 2*avg1*savg+ avg1^2) * sqrt(n/(n-1))
             else
                 std1 <- rep(1, length(savg))
         }
