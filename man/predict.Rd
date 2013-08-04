@@ -57,6 +57,11 @@
   \code{\link{madlib.glm}} logistic regression
 
   \code{\link{preview}} view the actual result
+
+  \code{\link{groups.lm.madlib}}, \code{\link{groups.lm.madlib.grps}},
+  \code{\link{groups.logregr.madlib}},
+  \code{\link{groups.logregr.madlib.grps}} extract grouping column
+  information from the fitted model(s). 
 }
 \examples{
 \dontrun{
@@ -103,6 +108,10 @@ content(pred)
 ans <- x$rings
 
 preview(mean((ans - pred)^2))
+
+## predictions for one group of data where sex = I
+idx <- which(groups(fit)[["sex"]] == "I") # which sub-model
+pred1 <- predict(fit[[idx]], x[x$sex == "I",]) # predict on part of data
 
 ## Example 3 --------
 

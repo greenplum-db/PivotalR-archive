@@ -28,7 +28,17 @@
 }
 
 \value{
-    The function returns the \code{logregr.madlib} object passed to the function.
+    A list that contains the value of each grouping colum. The elements
+    of the list are the same as the grouping columns. If \code{x} is a
+    \code{lm.madlib} object with one group's information in it, the
+    elements of the resulting list contain one value for each grouping
+    column. If \code{x} is \code{lm.madlib.grps}, which contains
+    multiple groups' information, then each element of the resulting
+    list is a vector with the length equal to the number of different
+    groups. \code{logregr.madlib} and \code{logregr.madlib.grps} have
+    the similar interpretation of the results.
+
+    If no grouping column is used, this funcion returns \code{NULL}.
 }
 
 \author{
@@ -42,6 +52,11 @@
   \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
   
   \code{\link{madlib.lm}} wrapper for MADlib linear regression
+
+  \code{\link{predict.lm.madlib}}, \code{\link{predict.lm.madlib.grps}},
+  \code{\link{predict.logregr.madlib}},
+  \code{\link{predict.logregr.madlib.grps}} make 
+  predictions for new data.
 }
 
 
@@ -50,16 +65,15 @@
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame
-source_data <- db.data.frame("madlibtestdata.log_breast_cancer_wisconsin")
+source_data <- as.db.data.frame(abalone, "abalone")
 preview(source_data, 10)
 
 ## logistic regression
-fit <- madlib.logregr(y ~ x - 1 , data = source_data)
-summary(fit)
+fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)
 
-## use I(.) for expressions
-fit <- madlib.logregr(y ~ x + I(x^2) - 1, data = source_data)
-summary(fit)
+groups(fit) # all grouping column values
+
+groups(fit[[1]]) # the first model's grouping column value
        }
 }
 
