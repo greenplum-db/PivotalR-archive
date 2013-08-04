@@ -94,7 +94,12 @@
   for details.
 
   For the logistic regression, the returned value is similar to that of
-  the linear regression, and is
+  the linear regression.  If there is no grouping (i.e. no \code{|} in the formula), the result
+  is a \code{logregr.madlib} object. Otherwise, it is a
+  \code{logregr.madlib.grps} 
+  object, which is just a list of \code{logregr.madlib} objects.
+
+  A \code{logregr.madlib} object 
   a list which contains the following items:
 
   \item{grouping column(s)}{
