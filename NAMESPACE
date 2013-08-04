@@ -67,3 +67,6 @@ export("colAgg", "rowAgg")
 export("crossprod", "unique")
 export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
 export ("PivotalR", "pivotalr", "print.none.obj")
+
+export("groups.lm.madlib", "groups.logregr.madlib",
+      "groups.lm.madlib.grps", "groups.logregr.madlib.grps")

@@ -1,6 +1,8 @@
 \name{predict}
 \alias{predict.lm.madlib}
 \alias{predict.logregr.madlib}
+\alias{predict.lm.madlib.grps}
+\alias{predict.logregr.madlib.grps}
 
 \title{
   Generate the \code{db.Rquery} object that can calculate the predictions
@@ -14,14 +16,17 @@
 \usage{
 \method{predict}{lm.madlib}(object, newdata, ...)
 
+\method{predict}{lm.madlib.grps}(object, newdata, ...)
+
 \method{predict}{logregr.madlib}(object, newdata, ...)
+
+\method{predict}{logregr.madlib.grps}(object, newdata, ...)
 }
 
 \arguments{
   \item{object}{
-    A \code{lm.madlib} or \code{logregr.madlib} object, which are the
-  results of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}
-  respectively. 
+    The
+  result of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}.
   }
   
   \item{newdata}{

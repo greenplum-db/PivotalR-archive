@@ -1,5 +1,6 @@
 \name{summary.lm.madlib}
 \alias{summary.lm.madlib}
+\alias{summary.lm.madlib.grps}
 
 \title{Summary information for Linear Regression output}
 \description{
@@ -9,6 +10,8 @@
 
 \usage{
 \method{summary}{lm.madlib}(object, ...)
+
+\method{summary}{lm.madlib.grps}(object, ...)
 }
 
 
@@ -21,7 +24,8 @@
 }
 
 \value{
-    The function returns the \code{lm.madlib} object passed to the function
+    The function returns the \code{lm.madlib} or \code{lm.madlib.grps}
+    object passed to the function 
 }
 
 \author{
@@ -46,7 +50,8 @@ preview(x, 10)
 ## linear regression conditioned on nation value
 ## i.e. grouping
 fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
-summary(fit)
+summary(fit[[1]]) # one model for a group
+summary(fit) # models for all groups
 
 ## use I(.) for expressions
 fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),

@@ -60,3 +60,52 @@
 
     res
 }
+
+## ------------------------------------------------------------------------
+
+.get.groups <- function (x)
+{
+    if (length(x$grp.cols) != 0) {
+        res <- list()
+        for (col in x$grp.cols)
+            res[[col]] <- x[[col]]
+        return (res)
+    } else {
+        return (NULL)
+    }
+}
+
+.get.groups.grps <- function (x)
+{
+    n <- length(x)
+    for (i in seq_len(n)) {
+        if (i == 1)
+            res <- .get.groups(x[[1]])
+        else {
+            tmp <- .get.groups(x[[i]])
+            for (col in x[[i]]$grp.cols)
+                res[[col]] <- c(res[[col]], tmp[[col]])
+        }
+    }
+    res
+}
+
+groups.lm.madlib <- function (x)
+{
+    .get.groups(x)
+}
+
+groups.logregr.madlib <- function (x)
+{
+    .get.groups(x)
+}
+
+groups.lm.madlib.grps <- function (x)
+{
+    .get.groups.grps(x)
+}
+
+groups.logregr.madlib.grps <- function (x)
+{
+    .get.groups.grps(x)
+}

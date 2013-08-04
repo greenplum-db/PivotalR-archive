@@ -1,29 +1,34 @@
-\name{summary.logregr.madlib}
-\alias{summary.logregr.madlib}
-\alias{summary.logregr.madlib.grps}
+\name{groups}
+\alias{groups.lm.madlib}
+\alias{groups.logregr.madlib}
+\alias{groups.lm.madlib.grps}
+\alias{groups.logregr.madlib.grps}
 
 \title{Summary information for Logistic Regression output}
 \description{
-    The function prints the value of each element in the Logistic
-    Regression output object.}
+  The function prints the value of each element in the Logistic
+  Regression output object.
+}
 
 \usage{
-\method{summary}{logregr.madlib}(object, ...)
+\method{groups}{lm.madlib}(x)
 
-\method{summary}{logregr.madlib.grps}(object, ...)
+\method{groups}{lm.madlib.grps}(x)
+
+\method{groups}{logregr.madlib}(x)
+
+\method{groups}{logregr.madlib.grps}(x)
 }
 
 \arguments{
-    \item{object}{Logistic regression object}
-
-    \item{\dots}{
-      Further arguments passed to or from other methods.
-      This is currently not implemented.}
+  \item{x}{
+    The result of \code{\link{madlib.lm}} or
+    \code{\link{madlib.glm}}
+  }
 }
 
 \value{
-    The function returns the \code{logregr.madlib} or
-    \code{logregr.madlib.grps} object passed to the function.
+    The function returns the \code{logregr.madlib} object passed to the function.
 }
 
 \author{
