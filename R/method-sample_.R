@@ -26,7 +26,7 @@ setMethod (
             options(warn = warn.r) # reset R warning level
             res
         } else {
-            y <- .create.inter.table(x)
+            y <- .create.indexed.temp.table(x)
             select <- sample(seq(n), size, replace = TRUE)
             freq <- table(select)
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
@@ -52,7 +52,7 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 ## Create an intermediate temp table with index
-.create.inter.table <- function (x, random = FALSE)
+.create.indexed.temp.table <- function (x, random = FALSE)
 {
     if (random) x <- sort(x, FALSE, "random")
     tmp <- .unique.string()

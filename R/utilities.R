@@ -15,7 +15,7 @@ is.db.data.frame <- function (x)
 .cut.data <- function (x, k)
 {
     ## randomize the data when creating serial index
-    y <- .create.inter.table(x, TRUE)
+    y <- .create.indexed.temp.table(x, TRUE)
     n <- dim(y)[1]
 
     if (n < k) stop("data dimension is even smaller than k!")
