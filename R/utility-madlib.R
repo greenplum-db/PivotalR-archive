@@ -45,18 +45,21 @@
 ## ------------------------------------------------------------------------
 
 ## get the result
-.get.res <- function (sql, tbl.output, conn.id)
+.get.res <- function (sql, tbl.output = NULL, conn.id)
 {
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class))
-        stop("Could not run MADlib linear regression !")
+        stop("Could not run SQL query !")
 
     ## retreive result
-    res <- try(.db.getQuery(paste("select * from", tbl.output), conn.id),
-               silent = TRUE)
-    if (is(res, .err.class))
-        stop("Could not retreive MADlib linear regression result !")
+    if (!is.null(tbl.output)) {
+        res <- try(.db.getQuery(paste("select * from", tbl.output),
+                                conn.id),
+                   silent = TRUE)
+        if (is(res, .err.class))
+            stop("Could not retreive result from SQL query !")
+    }
 
     res
 }
