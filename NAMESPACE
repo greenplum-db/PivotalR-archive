@@ -19,12 +19,16 @@ exportMethods ("print", "show")
 export ("is.db.data.frame", "arraydb.to.arrayr")
 
 export ("madlib.lm", "summary.lm.madlib", 
-        "print.lm.madlib", "show.lm.madlib")
+        "print.lm.madlib", "show.lm.madlib", "summary.lm.madlib.grps", 
+        "print.lm.madlib.grps", "show.lm.madlib.grps")
 
 export ("madlib.glm", "summary.logregr.madlib",
-        "print.logregr.madlib", "show.logregr.madlib")
+        "print.logregr.madlib", "show.logregr.madlib",
+        "summary.logregr.madlib.grps",
+        "print.logregr.madlib.grps", "show.logregr.madlib.grps")
 
-export("predict.lm.madlib", "predict.logregr.madlib")
+export("predict.lm.madlib", "predict.logregr.madlib",
+       "predict.lm.madlib.grps", "predict.logregr.madlib.grps")
 
 # export sample in the future
 # export ("sample")
@@ -65,3 +69,5 @@ export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
 export ("PivotalR", "pivotalr", "print.none.obj")
 
 exportMethods("scale")
+export("groups.lm.madlib", "groups.logregr.madlib",
+      "groups.lm.madlib.grps", "groups.logregr.madlib.grps")

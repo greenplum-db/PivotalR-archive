@@ -62,32 +62,48 @@ madlib.lm <- function (formula, data, na.action,
 
     ## organize the result
     n <- length(params$ind.vars)
-    rst <- list()
     res.names <- names(res)
-    for (i in seq(res.names))
-        rst[[res.names[i]]] <- res[[res.names[i]]]
-    rst$coef <- arraydb.to.arrayr(res$coef, "double", n)
-    rst$std_err <- arraydb.to.arrayr(res$std_err, "double", n)
-    rst$t_stats <- arraydb.to.arrayr(res$t_stats, "double", n)
-    rst$p_values <- arraydb.to.arrayr(res$p_values, "double", n)
-
-    ## other useful information
-    rst$grps <- dim(rst$coef)[1] # how many groups
-    rst$grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
-                                                     "character", n))
-
-    rst$has.intercept <- params$has.intercept # do we have an intercept
-    rst$ind.vars <- gsub("\"", "", params$ind.vars)
-    rst$ind.str <- params$ind.str
-    rst$col.name <- gsub("\"", "", data@.col.name)
-    rst$appear <- data@.appear.name
-    rst$call <- deparse(match.call()) # the current function call itself
-
-    rst$dummy <- data@.dummy
-    rst$dummy.expr <- data@.dummy.expr
+    rst <- list()
+    r.coef <- arraydb.to.arrayr(res$coef, "double", n)
+    r.std_err <- arraydb.to.arrayr(res$std_err, "double", n)
+    r.t_stats <- arraydb.to.arrayr(res$t_stats, "double", n)
+    r.p_values <- arraydb.to.arrayr(res$p_values, "double", n)
+    n.grps <- dim(r.coef)[1] # how many groups
+    r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
+                                                   "character", n))
+    r.has.intercept <- params$has.intercept # do we have an intercept
+    r.ind.vars <- gsub("\"", "", params$ind.vars)
+    r.ind.str <- params$ind.str
+    r.col.name <- gsub("\"", "", data@.col.name)
+    r.appear <- data@.appear.name
+    r.call <- deparse(match.call()) # the current function call itself
+    r.dummy <- data@.dummy
+    r.dummy.expr <- data@.dummy.expr
     
-    class(rst) <- "lm.madlib" # use this to track summary
-    rst
+    for (i in seq_len(n.grps)) {
+        rst[[i]] <- list()
+        for (j in seq(res.names))
+            rst[[i]][[res.names[j]]] <- res[[res.names[j]]][i]
+        rst[[i]]$coef <- r.coef[i,]
+        rst[[i]]$std_err <- r.std_err[i,]
+        rst[[i]]$t_stats <- r.t_stats[i,]
+        rst[[i]]$p_values <- r.p_values[i,]
+        rst[[i]]$grp.cols <- r.grp.cols
+        rst[[i]]$has.intercept <- r.has.intercept
+        rst[[i]]$ind.vars <- r.ind.vars
+        rst[[i]]$ind.str <- r.ind.str
+        rst[[i]]$col.name <- r.col.name
+        rst[[i]]$appear <- r.appear
+        rst[[i]]$call <- r.call
+        rst[[i]]$dummy <- r.dummy
+        rst[[i]]$dummy.expr <- r.dummy.expr
+        class(rst[[i]]) <- "lm.madlib"
+    }
+
+    class(rst) <- "lm.madlib.grps"
+    
+    if (n.grps == 1) return (rst[[1]])
+    else return (rst)
 }
 
 ## ------------------------------------------------------------------------
@@ -97,9 +113,101 @@ summary.lm.madlib <- function (object, ...)
     object
 }
 
+summary.lm.madlib.grps <- function (object, ...)
+{
+    object
+}
+
+
 ## ------------------------------------------------------------------------
 
 ## Pretty format of linear regression result
+print.lm.madlib.grps <- function (x,
+                                  digits = max(3L, getOption("digits") - 3L),
+                                  ...)
+{
+    n.grps <- length(x)
+    
+    if (x[[1]]$has.intercept)
+        rows <- c("(Intercept)", x[[1]]$ind.vars)
+    else
+        rows <- x[[1]]$ind.vars
+    for (i in seq_len(length(x[[1]]$col.name))) 
+        if (x[[1]]$col.name[i] != x[[1]]$appear[i])
+            rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
+    ind.width <- .max.width(rows)
+
+    cat("\nMADlib Linear Regression Result\n")
+    cat("\nCall:\n", paste(x[[1]]$call, sep = "\n", collapse = "\n"),
+        "\n", sep = "")
+    if (n.grps > 1)
+        cat("\nThe data is divided into", n.grps, "groups\n")
+    for (i in seq_len(n.grps))
+    {
+        cat("\n---------------------------------------\n\n")
+        if (length(x[[i]]$grp.cols) != 0)
+        {
+            cat("Group", i, "when\n")
+            for (col in x[[i]]$grp.cols)
+                cat(col, ": ", x[[i]][[col]], "\n", sep = "")
+            cat("\n")
+        }
+
+        cat("Coefficients:\n")
+        coef <- format(x[[i]]$coef, digits = digits)
+        std.err <- format(x[[i]]$std_err, digits = digits)
+        t.stats <- format(x[[i]]$t_stats, digits = digits)
+
+        stars <- rep("", length(x[[i]]$p_values))
+        for (j in seq(length(x[[i]]$p_values))) {
+            if (is.na(x[[i]]$p_values[j]) || is.nan(x[[i]]$p_values[j])) {
+                stars[j] <- " "
+                next
+            }
+            if (x[[i]]$p_values[j] < 0.001)
+                stars[j] <- "***"
+            else if (x[[i]]$p_values[j] < 0.01)
+                stars[j] <- "**"
+            else if (x[[i]]$p_values[j] < 0.05)
+                stars[j] <- "*"
+            else if (x[[i]]$p_values[j] < 0.1)
+                stars[j] <- "."
+            else
+                stars[j] <- " "
+        }
+        p.values <- paste(format(x[[i]]$p_values, digits = digits),
+                          stars)
+        output <- data.frame(cbind(Estimate = coef,
+                                   `Std. Error` = std.err,
+                                   `t value` = t.stats,
+                                   `Pr(>|t|)` = p.values),
+                             row.names = rows, check.names = FALSE)
+        print(format(output, justify = "left"))
+
+        cat("---\n")
+        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+        cat("R-squared:", x[[i]]$r2, "\n")
+        cat("Condition Number:", x[[i]]$condition_no, "\n")
+
+        if (!is.null(x[[i]]$bp_stats))
+        {
+            cat("Breusch-Pagan test statistics:", x[[i]]$bp_stats, "\n")
+            cat("Breusch-Pagan test p-value:", x[[i]]$bp_p_value, "\n")
+        }        
+    }
+
+    cat("\n")
+}
+
+## ------------------------------------------------------------------------
+
+show.lm.madlib.grps <- function (object)
+{
+    print(object)
+}
+
+## ------------------------------------------------------------------------
+
 print.lm.madlib <- function (x,
                              digits = max(3L, getOption("digits") - 3L),
                              ...)
@@ -116,62 +224,57 @@ print.lm.madlib <- function (x,
     cat("\nMADlib Linear Regression Result\n")
     cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
         "\n", sep = "")
-    if (x$grps > 1)
-        cat("\nThe data is divided into", x$grps, "groups\n")
-    for (i in seq_len(x$grps))
+    
+    cat("\n---------------------------------------\n\n")
+    if (length(x$grp.cols) != 0)
     {
-        cat("\n---------------------------------------\n\n")
-        if (length(x$grp.cols) != 0)
-        {
-            cat("Group", i, "when\n")
-            for (col in x$grp.cols)
-                cat(col, ": ", x[[col]][i], "\n", sep = "")
-            cat("\n")
-        }
-
-        cat("Coefficients:\n")
-        coef <- format(x$coef[i,], digits = digits)
-        std.err <- format(x$std_err[i,], digits = digits)
-        t.stats <- format(x$t_stats[i,], digits = digits)
-
-        stars <- rep("", length(x$p_values[i,]))
-        for (j in seq(length(x$p_values[i,]))) {
-            if (is.na(x$p_values[i,j]) || is.nan(x$p_values[i,j])) {
-                stars[j] <- " "
-                next
-            }
-            if (x$p_values[i,j] < 0.001)
-                stars[j] <- "***"
-            else if (x$p_values[i,j] < 0.01)
-                stars[j] <- "**"
-            else if (x$p_values[i,j] < 0.05)
-                stars[j] <- "*"
-            else if (x$p_values[i,j] < 0.1)
-                stars[j] <- "."
-            else
-                stars[j] <- " "
-        }
-        p.values <- paste(format(x$p_values[i,], digits = digits),
-                          stars)
-        output <- data.frame(cbind(Estimate = coef,
-                                   `Std. Error` = std.err,
-                                   `t value` = t.stats,
-                                   `Pr(>|t|)` = p.values),
-                             row.names = rows, check.names = FALSE)
-        print(format(output, justify = "left"))
-
-        cat("---\n")
-        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
-        cat("R-squared:", x$r2[i], "\n")
-        cat("Condition Number:", x$condition_no[i], "\n")
-
-        if (!is.null(x$bp_stats))
-        {
-            cat("Breusch-Pagan test statistics:", x$bp_stats[i], "\n")
-            cat("Breusch-Pagan test p-value:", x$bp_p_value[i], "\n")
-        }        
+        for (col in x$grp.cols)
+            cat(col, ": ", x[[col]], "\n", sep = "")
+        cat("\n")
     }
-
+    
+    cat("Coefficients:\n")
+    coef <- format(x$coef, digits = digits)
+    std.err <- format(x$std_err, digits = digits)
+    t.stats <- format(x$t_stats, digits = digits)
+    
+    stars <- rep("", length(x$p_values))
+    for (j in seq(length(x$p_values))) {
+        if (is.na(x$p_values[j]) || is.nan(x$p_values[j])) {
+            stars[j] <- " "
+            next
+        }
+        if (x$p_values[j] < 0.001)
+            stars[j] <- "***"
+        else if (x$p_values[j] < 0.01)
+            stars[j] <- "**"
+        else if (x$p_values[j] < 0.05)
+            stars[j] <- "*"
+        else if (x$p_values[j] < 0.1)
+            stars[j] <- "."
+        else
+            stars[j] <- " "
+    }
+    p.values <- paste(format(x$p_values, digits = digits),
+                      stars)
+    output <- data.frame(cbind(Estimate = coef,
+                               `Std. Error` = std.err,
+                               `t value` = t.stats,
+                               `Pr(>|t|)` = p.values),
+                         row.names = rows, check.names = FALSE)
+    print(format(output, justify = "left"))
+    
+    cat("---\n")
+    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+    cat("R-squared:", x$r2, "\n")
+    cat("Condition Number:", x$condition_no, "\n")
+    
+    if (!is.null(x$bp_stats))
+    {
+        cat("Breusch-Pagan test statistics:", x$bp_stats, "\n")
+        cat("Breusch-Pagan test p-value:", x$bp_p_value, "\n")
+    }        
+    
     cat("\n")
 }
 

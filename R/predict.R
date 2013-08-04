@@ -8,9 +8,19 @@ predict.lm.madlib <- function (object, newdata, ...)
     .predict(object, newdata, "linregr_predict", "double precision", "float8")
 }
 
+predict.lm.madlib.grps <- function (object, newdata, ...)
+{
+    .predict(object, newdata, "linregr_predict", "double precision", "float8")
+}
+
 ## ------------------------------------------------------------------------
 
 predict.logregr.madlib <- function (object, newdata, ...)
+{
+    .predict(object, newdata, "logregr_predict", "boolean", "bool")
+}
+
+predict.logregr.madlib.grps <- function (object, newdata, ...)
 {
     .predict(object, newdata, "logregr_predict", "boolean", "bool")
 }
@@ -19,6 +29,9 @@ predict.logregr.madlib <- function (object, newdata, ...)
 
 .predict <- function (object, newdata, func.str, data.type, udt.name)
 {
+    if (is(object, "lm.madlib") || is(object, "logregr.madlib"))
+        object <- list(object)
+    
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
 
@@ -43,32 +56,35 @@ predict.logregr.madlib <- function (object, newdata, ...)
         sort <- newdata@.sort
     }
     if (!is(newdata, "db.data.frame"))
-        ind.str <- .replace.col.with.expr(object$ind.str, names(newdata),
+        ind.str <- .replace.col.with.expr(object[[1]]$ind.str,
+                                          names(newdata),
                                           newdata@.expr)
     else
-        ind.str <- object$ind.str
+        ind.str <- object[[1]]$ind.str
     
     ## deal with groups
-    coef.i <- which(names(object) == "coef")
-    grp.col <- names(object)[seq_len(coef.i - 1)]
+    coef.i <- which(names(object[[1]]) == "coef")
+    grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
 
-    if (length(object$grp.cols) == 0) {
-        coef <- paste("array[", paste(object$coef, collapse = ", "), "]",
+    if (length(object[[1]]$grp.cols) == 0) {
+        coef <- paste("array[", paste(object[[1]]$coef, collapse = ", "),
+                      "]",
                       sep = "")
         expr <- paste(madlib, ".", func.str, "(", coef, ", ",
                       ind.str, ")", sep = "")
     } else {
-        l <- length(object$grp.cols)
+        l <- length(object[[1]]$grp.cols)
         expr <- "case when "
-        for (i in seq_len(object$grps)) {
+        n <- length(object)
+        for (i in seq_len(n)) {
             tmp <- ""
-            if (i != object$grps) {
+            if (i != n) {
                 for (j in seq_len(l)) {
-                    tmp <- paste(tmp, object$grp.cols[j], " = '",
-                                 object[[object$grp.cols[j]]][i],
+                    tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
+                                 object[[i]][[object[[i]]$grp.cols[j]]],
                                  "'::",
                                  newdata@.col.data_type[which(
-                                     names(newdata) == object$grp.cols[j])],
+                                     names(newdata) == object[[i]]$grp.cols[j])],
                                  sep = "")
                     if (j != l) tmp <- paste(tmp, " and ", sep = "")
                 }
@@ -77,14 +93,14 @@ predict.logregr.madlib <- function (object, newdata, ...)
                                                   newdata@.expr)
                 expr <- paste(expr, tmp, " then ", sep = "")
             }
-            coef.i <- paste("array[", paste(object$coef[i,],
+            coef.i <- paste("array[", paste(object[[i]]$coef,
                                             collapse = ", "),
                             "]", sep = "")
             expr <- paste(expr, madlib, ".", func.str, "(", coef.i, ", ",
                           ind.str, ")", sep = "")
-            if (i < object$grps - 1)
+            if (i < n - 1)
                 expr <- paste(expr, " when ", sep = "")
-            else if (i == object$grps - 1)
+            else if (i == n - 1)
                 expr <- paste(expr, " else ", sep = "")
             else
                 expr <- paste(expr, " end", sep = "")
@@ -94,14 +110,14 @@ predict.logregr.madlib <- function (object, newdata, ...)
     sql <- paste("select ", expr, " as madlib_predict from ",
                  tbl, where.str, sort$str, sep = "")
 
-    if (length(object$dummy) != 0) {
-        for (i in seq_len(length(object$dummy))) {
-            sql <- gsub(paste("(\"", object$dummy[i], "\"|",
-                              object$dummy[i], ")", sep = ""),
-                        object$dummy.expr[i], sql)
-            expr <- gsub(paste("(\"", object$dummy[i], "\"|",
-                               object$dummy[i], ")", sep = ""),
-                         object$dummy.expr[i], expr)
+    if (length(object[[1]]$dummy) != 0) {
+        for (i in seq_len(length(object[[1]]$dummy))) {
+            sql <- gsub(paste("(\"", object[[1]]$dummy[i], "\"|",
+                              object[[1]]$dummy[i], ")", sep = ""),
+                        object[[1]]$dummy.expr[i], sql)
+            expr <- gsub(paste("(\"", object[[1]]$dummy[i], "\"|",
+                               object[[1]]$dummy[i], ")", sep = ""),
+                         object[[1]]$dummy.expr[i], expr)
         }
     }
 

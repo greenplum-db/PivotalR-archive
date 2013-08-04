@@ -1,5 +1,6 @@
 \name{summary.logregr.madlib}
 \alias{summary.logregr.madlib}
+\alias{summary.logregr.madlib.grps}
 
 \title{Summary information for Logistic Regression output}
 \description{
@@ -8,6 +9,8 @@
 
 \usage{
 \method{summary}{logregr.madlib}(object, ...)
+
+\method{summary}{logregr.madlib.grps}(object, ...)
 }
 
 \arguments{
@@ -19,7 +22,8 @@
 }
 
 \value{
-    The function returns the \code{logregr.madlib} object passed to the function.
+    The function returns the \code{logregr.madlib} or
+    \code{logregr.madlib.grps} object passed to the function.
 }
 
 \author{

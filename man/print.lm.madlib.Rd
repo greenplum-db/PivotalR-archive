@@ -1,6 +1,8 @@
 \name{print.lm.madlib}
 \alias{print.lm.madlib}
+\alias{print.lm.madlib.grps}
 \alias{show.lm.madlib}
+\alias{show.lm.madlib.grps}
 
 \title{Display results of linear regression}
 
@@ -9,9 +11,15 @@
 }
 
 \usage{
-\method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+\method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L),
+...)
+
+\method{print}{lm.madlib.grps}(x, digits = max(3L, getOption("digits") -
+3L), ...) 
 
 \method{show}{lm.madlib}(object)
+
+\method{show}{lm.madlib.grps}(object)
 }
 
 \arguments{
@@ -60,6 +68,12 @@ preview(x, 10)
 ## linear regression conditioned on nation value
 ## i.e. grouping
 fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
+
+## display the model for one group 
+print(fit[[1]])
+show(fit[[1]])
+
+## display the models for all groups
 print(fit)
 show(fit)
     }

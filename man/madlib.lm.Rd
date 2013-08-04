@@ -75,7 +75,11 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 
 \value{
-  A list which contains the following items:
+  If there is no grouping (i.e. no \code{|} in the formula), the result
+  is a \code{lm.madlib} object. Otherwise, it is a \code{lm.madlib.grps}
+  object, which is just a list of \code{lm.madlib} objects.
+  
+  A \code{lm.madlib} object is a list which contains the following items:
 
   \item{grouping column(s)}{
     When there are grouping columns in the formula, the resulting list

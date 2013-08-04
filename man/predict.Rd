@@ -1,6 +1,8 @@
 \name{predict}
 \alias{predict.lm.madlib}
 \alias{predict.logregr.madlib}
+\alias{predict.lm.madlib.grps}
+\alias{predict.logregr.madlib.grps}
 
 \title{
   Generate the \code{db.Rquery} object that can calculate the predictions
@@ -14,14 +16,17 @@
 \usage{
 \method{predict}{lm.madlib}(object, newdata, ...)
 
+\method{predict}{lm.madlib.grps}(object, newdata, ...)
+
 \method{predict}{logregr.madlib}(object, newdata, ...)
+
+\method{predict}{logregr.madlib.grps}(object, newdata, ...)
 }
 
 \arguments{
   \item{object}{
-    A \code{lm.madlib} or \code{logregr.madlib} object, which are the
-  results of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}
-  respectively. 
+    The
+  result of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}.
   }
   
   \item{newdata}{
@@ -52,6 +57,11 @@
   \code{\link{madlib.glm}} logistic regression
 
   \code{\link{preview}} view the actual result
+
+  \code{\link{groups.lm.madlib}}, \code{\link{groups.lm.madlib.grps}},
+  \code{\link{groups.logregr.madlib}},
+  \code{\link{groups.logregr.madlib.grps}} extract grouping column
+  information from the fitted model(s). 
 }
 \examples{
 \dontrun{
@@ -98,6 +108,10 @@ content(pred)
 ans <- x$rings
 
 preview(mean((ans - pred)^2))
+
+## predictions for one group of data where sex = I
+idx <- which(groups(fit)[["sex"]] == "I") # which sub-model
+pred1 <- predict(fit[[idx]], x[x$sex == "I",]) # predict on part of data
 
 ## Example 3 --------
 

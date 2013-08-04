@@ -1,6 +1,8 @@
 \name{print.logregr.madlib}
 \alias{print.logregr.madlib}
 \alias{show.logregr.madlib}
+\alias{print.logregr.madlib.grps}
+\alias{show.logregr.madlib.grps}
 
 \title{Display results of logistic regression}
 
@@ -9,9 +11,15 @@
 }
 
 \usage{
-\method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+\method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") -
+3L), ...) 
+
+\method{print}{logregr.madlib.grps}(x, digits = max(3L,
+getOption("digits") - 3L), ...) 
 
 \method{show}{logregr.madlib}(object)
+
+\method{show}{logregr.madlib.grps}(object)
 }
 
 \arguments{
@@ -53,11 +61,18 @@
     \dontrun{
 ## Suppose that a valid connection with ID 1 exists
 ## create a table from the example data.frame
-source_data <- db.data.frame("madlibtestdata.log_breast_cancer_wisconsin")
+source_data <- as.db.data.frame(abalone, "abalone")
 preview(source_data, 10)
 
 ## logistic regression
-fit <- madlib.logregr(y ~ x - 1 , data = source_data)
+fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)
+
+## display a model for one group 
+fit[[1]]
+print(f[[1]])
+
+## display all models for all groups
+fit
 print(fit)
     }
 }
