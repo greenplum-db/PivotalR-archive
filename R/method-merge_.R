@@ -36,6 +36,11 @@ setMethod (
         if (length(by.x) == 0) {
             join.str <- "cross join"
             on.str <- ""
+            by.str <- NULL
+            col.data_type <- NULL
+            col.udt_name <- NULL
+            is.factor <- NULL
+            factor.suffix <- NULL
         } else {
             on.str <- paste("on", paste(paste("s.\"", by.x, "\"", sep = ""),
                                         paste("t.\"", by.y, "\"", sep = ""),
@@ -48,21 +53,21 @@ setMethod (
                 join.str <- "right join"
             else
                 join.str <- "full join"
+            
+            by.str <- paste("s.\"", .strip(by.x, "\""), "\"", sep = "")
+            col.idx <- .gwhich(names(x), by.x)
+            col.data_type <- x@.col.data_type[col.idx]
+            col.udt_name <- x@.col.udt_name[col.idx]
+            
+            col.idx.y <- .gwhich(names(y), by.y)
+            is.factor <- x@.is.factor[col.idx] & y@.is.factor[col.idx.y]
+            factor.suffix <- rep("", length(is.factor))
+            for (i in seq_len(length(factor.suffix))) # create new suffix
+                if (is.factor[i]) factor.suffix[i] <- .unique.string()
         }
 
         parent <- paste(x.content, join.str, y.content, on.str)
         src <- parent
-
-        by.str <- paste("s.\"", .strip(by.x, "\""), "\"", sep = "")
-        col.idx <- .gwhich(names(x), by.x)
-        col.data_type <- x@.col.data_type[col.idx]
-        col.udt_name <- x@.col.udt_name[col.idx]
-
-        col.idx.y <- .gwhich(names(y), by.y)
-        is.factor <- x@.is.factor[col.idx] & y@.is.factor[col.idx.y]
-        factor.suffix <- rep("", length(is.factor))
-        for (i in seq_len(length(factor.suffix))) # create new suffix
-            if (is.factor[i]) factor.suffix[i] <- .unique.string()
         
         col.name <- by.x
         x.diff <- setdiff(names(x), by.x)
