@@ -65,20 +65,9 @@ setMethod (
             stop(deparse(substitute(y)), " is not a proper matrix!")
         n <- length(b)
 
-        expr <- "array["
-        for (j in seq_len(n)) {
-            if (is.symmetric) m1 <- j
-            else m1 <- m
-            expr <- paste(expr, paste0("sum(", a[seq_len(m1)], " * ",
-                                       b[j], ")", collapse = ", "))
-            ## for (i in seq_len(m1)) {
-            ##     expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
-            ##                   sep = "")
-            ##     if (i != m1) expr <- paste0(expr, ", ")
-            ## }
-            if (j != n) expr <- paste0(expr, ", ")
-        }
-        expr <- paste0(expr, "]")
+        tmp <- outer(a, b, function(x, y){paste0("sum(", x, " * ", y, ")")})
+        if (is.symmetric) tmp <- tmp[upper.tri(tmp, diag = TRUE)]
+        expr <- paste0("array[", paste0(tmp, collapse = ", "), "]")
 
         new("db.Rcrossprod",
             .content = paste0("select ", expr, " as cross_prod from ",

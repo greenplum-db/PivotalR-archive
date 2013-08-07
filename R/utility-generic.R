@@ -25,18 +25,21 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             res <- rbind(res, rep(NA, n))
             next
         }
-        
-        elm <- regmatches(str[i],
-                          gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
-                                   str[i], perl=T))[[1]]
-        if (type == "character")
+
+        if (type == "character") {
+            elm <- regmatches(str[i],
+                              gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
+                                       str[i], perl=T))[[1]]
             elm <- as.character(elm)
-        else if (type == "integer")
-            elm <- as.integer(elm)
-        else if (type == "logical")
-            elm <- as.logical(elm)
-        else
-            elm <- as.numeric(elm)
+        } else {
+            elm <- strsplit(gsub("(\\{|\\})", "", str[i]), ",")[[1]]
+            if (type == "integer")
+                elm <- as.integer(elm)
+            else if (type == "logical")
+                elm <- as.logical(elm)
+            else
+                elm <- as.numeric(elm)
+        }
         
         res <- rbind(res, elm)
     }
