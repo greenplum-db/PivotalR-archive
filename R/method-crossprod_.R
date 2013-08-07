@@ -21,6 +21,7 @@ setMethod (
             stop("x and y cannot match because they originate",
                  " from different sources!")
         conn.id <- conn.id(x)
+        is.symmetric <- eql(x, y) # a symmetric matrix
 
         if (is(x, "db.data.frame")) {
             tbl <- content(x)
@@ -63,10 +64,12 @@ setMethod (
         else
             stop(deparse(substitute(y)), " is not a proper matrix!")
         n <- length(b)
- 
+
         expr <- "array["
         for (j in seq_len(n)) {
-            for (i in seq_len(m)) {
+            if (is.symmetric) m1 <- j
+            else m1 <- m
+            for (i in seq_len(m1)) {
                 expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
                               sep = "")
                 if (i != m) expr <- paste0(expr, ", ")
@@ -90,6 +93,8 @@ setMethod (
             .is.factor = FALSE,
             .factor.suffix = "",
             .sort = sort,
+            .is.crossprod = TRUE,
+            .is.symmetric = is.symmetric,
             .dim = c(m,n))
     })
 

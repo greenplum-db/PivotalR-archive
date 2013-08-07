@@ -142,12 +142,18 @@ setMethod (
         
         if (dim(res)[1] == 1) {
             rst <- arraydb.to.arrayr(res[1,1], "double")
-            rst <- matrix(rst, nrow = dims[1], ncol = dims[2])
+            if (x@.is.symmetric[1])
+                rst <- new("dtpMatrix", uplo = "U", x = rst, Dim = as.integer(dims))
+            else
+                rst <- new("dgeMatrix", x = rst, Dim = as.integer(dims))
         } else {
             rst <- list()
             for (i in seq_len(dim(res)[1])) {
                 rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
-                rst[[i]] <- matrix(rst[[i]], nrow = dims[1], ncol = dims[2])
+                if (x@.is.symmetric[i])
+                    rst[[i]] <- new("dtpMatrix", uplo = "U", x = rst[[i]], Dim = as.integer(dims))
+                else
+                    rst[[i]] <- new("dgeMatrix", x = rst[[i]], Dim = as.integer(dims))
             }
         }
         
