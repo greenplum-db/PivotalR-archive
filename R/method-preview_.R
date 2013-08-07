@@ -136,26 +136,30 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        res <- .db.getQuery(paste0(content(x), .limit.str(nrows)), conn.id(x))
+        res <- .db.getQuery(paste0("select unnest(", names(x)[1], ") as v from (select * from (",
+                                   content(x),
+                                   ") s", .limit.str(nrows), ") s1"), conn.id(x))
 
+        n <- dim(x)[1]
         dims <- x@.dim
         
-        if (dim(res)[1] == 1) {
-            rst <- arraydb.to.arrayr(res[1,1], "double")
+        if (n == 1) {
+            ## rst <- arraydb.to.arrayr(res[,1], "double")
             if (x@.is.symmetric[1])
-                rst <- new("dspMatrix", uplo = "U", x = rst[1,], Dim = as.integer(dims))
+                rst <- new("dspMatrix", uplo = "U", x = res[,1], Dim = as.integer(dims))
             else
-                rst <- new("dgeMatrix", x = rst, Dim = as.integer(dims))
+                rst <- new("dgeMatrix", x = res[,1], Dim = as.integer(dims))
         } else {
             rst <- list()
-            for (i in seq_len(dim(res)[1])) {
-                rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
+            l <- dim(res)[1] / n
+            for (i in seq_len(n)) {
+                ## rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
                 if (x@.is.symmetric[i])
                     rst[[i]] <- new("dtpMatrix", uplo = "U",
-                                    x = rst[[i]][1,],
+                                    x = res[(i-1)*l + seq(l),1],
                                     Dim = as.integer(dims))
                 else
-                    rst[[i]] <- new("dgeMatrix", x = rst[[i]],
+                    rst[[i]] <- new("dgeMatrix", x = res[(i-1)*l + seq(l),1],
                                     Dim = as.integer(dims))
             }
         }

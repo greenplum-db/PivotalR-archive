@@ -65,9 +65,13 @@ setMethod (
             stop(deparse(substitute(y)), " is not a proper matrix!")
         n <- length(b)
 
-        tmp <- outer(a, b, function(x, y){paste0("sum(", x, " * ", y, ")")})
+        tmp <- outer(a, b, function(x, y){paste0(x, " * ", y)})
         if (is.symmetric) tmp <- tmp[upper.tri(tmp, diag = TRUE)]
-        expr <- paste0("array[", paste0(tmp, collapse = ", "), "]")
+        expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")
+
+        db.info <- .get.dbms.str(conn.id)
+        if (db.info$db.str == "PostgreSQL")
+            expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
 
         new("db.Rcrossprod",
             .content = paste0("select ", expr, " as cross_prod from ",

@@ -7,9 +7,9 @@ setGeneric (
     "delete",
     def = function (x, ...) {
         res <- standardGeneric("delete")
-        if (res && !is.character(x)) {
-            rm(list = deparse(substitute(x)), pos = 1)
-        }
+        ## if (res && !is.character(x)) {
+        ##     rm(list = deparse(substitute(x)), pos = 1)
+        ## }
         res
     },
     signature = "x")
