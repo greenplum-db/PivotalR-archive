@@ -143,7 +143,7 @@ setMethod (
         if (dim(res)[1] == 1) {
             rst <- arraydb.to.arrayr(res[1,1], "double")
             if (x@.is.symmetric[1])
-                rst <- new("dtpMatrix", uplo = "U", x = rst, Dim = as.integer(dims))
+                rst <- new("dspMatrix", uplo = "U", x = rst, Dim = as.integer(dims))
             else
                 rst <- new("dgeMatrix", x = rst, Dim = as.integer(dims))
         } else {
