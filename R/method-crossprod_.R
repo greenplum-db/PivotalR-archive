@@ -69,11 +69,13 @@ setMethod (
         for (j in seq_len(n)) {
             if (is.symmetric) m1 <- j
             else m1 <- m
-            for (i in seq_len(m1)) {
-                expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
-                              sep = "")
-                if (i != m) expr <- paste0(expr, ", ")
-            }
+            expr <- paste(expr, paste0("sum(", a[seq_len(m1)], " * ",
+                                       b[j], ")", collapse = ", "))
+            ## for (i in seq_len(m1)) {
+            ##     expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
+            ##                   sep = "")
+            ##     if (i != m1) expr <- paste0(expr, ", ")
+            ## }
             if (j != n) expr <- paste0(expr, ", ")
         }
         expr <- paste0(expr, "]")

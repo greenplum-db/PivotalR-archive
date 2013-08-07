@@ -143,7 +143,7 @@ setMethod (
         if (dim(res)[1] == 1) {
             rst <- arraydb.to.arrayr(res[1,1], "double")
             if (x@.is.symmetric[1])
-                rst <- new("dspMatrix", uplo = "U", x = rst, Dim = as.integer(dims))
+                rst <- new("dspMatrix", uplo = "U", x = rst[1,], Dim = as.integer(dims))
             else
                 rst <- new("dgeMatrix", x = rst, Dim = as.integer(dims))
         } else {
@@ -151,9 +151,12 @@ setMethod (
             for (i in seq_len(dim(res)[1])) {
                 rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
                 if (x@.is.symmetric[i])
-                    rst[[i]] <- new("dtpMatrix", uplo = "U", x = rst[[i]], Dim = as.integer(dims))
+                    rst[[i]] <- new("dtpMatrix", uplo = "U",
+                                    x = rst[[i]][1,],
+                                    Dim = as.integer(dims))
                 else
-                    rst[[i]] <- new("dgeMatrix", x = rst[[i]], Dim = as.integer(dims))
+                    rst[[i]] <- new("dgeMatrix", x = rst[[i]],
+                                    Dim = as.integer(dims))
             }
         }
         
@@ -171,6 +174,6 @@ lookat <- function (x, nrows = 100, array = TRUE)
 {
     
     if (is(x, "db.table")) return (preview(x, nrows, array = array))
-    if (is(x, "db.Rcrossprod")) return (preview(x, FALSE))
+    if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE))
     preview(x, nrows, FALSE, array)
 }
