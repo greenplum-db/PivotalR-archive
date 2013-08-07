@@ -21,7 +21,7 @@ setMethod (
 
         all.names <- names(.expand.array(x))
         lg <- length(all.names)
-        y <- rowAgg(x)
+        y <- db.array(x)
         names(y) <- "vec"
         col.dim <- length(strsplit(y@.expr, ",")[[1]])
         

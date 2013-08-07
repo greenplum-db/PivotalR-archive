@@ -40,7 +40,7 @@
 
 \note{This function applies only onto \code{\linkS4class{db.obj}} with
   one column. If you want to put the unique values from multiple columns
-  together, you have to use \code{\link{rowAgg}}}
+  together, you have to use \code{\link{db.array}}}
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}

@@ -121,7 +121,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rcrossprod"),
-    def = function (x, interactive = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -136,17 +136,25 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        res <- .db.getQuery(content(x), conn.id(x))
+        res <- .db.getQuery(paste0(content(x), .limit.str(nrows)), conn.id(x))
 
         dims <- x@.dim
-
-        res <- arraydb.to.arrayr(res[1,1], "double")
-        res <- matrix(res, nrow = dims[1], ncol = dims[2])
+        
+        if (dim(res)[1] == 1) {
+            rst <- arraydb.to.arrayr(res[1,1], "double")
+            rst <- matrix(rst, nrow = dims[1], ncol = dims[2])
+        } else {
+            rst <- list()
+            for (i in seq_len(dim(res)[1])) {
+                rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
+                rst[[i]] <- matrix(rst[[i]], nrow = dims[1], ncol = dims[2])
+            }
+        }
         
         msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
         options(warn = warn.r) # reset R warning level
            
-        return (res)
+        return (rst)
     })
 
 

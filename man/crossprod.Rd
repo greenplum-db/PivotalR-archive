@@ -47,7 +47,7 @@
 }
 
 \seealso{
-  \code{\link{rowAgg}} forms an array using columns
+  \code{\link{db.array}} forms an array using columns
 }
 \examples{
 \dontrun{
@@ -61,7 +61,7 @@ x <- as.db.data.frame(abalone, "abalone")
 
 lookat(crossprod(x[,-c(1,2)]))
 
-x$arr <- rowAgg(1, x$length, x$diameter)
+x$arr <- db.array(1, x$length, x$diameter)
 
 lookat(crossprod(x$arr))
 }

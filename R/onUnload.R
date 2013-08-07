@@ -12,4 +12,7 @@
     pkg.names <- names(.localVars$drv)
     for (pkg in pkg.names)
         .db.unloadDriver(pkg)
+
+    ## turn off the `special cbind()' :
+    methods:::bind_activation(FALSE)
 }

@@ -52,7 +52,7 @@ x <- db.data.frame("abalone") # x points to table "abalone"
 
 lookat(crossprod(x[,-c(1,2)]))
 
-x$arr <- rowAgg(1, x$length, x$diameter)
+x$arr <- db.array(1, x$length, x$diameter)
 
 lookat(crossprod(x$arr))
 }

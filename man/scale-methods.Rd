@@ -72,7 +72,7 @@
 }
 
 \seealso{
-  \code{\link{rowAgg}} creates an array column for a
+  \code{\link{db.array}} creates an array column for a
   \code{\linkS4class{db.Rquery}} object.
 }
 
