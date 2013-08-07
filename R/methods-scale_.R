@@ -54,6 +54,8 @@ setMethod (
             res <- .get.res(sql, conn.id = conn.id)
             n <- res$n # row dimension
             savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))
+        } else {
+            n <- dim(x)[1]
         }
 
         if (is.logical(center)) {
@@ -87,6 +89,7 @@ setMethod (
             attr(z, "scaled:scale") <- std1
         } else
             attr(z, "scaled:scale") <- NULL
+        attr(z, "row.number") <- n
 
         ## reset message level
         msg.level <- .set.msg.level(msg.level, conn.id) 
