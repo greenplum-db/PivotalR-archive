@@ -121,7 +121,7 @@ setMethod (
 setMethod (
     "preview",
     signature (x = "db.Rcrossprod"),
-    def = function (x, interactive = FALSE) {
+    def = function (x, nrows = 100, interactive = FALSE) {
         msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -136,17 +136,42 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        res <- .db.getQuery(content(x), conn.id(x))
+        ## NOTE: Unfortunately, RPostgreSQL cannot extract an array with elements
+        ## more than 1500. So we have to use unnest to help to load a large array
+        ## TODO: Create a separate array loading function to specifically deal
+        ## with such situations and can be called by other functions.
+        res <- .db.getQuery(paste0("select unnest(", names(x)[1], ") as v from (select * from (",
+                                   content(x),
+                                   ") s", .limit.str(nrows), ") s1"), conn.id(x))
 
+        n <- dim(x)[1]
         dims <- x@.dim
-
-        res <- arraydb.to.arrayr(res[1,1], "double")
-        res <- matrix(res, nrow = dims[1], ncol = dims[2])
+        
+        if (n == 1) {
+            ## rst <- arraydb.to.arrayr(res[,1], "double")
+            if (x@.is.symmetric[1])
+                rst <- new("dspMatrix", uplo = "U", x = res[,1], Dim = as.integer(dims))
+            else
+                rst <- new("dgeMatrix", x = res[,1], Dim = as.integer(dims))
+        } else {
+            rst <- list()
+            l <- dim(res)[1] / n
+            for (i in seq_len(n)) {
+                ## rst[[i]] <- arraydb.to.arrayr(res[i,1], "double")
+                if (x@.is.symmetric[i])
+                    rst[[i]] <- new("dtpMatrix", uplo = "U",
+                                    x = res[(i-1)*l + seq(l),1],
+                                    Dim = as.integer(dims))
+                else
+                    rst[[i]] <- new("dgeMatrix", x = res[(i-1)*l + seq(l),1],
+                                    Dim = as.integer(dims))
+            }
+        }
         
         msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
         options(warn = warn.r) # reset R warning level
            
-        return (res)
+        return (rst)
     })
 
 
@@ -157,6 +182,6 @@ lookat <- function (x, nrows = 100, array = TRUE)
 {
     
     if (is(x, "db.table")) return (preview(x, nrows, array = array))
-    if (is(x, "db.Rcrossprod")) return (preview(x, FALSE))
+    if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE))
     preview(x, nrows, FALSE, array)
 }

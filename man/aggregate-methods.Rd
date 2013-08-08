@@ -13,7 +13,7 @@
 \alias{colMeans,db.obj-method}
 \alias{colSums,db.obj-method}
 \alias{colAgg}
-\alias{rowAgg}
+\alias{db.array}
 
 \title{Functions to perform a calculation on multiple values and return a single value}
 \description{
@@ -45,7 +45,7 @@ the sum of each column.}
 
 colAgg(x)
 
-rowAgg(x, ...)
+db.array(x, ...)
 }
 
 \arguments{
@@ -53,7 +53,7 @@ rowAgg(x, ...)
         A \code{db.obj} object.
         The signature of the method.
 
-        For \code{rowAgg}, \code{x} can also be a normal R object like
+        For \code{db.array}, \code{x} can also be a normal R object like
     double value.
     }
 
@@ -107,7 +107,7 @@ rowAgg(x, ...)
     For \code{colAgg}, a \code{db.Rquery} which is a SQL query to retreive
     the column values as an array aggregate.
 
-    For \code{rowAgg}, a \code{db.Rquery} which is a SQL query which
+    For \code{db.array}, a \code{db.Rquery} which is a SQL query which
     combine all columns into an array.
 }
 
@@ -166,7 +166,7 @@ colAgg(x$diameter)
 colAgg(x)
 
 ## put everything into an array plus a constant 1 as the first element
-rowAgg(1, x, x, x)
+db.array(1, x, x, x)
 }
 }
 

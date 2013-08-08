@@ -21,6 +21,7 @@ setMethod (
             stop("x and y cannot match because they originate",
                  " from different sources!")
         conn.id <- conn.id(x)
+        is.symmetric <- eql(x, y) # a symmetric matrix
 
         if (is(x, "db.data.frame")) {
             tbl <- content(x)
@@ -63,17 +64,14 @@ setMethod (
         else
             stop(deparse(substitute(y)), " is not a proper matrix!")
         n <- length(b)
- 
-        expr <- "array["
-        for (j in seq_len(n)) {
-            for (i in seq_len(m)) {
-                expr <- paste(expr, "sum(", a[i], " * ", b[j], ")",
-                              sep = "")
-                if (i != m) expr <- paste0(expr, ", ")
-            }
-            if (j != n) expr <- paste0(expr, ", ")
-        }
-        expr <- paste0(expr, "]")
+
+        tmp <- outer(a, b, function(x, y){paste0(x, " * ", y)})
+        if (is.symmetric) tmp <- tmp[upper.tri(tmp, diag = TRUE)]
+        expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")
+
+        db.info <- .get.dbms.str(conn.id)
+        if (db.info$db.str == "PostgreSQL")
+            expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
 
         new("db.Rcrossprod",
             .content = paste0("select ", expr, " as cross_prod from ",
@@ -90,6 +88,8 @@ setMethod (
             .is.factor = FALSE,
             .factor.suffix = "",
             .sort = sort,
+            .is.crossprod = TRUE,
+            .is.symmetric = is.symmetric,
             .dim = c(m,n))
     })
 

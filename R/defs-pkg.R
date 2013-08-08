@@ -115,7 +115,10 @@ setClass("db.Rquery",
 
 ## matrix representation
 setClass("db.Rcrossprod",
-         representation(.dim = "numeric"),
+         representation(
+             .is.crossprod = "logical", # is the column a crossprod
+             .is.symmetric = "logical", # is the column crossprod symmetric
+             .dim = "numeric"), # 
          contains = "db.Rquery")
 
 ## ------------------------------------------------------------------------

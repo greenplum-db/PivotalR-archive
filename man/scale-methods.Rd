@@ -61,7 +61,8 @@
 
   The numeric
   centering and scalings used (if any) are returned as attributes
-  "scaled:center" and "scaled:scale"
+  "scaled:center" and "scaled:scale". The number of rows in the table is also 
+  returned as the attribute "row.number".
 }
 
 \author{
@@ -72,7 +73,7 @@
 }
 
 \seealso{
-  \code{\link{rowAgg}} creates an array column for a
+  \code{\link{db.array}} creates an array column for a
   \code{\linkS4class{db.Rquery}} object.
 }
 

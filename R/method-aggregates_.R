@@ -9,7 +9,7 @@
     x <- .expand.array(x)
     y <- .sub.aggregate(x, func, vector, input.types, allow.bool,
                         x@.col.data_type, x@.col.udt_name, inside)
-    return (rowAgg(y))
+    return (db.array(y))
 }
 
 ## ------------------------------------------------------------------------
@@ -373,7 +373,7 @@ colAgg <- function (x)
 ## ------------------------------------------------------------------------
 
 ## array_agg all the columns on the same row
-rowAgg <- function (x, ...)
+db.array <- function (x, ...)
 {
     n <- nargs()
     dat <- list()

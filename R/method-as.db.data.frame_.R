@@ -5,7 +5,7 @@
 
 setGeneric (
     "as.db.data.frame",
-    def = function (x, table.name, verbose = TRUE, ...) {
+    def = function (x, table.name = NULL, verbose = TRUE, ...) {
         x.str <- deparse(substitute(x))
         res <- standardGeneric("as.db.data.frame")
         if (verbose) {
@@ -42,9 +42,10 @@ setMethod (
     "as.db.data.frame",
     signature (x = "data.frame"),
     def = function (
-    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
+    x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
+        if (is.null(table.name)) table.name <- .unique.string()
          .method.as.db.data.frame.1(x, 
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
@@ -59,9 +60,10 @@ setMethod (
     "as.db.data.frame",
     signature (x = "character"),
     def = function (
-    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
+    x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
+        if (is.null(table.name)) table.name <- .unique.string()
         f <- paste0(getwd(), "/", x)
         if (file.exists(f)) x <- f
         else if (!file.exists(x))
@@ -75,10 +77,11 @@ setMethod (
 ## ------------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
-    x, table.name, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
+    x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
+    if (is.null(table.name)) table.name <- .unique.string()
     exists <- db.existsObject(table.name, conn.id, is.temp)
     if (is.temp) exists <- exists[[1]]
     if (exists) stop("The table already exists in connection ", conn.id, "!")
@@ -134,10 +137,12 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.Rquery"),
-    def = function (x, table.name, verbose = TRUE,
+    def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL, nrow = NULL) {
+        if (is.null(table.name)) table.name <- .unique.string()
+        
         conn.id <- conn.id(x)
 
         dist.str <- .get.distributed.by.str(conn.id, distributed.by)
@@ -253,9 +258,10 @@ setMethod (
 setMethod (
     "as.db.data.frame",
     signature (x = "db.data.frame"),
-    def = function (x, table.name, verbose = TRUE,
+    def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE, is.temp = FALSE,
     distributed.by = NULL, nrow = NULL) {
+        if (is.null(table.name)) table.name <- .unique.string()
         if (table.name == content(x))
             stop("cannot copy an object into itself!")
         list(res = as.db.data.frame(x[,], table.name, FALSE,

@@ -347,7 +347,7 @@ setMethod (
                 else if (missing(i)) x[,j] <- value
                 else if (missing(j)) x[i,] <- value
                 else x[i,j] <- value
-            return (rowAgg(x))
+            return (db.array(x))
         }
         
         if (n == 4) {
@@ -389,7 +389,7 @@ setMethod (
                 else if (missing(i)) x[,j] <- value
                 else if (missing(j)) x[i,] <- value
                 else x[i,j] <- value
-            return (rowAgg(x))
+            return (db.array(x))
         }
  
         if (n == 4) {
@@ -434,7 +434,7 @@ setMethod (
                 else if (missing(i)) x[,j] <- value
                 else if (missing(j)) x[i,] <- value
                 else x[i,j] <- value
-            return (rowAgg(x))
+            return (db.array(x))
         }
         if (n == 4) {
             if (missing(i) && missing(j))
@@ -477,7 +477,7 @@ setMethod (
                 else if (missing(i)) x[,j] <- value
                 else if (missing(j)) x[i,] <- value
                 else x[i,j] <- value
-            return (rowAgg(x))
+            return (db.array(x))
         }
         if (n == 4) {
             if (missing(i) && missing(j)) {
@@ -524,7 +524,7 @@ setMethod (
                 else if (missing(i)) x[,j] <- value
                 else if (missing(j)) x[i,] <- value
                 else x[i,j] <- value
-            return (rowAgg(x))
+            return (db.array(x))
         }
         if (n == 4) {
             if (missing(i) && missing(j))

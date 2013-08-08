@@ -1,7 +1,7 @@
 \name{crossprod}
 
 \alias{crossprod}
-\alias{crossprod,db.obj-method}
+\alias{crossprod,db.obj,ANY-method}
 
 \title{
   Compute the matrix product of \code{X^T} and \code{Y}.
@@ -13,7 +13,7 @@
 }
 
 \usage{
-\S4method{crossprod}{db.obj}(x, y = x)
+\S4method{crossprod}{db.obj,ANY}(x, y = x)
 }
 
 \arguments{
@@ -47,7 +47,7 @@
 }
 
 \seealso{
-  \code{\link{rowAgg}} forms an array using columns
+  \code{\link{db.array}} forms an array using columns
 }
 \examples{
 \dontrun{
@@ -61,9 +61,40 @@ x <- as.db.data.frame(abalone, "abalone")
 
 lookat(crossprod(x[,-c(1,2)]))
 
-x$arr <- rowAgg(1, x$length, x$diameter)
+x$arr <- db.array(1, x$length, x$diameter)
 
 lookat(crossprod(x$arr))
+
+## -----------------------------------------------------
+
+## Create a function that does Principal Component Analysis in parallel.
+## As long as the number of features of the data table is fewer than
+## ~ 5000, the matrix t(x) %*% x can be loaded into memory to compute
+## the eigenvalues and eigenvectors. However, the step t(x) %*% x must
+## be done in-database in parallel, because x can be very big.
+pca <- function (x, center = TRUE, scale = FALSE)
+{
+    y <- scale(x, center = center, scale = scale) # centering and scaling
+    z <- as.db.data.frame(y, verbose = FALSE) # create an intermediate table to save computation
+    m <- lookat(crossprod(z)) # one scan of the table to compute Z^T * Z
+    d <- delete(z) # delete the intermediate table
+    res <- eigen(m) # only this computation is in R
+    n <- attr(y, "row.number") # save the computation to count rows
+     
+    ## return the result
+    list(val = sqrt(res$values/(n-1)), # eigenvalues
+         vec = res$vectors, # columns of this matrix are eigenvectors
+         center = attr(y, "scaled:center"),
+         scale = attr(y, "scaled:scale"))
+}
+
+## create a data table with a random name
+dat <- as.db.data.frame(abalone)
+
+## exclude id and sex columns
+p <- pca(dat[,-c(1,2)])
+
+p$val # eigenvalues
 }
 }
 

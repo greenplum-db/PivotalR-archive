@@ -31,4 +31,7 @@
         .localVars$conn.type[[tolower(.supported.connections[i])]] <- integer(0)
 
     packageStartupMessage("\nTo launch the graphical user interface, run the function pivotalr() !")
+
+    ## turn on cbind implementation using cbind2
+    methods:::bind_activation(on = TRUE)
 }

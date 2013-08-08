@@ -15,6 +15,16 @@
   has one additional slot as is described in the following.
   
   \describe{
+    \item{\code{.is.crossprod}:}{
+      A vector of logical values, which has the same length as the
+    number of columns. Whether each column is the result of
+    \code{\link{crossprod}}.
+  }
+  \item{\code{.is.symmetric}:}{
+    A vector of logical values, which has the same length as the
+    number of columns. Whether the column contains matrices that are
+    symmetric. 
+  }
     \item{\code{.dim}:}{
         Dimension of the matrix represented by this object.
     }
@@ -52,7 +62,7 @@ x <- db.data.frame("abalone") # x points to table "abalone"
 
 lookat(crossprod(x[,-c(1,2)]))
 
-x$arr <- rowAgg(1, x$length, x$diameter)
+x$arr <- db.array(1, x$length, x$diameter)
 
 lookat(crossprod(x$arr))
 }

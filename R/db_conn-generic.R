@@ -285,7 +285,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
         tbl.name <- table[2]
     }
     ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
-                             tbl.name, "'", schema.str, sep = ""), conn.id)
+                             .strip(tbl.name, "\""), "'", .strip(schema.str, "\""), sep = ""), conn.id)
     if (ct == 0)
         FALSE
     else
