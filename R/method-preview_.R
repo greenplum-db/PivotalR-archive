@@ -136,6 +136,10 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
+        ## NOTE: Unfortunately, RPostgreSQL cannot extract an array with elements
+        ## more than 1500. So we have to use unnest to help to load a large array
+        ## TODO: Create a separate array loading function to specifically deal
+        ## with such situations and can be called by other functions.
         res <- .db.getQuery(paste0("select unnest(", names(x)[1], ") as v from (select * from (",
                                    content(x),
                                    ") s", .limit.str(nrows), ") s1"), conn.id(x))

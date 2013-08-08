@@ -61,7 +61,8 @@
 
   The numeric
   centering and scalings used (if any) are returned as attributes
-  "scaled:center" and "scaled:scale"
+  "scaled:center" and "scaled:scale". The number of rows in the table is also 
+  returned as the attribute "row.number".
 }
 
 \author{

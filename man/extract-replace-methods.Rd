@@ -8,7 +8,7 @@
 \alias{$<-,db.obj,numeric-method}
 \alias{$<-,db.obj,db.Rquery-method}
 \alias{$<-,db.obj,logical-method}
-\alias{[,db.obj-method}
+\alias{[,db.obj,ANY,ANY,ANY-method}
 \alias{[<-,db.obj,ANY,ANY,character-method}
 \alias{[<-,db.obj,ANY,ANY,integer-method}
 \alias{[<-,db.obj,ANY,ANY,numeric-method}
@@ -31,7 +31,7 @@
 \usage{
 \S4method{$}{db.obj}(x, name)
 \S4method{[[}{db.obj}(x, i, j, ...)
-\S4method{[}{db.obj}(x, i, j, ..., drop = TRUE)
+\S4method{[}{db.obj,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
 \S4method{$}{db.obj,character}(x, name) <- value
 \S4method{$}{db.obj,integer}(x, name) <- value
 \S4method{$}{db.obj,numeric}(x, name) <- value

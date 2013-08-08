@@ -19,19 +19,19 @@
 }
 
 \usage{
-\S4method{as.db.data.frame}{character}(x, table.name, verbose = TRUE,
+\S4method{as.db.data.frame}{character}(x, table.name = NULL, verbose = TRUE,
 conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
 NULL, is.temp = FALSE, ...)
 
-\S4method{as.db.data.frame}{data.frame}(x, table.name, verbose = TRUE,
+\S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose = TRUE,
 conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
 NULL, is.temp = FALSE, ...)
 
-\S4method{as.db.data.frame}{db.Rquery}(x, table.name, verbose = TRUE,
+\S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose = TRUE,
 is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL,
 nrow = NULL)
 
-\S4method{as.db.data.frame}{db.data.frame}(x, table.name, verbose = TRUE,
+\S4method{as.db.data.frame}{db.data.frame}(x, table.name = NULL, verbose = TRUE,
 is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow = NULL)
 }
 
@@ -53,7 +53,9 @@ is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow = NULL)
 
   \item{table.name}{
     A string, the name of the table to be created. The returned
-    \code{db.data.frame} object is pointing to this table.
+    \code{db.data.frame} object is pointing to this table. When
+    \code{table.name} is \code{NULL}, a random name is used, which also
+    avoids the name conflicts.
   }
 
   \item{verbose}{

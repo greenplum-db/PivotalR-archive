@@ -71,3 +71,5 @@ export ("PivotalR", "pivotalr", "print.none.obj")
 exportMethods("scale")
 export("groups.lm.madlib", "groups.logregr.madlib",
       "groups.lm.madlib.grps", "groups.logregr.madlib.grps")
+
+exportMethods("cbind2")

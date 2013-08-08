@@ -25,7 +25,7 @@ array = TRUE)
 \S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE,
 array = TRUE)
 
-\S4method{preview}{db.Rcrossprod}(x, interactive = FALSE)
+\S4method{preview}{db.Rcrossprod}(x, nrows = 100, interactive = FALSE)
 
 lookat(x, nrows = 100, array = TRUE)
 }
@@ -74,7 +74,11 @@ object, this
   object. 
 
   When the signature \code{x} is a \code{\linkS4class{db.Rcrossprod}}
-  object, this function output a matrix to R.
+  object, this function output a matrix to R. If the matrix is symmetric,
+  it is returned as \code{\linkS4class{dspMatrix}}. Otherwise, it is
+  returned as \code{\linkS4class{dgeMatrix}}. If there are multiple
+  matrices in \code{x}, a list is returned and each element of the list
+  is a matrix.
 }
 
 \value{

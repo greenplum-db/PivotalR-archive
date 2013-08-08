@@ -3,6 +3,8 @@
 ## Returns: A db.Rquery object, also with attributes
 ## scaled:center and scaled:scale
 
+setGeneric ("scale")
+
 setMethod (
     "scale",
     signature(x = "db.obj"),
@@ -46,14 +48,20 @@ setMethod (
         }
         
         if (both.numeric != 2) {
-            sql <- paste("select (f).*, n from (select ", madlib,
+            ## NOTE: I am using unnest here
+            ## For the reason, please see the definition of
+            ## preview-db.Rcrossprod method
+            sql <- paste0("select unnest((f).mean) as mean, ",
+                          "unnest((f).std) as std, ",
+                          "n from (select ", madlib,
                          ".__utils_var_scales_result(", madlib,
                          ".utils_var_scales(vec, ", col.dim,
                          ")) as f, count(vec) as n from (",
-                         content(y), ") h) s", sep = "")
+                         content(y), ") h) s")
             res <- .get.res(sql, conn.id = conn.id)
-            n <- res$n # row dimension
-            savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))
+            n <- res$n[1] # row dimension
+            ## savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))
+            savg <- res$mean
         } else {
             n <- dim(x)[1]
         }
@@ -66,8 +74,9 @@ setMethod (
         }
 
         if (is.logical(scale)) {
-            var <- (as.vector(arraydb.to.arrayr(res$std, "double"))^2 +
-                    savg^2)
+            ## var <- (as.vector(arraydb.to.arrayr(res$std, "double"))^2 +
+            ##         savg^2)
+            var <- res$std^2 + savg^2
             if (scale)
                 std1 <- sqrt(var - 2*avg1*savg+ avg1^2) * sqrt(n/(n-1))
             else

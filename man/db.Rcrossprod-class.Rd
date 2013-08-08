@@ -15,6 +15,16 @@
   has one additional slot as is described in the following.
   
   \describe{
+    \item{\code{.is.crossprod}:}{
+      A vector of logical values, which has the same length as the
+    number of columns. Whether each column is the result of
+    \code{\link{crossprod}}.
+  }
+  \item{\code{.is.symmetric}:}{
+    A vector of logical values, which has the same length as the
+    number of columns. Whether the column contains matrices that are
+    symmetric. 
+  }
     \item{\code{.dim}:}{
         Dimension of the matrix represented by this object.
     }
