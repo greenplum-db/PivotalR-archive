@@ -34,13 +34,24 @@ create or replace function pg_temp.crossprod_gpdb_double_prefunc (
 ) returns double precision[] as $$
 declare
     i   integer;
-    n   integer;
+    n1  integer;
+    n2  integer;
+    res double precision[];
 begin
-    n := array_upper(state1, 1);
+    res = state1;
+    n1 = array_upper(state1, 1);
+    n2 = array_upper(state2, 1);
+    if n1 is NULL and n2 is NULL then
+        return NULL;
+    elsif n1 is NULL then
+        return state2;
+    elsif n2 is NULL then
+        return state1;
+    end if;
     for i in 1 .. n loop
-        state1[i] = state1[i] + state2[i];
+        res[i] = state1[i] + state2[i];
     end loop;
-    return state1;
+    return res;
 end;
 $$ language plpgsql;
 

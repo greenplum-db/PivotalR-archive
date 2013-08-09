@@ -56,7 +56,8 @@ setMethod (
         } ## else
           ##   stop(deparse(substitute(x)), " is not a proper matrix!")
         m <- .col.number.all(x) # compute the column numbers including array
-
+        n <- m # if it is symmetric
+  
         if (!is.symmetric) {
             if (is(y, "db.data.frame")) s <- names(y)
             else s <- y@.expr
@@ -97,7 +98,7 @@ setMethod (
             expr <- paste0(func, "(", a, ", ", m, ", ", b, ", ", n, ")")
 
         new("db.Rcrossprod",
-            .content = paste0("select ", expr, " as crossprod from ",
+            .content = paste0("select ", expr, " as cross_prod from ",
             tbl, where.str, sort$str, sep = ""),
             .expr = expr,
             .source = src,
