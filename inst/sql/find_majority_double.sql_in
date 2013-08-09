@@ -1,3 +1,6 @@
+-- used in prediction for bagging to find out the majority
+-- see generic.bagging.R for details
+
 create or replace function pg_temp.find_majority_double (
     arr     double precision[]
 ) returns double precision as $$
