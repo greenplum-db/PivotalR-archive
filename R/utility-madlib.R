@@ -1,19 +1,24 @@
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 ## Utility functions used by madlib
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## check whether newer MADlib version is used
 .check.madlib.version <- function (data)
 {
     ## Only newer versions of MADlib are supported
-    idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id(data), 2]
-    if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
-        .madlib.version.number(conn.id(data)) < 0.6)
-        stop("MADlib error: Please use Madlib version newer than 0.5 !")
+    conn.id <- conn.id(data)
+    idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
+    db.info <- .get.dbms.str(conn.id)
+    if (db.info$db.str != "HAWQ") {
+        if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
+            .madlib.version.number(conn.id) < 0.6)
+            stop("MADlib error: Please use Madlib version newer than ",
+                 "0.5 !")
+    }
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## Analyze the formula and get each terms
 .get.params <- function (formula, data)
@@ -64,7 +69,7 @@
     res
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .get.groups <- function (x)
 {
@@ -77,6 +82,8 @@
         return (NULL)
     }
 }
+
+## -----------------------------------------------------------------------
 
 .get.groups.grps <- function (x)
 {
@@ -93,20 +100,28 @@
     res
 }
 
+## -----------------------------------------------------------------------
+
 groups.lm.madlib <- function (x)
 {
     .get.groups(x)
 }
+
+## -----------------------------------------------------------------------
 
 groups.logregr.madlib <- function (x)
 {
     .get.groups(x)
 }
 
+## -----------------------------------------------------------------------
+
 groups.lm.madlib.grps <- function (x)
 {
     .get.groups.grps(x)
 }
+
+## -----------------------------------------------------------------------
 
 groups.logregr.madlib.grps <- function (x)
 {

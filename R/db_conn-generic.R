@@ -104,8 +104,12 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
 .get.dbms.str <- function (conn.id)
 {
     dbms.str <- dbms(conn.id = conn.id)
-    if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum")
-    {
+    if (gsub(".*(HAWQ).*", "\\1", dbms.str, perl=T) == "HAWQ") {
+        db.str <- "HAWQ"
+        version.str <- gsub(".*HAWQ[^\\d]+([\\d\\.]+).*", "\\1",
+                            dbms.str, perl=T)
+    } else if (gsub(".*(Greenplum).*", "\\1", dbms.str,
+                  perl=T) == "Greenplum") {
         db.str <- "Greenplum"
         version.str <- gsub(".*Greenplum[^\\d]+([\\d\\.]+).*",
                             "\\1", dbms.str, perl=T)

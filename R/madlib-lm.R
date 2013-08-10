@@ -31,11 +31,19 @@ madlib.lm <- function (formula, data, na.action,
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     tbl.source <- analyzer$tbl.source
 
+    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    if (db.str == "HAWQ" && hetero)
+        stop("Right now MADlib on HAWQ does not support computing ",
+             "heteroskedasticity in linear regression !")
+    
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL"
     else
-        if (.madlib.version.number(conn.id(data)) > 0.7)
+        if (db.str == "HAWQ") {
+            stop("Right now MADlib on HAWQ does not support grouping ",
+                 "in linear regression !")
+        } else if (.madlib.version.number(conn.id(data)) > 0.7)
             grp <- paste0("'", params$grp.str, "'")
         else
             grp <- paste("'{", params$grp.str, "}'::text[]")
@@ -43,18 +51,25 @@ madlib.lm <- function (formula, data, na.action,
     ## construct SQL string
     conn.id <- conn.id(data)
     tbl.source <- gsub("\"", "", content(data))
-    tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    sql <- paste("select ", madlib, ".linregr_train('",
-                 tbl.source, "', '", tbl.output, "', '",
-                 params$dep.str, "', '", params$ind.str, "', ",
-                 grp, ", ", hetero, ")", sep = "")
-
+    if (db.str == "HAWQ") {
+        tbl.output <- NULL
+        sql <- paste0("select (f).* from (select ", madlib, ".linregr(",
+                      params$dep.str, ",", params$ind.str, ") as f from ",
+                      tbl.source, ") s")
+    } else {
+        tbl.output <- .unique.string()
+        sql <- paste0("select ", madlib, ".linregr_train('",
+                      tbl.source, "', '", tbl.output, "', '",
+                      params$dep.str, "', '", params$ind.str, "', ",
+                      grp, ", ", hetero, ")")
+    }
+        
     ## execute and get the result
     res <- .get.res(sql, tbl.output, conn.id)
 
     ## drop temporary tables
-    .db.removeTable(tbl.output, conn.id)
+    if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
     msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
