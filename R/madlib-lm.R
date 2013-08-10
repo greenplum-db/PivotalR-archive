@@ -51,13 +51,14 @@ madlib.lm <- function (formula, data, na.action,
     ## construct SQL string
     conn.id <- conn.id(data)
     tbl.source <- gsub("\"", "", content(data))
-    tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
+        tbl.output <- NULL
         sql <- paste0("select (f).* from (select ", madlib, ".linregr(",
                       params$dep.str, ",", params$ind.str, ") as f from ",
                       tbl.source, ") s")
     } else {
+        tbl.output <- .unique.string()
         sql <- paste0("select ", madlib, ".linregr_train('",
                       tbl.source, "', '", tbl.output, "', '",
                       params$dep.str, "', '", params$ind.str, "', ",
@@ -68,7 +69,7 @@ madlib.lm <- function (formula, data, na.action,
     res <- .get.res(sql, tbl.output, conn.id)
 
     ## drop temporary tables
-    .db.removeTable(tbl.output, conn.id)
+    if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
     msg.level <- .set.msg.level(msg.level, conn.id) # reset message level

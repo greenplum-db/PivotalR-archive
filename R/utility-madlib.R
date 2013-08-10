@@ -121,6 +121,8 @@ groups.lm.madlib.grps <- function (x)
     .get.groups.grps(x)
 }
 
+## -----------------------------------------------------------------------
+
 groups.logregr.madlib.grps <- function (x)
 {
     .get.groups.grps(x)
