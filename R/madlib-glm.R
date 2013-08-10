@@ -67,22 +67,34 @@ madlib.glm <- function (formula, data, family = "gaussian",
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     tbl.source <- analyzer$tbl.source
 
+    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL::text"
     else
-        grp <- paste("'", params$grp.str, "'")
+        if (db.str == "HAWQ")
+            stop("Right now MADlib on HAWQ does not support grouping ",
+                 "in logistic regression !")
+        else
+            grp <- paste("'", params$grp.str, "'")
 
     ## construct SQL string
     conn.id <- conn.id(data)
     tbl.source <- gsub("\"", "", content(data))
     tbl.output <- .unique.string()
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    sql <- paste("select ", madlib, ".logregr_train('",
-                 tbl.source, "', '", tbl.output, "', '",
-                 params$dep.str, "', '", params$ind.str, "', ",
-                 grp, ", ", max_iter, ", '", method, "', ",
-                 tolerance, ")", sep = "")
+    if (db.str == "HAWQ") {
+        sql <- paste0("select (f).* from (select ", madlib,
+                      ".logregr('", tbl.source, "', '", params$dep.str,
+                      "', '", params$ind.str, "', ", max_iter,
+                      ", '", method, "', ", tolerance, ") as f) s")
+    } else {
+        sql <- paste0("select ", madlib, ".logregr_train('",
+                      tbl.source, "', '", tbl.output, "', '",
+                      params$dep.str, "', '", params$ind.str, "', ",
+                      grp, ", ", max_iter, ", '", method, "', ",
+                      tolerance, ")")
 
     ## execute the logistic regression and get the result
     res <- .get.res(sql, tbl.output, conn.id)

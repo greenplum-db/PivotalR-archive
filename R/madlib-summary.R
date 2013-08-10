@@ -13,6 +13,10 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
         .madlib.version.number(conn.id(x)) < 0.6)
         stop("MADlib error: Please use Madlib version newer than 0.5!")
+
+    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    if (db.str == "HAWQ")
+        stop("Right now MADlib on HAWQ does not support table summary !")
     
     if (!is(x, "db.obj"))
         stop("Cannot operate on non db.obj objects!")
