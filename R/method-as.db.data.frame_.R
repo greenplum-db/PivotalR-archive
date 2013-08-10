@@ -45,8 +45,11 @@ setMethod (
     x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
-        if (is.null(table.name)) table.name <- .unique.string()
-         .method.as.db.data.frame.1(x, 
+        if (is.null(table.name)) {
+            table.name <- .unique.string()
+            is.temp <- TRUE
+        }
+        .method.as.db.data.frame.1(x, 
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
                                    distributed.by, is.temp, ...)
@@ -63,7 +66,11 @@ setMethod (
     x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...) {
-        if (is.null(table.name)) table.name <- .unique.string()
+        if (is.null(table.name)) {
+            table.name <- .unique.string()
+            is.temp <- TRUE
+        }
+        
         f <- paste0(getwd(), "/", x)
         if (file.exists(f)) x <- f
         else if (!file.exists(x))
@@ -81,7 +88,11 @@ setMethod (
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
-    if (is.null(table.name)) table.name <- .unique.string()
+    if (is.null(table.name)) {
+        table.name <- .unique.string()
+        is.temp <- TRUE
+    }
+    
     exists <- db.existsObject(table.name, conn.id, is.temp)
     if (is.temp) exists <- exists[[1]]
     if (exists) stop("The table already exists in connection ", conn.id, "!")
@@ -141,7 +152,10 @@ setMethod (
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL, nrow = NULL) {
-        if (is.null(table.name)) table.name <- .unique.string()
+        if (is.null(table.name)) {
+            table.name <- .unique.string()
+            is.temp <- TRUE
+        }
         
         conn.id <- conn.id(x)
 
@@ -261,7 +275,11 @@ setMethod (
     def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE, is.temp = FALSE,
     distributed.by = NULL, nrow = NULL) {
-        if (is.null(table.name)) table.name <- .unique.string()
+        if (is.null(table.name)) {
+            table.name <- .unique.string()
+            is.temp <- TRUE
+        }
+        
         if (table.name == content(x))
             stop("cannot copy an object into itself!")
         list(res = as.db.data.frame(x[,], table.name, FALSE,
