@@ -100,7 +100,7 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
         n <- length(object)
         for (i in seq_len(n)) {
             tmp <- ""
-            if (i != n) {
+            ## if (i != n) {
                 for (j in seq_len(l)) {
                     tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
                                  object[[i]][[object[[i]]$grp.cols[j]]],
@@ -114,7 +114,8 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
                     tmp <- .replace.col.with.expr(tmp, names(newdata),
                                                   newdata@.expr)
                 expr <- paste(expr, tmp, " then ", sep = "")
-            }
+            ## }
+        
             if (db.str != "HAWQ") {
                 coef.i <- paste("array[", paste(object[[i]]$coef,
                                                 collapse = ", "),
@@ -128,10 +129,10 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
                     expr <- paste0(expr, " > 0")
             }
             
-            if (i < n - 1)
+            if (i < n)
                 expr <- paste(expr, " when ", sep = "")
-            else if (i == n - 1)
-                expr <- paste(expr, " else ", sep = "")
+            ## else if (i == n - 1)
+                ## expr <- paste(expr, " else ", sep = "")
             else
                 expr <- paste(expr, " end", sep = "")
         }    

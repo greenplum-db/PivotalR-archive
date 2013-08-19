@@ -107,6 +107,11 @@ setMethod (
             } else if (is(j, "db.Rquery"))
                 j <- .db.getQuery(paste(content(j), "limit 1"), conn.id(x))
         }
+
+        if (n == 2 && length(names(x)) == 1 && is(i, "db.Rquery")) {
+            n <- 3
+            j <- 1
+        }
         
         if (n == 2) { # select columns
             ## i.txt <- deparse(substitute(i))

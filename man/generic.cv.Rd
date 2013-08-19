@@ -85,7 +85,7 @@ err <- generic.cv(function(data) {
                   predict,
                   function(predicted, data) {
                       lookat(mean((data$rings - predicted)^2))
-                  })
+                  }, data = y)
 }
 }
 

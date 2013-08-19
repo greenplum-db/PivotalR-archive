@@ -1,4 +1,5 @@
 \name{groups}
+\alias{groups}
 \alias{groups.lm.madlib}
 \alias{groups.logregr.madlib}
 \alias{groups.lm.madlib.grps}
