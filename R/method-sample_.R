@@ -17,7 +17,7 @@ setMethod (
         msg.level <- .set.msg.level("panic", conn.id(x))
         warn.r <- getOption("warn")
         options(warn = -1)
-        
+
         if (!replace) {
             tmp <- .unique.string()
             res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
@@ -30,7 +30,6 @@ setMethod (
             select <- sample(seq(n), size, replace = TRUE)
             freq <- table(select)
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
-            
             res <- as.db.data.frame(y[fq[,1],-y@.dim[2]], .unique.string(),
                                     FALSE, FALSE, TRUE, FALSE, NULL, NULL)
             for (i in seq_len(max(fq[,2])-1)+1) {
@@ -39,7 +38,7 @@ setMethod (
                              ")", sep = "")
                 .db.getQuery(sql, conn.id(x))
             }
-            
+
             delete(y)
             msg.level <- .set.msg.level(msg.level, conn.id(x)) 
             options(warn = warn.r) # reset R warning level
@@ -62,7 +61,7 @@ setMethod (
     else
         y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE, FALSE,
                               NULL, NULL)
-    tmp <- db.objects(tmp)
+    tmp <- db.objects(tmp, conn.id(x))
     id.col <- .unique.string()
     sql <- paste("alter table ", tmp, " add column ", id.col,
                  " bigserial", sep = "")
