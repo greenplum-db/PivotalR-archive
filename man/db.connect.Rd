@@ -4,11 +4,7 @@
 \title{
   Create a connection to a database
 }
-\description{
-  Create a connection to a PostgreSQL or Greenplum (Pivotal) database. One can create multiple connections
-  to multiple databases. The connections are indexed by an integer
-  starting from 1.
-}
+
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
 password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL",
@@ -66,7 +62,11 @@ default.schemas = NULL, verbose = TRUE)
 
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
-
+\description{
+  Create a connection to a PostgreSQL or Greenplum (Pivotal) database. One can create multiple connections
+  to multiple databases. The connections are indexed by an integer
+  starting from 1.
+}
 \note{
   Right only MADlib 0.6 or later is supported. If you have an older
   version of MADlib, you will not be able to use all the functions whose
@@ -74,6 +74,15 @@ default.schemas = NULL, verbose = TRUE)
   functions.
 
   Also, right now only PostgreSQL and Greenplum databases are supported.
+}
+
+
+\examples{
+\dontrun{
+## connect to a database
+db.connect(host = "localhost", user = "me", dbname = "me", password =
+"", port = 5432, madlib = "madlib")
+}
 }
 
 \seealso{
@@ -89,13 +98,6 @@ default.schemas = NULL, verbose = TRUE)
   \code{\link{db.search.path}} and \code{\link{db.default.schemas}}
   displays or sets the search path (i.e. default schemas) in the
   connected database.
-}
-\examples{
-\dontrun{
-## connect to a database
-db.connect(host = "localhost", user = "me", dbname = "me", password =
-"", port = 5432, madlib = "madlib")
-}
 }
 
 \keyword{utility}
