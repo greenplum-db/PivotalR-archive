@@ -122,6 +122,11 @@ NOT recommended to directly manipulate the internal slots of these objects.
 
       str: A string, the full "order by ..." string.
     }
+
+    \item{\code{.is.agg}:}{
+      logical value, whether this object represents an aggregate
+      operation.
+    }
   }
 }
 

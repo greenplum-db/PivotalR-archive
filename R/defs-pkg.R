@@ -107,8 +107,10 @@ setClass("db.Rquery",
              .where = "character", # WHERE clause
              .is.factor = "logical", # a boolean vector
              .factor.suffix = "character",
-             .sort = "list" # order by
-             )
+             .sort = "list", # order by
+             .is.agg = "logical" # is this an aggrgate?
+             ),
+         prototype = list(.is.agg = FALSE)
          )
 
 ## ------------------------------------------------------------------------

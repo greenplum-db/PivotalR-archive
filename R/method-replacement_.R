@@ -197,6 +197,11 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, name, value) {
         if (length(name) != 1) stop("Cannot replace multiple columns")
+        if (is(value, "db.Rquery") && value@.is.agg) {
+            value <- as.numeric(lookat(value))
+            x[[name]] <- value
+            return (x)
+        }
         .replacement(x, name, value)
     },
     valueClass = "db.Rquery")
@@ -261,6 +266,23 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
         if (length(i) != 1) stop("Cannot replace multiple columns")
+          if (is(value, "db.Rquery") && value@.is.agg) {
+            value <- as.numeric(lookat(value))
+            if (missing(i) && missing(j)) {
+                x[[,]] <- value
+                return (x)
+            }
+            if (missing(i)) {
+                x[[,j]] <- value
+                return (x)
+            }
+            if (missing(j)) {
+                x[[i,]] <- value
+                return (x)
+            }
+            x[[i,j]] <- value
+            return (x)
+        }
         name <- .preprocess.name(x, i)
         .replacement(x, name, value)
     },
@@ -338,6 +360,24 @@ setMethod (
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
         n <- length(sys.calls()[[1]]) - 1
+        if (is(value, "db.Rquery") && value@.is.agg) {
+            value <- as.numeric(lookat(value))
+            if (missing(i) && missing(j)) {
+                x[,] <- value
+                return (x)
+            }
+            if (missing(i)) {
+                x[,j] <- value
+                return (x)
+            }
+            if (missing(j)) {
+                x[i,] <- value
+                return (x)
+            }
+            x[i,j] <- value
+            return (x)
+        }
+        
         if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
             x <- .expand.array(x)
             if (n == 3)
@@ -367,7 +407,11 @@ setMethod (
                     .replacement(x, names(x[i,j]), value, str, where.str)
             }
         } else if (n == 3) {
-            .replacement(x, names(x[i]), value)
+            if (is(i, "db.Rquery")) {
+                str <- .case.condition(x, i)
+                .replacement(x, names(x[i]), value, str)
+            } else
+                .replacement(x, names(x[i]), value)
         }
     },
     valueClass = "db.Rquery")

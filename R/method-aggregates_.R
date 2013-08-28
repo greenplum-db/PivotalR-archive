@@ -146,8 +146,10 @@ setMethod (
     "mean",
     signature(x = "db.obj"),
     function (x, ...) {
-        .aggregate(x, "avg", FALSE, .num.types, TRUE,
-                   "double precision", "float8")
+        res <- .aggregate(x, "avg", FALSE, .num.types, TRUE,
+                          "double precision", "float8")
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -159,8 +161,10 @@ setMethod (
     "sum",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "sum", FALSE, .num.types, TRUE,
-                   x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "sum", FALSE, .num.types, TRUE,
+                          x@.col.data_type, x@.col.udt_name)
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -172,7 +176,9 @@ setMethod (
     "length",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "count", FALSE, NULL, FALSE, "integer", "int4")
+        res <- .aggregate(x, "count", FALSE, NULL, FALSE, "integer", "int4")
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -184,8 +190,10 @@ setMethod (
     "max",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "max", FALSE, .num.types, FALSE,
-                   x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "max", FALSE, .num.types, FALSE,
+                          x@.col.data_type, x@.col.udt_name)
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -197,8 +205,10 @@ setMethod (
     "min",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        .aggregate(x, "min", FALSE, .num.types, FALSE,
-                   x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "min", FALSE, .num.types, FALSE,
+                          x@.col.data_type, x@.col.udt_name)
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -217,8 +227,10 @@ setMethod (
     "sd",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "stddev", FALSE, .num.types, TRUE,
-                   "double precision", "float8")
+        res <- .aggregate(x, "stddev", FALSE, .num.types, TRUE,
+                          "double precision", "float8")
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -237,8 +249,10 @@ setMethod (
     "var",
     signature(x = "db.obj"),
     function (x) {
-        .aggregate(x, "variance", FALSE, .num.types, TRUE,
-                   "double precision", "float8")
+        res <- .aggregate(x, "variance", FALSE, .num.types, TRUE,
+                          "double precision", "float8")
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -250,8 +264,10 @@ setMethod (
     "colMeans",
     signature(x = "db.obj"),
     function (x, na.rm = FALSE, dims = 1, ...) {
-        .aggregate(x, "avg", FALSE, .num.types, TRUE,
-                   "double precision", "float8")
+        res <- .aggregate(x, "avg", FALSE, .num.types, TRUE,
+                          "double precision", "float8")
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -263,8 +279,10 @@ setMethod (
     "colSums",
     signature(x = "db.obj"),
     function (x, na.rm = FALSE, dims = 1, ...) {
-        .aggregate(x, "sum", FALSE, .num.types, TRUE,
-                   x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "sum", FALSE, .num.types, TRUE,
+                          x@.col.data_type, x@.col.udt_name)
+        res@.is.agg <- TRUE
+        res
     },
     valueClass = "db.Rquery")
 
@@ -366,8 +384,9 @@ colAgg <- function (x)
 {
     if (!is(x, "db.obj"))
         stop("this function only works with db.obj!")
-    .aggregate(x, "array_agg", FALSE, NULL, FALSE, "array",
-               paste("_", x@.col.udt_name, sep = ""))
+    res <- .aggregate(x, "array_agg", FALSE, NULL, FALSE, "array",
+                      paste("_", x@.col.udt_name, sep = ""))
+    res@.is.agg <- TRUE
 }
 
 ## ------------------------------------------------------------------------
