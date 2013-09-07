@@ -11,7 +11,7 @@ setGeneric ("madlib.arima",
 setMethod (
     "madlib.arima",
     signature (x = "db.Rquery", ts = "db.Rquery"),
-    def = function (x, ts, by, order=c(1,1,1),
+    def = function (x, ts, by = NULL, order=c(1,1,1),
     seasonal = list(order = c(0,0,0), period = NA),
     include.mean = TRUE, method = "CSS",
     optim.method = "LM",
@@ -26,7 +26,7 @@ setMethod (
     f.str <- paste(names(x), "~", names(ts))
 
     ## grouping is a list of db.Rquery
-    if (!missing(by)) {
+    if (!is.null(by)) {
         grp.names <- character(0)
         for (i in seq_len(length(by))) {
             data <- cbind(data, by[[i]])
