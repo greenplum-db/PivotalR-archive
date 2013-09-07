@@ -174,8 +174,19 @@ setMethod (
         return (rst)
     })
 
+## ----------------------------------------------------------------------
 
-## ------------------------------------------------------------------------
+## Directly read a table without wrapping it with db.table
+setMethod (
+    "preview",
+    signature (x = "character"),
+    def = function (x, conn.id = 1, nrows = 100, array = TRUE) {
+        x <- db.data.frame(x, conn.id=conn.id)
+        lookat(x, nrows=nrows, array=array)
+    })
+
+
+## -----------------------------------------------------------------------
 
 ## same as preview
 lookat <- function (x, nrows = 100, array = TRUE)

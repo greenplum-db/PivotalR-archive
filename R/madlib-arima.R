@@ -1,0 +1,226 @@
+
+## ----------------------------------------------------------------------
+## Wrapper function for MADlib's ARIMA
+## ----------------------------------------------------------------------
+
+setGeneric ("madlib.arima",
+            def = function (x, ts, ...) standardGeneric("madlib.arima"))
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "madlib.arima",
+    signature (x = "db.Rquery", ts = "db.Rquery"),
+    def = function (x, ts, by, order=c(1,1,1),
+    seasonal = list(order = c(0,0,0), period = NA),
+    include.mean = TRUE, method = "CSS",
+    optim.method = "LM",
+    optim.control = list(), ...)
+{
+    if (length(names(x)) != 1 || length(names(ts)) != 1)
+        stop("ARIMA can only have one time stamp column and ",
+             "one time series value column !")
+
+    
+    data <- cbind(x, ts)
+    f.str <- paste(names(x), "~", names(ts))
+
+    ## grouping is a list of db.Rquery
+    if (!missing(by)) {
+        grp.names <- character(0)
+        for (i in seq_len(length(by))) {
+            data <- cbind(data, by[[i]])
+            grp.names <- c(grp.names, names(by[[i]]))
+        }
+        f.str <- paste(f.str, "|", paste(grp.names, collapse = "+"))
+    }
+
+    madlib.arima(formula(f.str), data, order, seasonal, include.mean,
+                 method, optim.method, optim.control, ...)
+})
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "madlib.arima",
+    signature (x = "formula", ts = "db.obj"),
+    def = function (x, ts, order=c(1,1,1),
+    seasonal = list(order = c(0,0,0), period = NA),
+    include.mean = TRUE, method = "CSS",
+    optim.method = "LM",
+    optim.control = list(), ...)
+{
+    args <- list(...)
+    args <- c(args, optim.control)
+    args$formula <- x
+    args$data <- ts
+    args$order <- order
+    args$seasonal <- seasonal
+    args$include.mean <- include.mean
+    args$optim.method <- optim.method
+    call <- deparse(match.call())
+
+    if (tolower(method) == "css") {
+        fit <- do.call(.madlib.arima.css, args)
+        fit$call <- call
+        return (fit)
+    } else
+        stop("Right now MADlib's ARIMA does not support methods ",
+             "other than \"CSS\" !")
+})
+
+## ----------------------------------------------------------------------
+
+.madlib.arima.css <- function (formula, data, order=c(1,1,1),
+                               seasonal = list(order = c(0, 0, 0),
+                               period = NA),
+                               include.mean = TRUE, optim.method = "LM",
+                               tau = 1e-3, e1 = 1e-15, e2 = 1e-15,
+                               e3 = 1e-15, max.iter = 100,
+                               hessian.delta = 1e-4, param.init = "zero",
+                               chunk.size = 10000, ...)
+{
+    if (tolower(optim.method) != "lm")
+        stop("Right now MADlib ARIMA only supports ",
+             "LM optimization method !")
+
+    if (!identical(seasonal, list(order = c(0, 0, 0), period = NA)))
+        stop("Right now MADlib ARIMA does not support seasonal order !")
+
+    if (length(order) != 3)
+        stop("ARIMA needs order to be an integer array of length 3 !")
+    
+    ## make sure fitting to db.obj
+    if (! is(data, "db.obj"))
+        stop("madlib.lm cannot be used on the object ",
+             deparse(substitute(data)))
+    
+    ## Only newer versions of MADlib are supported
+    .check.madlib.version(data, 1.2)
+
+    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    if (db.str == "HAWQ")
+        stop("Right now MADlib on HAWQ does not support ARIMA !")
+    
+    ## suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id(data)) 
+    ## disable warning in R, RPostgreSQL
+    ## prints some unnessary warning messages
+    warn.r <- getOption("warn")
+    options(warn = -1)
+
+    ## analyze the formula
+    analyzer <- .get.params(formula, data)
+    data <- analyzer$data
+    params <- analyzer$params
+    is.tbl.source.temp <- analyzer$is.tbl.source.temp
+    tbl.source <- analyzer$tbl.source
+
+    if (length(params$ind.vars) != 1)
+        stop("Only one time stamp is allowed !")
+
+    ## dependent, independent and grouping strings
+    if (is.null(params$grp.str))
+        grp <- "NULL"
+    else
+        stop("Right now MADlib does not support grouping in ARIMA !")
+
+    ## construct SQL string
+    conn.id <- conn.id(data)
+    tbl.source <- gsub("\"", "", content(data))
+    madlib <- schema.madlib(conn.id) # MADlib schema name
+    tbl.output <- .unique.string()
+    order.str <- paste0("array[", toString(order), "]")
+    optim.control.str <- paste0("tau=", tau, ", e1=", e1, ", e2=", e2,
+                                ", e3=", e3, ", hessian_delta=",
+                                hessian.delta, ", chunk_size=",
+                                chunk.size, ", param_init=\"",
+                                param.init, "\"")
+    sql <- paste0("select ", madlib, ".arima_train('",
+                  tbl.source, "', '", tbl.output, "', '",
+                  params$ind.str, "', '", params$dep.str, "', ",
+                  grp, ", ", include.mean, ", '",
+                  optim.control.str, "')")
+
+    ## execute and get the result
+    res <- .get.res(sql=sql, conn.id=conn.id)
+
+    p <- order[1]
+    d <- order[2]
+    q <- order[3]
+    ## retrieve the coefficients
+    res <- preview(tbl.output, conn.id=conn.id, "all")
+    rst <- list()
+    
+    rst$coef <- numeric(0) # coefficients
+    rst$s.e. <- numeric(0) # standard errors
+    coef.names <- character(0)
+    if (p != 0) {
+        rst$coef <- c(rst$coef, res[1,1:p])
+        rst$s.e. <- c(rst$s.e., res[1,p+(1:p)])
+        coef.names <- c(coef.names, paste0("ar", 1:p))
+    }
+    if (q != 0) {
+        rst$coef <- c(rst$coef, res[1,2*p + (1:q)])
+        rst$s.e. <- c(rst$s.e., res[1,2*p+q+(1:q)])
+        coef.names <- c(coef.names, paste0("ma", 1:q))
+    }
+    if (include.mean && d == 0) {
+        rst$coef <- c(rst$coef, res[1,dim(res)[2]-1])
+        rst$s.e. <- c(rst$s.e., res[1,dim(res)[2]])
+        coef.names <- c(coef.names, "mean")
+    }
+    names(rst$coef) <- coef.names
+    names(rst$s.e.) <- coef.names
+
+    ## retrieve the statistics
+    rst$series <- content(data)
+    rst$time.stamp <- params$ind.str
+    rst$time.series <- params$dep.str
+
+    res <- preview(paste0(tbl.output, "_summary", conn.id=conn.id, "all"))
+    rst$sigma2 <- res$residual_variance
+    rst$loglik <- res$log_likelihood
+    rst$iter.num <- res$iter_num
+    rst$exec.time <- res$exec_time
+    
+    ## create db.data.frame object for residual table
+    rst$residuals <- db.data.frame(paste0(tbl.output, "residual"),
+                                   conn.id=conn.id)
+
+    ## drop temporary tables
+    if (is.tbl.source.temp) delete(tbl.source, conn.id)
+    delete(tbl.output, conn.id)
+    delete(paste0(tbl.output, "_summary"), conn.id)
+                
+    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
+    options(warn = warn.r) # reset R warning level
+
+    class(rst) <- "arima.css.madlib"
+    rst
+}
+
+## ----------------------------------------------------------------------
+
+summary.arima.css.madlib <- function (object, ...)
+{
+    object
+}
+
+## ----------------------------------------------------------------------
+
+print.arima.css.madlib <- function (x,
+                                    digits = max(3L,
+                                    getOption("digits") - 3L),
+                                    ...)
+{
+    
+}
+
+
+## ----------------------------------------------------------------------
+
+predict.arima.css.madlib <- function()
+{
+
+}

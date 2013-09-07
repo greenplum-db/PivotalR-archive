@@ -28,7 +28,7 @@
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
     tbl.source <- character(0)
-    if (is(params$data, "db.Rquery")) {
+    if (is(params$data, "db.Rquery") || is(params$data, "db.view")) {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
         data <- as.db.data.frame(x = params$data,

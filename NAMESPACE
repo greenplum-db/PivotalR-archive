@@ -73,3 +73,8 @@ export("groups", "groups.lm.madlib", "groups.logregr.madlib",
       "groups.lm.madlib.grps", "groups.logregr.madlib.grps")
 
 exportMethods("cbind2")
+
+export("madlib.arima")
+
+export("summary.arima.css.madlib", "print.arima.css.madlib",
+       "predict.arima.css.madlib")
