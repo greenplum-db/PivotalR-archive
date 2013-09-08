@@ -20,7 +20,6 @@ setMethod (
     if (length(names(x)) != 1 || length(names(ts)) != 1)
         stop("ARIMA can only have one time stamp column and ",
              "one time series value column !")
-
     
     data <- cbind(x, ts)
     f.str <- paste(names(x), "~", names(ts))
@@ -186,11 +185,12 @@ setMethod (
     
     ## create db.data.frame object for residual table
     rst$residuals <- db.data.frame(paste0(tbl.output, "residual"),
-                                   conn.id=conn.id)
+                                   conn.id = conn.id)
+    rst$model <- db.data.frame(tbl.output, conn.id = conn.id)
 
     ## drop temporary tables
     if (is.tbl.source.temp) delete(tbl.source, conn.id)
-    delete(tbl.output, conn.id)
+    ## delete(tbl.output, conn.id)         
     delete(paste0(tbl.output, "_summary"), conn.id)
                 
     msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
@@ -214,13 +214,37 @@ print.arima.css.madlib <- function (x,
                                     getOption("digits") - 3L),
                                     ...)
 {
-    
-}
+    cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
+        "\n", sep = "")
+    cat("Coefficients:\n")
 
+    coef <- format(x$coef, digits = digits)
+    std.err <- format(x$s.e., digits = digits)
+    est <- rbind(coef, std.err)
+    row.names(est) <- c("", "s.e.")
+
+    print(format(est, justify = "left"))
+
+    cat("\n")
+
+    cat("sigma^2 estimated as ", format(x$sigma2, digits = digits),
+        ",  part log likelihood = ", format(x$loglik, digits = digits),
+        sep = "")
+    cat("\n")
+}
 
 ## ----------------------------------------------------------------------
 
-predict.arima.css.madlib <- function()
+## Some functionalities will be implemented in the future
+predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
 {
-
+    tbl.output <- .unique.string()
+    conn.id <- conn.id(data)
+    madlib <- schema.madlib(conn.id) # MADlib schema name
+    sql <- paste0("select ", madlib, ".arima_forecast('",
+                  content(object$model), "', '", tbl.output, "',",
+                  n.ahead, ")")
+    res <- .get.res(sql=sql, conn.id=conn.id)
+    rst <- db.data.frame(tbl.output, conn.id=conn.id)
+    rst
 }

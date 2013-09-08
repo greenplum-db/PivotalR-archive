@@ -131,3 +131,13 @@ groups.logregr.madlib.grps <- function (x)
 {
     .get.groups.grps(x)
 }
+
+## ----------------------------------------------------------------------
+
+## delete all __madlib_temp_* tables from a database
+clean.madlib.temp <- function(conn.id = 1)
+{
+    for (tbl in db.objects("__madlib_temp_\\d+_\\d+_\\d+__",
+                           conn.id=conn.id))
+        delete(tbl, conn.id=conn.id)
+}
