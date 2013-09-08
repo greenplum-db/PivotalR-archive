@@ -60,8 +60,8 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                 stop("Could not set the default schemas ! ",
                      "default.schemas must be a set of schema names ",
                      "separated by commas. One can also use the ",
-                     "function db.default.schemas to display or set the ",
-                     "current default schemas.")
+                     "function db.default.schemas or db.search.path ",
+                     "to display or set the current default schemas.")
         }
         
         return (result)
@@ -84,10 +84,15 @@ db.default.schemas <- function (conn.id = 1)
     res
 }
 
+db.search.path <- function (conn.id = 1)
+{
+    db.default.schemas(conn.id)
+}
+
 ## ----------------------------------------------------------------------
 
 ## set current search path
-"db.default.schemas<-" <- function (conn.id, value)
+"db.default.schemas<-" <- function (conn.id = 1, value)
 {
     res <- .db.getQuery(paste("set search_path =",
                               value), conn.id = conn.id)
@@ -96,6 +101,11 @@ db.default.schemas <- function (conn.id = 1)
              "default.schemas must be a set of schema names ",
              "separated by commas.")
     res
+}
+
+"db.search.path<-" <- function (conn.id = 1, value)
+{
+    db.default.schemas(conn.id) <- value
 }
 
 ## ---------------------------------------------------------------------- 

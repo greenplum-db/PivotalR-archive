@@ -48,7 +48,8 @@ default.schemas = NULL)
     of the database that you want to use. The string must be a set of
   schema names 
     separated by commas. One can also use
-  \code{\link{db.default.schemas}} to display or set the search
+  \code{\link{db.default.schemas}} or
+  \code{\link{db.search.path}}  to display or set the search 
   path in the database.
   }
  }
