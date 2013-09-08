@@ -181,7 +181,7 @@ setMethod (
     "preview",
     signature (x = "character"),
     def = function (x, conn.id = 1, nrows = 100, array = TRUE) {
-        x <- db.data.frame(x, conn.id=conn.id)
+        x <- db.data.frame(x, conn.id=conn.id, verbose = FALSE)
         lookat(x, nrows=nrows, array=array)
     })
 

@@ -4,7 +4,12 @@
 ## ----------------------------------------------------------------------
 
 setGeneric ("madlib.arima",
-            def = function (x, ts, ...) standardGeneric("madlib.arima"))
+            def = function (x, ts, ...) {
+                call <- deparse(match.call())
+                fit <- standardGeneric("madlib.arima")
+                fit$call <- call
+                fit
+            })
 
 ## ----------------------------------------------------------------------
 
@@ -57,12 +62,9 @@ setMethod (
     args$seasonal <- seasonal
     args$include.mean <- include.mean
     args$optim.method <- optim.method
-    call <- deparse(match.call())
 
     if (tolower(method) == "css") {
-        fit <- do.call(.madlib.arima.css, args)
-        fit$call <- call
-        return (fit)
+        do.call(.madlib.arima.css, args)
     } else
         stop("Right now MADlib's ARIMA does not support methods ",
              "other than \"CSS\" !")
@@ -137,8 +139,8 @@ setMethod (
                                 param.init, "\"")
     sql <- paste0("select ", madlib, ".arima_train('",
                   tbl.source, "', '", tbl.output, "', '",
-                  params$ind.str, "', '", params$dep.str, "', ",
-                  grp, ", ", include.mean, ", '",
+                  params$ind.vars, "', '", params$dep.str, "', ",
+                  grp, ", ", include.mean, ", ", order.str, ", '",
                   optim.control.str, "')")
 
     ## execute and get the result
@@ -174,24 +176,27 @@ setMethod (
 
     ## retrieve the statistics
     rst$series <- content(data)
-    rst$time.stamp <- params$ind.str
+    rst$time.stamp <- params$ind.vars
     rst$time.series <- params$dep.str
 
-    res <- preview(paste0(tbl.output, "_summary", conn.id=conn.id, "all"))
+    res <- preview(paste0(tbl.output, "_summary"), conn.id=conn.id, "all")
     rst$sigma2 <- res$residual_variance
     rst$loglik <- res$log_likelihood
     rst$iter.num <- res$iter_num
     rst$exec.time <- res$exec_time
     
     ## create db.data.frame object for residual table
-    rst$residuals <- db.data.frame(paste0(tbl.output, "residual"),
-                                   conn.id = conn.id)
-    rst$model <- db.data.frame(tbl.output, conn.id = conn.id)
+    rst$residuals <- db.data.frame(paste0(tbl.output, "_residual"),
+                                   conn.id = conn.id, verbose = FALSE)
+    rst$model <- db.data.frame(tbl.output, conn.id = conn.id,
+                               verbose = FALSE)
+    rst$statistics <- db.data.frame(paste0(tbl.output, "_summary"),
+                                    conn.id = conn.id, verbose = FALSE)
 
     ## drop temporary tables
     if (is.tbl.source.temp) delete(tbl.source, conn.id)
     ## delete(tbl.output, conn.id)         
-    delete(paste0(tbl.output, "_summary"), conn.id)
+    ## delete(paste0(tbl.output, "_summary"), conn.id)
                 
     msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
     options(warn = warn.r) # reset R warning level
@@ -215,7 +220,7 @@ print.arima.css.madlib <- function (x,
                                     ...)
 {
     cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
-        "\n", sep = "")
+        "\n\n", sep = "")
     cat("Coefficients:\n")
 
     coef <- format(x$coef, digits = digits)
@@ -223,7 +228,7 @@ print.arima.css.madlib <- function (x,
     est <- rbind(coef, std.err)
     row.names(est) <- c("", "s.e.")
 
-    print(format(est, justify = "left"))
+    print(format(data.frame(est), justify = "right"))
 
     cat("\n")
 
@@ -238,13 +243,26 @@ print.arima.css.madlib <- function (x,
 ## Some functionalities will be implemented in the future
 predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
 {
+    conn.id <- conn.id(object$model)
+    
+    ## suppress all messages
+    msg.level <- .set.msg.level("panic", conn.id) 
+    ## disable warning in R, RPostgreSQL
+    ## prints some unnessary warning messages
+    warn.r <- getOption("warn")
+    options(warn = -1)
+    
     tbl.output <- .unique.string()
-    conn.id <- conn.id(data)
+    tbl.model <- .strip(content(object$model), "\"")
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste0("select ", madlib, ".arima_forecast('",
-                  content(object$model), "', '", tbl.output, "',",
+                  tbl.model, "', '", tbl.output, "',",
                   n.ahead, ")")
     res <- .get.res(sql=sql, conn.id=conn.id)
-    rst <- db.data.frame(tbl.output, conn.id=conn.id)
+    rst <- db.data.frame(tbl.output, conn.id=conn.id, verbose = FALSE)
+
+    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
+    options(warn = warn.r) # reset R warning level
+    
     rst
 }
