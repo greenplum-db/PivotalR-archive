@@ -11,6 +11,8 @@ setGeneric ("madlib.arima",
                 fit
             })
 
+setClass("arima.css.madlib")
+
 ## ----------------------------------------------------------------------
 
 setMethod (

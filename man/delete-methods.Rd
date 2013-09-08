@@ -4,6 +4,7 @@
 \alias{delete,db.data.frame-method}
 \alias{delete,db.Rquery-method}
 \alias{delete,character-method}
+\alias{delete,arima.css.madlib-method}
 
 \title{ Delete a \code{db.obj} object or a table/view in the database }
 
@@ -18,7 +19,10 @@
 
 \S4method{delete}{db.Rquery}(x)
 
-\S4method{delete}{character}(x, conn.id = 1, is.temp = FALSE, cascade = FALSE)
+\S4method{delete}{character}(x, conn.id = 1, is.temp = FALSE, cascade =
+FALSE)
+
+\S4method{delete}{arima.css.madlib}(x)
 }
 
 \arguments{
@@ -32,8 +36,12 @@
   object, which represents some operations on an existing
   \code{db.data.frame} object;
 
-  or a string, the table/view name to delete in the database.  
-}
+  or a string, the table/view name to delete in the database;
+
+  or an object which is the result of \code{\link{madlib.arima}}. In the
+  last case, the result model tables include \code{model},
+  \code{residuals} and 
+  \code{statistics} will be deleted.} 
 
 \item{conn.id}{
   An integer, default is 1. The connection ID to the database.

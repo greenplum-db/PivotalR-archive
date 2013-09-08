@@ -138,7 +138,13 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 }
 
 \seealso{
-  
+  \code{\link{delete,arima.css.madlib-method}}
+
+  \code{\link{print.arima.css.madlib}},
+  \code{\link{show.arima.css.madlib}} and
+  \code{\link{summary.arima.css.madlib}}
+
+  \code{predict.arima.css.madlib}
 }
 
 \examples{
