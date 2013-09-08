@@ -42,6 +42,6 @@
 
 \examples{
 \dontrun{
-Please see the examples in madlib.arima doc.
+## Please see the examples in madlib.arima doc.
 }
 }

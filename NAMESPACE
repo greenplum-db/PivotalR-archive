@@ -77,7 +77,7 @@ exportMethods("cbind2")
 export("madlib.arima")
 
 export("summary.arima.css.madlib", "print.arima.css.madlib",
-       "predict.arima.css.madlib")
+       "predict.arima.css.madlib", "show.arima.css.madlib")
 
 export("clean.madlib.temp")
 

@@ -238,6 +238,13 @@ print.arima.css.madlib <- function (x,
     cat("\n")
 }
 
+## -----------------------------------------------------------------------
+
+show.arima.css.madlib <- function (object)
+{
+    print(object)
+}
+
 ## ----------------------------------------------------------------------
 
 ## Some functionalities will be implemented in the future

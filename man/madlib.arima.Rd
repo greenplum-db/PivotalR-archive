@@ -1,7 +1,7 @@
 \name{madlib.arima}
 \alias{madlib.arima}
-\alias{madlib.arima-db.Rquery,db.Rquery-method}
-\alias{madlib.arima-formula,db.obj-method}
+\alias{madlib.arima,db.Rquery,db.Rquery-method}
+\alias{madlib.arima,formula,db.obj-method}
 
 \title{Wrapper for MADlib's ARIMA model fitting function}
 
@@ -59,6 +59,10 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
   }
 
   \item{optim.control}{
+
+  }
+
+  \item{\dots}{
 
   }
 }

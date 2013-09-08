@@ -83,6 +83,10 @@ default.schemas = NULL)
   about the connection.
   
   \code{\link{conn.eql}} tests whether two connections are the same.
+
+  \code{\link{db.search.path}} and \code{\link{db.default.schemas}}
+  displays or sets the search path (i.e. default schemas) in the
+  connected database.
 }
 \examples{
 \dontrun{
