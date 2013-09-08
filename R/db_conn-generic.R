@@ -75,37 +75,30 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
 
 ## ----------------------------------------------------------------------
 
-## show the current search path
-db.default.schemas <- function (conn.id = 1)
+## show/set the current search path
+db.default.schemas <- function (conn.id = 1, set = NULL)
 {
-    res <- .db.getQuery("show search_path =", conn.id = conn.id)
-    if (is(res, .err.class))
-        stop("Could not show the default schemas ! ")
-    res
+    if (!.is.conn.id.valid(conn.id))
+        stop(conn.id, " is not a valid connection ID !")
+    
+    if (is.null(set)) {
+        res <- .db.getQuery("show search_path", conn.id = conn.id)
+        if (is(res, .err.class))
+            stop("Could not show the default schemas ! ")
+        res
+    } else {
+        res <- .db.getQuery(paste("set search_path =",
+                                  set), conn.id = conn.id)
+        if (is(res, .err.class))
+            stop("Could not set the default schemas ! ",
+                 "default.schemas must be a set of schema names ",
+                 "separated by commas.")
+    }
 }
 
-db.search.path <- function (conn.id = 1)
+db.search.path <- function (conn.id = 1, set = NULL)
 {
-    db.default.schemas(conn.id)
-}
-
-## ----------------------------------------------------------------------
-
-## set current search path
-"db.default.schemas<-" <- function (conn.id = 1, value)
-{
-    res <- .db.getQuery(paste("set search_path =",
-                              value), conn.id = conn.id)
-    if (is(res, .err.class))
-        stop("Could not set the default schemas ! ",
-             "default.schemas must be a set of schema names ",
-             "separated by commas.")
-    res
-}
-
-"db.search.path<-" <- function (conn.id = 1, value)
-{
-    db.default.schemas(conn.id) <- value
+    db.default.schemas(conn.id, set)
 }
 
 ## ---------------------------------------------------------------------- 

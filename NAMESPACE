@@ -81,5 +81,4 @@ export("summary.arima.css.madlib", "print.arima.css.madlib",
 
 export("clean.madlib.temp")
 
-export("db.default.schemas", "db.default.schemas<-", "db.search.path",
-       "db.search.path<-")
+export("db.default.schemas", "db.search.path")

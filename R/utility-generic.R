@@ -61,7 +61,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     return (length(conn.id) != 0 &&
             !is.null(conn.id) &&
-            !is.na(conn.id) && 
+            !is.na(conn.id) &&
+            is(conn.id, "numeric") &&
             conn.id >= 1 &&
             length(.localVars$conn.id) != 0 &&
             conn.id %in% .localVars$conn.id[,1])

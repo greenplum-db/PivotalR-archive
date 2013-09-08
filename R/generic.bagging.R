@@ -1,7 +1,7 @@
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 ## Bagging method, not a wrapper of MADlib function
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 {
@@ -22,7 +22,7 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     res
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 predict.bagging.model <- function (object, newdata, combine = "mean",
                                    ...)
@@ -110,7 +110,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         stop("combine method must be \"mean\" or \"vote\"!")
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## load a SQL function from inst/sql/
 .load.func <- function (funcname, conn.id)
