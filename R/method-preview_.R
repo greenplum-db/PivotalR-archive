@@ -191,7 +191,6 @@ setMethod (
 ## same as preview
 lookat <- function (x, nrows = 100, array = TRUE)
 {
-    
     if (is(x, "db.table")) return (preview(x, nrows, array = array))
     if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE))
     preview(x, nrows, FALSE, array)
