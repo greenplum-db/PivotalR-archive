@@ -1,11 +1,11 @@
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 ## Universal database connection utilities
 ## Multiple R connection packages are supported
 
 ## Note: Internal functions do not need argument check
 ## only functions that are exposed to the users need the check
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## connect to a database using a specific R package
 ## Right now, only RPostgreSQL is supported
@@ -14,7 +14,8 @@
 ## A driver will be automatically created for connection package
 db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = user,
                         password = "", port = 5432,
-                        madlib = "madlib", conn.pkg = "RPostgreSQL")
+                        madlib = "madlib", conn.pkg = "RPostgreSQL",
+                        default.schemas = NULL)
 {    
     ## argument type check
     if (!.is.arg.string(host) ||
@@ -51,6 +52,18 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         result <- eval(parse(text = command))
         cat(paste("Created a connection to database with ID", result, "\n"))
         .madlib.version.number(result) # record the madlib version number
+
+        if (!is.null(default.schemas)) {
+            res <- .db.getQuery(paste("set search_path =",
+                                      default.schemas), conn.id = result)
+            if (is(res, .err.class))
+                stop("Could not set the default schemas ! ",
+                     "default.schemas must be a set of schema names ",
+                     "separated by commas. One can also use the ",
+                     "function db.default.schemas to display or set the ",
+                     "current default schemas.")
+        }
+        
         return (result)
     }
     else
@@ -60,7 +73,32 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
     }
 }
 
-## ------------------------------------------------------------------------ 
+## ----------------------------------------------------------------------
+
+## show the current search path
+db.default.schemas <- function (conn.id = 1)
+{
+    res <- .db.getQuery("show search_path =", conn.id = conn.id)
+    if (is(res, .err.class))
+        stop("Could not show the default schemas ! ")
+    res
+}
+
+## ----------------------------------------------------------------------
+
+## set current search path
+"db.default.schemas<-" <- function (conn.id, value)
+{
+    res <- .db.getQuery(paste("set search_path =",
+                              value), conn.id = conn.id)
+    if (is(res, .err.class))
+        stop("Could not set the default schemas ! ",
+             "default.schemas must be a set of schema names ",
+             "separated by commas.")
+    res
+}
+
+## ---------------------------------------------------------------------- 
 
 ## disconnect a connection
 db.disconnect <- function (conn.id = 1, verbose = TRUE)
@@ -99,7 +137,7 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
     return (res)
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .get.dbms.str <- function (conn.id)
 {
@@ -121,7 +159,7 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
     list(db.str = db.str, version.str = version.str)
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## List all connection info
 db.list <- function ()
@@ -164,7 +202,7 @@ db.list <- function ()
     }
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## list tables and views in the connection
 db.objects <- function (search = NULL, conn.id = 1)
@@ -191,7 +229,7 @@ db.objects <- function (search = NULL, conn.id = 1)
         NULL
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## does an object exist?
 db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
@@ -218,11 +256,11 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     }
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 ## All the following function are used inside the package only
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## fetch the result of sendQuery
 .db.fetch <- function (res, n = 500)
@@ -233,7 +271,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 ## unload driver for a specific connection package
 .db.unloadDriver <- function (pkg)
@@ -243,7 +281,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.sendQuery <- function (query, conn.id = 1)
 {
@@ -253,7 +291,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     list(res = eval(parse(text = command)), conn.id = conn.id)
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.getQuery <- function (query, conn.id = 1)
 {
@@ -263,7 +301,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .db.listTables <- function (conn.id = 1)
 {
@@ -273,7 +311,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .db.existsTable <- function (table, conn.id = 1)
 {
@@ -296,7 +334,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
         TRUE
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.existsTempTable <- function (table, conn.id = 1)
 {
@@ -329,7 +367,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     }
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.listFields <- function (table, conn.id = 1)
 {
@@ -339,7 +377,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.writeTable <- function (table, r.obj, add.row.names = TRUE, 
                             overwrite = FALSE, append = FALSE,
@@ -361,7 +399,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.readTable <- function (table, rown.names = "row.names", conn.id = 1)
 {
@@ -372,7 +410,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     eval(parse(text = command))
 }
 
-## ------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 .db.removeTable <- function(table, conn.id = 1)
 {

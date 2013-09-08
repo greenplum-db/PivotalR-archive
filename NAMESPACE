@@ -80,3 +80,5 @@ export("summary.arima.css.madlib", "print.arima.css.madlib",
        "predict.arima.css.madlib")
 
 export("clean.madlib.temp")
+
+export("db.default.schemas", "db.default.schemas<-")
