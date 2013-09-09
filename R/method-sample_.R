@@ -9,7 +9,7 @@ setGeneric("sample")
 setMethod (
     "sample",
     signature(x = "db.obj"),
-    function (x, size, replace = FALSE, prob = NULL, ...) {
+    function (x, size, replace = FALSE, prob = NULL, indexed.x = FALSE, ...) {
         n <- dim(x)[1]
         if (!replace && n < size)
             stop("size is larger than data size!")
@@ -26,7 +26,10 @@ setMethod (
             options(warn = warn.r) # reset R warning level
             res
         } else {
-            y <- .create.indexed.temp.table(x)
+            if (!indexed.x)
+                y <- .create.indexed.temp.table(x)
+            else
+                y <- x
             select <- sample(seq(n), size, replace = TRUE)
             freq <- table(select)
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
@@ -39,7 +42,7 @@ setMethod (
                 .db.getQuery(sql, conn.id(x))
             }
 
-            delete(y)
+            if (!indexed.x) delete(y)
             msg.level <- .set.msg.level(msg.level, conn.id(x)) 
             options(warn = warn.r) # reset R warning level
 

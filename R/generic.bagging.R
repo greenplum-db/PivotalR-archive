@@ -5,6 +5,8 @@
 
 generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 {
+    warnings <- .suppress.warnings(conn.id(data))
+    
     if (fraction > 1)
         stop("fraction cannot be larger than 1!")
     if (!is(data, "db.obj"))
@@ -14,11 +16,17 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     size <- as.integer(n * fraction)
 
     res <- list()
+    idat <- .create.indexed.temp.table(data)
     for (i in 1:nbags) {
-        data.use <- sample(data, size, replace = TRUE)
+        data.use <- sample(idat, size, replace = TRUE, indexed = TRUE)
         res[[i]] <- train(data = data.use)
+        delete(data.use)
     }
+    delete(idat)
     class(res) <- "bagging.model"
+
+    .restore.warnings(warnings)
+   
     res
 }
 
