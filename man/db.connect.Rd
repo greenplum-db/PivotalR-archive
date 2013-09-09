@@ -11,7 +11,8 @@
 }
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
-password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
+password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL",
+default.schemas = NULL)
 }
 
 \arguments{
@@ -39,9 +40,18 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
    }
   \item{conn.pkg}{
     A string, default is "RPostgreSQL". The name of the R package used
-  to connect to the database. Currently, only RPostgreSQL is supported,
-  but the support for other packages such as RODBC can be easily added.
-   }
+    to connect to the database. Currently, only RPostgreSQL is supported,
+    but the support for other packages such as RODBC can be easily added.
+  }
+  \item{default.schemas}{
+    A string, default is \code{NULL}. The search path or default schemas
+    of the database that you want to use. The string must be a set of
+  schema names 
+    separated by commas. One can also use
+  \code{\link{db.default.schemas}} or
+  \code{\link{db.search.path}}  to display or set the search 
+  path in the database.
+  }
  }
 
 \value{
@@ -73,6 +83,10 @@ password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL")
   about the connection.
   
   \code{\link{conn.eql}} tests whether two connections are the same.
+
+  \code{\link{db.search.path}} and \code{\link{db.default.schemas}}
+  displays or sets the search path (i.e. default schemas) in the
+  connected database.
 }
 \examples{
 \dontrun{

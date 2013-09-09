@@ -40,7 +40,7 @@
 }
 
 \value{
-  A \code{db.Rquery} object, which contains the SQL query to compute the
+  A \code{\linkS4class{db.Rquery}} object, which contains the SQL query to compute the
     predictions. 
 }
 

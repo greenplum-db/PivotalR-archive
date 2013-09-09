@@ -1,8 +1,8 @@
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 ## Wrapper function for MADlib's linear, logistic and multinomial
 ## logistic regressions
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## na.action is a place holder
 ## family specific parameters are in control, which
@@ -41,7 +41,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     return
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .madlib.logregr <- function (formula, data, na.action, method = "irls",
                              max_iter = 10000, tolerance = 1e-5)
@@ -156,7 +156,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     else return (rst)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 summary.logregr.madlib <- function (object, ...)
 {
@@ -168,7 +168,7 @@ summary.logregr.madlib.grps <- function (object, ...)
     object
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## Pretty format of linear regression result
 print.logregr.madlib.grps <- function (x,
@@ -247,14 +247,14 @@ print.logregr.madlib.grps <- function (x,
     cat("\n")
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 show.logregr.madlib.grps <- function (object)
 {
     print(object)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## Pretty format of linear regression result
 print.logregr.madlib <- function (x,
@@ -326,7 +326,7 @@ print.logregr.madlib <- function (x,
     cat("\n")
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 show.logregr.madlib <- function (object)
 {
@@ -334,7 +334,7 @@ show.logregr.madlib <- function (object)
 }
 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .madlib.mlogregr <- function (formula, data, na.action, method = "irls",
                               max_iter = 10000, tolerance = 1e-5, call)

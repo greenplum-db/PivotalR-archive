@@ -1,20 +1,34 @@
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 ## delete db.data.frame objects
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 setGeneric (
     "delete",
     def = function (x, ...) {
-        res <- standardGeneric("delete")
-        ## if (res && !is.character(x)) {
-        ##     rm(list = deparse(substitute(x)), pos = 1)
-        ## }
+        rst <- standardGeneric("delete")
+        res <- rst$res
+        conn.id <- rst$conn.id
+        if (res && (!is.character(x) ||
+                    is.character(x) &&
+                    .strip(deparse(substitute(x)), "\"") != x)) {
+            envir <- parent.env(parent.env(parent.env(parent.env(
+                parent.env(as.environment(-1))))))
+            ## suppress all messages
+            msg.level <- .set.msg.level("panic", conn.id) 
+            ## disable warning in R, RPostgreSQL
+            ## prints some unnessary warning messages
+            warn.r <- getOption("warn")
+            options(warn = -1)
+            rm(list=deparse(substitute(x)), envir=envir)
+            msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
+            options(warn = warn.r) # reset R warning level
+        }
         res
     },
     signature = "x")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 setMethod (
     "delete",
@@ -23,19 +37,19 @@ setMethod (
         ## .db.removeTable(content(x), conn.id(x))
         s <- delete(content(x), conn.id(x), x@.table.type == "LOCAL TEMPORARY",
                     cascade)
-        s
+        list(res=s, conn.id=conn.id(x)) 
     })
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 setMethod (
     "delete",
     signature (x = "db.Rquery"),
     def = function (x) {
-        TRUE
+        list(res=TRUE, conn.id=conn.id(x))
     })
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 setMethod (
     "delete",
@@ -49,13 +63,13 @@ setMethod (
         if (length(exists) == 2)
             if (! exists[[1]]) {
                 options(warn = warn.r) # reset R warning level
-                return (FALSE)
+                return (list(res=FALSE, conn.id=conn.id))
             } else
                 x <- exists[[2]]
         else
             if (! exists) {
                 options(warn = warn.r) # reset R warning level
-                return (FALSE)
+                return (list(res=FALSE, conn.id=conn.id))
             } else {
                 if (length(x) == 1) x <- strsplit(x, "\\.")[[1]]
                 if (length(x) != 2) {
@@ -68,7 +82,7 @@ setMethod (
                             table_schema <- c(table_schema, schema)
                     if (identical(table_schema, character(0))) {
                         options(warn = warn.r) # reset R warning level
-                        return (FALSE)
+                        return (list(res=FALSE, conn.id=conn.id))
                     }
                     schema.str <- strsplit(table_schema, "_")
                     for (i in seq_len(length(schema.str))) {
@@ -81,7 +95,7 @@ setMethod (
                 }
                 if (length(x) == 1) {
                     options(warn = warn.r) # reset R warning level
-                    return (FALSE)
+                    return (list(res=FALSE, conn.id=conn.id))
                 }
             }
         ## .db.removeTable(x, conn.id)
@@ -101,12 +115,25 @@ setMethod (
         options(warn = warn.r) # reset R warning level
         if (length(exists) == 2)
             if (! exists[[1]]) 
-                return (TRUE)
+                return (list(res=TRUE, conn.id=conn.id))
             else
-                return (FALSE)
+                return (list(res=FALSE, conn.id=conn.id))
         else
             if (! exists)
-                return (TRUE)
+                return (list(res=TRUE, conn.id=conn.id))
             else
-                return (FALSE)
+                return (list(res=FALSE, conn.id=conn.id))
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "arima.css.madlib"),
+    def = function (x) {
+        conn.id <- conn.id(x$model)
+        d1 <- delete(x$model)
+        d2 <- delete(x$residuals)
+        d3 <- delete(x$statistics)
+        list(res=all(c(d1, d2, d3)), conn.id=conn.id)
     })

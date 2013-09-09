@@ -1,6 +1,7 @@
 \name{preview}
 \alias{lookat}
 \alias{preview}
+\alias{preview,character-method}
 \alias{preview,db.view-method}
 \alias{preview,db.table-method}
 \alias{preview,db.Rquery-method}
@@ -27,6 +28,8 @@ array = TRUE)
 
 \S4method{preview}{db.Rcrossprod}(x, nrows = 100, interactive = FALSE)
 
+\S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE)
+
 lookat(x, nrows = 100, array = TRUE)
 }
 
@@ -34,12 +37,20 @@ lookat(x, nrows = 100, array = TRUE)
   \item{x}{
     The signature of the method. 
     A \code{\linkS4class{db.data.frame}} (includes
-  \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}})
-  object, which points to a table or view in
+    \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}})
+    object, which points to a table or view in
     the database; or a \code{\linkS4class{db.Rquery}} object, which
-  represents some 
-  operations on a \code{\linkS4class{db.data.frame}} object.
+    represents some 
+    operations on a \code{\linkS4class{db.data.frame}} object. If \code{x}
+    is a string, which means a table name, this function directly reads
+    data from the table without having to wrap it with a
+    \code{db.data.frame} class object.
   }
+
+  \item{conn.id}{
+    An integer, the ID of the connection where the table resides.
+  }
+
   \item{nrows}{
     An integer, default is 100, how many rows of data. If it is
   \code{NULL} or \code{"all"}, then all data in the table will be send

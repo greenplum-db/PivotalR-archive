@@ -3,7 +3,7 @@
 
 ## Check arguments of function to make sure that they are legal
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## convert {...} string into an arrayparams$grp.str
 arraydb.to.arrayr <- function (str, type = "double", n = 1)
@@ -47,7 +47,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     res
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .is.arg.string <- function (arg)
 {
@@ -55,19 +55,20 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             is.character(arg))
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .is.conn.id.valid <- function (conn.id)
 {
     return (length(conn.id) != 0 &&
             !is.null(conn.id) &&
-            !is.na(conn.id) && 
+            !is.na(conn.id) &&
+            is(conn.id, "numeric") &&
             conn.id >= 1 &&
             length(.localVars$conn.id) != 0 &&
             conn.id %in% .localVars$conn.id[,1])
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## get the distributed by string
 .get.distributed.by.str <- function(conn.id, distributed.by)
@@ -90,7 +91,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     return (dist.str)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## simply return the most direct answer
 .db.analyze.table.name <- function (name)
@@ -112,7 +113,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         return (paste("table_name = '", table, "'", sep = ""))
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## Is the object in database a table?
 .is.table.or.view <- function (table, conn.id = 1)
@@ -126,7 +127,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         return (FALSE)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## Is the object in database a view?
 .is.view <- function (table, conn.id = 1)
@@ -140,7 +141,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         return (FALSE)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .unique.string <- function ()
 {
@@ -159,7 +160,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     gsub(rm.str, "\\1", str, perl = TRUE)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## analyze formula
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
@@ -294,7 +295,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
          data = data)
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## R's log is SQL's log(exp(1.), x)
 ## R's log10 is SQL's log
@@ -307,7 +308,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     res
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 .replace.with.quotes <- function (vars, cols)
 {
@@ -335,7 +336,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     vars
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## interactively read an input from the user
 .read.input <- function (msg, expected.answer = c("yes", "y", "no", "n"))
@@ -346,7 +347,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     a
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## set/reset the message level
 ## returns the old message level
@@ -357,7 +358,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     old.level
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## If an independent variable is an array, it needs special treatment
 .is.array <- function (labels, data)
@@ -393,7 +394,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     nlabels
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## replace array in the formula
 .replace.array <- function (fstr, data)
@@ -430,7 +431,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     fstr
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 ## whether two where strings are equivalent
 .eql.where <- function (where1, where2)
