@@ -105,12 +105,7 @@ setMethod (
     if (db.str == "HAWQ")
         stop("Right now MADlib on HAWQ does not support ARIMA !")
     
-    ## suppress all messages
-    msg.level <- .set.msg.level("panic", conn.id(data)) 
-    ## disable warning in R, RPostgreSQL
-    ## prints some unnessary warning messages
-    warn.r <- getOption("warn")
-    options(warn = -1)
+    warnings <- .suppress.warnings(conn.id(data))
 
     ## analyze the formula
     analyzer <- .get.params(formula, data)
@@ -200,8 +195,7 @@ setMethod (
     ## delete(tbl.output, conn.id)         
     ## delete(paste0(tbl.output, "_summary"), conn.id)
                 
-    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
-    options(warn = warn.r) # reset R warning level
+    .restore.warnings(warnings)
 
     class(rst) <- "arima.css.madlib"
     rst
@@ -254,12 +248,7 @@ predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
 {
     conn.id <- conn.id(object$model)
     
-    ## suppress all messages
-    msg.level <- .set.msg.level("panic", conn.id) 
-    ## disable warning in R, RPostgreSQL
-    ## prints some unnessary warning messages
-    warn.r <- getOption("warn")
-    options(warn = -1)
+    warnings <- .suppress.warnings(conn.id)
     
     tbl.output <- .unique.string()
     tbl.model <- .strip(content(object$model), "\"")
@@ -270,8 +259,7 @@ predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
     res <- .get.res(sql=sql, conn.id=conn.id)
     rst <- db.data.frame(tbl.output, conn.id=conn.id, verbose = FALSE)
 
-    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
-    options(warn = warn.r) # reset R warning level
+    .restore.warnings(warnings)
     
     rst
 }

@@ -14,16 +14,13 @@ setMethod (
         if (!replace && n < size)
             stop("size is larger than data size!")
 
-        msg.level <- .set.msg.level("panic", conn.id(x))
-        warn.r <- getOption("warn")
-        options(warn = -1)
+        warnings <- .suppress.warnings(conn.id(x))
 
         if (!replace) {
             tmp <- .unique.string()
             res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
                                     FALSE, TRUE, FALSE, NULL, size)
-            msg.level <- .set.msg.level(msg.level, conn.id(x)) 
-            options(warn = warn.r) # reset R warning level
+            .restore.warnings(warnings)
             res
         } else {
             if (!indexed.x)
@@ -43,8 +40,8 @@ setMethod (
             }
 
             if (!indexed.x) delete(y)
-            msg.level <- .set.msg.level(msg.level, conn.id(x)) 
-            options(warn = warn.r) # reset R warning level
+
+            .restore.warnings(warnings)
 
             res@.dim[1] <- size
             res

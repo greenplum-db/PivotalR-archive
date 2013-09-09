@@ -11,7 +11,7 @@
 
 \usage{
 \S4method{sample}{db.obj}(x, size, replace = FALSE, prob = NULL,
-indexed.x = FALSE...)
+indexed.x = FALSE, ...)
 }
 
 \arguments{

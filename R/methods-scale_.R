@@ -14,12 +14,8 @@ setMethod (
             stop("center and scale must be numeric or logical !")
         
         conn.id <- conn.id(x)
-        ## suppress all messages
-        msg.level <- .set.msg.level("panic", conn.id) 
-        ## disable warning in R, RPostgreSQL
-        ## prints some unnessary warning messages
-        warn.r <- getOption("warn")
-        options(warn = -1)
+
+        warnings <- .suppress.warnings(conn.id)
 
         all.names <- names(.expand.array(x))
         lg <- length(all.names)
@@ -100,9 +96,8 @@ setMethod (
             attr(z, "scaled:scale") <- NULL
         attr(z, "row.number") <- n
 
-        ## reset message level
-        msg.level <- .set.msg.level(msg.level, conn.id) 
-        options(warn = warn.r) # reset R warning level
+        .restore.warnings(warnings)
+
         z
     },
     valueClass = "db.Rquery")

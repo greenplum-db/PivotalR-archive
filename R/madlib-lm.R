@@ -16,13 +16,8 @@ madlib.lm <- function (formula, data, na.action,
     
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
-    
-    ## suppress all messages
-    msg.level <- .set.msg.level("panic", conn.id(data)) 
-    ## disable warning in R, RPostgreSQL
-    ## prints some unnessary warning messages
-    warn.r <- getOption("warn")
-    options(warn = -1)
+
+    warnings <- .suppress.warnings(conn.id(data))
 
     ## analyze the formula
     analyzer <- .get.params(formula, data)
@@ -72,8 +67,7 @@ madlib.lm <- function (formula, data, na.action,
     if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
-    msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
-    options(warn = warn.r) # reset R warning level
+    .restore.warnings(warnings)
 
     ## organize the result
     n <- length(params$ind.vars)

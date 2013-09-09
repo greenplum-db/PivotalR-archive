@@ -14,15 +14,10 @@ setGeneric (
                     .strip(deparse(substitute(x)), "\"") != x)) {
             envir <- parent.env(parent.env(parent.env(parent.env(
                 parent.env(as.environment(-1))))))
-            ## suppress all messages
-            msg.level <- .set.msg.level("panic", conn.id) 
-            ## disable warning in R, RPostgreSQL
-            ## prints some unnessary warning messages
-            warn.r <- getOption("warn")
-            options(warn = -1)
+
+            warnings <- .suppress.warnings(conn.id)
             rm(list=deparse(substitute(x)), envir=envir)
-            msg.level <- .set.msg.level(msg.level, conn.id) # reset message level
-            options(warn = warn.r) # reset R warning level
+            .restore.warnings(warnings)
         }
         res
     },

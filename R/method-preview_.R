@@ -79,9 +79,7 @@ setMethod (
     "preview",
     signature (x = "db.Rquery"),
     def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
-        msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
-        warn.r <- getOption("warn")
-        options(warn = -1)
+        warnings <- .suppress.warnings(conn.id(x))
 
         if (interactive) {
             cat(deparse(substitute(x)),
@@ -97,8 +95,7 @@ setMethod (
         res <- .db.getQuery(paste(content(x), .limit.str(nrows),
                                   sep = ""), conn.id(x))
 
-        msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
-        options(warn = warn.r) # reset R warning level
+        .restore.warnings(warnings)
 
         if (length(names(x)) == 1 && x@.col.data_type == "array") {
             if (gsub("int", "", x@.col.udt_name) != x@.col.udt_name)
@@ -122,9 +119,7 @@ setMethod (
     "preview",
     signature (x = "db.Rcrossprod"),
     def = function (x, nrows = 100, interactive = FALSE) {
-        msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
-        warn.r <- getOption("warn")
-        options(warn = -1)
+        warnings <- .suppress.warnings(conn.id(x))
 
         if (interactive) {
             cat(deparse(substitute(x)),
@@ -167,9 +162,8 @@ setMethod (
                                     Dim = as.integer(dims))
             }
         }
-        
-        msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
-        options(warn = warn.r) # reset R warning level
+
+        .restore.warnings(warnings)
            
         return (rst)
     })

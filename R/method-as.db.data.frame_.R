@@ -116,9 +116,7 @@ setMethod (
         (is.temp && .db.existsTempTable(table, conn.id)[[1]]))
         stop("Table already exists!")
 
-    msg.level <- .set.msg.level("panic", conn.id)
-    warn.r <- getOption("warn")
-    options(warn = -1)
+    warnings <- .suppress.warnings(conn.id)
     
     .db.writeTable(table, x, add.row.names = add.row.names,
                    distributed.by = distributed.by,
@@ -133,8 +131,7 @@ setMethod (
                            " add primary key (\"",
                            key, "\")", sep = ""), conn.id)
 
-    msg.level <- .set.msg.level(msg.level, conn.id) 
-    options(warn = warn.r) # reset R warning level
+    .restore.warnings(warnings)
     
     list(res = db.data.frame(x = table.name, conn.id = conn.id, key = key,
          verbose = verbose, is.temp = is.temp),
@@ -165,9 +162,7 @@ setMethod (
         if (is.temp) exists <- exists[[1]]
         if (exists) stop("The table already exists in connection ", conn.id, "!")
 
-        msg.level <- .set.msg.level("panic", conn.id(x))
-        warn.r <- getOption("warn")
-        options(warn = -1)
+        warnings <- .suppress.warnings(conn.id(x))
         
         if (is.temp) 
             temp.str <- "temp"
@@ -252,8 +247,7 @@ setMethod (
 
         .db.getQuery(create.str, conn.id) # create table
 
-        msg.level <- .set.msg.level(msg.level, conn.id(x)) 
-        options(warn = warn.r) # reset R warning level
+        .restore.warnings(warnings)
 
         res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)

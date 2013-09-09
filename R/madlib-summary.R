@@ -23,11 +23,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
         stop("target.cols or grouping.cols has columns that are not in ",
              "the data!")
 
-    msg.level <- .set.msg.level("panic", conn.id(x)) # suppress all messages
-    ## disable warning in R, RPostgreSQL
-    ## prints some unnessary warning messages
-    warn.r <- getOption("warn")
-    options(warn = -1)
+    warnings <- .suppress.warnings(conn.id(x))
     
     if (is(x, "db.view") || is(x, "db.Rquery")) {
         if (interactive) {
@@ -84,8 +80,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
 
     class(res) <- "summary.madlib"
 
-    msg.level <- .set.msg.level(msg.level, conn.id(x)) # reset message level
-    options(warn = warn.r) # reset R warning level
+    .restore.warnings(warnings)
     
     return (res)
 }
