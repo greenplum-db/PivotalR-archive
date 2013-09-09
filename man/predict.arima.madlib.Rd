@@ -45,3 +45,7 @@
 ## Please see the examples in madlib.arima doc.
 }
 }
+
+\keyword{ madlib }
+\keyword{ wrapper }
+\keyword{ math }

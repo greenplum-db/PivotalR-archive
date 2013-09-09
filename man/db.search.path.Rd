@@ -4,11 +4,16 @@
 
 \title{
   Display or set the search path (i.e. default schemas) for a connected
-  session to a database
+  session to a database. The use can easily switch to a schema that he
+  has the privilege to write. 
 }
 
 \description{
- 
+  Allow the user to check and set the search path for the session that
+  he connects to the database. The search path is a set of schema names
+  separated by commas. These are the default schemas that the programme
+  will search and save tables if a schema name is not given together
+  with the table name in the format of "schema_name.table_name".
 }
 
 \usage{
@@ -19,16 +24,18 @@ db.default.schemas(conn.id = 1, set = NULL)
 
 \arguments{
   \item{conn.id}{
-
+    An integer, default is 1. The ID of the database connection.
   }
 
   \item{set}{
-
+    A string, default is \code{NULL}. The default schema names separated
+    by commas.
   }
 }
 
 \value{
-  
+  When \code{set} is \code{NULL}, this function prints the current
+  connected session's search path.
 }
 
 \author{
@@ -46,7 +53,13 @@ db.default.schemas(conn.id = 1, set = NULL)
 
 \examples{
 \dontrun{
+library(PivotalR)
+db.connect(port = 14526, dbname = "madlib", default.schemas =
+"public,madlib")
 
+db.search.path()
+
+db.search.path(set = "public,madlibtestdata")
 }
 }
 
