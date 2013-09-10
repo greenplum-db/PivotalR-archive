@@ -67,12 +67,12 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                  ");", sep = "")
 
     res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
-    if (is(res, ".err.class"))
+    if (is(res, .err.class))
         stop("Could not do the summary!")
 
     res <- try(.db.getQuery(paste("select * from", out.tbl),
                             conn.id(x)), silent = TRUE)
-    if (is(res, ".err.class"))
+    if (is(res, .err.class))
         stop("Could not do the summary!")
     
     .db.removeTable(out.tbl, conn.id(x))

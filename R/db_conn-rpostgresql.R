@@ -249,7 +249,7 @@
                                                 field.types, add.row.names,
                                                 dist.str, is.temp)
                 rs <- try(.db.sendQuery(sql, conn.id))
-                if(is(rs, RPostgreSQL:::ErrorClass)){
+                if(is(rs, .err.class)){
                     warning("could not create table: aborting postgresqlImportFile")
                     return(FALSE)
                 }
@@ -302,7 +302,7 @@
                 rs <- try(.db.sendQuery(sql, conn.id))
                 if (is.temp) name <- (.db.existsTempTable(table,
                                                           conn.id))[[2]]
-                if(is(rs, RPostgreSQL:::ErrorClass))
+                if(is(rs, .err.class))
                 {
                     warning("could not create table: aborting assignTable")
                     return(FALSE)
