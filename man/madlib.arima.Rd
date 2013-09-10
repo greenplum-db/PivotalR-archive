@@ -30,7 +30,8 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
     A formula with the format of \code{time series value} \code{~}
   \code{time stamp} \code{|} \code{grouping col_1 + ... + grouping
   col_n}. Or a \code{\linkS4class{db.Rquery}} object, which is the
-\code{time series value}. Grouping is not implemented yet.
+\code{time series value}. Grouping is not implemented yet. Both time
+  stamp and time series can be valid expressions.
 
   We must specify the time stamp because the table in database has no
   order of rows, and we have to order they according the given time
@@ -42,7 +43,8 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
     \code{\linkS4class{db.obj}} object, which contains both the time
     series and time stamp columns. If \code{x} is a
     \code{\linkS4class{db.Rquery}} object, this must be another
-    \code{db.Rquery} object, which is the \code{time stamp}.
+    \code{db.Rquery} object, which is the \code{time stamp} and can be a
+    valid expression.
   }
 
   \item{by}{
@@ -266,6 +268,9 @@ lookat(s$statistics)
 pred <- predict(s, n.ahead = 10)
 
 lookat(sort(pred, F, pred$step_ahead), "all")
+
+## Use expressions
+s <- madlib.arima(tval+2 ~ I(tid + 1), x, order = c(2,0,1))
 }
 }
 

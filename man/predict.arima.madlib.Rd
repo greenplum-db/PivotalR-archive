@@ -25,7 +25,7 @@
 
 \value{
   A \code{\linkS4class{db.table}} object, which points to a table that
-  contains the forecasted values. The table has two columns: step_ahead
+  contains the forecasted values. The table has two columns: steps_ahead
   and forecast_value.
 }
 

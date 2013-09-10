@@ -101,21 +101,41 @@ setMethod (
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data, 1.2)
 
-    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    conn.id <- conn.id(data)
+    
+    db.str <- (.get.dbms.str(conn.id))$db.str
     if (db.str == "HAWQ")
         stop("Right now MADlib on HAWQ does not support ARIMA !")
     
-    warnings <- .suppress.warnings(conn.id(data))
+    warnings <- .suppress.warnings(conn.id)
 
     ## analyze the formula
     analyzer <- .get.params(formula, data)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
-    tbl.source <- analyzer$tbl.source
-
+    ## tbl.source <- analyzer$tbl.source
+    tbl.source <- gsub("\"", "", content(data))
+    
     if (length(params$ind.vars) != 1)
         stop("Only one time stamp is allowed !")
+
+    ## allow expressions as time series and time stamp
+    ## create intermediate tables to accomodate this
+    col.names <- names(data)
+    if (!(.strip(params$ind.vars, "\"") %in% col.names) ||
+        !(.strip(params$dep.str, "\"") %in% col.names)) {
+        new.src <- .unique.string()
+        res <- .get.res(sql = paste0("create table ", new.src, " as ",
+                        "select ", params$dep.str, " as tval, ",
+                        params$ind.vars, " as tid from ", tbl.source),
+                        conn.id = conn.id)
+        if (is.tbl.source.temp) delete(tbl.source)
+        is.tbl.source.temp <- TRUE
+        tbl.source <- new.src
+        params$dep.str <- "tval"
+        params$ind.vars <- "tid"
+    }
 
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
@@ -124,8 +144,6 @@ setMethod (
         stop("Right now MADlib does not support grouping in ARIMA !")
 
     ## construct SQL string
-    conn.id <- conn.id(data)
-    tbl.source <- gsub("\"", "", content(data))
     madlib <- schema.madlib(conn.id) # MADlib schema name
     tbl.output <- .unique.string()
     order.str <- paste0("array[", toString(order), "]")
@@ -191,7 +209,9 @@ setMethod (
                                     conn.id = conn.id, verbose = FALSE)
 
     ## drop temporary tables
-    if (is.tbl.source.temp) delete(tbl.source, conn.id)
+    if (is.tbl.source.temp) rst$temp.source <- TRUE
+    else rst$temp.source <- FALSE
+    ## if (is.tbl.source.temp) delete(tbl.source, conn.id)
     ## delete(tbl.output, conn.id)         
     ## delete(paste0(tbl.output, "_summary"), conn.id)
                 

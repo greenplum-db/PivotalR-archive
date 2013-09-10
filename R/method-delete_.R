@@ -130,5 +130,7 @@ setMethod (
         d1 <- delete(x$model)
         d2 <- delete(x$residuals)
         d3 <- delete(x$statistics)
+        if (x$temp.source) d4 <- delete(x$series)
+        else d4 <- TRUE
         list(res=all(c(d1, d2, d3)), conn.id=conn.id)
     })
