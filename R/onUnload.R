@@ -14,5 +14,5 @@
         .db.unloadDriver(pkg)
 
     ## turn off the `special cbind()' :
-    methods:::bind_activation(FALSE)
+    source(paste0(.localVars$pkg.path, "/auto/disable.cbind2.R"))
 }

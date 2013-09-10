@@ -33,5 +33,6 @@
     packageStartupMessage("\nTo launch the graphical user interface, run the function pivotalr() !")
 
     ## turn on cbind implementation using cbind2
-    methods:::bind_activation(on = TRUE)
+    .localVars$pkg.path <- path.package(.this.pkg.name)
+    source(paste0(.localVars$pkg.path, "/auto/enable.cbind2.R"))
 }
