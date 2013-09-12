@@ -51,5 +51,6 @@ z[is.na(x$height),"height"] <- 23
 }
 }
 
-\keyword{data}
-\keyword{utilities}
+\keyword{database}
+\keyword{math}
+\keyword{utility}

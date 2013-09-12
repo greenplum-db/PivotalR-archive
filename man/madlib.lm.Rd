@@ -234,5 +234,5 @@ fit <- madlib.lm(y ~ x, data = array.data)
 }
 }
 
-\keyword{ madlib }
-\keyword{ wrapper }
+\keyword{madlib}
+\keyword{stats}

@@ -75,5 +75,5 @@ preview(x$rings[x$length > 10 & x$height < 2,])
 }
 
 \keyword{methods}
-\keyword{logic}
+\keyword{math}
 

@@ -118,5 +118,5 @@ y <- x[,-c(1,2)] # use all columns except the first two
 }
 }
 
-\keyword{manip}
-\keyword{utilities}
+\keyword{data operation}
+\keyword{utility}

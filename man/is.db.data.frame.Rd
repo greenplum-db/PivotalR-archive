@@ -48,5 +48,5 @@ is.db.data.frame(x) #check if x is of type db.data.frame
 }
 }
 
-\keyword{data}
-\keyword{utilities}
+\keyword{database}
+\keyword{utility}

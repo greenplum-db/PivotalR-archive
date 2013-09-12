@@ -96,6 +96,6 @@ db.connect(host = "localhost", user = "me", dbname = "me", password =
 }
 }
 
-\keyword{utilities}
-\keyword{ database }
-\keyword{ misc }
+\keyword{utility}
+\keyword{connection}
+\keyword{database}

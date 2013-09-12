@@ -65,4 +65,5 @@ fit <- madlib.lm(sf_mrtg_pct_assets ~ ., data = y)
 fit
 }
 }
-\keyword{datasets}
+\keyword{database}
+\keyword{data operation}

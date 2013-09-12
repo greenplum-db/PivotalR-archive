@@ -77,8 +77,7 @@ x# Display the associated table, and database information for x
   }
 }
 \keyword{IO}
-\keyword{print}
-\keyword{utilities}
+\keyword{utility}
 
 
 

@@ -55,5 +55,5 @@ preview(subset(x, 1:3))
     }
 }
 
-\keyword{manip}
-\keyword{lists}
+\keyword{data operation}
+\keyword{database}

@@ -66,6 +66,6 @@ preview(y)
 }
 }
 
-\keyword{ database }
+\keyword{database}
 \keyword{methods}
-\keyword{utilities}
+\keyword{utility}

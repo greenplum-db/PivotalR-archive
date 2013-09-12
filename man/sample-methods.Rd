@@ -101,4 +101,6 @@ delete(b)
 }
 \keyword{methods}
 \keyword{database}
+\keyword{stats}
+\keyword{math}
 \keyword{utility}

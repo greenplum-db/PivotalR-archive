@@ -189,5 +189,6 @@ z <- as.db.data.frame(x[,], "abalone1")
 }
 }
 
-\keyword{methods}
+\keyword{utility}
 \keyword{ database }
+\keyword{methods}

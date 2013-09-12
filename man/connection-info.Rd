@@ -117,7 +117,6 @@ db.objects(1) # list all tables/views with their schema in connection 1
 }
 }
 
-\keyword{ utility }
-\keyword{ info }
-\keyword{ database }
+\keyword{utility}
+\keyword{database}
 

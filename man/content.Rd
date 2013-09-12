@@ -68,5 +68,5 @@ content(by(x, x$sex, sum))
 }
 }
 
-\keyword{ sql }
-\keyword{ database }
+\keyword{utility}
+\keyword{database}

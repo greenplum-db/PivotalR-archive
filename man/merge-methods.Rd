@@ -101,4 +101,5 @@ m1 <- merge(a,b, by.x = "surname", by.y = "name", all = TRUE)
 }
 
 \keyword{methods}
+\keyword{data operation}
 \keyword{database}

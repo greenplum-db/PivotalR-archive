@@ -89,5 +89,5 @@ err <- generic.cv(function(data) {
 }
 }
 
-\keyword{ utility }
-\keyword{ math }
+\keyword{stats}
+\keyword{math}

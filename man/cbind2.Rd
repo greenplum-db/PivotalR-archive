@@ -59,6 +59,6 @@ plot(lookat(z, 100))
 }
 }
 
-\keyword{data}
-\keyword{utilities}
+\keyword{data operation}
+\keyword{utility}
 

@@ -62,5 +62,5 @@ db.existsObject("madlibtestdata.lin_ornstein", 1)
 }
 }
 
-\keyword{ database }
-\keyword{ utilities }
+\keyword{database}
+\keyword{utility}

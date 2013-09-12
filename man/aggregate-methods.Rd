@@ -170,5 +170,5 @@ db.array(1, x, x, x)
 }
 }
 
-\keyword{database}
-\keyword{aggregates}
+\keyword{math}
+\keyword{stats}

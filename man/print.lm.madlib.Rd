@@ -80,5 +80,5 @@ show(fit)
 }
 
 \keyword{IO}
-\keyword{print}
-\keyword{utilities}
+\keyword{madlib}
+\keyword{utility}

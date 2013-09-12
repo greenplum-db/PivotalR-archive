@@ -82,6 +82,5 @@ s
 }
 }
 
-\keyword{utilities}
-\keyword{ database }
-\keyword{ misc }
+\keyword{utility}
+\keyword{database}

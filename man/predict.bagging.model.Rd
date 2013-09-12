@@ -74,6 +74,6 @@ lookat(mean((y$rings - pred)^2)) # mean squared error
 }
 }
 
-\keyword{ methods }
-\keyword{ math }
-\keyword{ stats }
+\keyword{madlib}
+\keyword{math}
+\keyword{stats}

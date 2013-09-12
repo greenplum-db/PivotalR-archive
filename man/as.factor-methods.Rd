@@ -68,4 +68,5 @@ fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
 }
 
 \keyword{methods}
-\keyword{ factor }
+\keyword{factor}
+\keyword{math}

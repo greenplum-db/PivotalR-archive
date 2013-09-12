@@ -92,4 +92,4 @@ fit <- madlib.lm(rings ~ area, data = x)
 }
 
 \keyword{methods}
-\keyword{function}
+\keyword{math}

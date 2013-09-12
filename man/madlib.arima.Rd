@@ -274,6 +274,5 @@ s <- madlib.arima(tval+2 ~ I(tid + 1), x, order = c(2,0,1))
 }
 }
 
-\keyword{ madlib }
-\keyword{ wrapper }
-\keyword{ math }
+\keyword{madlib}
+\keyword{stats}

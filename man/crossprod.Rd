@@ -99,5 +99,5 @@ p$val # eigenvalues
 }
 
 \keyword{methods}
-\keyword{database}
-\keyword{utility}
+\keyword{math}
+

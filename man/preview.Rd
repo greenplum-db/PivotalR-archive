@@ -133,5 +133,6 @@ preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 }
 
 \keyword{methods}
+\keyword{data operation}
 \keyword{database}
 \keyword{utility}

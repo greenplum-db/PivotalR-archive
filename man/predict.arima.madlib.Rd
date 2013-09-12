@@ -46,6 +46,6 @@
 }
 }
 
-\keyword{ madlib }
-\keyword{ wrapper }
-\keyword{ math }
+\keyword{madlib}
+\keyword{stats}
+\keyword{math}

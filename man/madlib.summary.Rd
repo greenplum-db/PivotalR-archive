@@ -129,5 +129,5 @@ print(summary_result)
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ htest }
-\keyword{ univar }
+\keyword{stats}
+\keyword{madlib}

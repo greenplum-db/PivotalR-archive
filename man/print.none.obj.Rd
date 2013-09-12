@@ -39,5 +39,5 @@
 }
 
 \keyword{IO}
-\keyword{print}
+\keyword{GUI}
 \keyword{utilities}

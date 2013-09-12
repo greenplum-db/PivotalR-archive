@@ -59,4 +59,5 @@ summary(fit)
 }
 
 \keyword{madlib}
-\keyword{summary}
+\keyword{stats}
+\keyword{math}

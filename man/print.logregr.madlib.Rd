@@ -78,4 +78,5 @@ print(fit)
 }
 
 \keyword{IO}
-\keyword{print}
+\keyword{madlib}
+\keyword{utility}

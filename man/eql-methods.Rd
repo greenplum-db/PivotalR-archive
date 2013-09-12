@@ -56,6 +56,6 @@ eql(x,z) # This returns false
 }
 }
 
-\keyword{data}
-\keyword{utilities}
+\keyword{database}
+\keyword{utility}
 

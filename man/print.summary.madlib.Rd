@@ -68,6 +68,6 @@ show(summary_result)
 }
 
 \keyword{IO}
-\keyword{print}
+\keyword{madlib}
 \keyword{utilities}
 

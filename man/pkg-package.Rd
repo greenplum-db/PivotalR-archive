@@ -269,4 +269,4 @@ x[is.na(x)] <- 45
 }
 }
 
-\keyword{ package }
+\keyword{package}

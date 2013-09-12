@@ -59,5 +59,6 @@ conn.eql(1, 2) # returns TRUE
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ database }
+\keyword{database}
+\keyword{utility}
 

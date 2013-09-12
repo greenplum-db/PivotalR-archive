@@ -117,4 +117,4 @@ preview(x[x$length > 10,])
 }
 
 \keyword{methods}
-\keyword{logic}
+\keyword{math}

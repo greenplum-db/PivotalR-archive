@@ -54,4 +54,4 @@ is.factor(x)
 }
 
 \keyword{methods}
-\keyword{ factor }
+\keyword{math}

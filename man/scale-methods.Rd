@@ -97,4 +97,5 @@ y <- as.db.data.frame(s, "scaled_abalone")
 }
 
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
+\keyword{math}
+\keyword{stats}

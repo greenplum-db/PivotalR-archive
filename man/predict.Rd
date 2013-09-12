@@ -127,6 +127,6 @@ plot(random.sample)
 }
 }
 
-\keyword{ methods }
-\keyword{ math }
-\keyword{ stats }
+\keyword{methods}
+\keyword{math}
+\keyword{stats}

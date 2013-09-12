@@ -80,4 +80,4 @@ preview(by(x[,-c(1,2)], x[,"sex"], mean)) # the same
 }
 
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
+\keyword{data operation}

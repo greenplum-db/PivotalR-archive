@@ -80,6 +80,5 @@ lookat(mean((y$rings - pred)^2)) # mean squared error
 }
 }
 
-\keyword{utility}
-\keyword{ math }
-\keyword{ stats }
+\keyword{math}
+\keyword{stats}

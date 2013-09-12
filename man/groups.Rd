@@ -79,4 +79,5 @@ groups(fit[[1]]) # the first model's grouping column value
 }
 
 \keyword{madlib}
-\keyword{summary}
+\keyword{math}
+\keyword{stats}

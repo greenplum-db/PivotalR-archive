@@ -61,5 +61,5 @@ db.list()
 }
 
 \keyword{utility}
-\keyword{ database }
-\keyword{ connection }
+\keyword{database}
+\keyword{connection}

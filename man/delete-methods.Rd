@@ -124,4 +124,4 @@ for (table.name in to.delete) delete(table.name, conn.id = 2)
 
 \keyword{methods}
 \keyword{database}
-\keyword{utilities}
+\keyword{utility}

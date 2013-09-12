@@ -59,5 +59,5 @@ db.objects("^madlibtestdata.lin")
 }
 }
 
-\keyword{ utilities }
-\keyword{ misc }
+\keyword{utility}
+\keyword{database}

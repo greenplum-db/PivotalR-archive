@@ -38,5 +38,5 @@ pivotalr()
   [2] shiny website, \url{http://www.rstudio.com/shiny/}
 }
 
-\keyword{IO}
-\keyword{utilities}
+\keyword{GUI}
+\keyword{utility}

@@ -58,7 +58,7 @@ key(x) <- 'length'
 }
 }
 
-\keyword{data}
-\keyword{attribute}
+\keyword{database}
+\keyword{data operation}
 
 

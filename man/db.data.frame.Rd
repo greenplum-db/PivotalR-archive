@@ -94,5 +94,5 @@ z <- db.data.frame("myschema.mytable")
 }
 }
 
-\keyword{ utilities }
-\keyword{ misc }
+\keyword{utility}
+\keyword{database}

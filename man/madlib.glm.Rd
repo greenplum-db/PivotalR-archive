@@ -268,6 +268,6 @@ fit <- madlib.lm(y < 10 ~ x, data = array.data)
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ madlib }
-\keyword{ wrapper }
-\keyword{ regression }
+\keyword{madlib}
+\keyword{stats}
+
