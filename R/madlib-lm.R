@@ -17,34 +17,45 @@ madlib.lm <- function (formula, data, na.action,
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
 
-    warnings <- .suppress.warnings(conn.id(data))
+    conn.id <- conn.id(data) # connection ID
 
-    ## analyze the formula
-    analyzer <- .get.params(formula, data)
-    data <- analyzer$data
-    params <- analyzer$params
-    is.tbl.source.temp <- analyzer$is.tbl.source.temp
-    tbl.source <- analyzer$tbl.source
-
-    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    ## Check for HAWQ
+    db.str <- (.get.dbms.str(conn.id))$db.str
     if (db.str == "HAWQ" && hetero)
         stop("Right now MADlib on HAWQ does not support computing ",
              "heteroskedasticity in linear regression !")
+
+    ## suppress both SQL and R warnings
+    warnings <- .suppress.warnings(conn.id)
+
+    ## analyze the formula
+    analyzer <- .get.params(formula, data)
+
+    ## For db.view or db.R.query, create a temporary table
+    ## For pivoted db.Rquery, realize the pivoting
+    ## Else: just return the original data table
+    data <- analyzer$data
+
+    ## dependent, independent and grouping variables
+    ## has.intercept boolean
+    params <- analyzer$params
+
+    ## Is data temporarily created?
+    is.tbl.source.temp <- analyzer$is.tbl.source.temp
     
-    ## dependent, independent and grouping strings
+    ## grouping string
     if (is.null(params$grp.str))
         grp <- "NULL"
     else
         if (db.str == "HAWQ") {
             stop("Right now MADlib on HAWQ does not support grouping ",
                  "in linear regression !")
-        } else if (.madlib.version.number(conn.id(data)) > 0.7)
+        } else if (.madlib.version.number(conn.id) > 0.7)
             grp <- paste0("'", params$grp.str, "'")
         else
             grp <- paste("'{", params$grp.str, "}'::text[]")
 
     ## construct SQL string
-    conn.id <- conn.id(data)
     tbl.source <- gsub("\"", "", content(data))
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
@@ -60,16 +71,18 @@ madlib.lm <- function (formula, data, na.action,
                       grp, ", ", hetero, ")")
     }
         
-    ## execute and get the result
+    ## execute and get the result, error handling is taken care of
     res <- .get.res(sql, tbl.output, conn.id)
 
     ## drop temporary tables
+    ## HAWQ does not need to drop the output table
     if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
+    ## reset SQL and R warning levels
     .restore.warnings(warnings)
 
-    ## organize the result
+    ## organize the result (into groups)
     n <- length(params$ind.vars)
     res.names <- names(res)
     rst <- list()
@@ -106,11 +119,14 @@ madlib.lm <- function (formula, data, na.action,
         rst[[i]]$call <- r.call
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
-        class(rst[[i]]) <- "lm.madlib"
+        class(rst[[i]]) <- "lm.madlib" # A single model class
     }
 
+    ## the class of a list of models
     class(rst) <- "lm.madlib.grps"
-    
+
+    ## If no grouping, just return one model
+    ## Otherwise, return a list of models
     if (n.grps == 1) return (rst[[1]])
     else return (rst)
 }
@@ -131,6 +147,8 @@ summary.lm.madlib.grps <- function (object, ...)
 ## -----------------------------------------------------------------------
 
 ## Pretty format of linear regression result
+## Print a list of models
+## NOTE: code needs refactoring
 print.lm.madlib.grps <- function (x,
                                   digits = max(3L, getOption("digits") - 3L),
                                   ...)
@@ -217,6 +235,8 @@ show.lm.madlib.grps <- function (object)
 
 ## -----------------------------------------------------------------------
 
+## Print a single model
+## NOTE: Code needs refactoring
 print.lm.madlib <- function (x,
                              digits = max(3L, getOption("digits") - 3L),
                              ...)

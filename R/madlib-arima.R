@@ -7,7 +7,7 @@ setGeneric ("madlib.arima",
             def = function (x, ts, ...) {
                 call <- deparse(match.call())
                 fit <- standardGeneric("madlib.arima")
-                fit$call <- call
+                fit$call <- call # call must be in generic function
                 fit
             })
 
@@ -15,6 +15,7 @@ setClass("arima.css.madlib")
 
 ## ----------------------------------------------------------------------
 
+## One of the two interfaces of madlib.arima
 setMethod (
     "madlib.arima",
     signature (x = "db.Rquery", ts = "db.Rquery"),
@@ -41,6 +42,7 @@ setMethod (
         f.str <- paste(f.str, "|", paste(grp.names, collapse = "+"))
     }
 
+    ## Transform to the other interface
     madlib.arima(formula(f.str), data, order, seasonal, include.mean,
                  method, optim.method, optim.control, ...)
 })
@@ -56,6 +58,8 @@ setMethod (
     optim.method = "LM",
     optim.control = list(), ...)
 {
+    ## Prepare for another function
+    ## To avoid argument checking/matching
     args <- list(...)
     args <- c(args, optim.control)
     args$formula <- x
@@ -114,12 +118,17 @@ setMethod (
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
-    ## tbl.source <- analyzer$tbl.source
     tbl.source <- gsub("\"", "", content(data))
     
     if (length(params$ind.vars) != 1)
         stop("Only one time stamp is allowed !")
 
+    ## dependent, independent and grouping strings
+    if (is.null(params$grp.str))
+        grp <- "NULL"
+    else
+        stop("Right now MADlib does not support grouping in ARIMA !")
+    
     ## allow expressions as time series and time stamp
     ## create intermediate tables to accomodate this
     col.names <- names(data)
@@ -136,12 +145,6 @@ setMethod (
         params$dep.str <- "tval"
         params$ind.vars <- "tid"
     }
-
-    ## dependent, independent and grouping strings
-    if (is.null(params$grp.str))
-        grp <- "NULL"
-    else
-        stop("Right now MADlib does not support grouping in ARIMA !")
 
     ## construct SQL string
     madlib <- schema.madlib(conn.id) # MADlib schema name
@@ -164,6 +167,7 @@ setMethod (
     p <- order[1]
     d <- order[2]
     q <- order[3]
+    
     ## retrieve the coefficients
     res <- preview(tbl.output, conn.id=conn.id, "all")
     rst <- list()
@@ -208,12 +212,10 @@ setMethod (
     rst$statistics <- db.data.frame(paste0(tbl.output, "_summary"),
                                     conn.id = conn.id, verbose = FALSE)
 
-    ## drop temporary tables
+    ## If temp.source is TRUE, the delete(...) function
+    ## will delete it
     if (is.tbl.source.temp) rst$temp.source <- TRUE
     else rst$temp.source <- FALSE
-    ## if (is.tbl.source.temp) delete(tbl.source, conn.id)
-    ## delete(tbl.output, conn.id)         
-    ## delete(paste0(tbl.output, "_summary"), conn.id)
                 
     .restore.warnings(warnings)
 
