@@ -9,7 +9,7 @@ from command line
 
         R CMD install xxxxx.tar.gz
         
-from within R
+or from within R
 
         > install.packages("xxxxx.tar.gz", repos = NULL, type = "source")
 
