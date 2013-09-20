@@ -1,6 +1,18 @@
 PivotalR
 =======
 
+***[Download the latest tarball](https://github.com/madlib-internal/PivotalR/tarball/master)***
+
+And install it
+
+from command line
+
+        R CMD install xxxxx.tar.gz
+        
+from within R
+
+        > install.packages("xxxxx.tar.gz", repos = NULL, type = "source")
+
 ***Please see [wiki](https://github.com/madlib-internal/PivotalR/wiki) and [PivotalR](http://madlib-internal.github.io/PivotalR) for more information.***
 
 PivotalR is a package that enables users of R, the most popular open source statistical programming language 
