@@ -3,6 +3,9 @@
 ## Wrapper function for MADlib's lm function
 ## ----------------------------------------------------------------------
 
+setClass("lm.madlib")
+setClass("lm.madlib.grps")
+
 ## na.action is a place holder
 ## will implement later in R (using temp table), or will implement
 ## in MADlib
@@ -76,8 +79,10 @@ madlib.lm <- function (formula, data, na.action,
 
     ## drop temporary tables
     ## HAWQ does not need to drop the output table
-    if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
+    ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+
+    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     ## reset SQL and R warning levels
     .restore.warnings(warnings)
@@ -119,6 +124,7 @@ madlib.lm <- function (formula, data, na.action,
         rst[[i]]$call <- r.call
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
+        rst[[i]]$model <- model
         class(rst[[i]]) <- "lm.madlib" # A single model class
     }
 

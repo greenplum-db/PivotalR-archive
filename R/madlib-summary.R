@@ -3,6 +3,8 @@
 ## Summary of a db.obj
 ## -----------------------------------------------------------------------
 
+setClass("summary.madlib")
+
 madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                             get.distinct = TRUE, get.quartiles = TRUE,
                             ntile = NULL, n.mfv = 10, estimate = TRUE,
@@ -75,9 +77,12 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     if (is(res, .err.class))
         stop("Could not do the summary!")
     
-    .db.removeTable(out.tbl, conn.id(x))
+    ## .db.removeTable(out.tbl, conn.id(x))
     if (to.drop.tbl) .db.removeTable(tbl, conn.id(x))
 
+    attr(res, "summary") <- db.data.frame(out.tbl, conn.id = conn.id(x),
+                                          verbose = FALSE)
+    
     class(res) <- "summary.madlib"
 
     .restore.warnings(warnings)

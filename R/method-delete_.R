@@ -134,3 +134,64 @@ setMethod (
         else d4 <- TRUE
         list(res=all(c(d1, d2, d3)), conn.id=conn.id)
     })
+
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "summary.madlib"),
+    def = function (x) {
+        tbl <- attr(x, "summary")
+        conn.id <- conn.id(tbl)
+        d1 <- delete(tbl)
+        list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "lm.madlib"),
+    def = function (x) {
+        conn.id <- conn.id(x$model)
+        d1 <- delete(x$model)
+        list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "lm.madlib.grps"),
+    def = function (x) {
+        conn.id <- conn.id(x[[1]]$model)
+        d1 <- delete(x[[1]]$model)
+        list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "logregr.madlib"),
+    def = function (x) {
+        conn.id <- conn.id(x$model)
+        d1 <- delete(x$model)
+        list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "logregr.madlib.grps"),
+    def = function (x) {
+        conn.id <- conn.id(x[[1]]$model)
+        d1 <- delete(x[[1]]$model)
+        list(res=d1, conn.id=conn.id)
+    })
+
+
+
+

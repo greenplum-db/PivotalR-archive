@@ -4,6 +4,9 @@
 ## logistic regressions
 ## -----------------------------------------------------------------------
 
+setClass("logregr.madlib")
+setClass("logregr.madlib.grps")
+
 ## na.action is a place holder
 ## family specific parameters are in control, which
 ## is a list of parameters
@@ -97,8 +100,10 @@ madlib.glm <- function (formula, data, family = "gaussian",
     res <- .get.res(sql, tbl.output, conn.id)
 
     ## drop temporary tables
-    if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
+    ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+
+    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     .restore.warnings(warnings)
 
@@ -141,6 +146,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
         rst[[i]]$call <- r.call
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
+        rst[[i]]$model <- model
         class(rst[[i]]) <- "logregr.madlib"
     }
     

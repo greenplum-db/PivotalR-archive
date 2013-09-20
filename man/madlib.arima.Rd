@@ -212,7 +212,11 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 }
 
 \seealso{
-  \code{\link{delete,arima.css.madlib-method}} deletes the result of
+    \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
+  \code{\link{madlib.summary}} are MADlib
+  wrapper functions.
+  
+  \code{\link{delete}} deletes the result of
   this function together with the model, residual and statistics
   tables. 
 

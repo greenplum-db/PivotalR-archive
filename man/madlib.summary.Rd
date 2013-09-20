@@ -90,7 +90,14 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
     \item{third_quartile}{numeric. Third quartile (75th percentile, valid only for numeric columns)}
     \item{quantile_array}{numeric. Percentile values corresponding to ntile_array}
     \item{most_frequent_values}{character. Most frequent values}
-    \item{mfv_frequencies}{character. Frequency of the most frequent values}
+    \item{mfv_frequencies}{character. Frequency of the most frequent
+      values}
+
+    The \code{data.frame} has an extra attribute names \code{"summary"},
+    which is a \code{\linkS4class{db.data.frame}} object and wraps the
+    result table created by MADlib inside the database. One can access
+    this object using \code{attr(res, "summary")}, where \code{res} is
+    the result of this function.
 }
 
 \author{
@@ -98,6 +105,14 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
 
   Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}
+}
+
+\seealso{
+    \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
+    \code{\link{madlib.arima}} are MADlib
+    wrapper functions.
+
+    \code{\link{delete}} safely deletes the result of this function.
 }
 
 \examples{

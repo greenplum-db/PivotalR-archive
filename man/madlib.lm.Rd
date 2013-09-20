@@ -173,6 +173,15 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
     for details.
   }
+
+  \item{model}{
+    A \code{\linkS4class{db.data.frame}} object, which wraps the result
+    table of this function.
+  }
+
+  Note that if there is grouping done, and there are multiple
+  \code{lm.madlib} objects in the final result, each one of them
+  contains the same copy \code{model}.
 }
 
 \references{
@@ -198,9 +207,13 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 }
 
 \seealso{
-  \code{\link{madlib.glm}} logistic regression
+  \code{\link{madlib.glm}},
+  \code{\link{madlib.summary}}, \code{\link{madlib.arima}} are MADlib
+  wrapper functions.
 
   \code{\link{as.factor}} creates categorial variables for fitiing.
+
+  \code{\link{delete}} safely deletes the result of this function.
 }
 \examples{
 \dontrun{
