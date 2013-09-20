@@ -30,7 +30,7 @@ array = TRUE)
 
 \S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE)
 
-lookat(x, nrows = 100, array = TRUE)
+lookat(x, nrows = 100, array = TRUE, conn.id = 1)
 }
 
 \arguments{

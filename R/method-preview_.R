@@ -183,9 +183,10 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## same as preview
-lookat <- function (x, nrows = 100, array = TRUE)
+lookat <- function (x, nrows = 100, array = TRUE, conn.id = 1)
 {
     if (is(x, "db.table")) return (preview(x, nrows, array = array))
     if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE))
+    if (is(x, "character")) return (preview(x, conn.id, nrows, array))
     preview(x, nrows, FALSE, array)
 }
