@@ -3,9 +3,10 @@
 \alias{Aggregate functions}
 \alias{sd}
 \alias{var}
+\alias{count}
 \alias{mean,db.obj-method}
 \alias{sum,db.obj-method}
-\alias{length,db.obj-method}
+\alias{count,db.obj-method}
 \alias{max,db.obj-method}
 \alias{min,db.obj-method}
 \alias{sd,db.obj-method}
@@ -29,7 +30,7 @@ the sum of each column.}
 
 \S4method{sum}{db.obj}(x, ..., na.rm = FALSE)
 
-\S4method{length}{db.obj}(x)
+\S4method{count}{db.obj}(x)
 
 \S4method{max}{db.obj}(x, ..., na.rm = FALSE)
 
@@ -76,7 +77,7 @@ db.array(x, ...)
 }
 
 \details{
-    For aggregate functions: \code{mean}, \code{sum}, \code{length},
+    For aggregate functions: \code{mean}, \code{sum}, \code{count},
     \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
     \code{x} must be a reference to a single column in a table.
 
@@ -90,7 +91,7 @@ db.array(x, ...)
 
     For \code{sum}, a \code{db.Rquery} which is a SQL query to extract the sum of a column of a table.
 
-    For \code{length}, a \code{db.Rquery} which is a SQL query to extract the count of a column of a table.
+    For \code{count}, a \code{db.Rquery} which is a SQL query to extract the count of a column of a table.
 
     For \code{max}, a \code{db.Rquery} which is a SQL query to extract the max of a column of a table.
 
@@ -139,7 +140,7 @@ mean(x$diameter)
 sum(x$height)
 
 ## get the number of entries in a column
-length(x$id)
+count(x$id)
 
 ## get the max value of a column
 max(x$diameter)

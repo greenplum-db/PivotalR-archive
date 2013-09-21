@@ -56,7 +56,8 @@ export("madlib.summary", "print.summary.madlib", "show.summary.madlib")
 
 export("db.objects", "db.existsObject")
 
-exportMethods("mean", "sum", "length", "max", "min")
+export("count")
+exportMethods("mean", "sum", "max", "min")
 export("sd", "var")
 
 exportMethods("sample")

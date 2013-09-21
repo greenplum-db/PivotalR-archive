@@ -170,10 +170,10 @@ setMethod (
 
 ## -----------------------------------------------------------------------
 
-setGeneric ("length")
+setGeneric ("count", function(x) standardGeneric("count"))
 
 setMethod (
-    "length",
+    "count",
     signature(x = "db.obj"),
     function (x) {
         res <- .aggregate(x, "count", FALSE, NULL, FALSE, "integer", "int4")

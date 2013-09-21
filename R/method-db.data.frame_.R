@@ -65,6 +65,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     tbl.type <- .db.getQuery(
         paste("select table_type from information_schema.tables where ",
               .db.table.schema.str(table), sep = ""), conn.id)
+
     res@.table.type <- tbl.type$table_type
 
     res@.is.factor <- rep(FALSE, length(res@.col.name))
