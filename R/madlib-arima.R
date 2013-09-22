@@ -237,7 +237,7 @@ print.arima.css.madlib <- function (x,
                                     getOption("digits") - 3L),
                                     ...)
 {
-    cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n\n", sep = "")
     cat("Coefficients:\n")
 

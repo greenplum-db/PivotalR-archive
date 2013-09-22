@@ -220,6 +220,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                                right.hand, perl = TRUE)
         }
     } else {
+        # make all text columns to be factor
+        for (i in seq_len(length(names(data)))) {
+            if (data@.col.data_type[i] %in% .txt.types) {
+                col <- data@.col.name[i]
+                right.hand <- gsub(col,
+                                   paste0("as\\.factor\\(",
+                                          col, "\\)"),
+                                   right.hand)
+            }
+        }
+        
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
                            "factor(\\1)", right.hand, perl = T)

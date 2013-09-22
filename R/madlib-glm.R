@@ -188,7 +188,7 @@ print.logregr.madlib.grps <- function (x,
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
-    cat("\nCall:\n", paste(x[[1]]$call, sep = "\n", collapse = "\n"),
+    cat("\nCall:\n", paste(deparse(x[[1]]$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
     if (n.grps > 1)
         cat("\nThe data is divided into", x$grps, "groups\n")
@@ -272,7 +272,7 @@ print.logregr.madlib <- function (x,
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
-    cat("\nCall:\n", paste(x$call, sep = "\n", collapse = "\n"),
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
  
     cat("\n---------------------------------------\n\n")
