@@ -240,8 +240,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
     }
 
-    right.hand <- gsub("as.factor\\((.*)\\)", "\\1", right.hand, perl = T)
-    right.hand <- gsub("factor\\((.*)\\)", "\\1", right.hand, perl = T)
+    right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
+    right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
 
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")

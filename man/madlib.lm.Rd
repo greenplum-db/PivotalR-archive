@@ -158,7 +158,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   }
 
   \item{call}{
-    A string. The function call that generates this result.
+    A language object. The function call that generates this result.
   }
 
   \item{col.name}{

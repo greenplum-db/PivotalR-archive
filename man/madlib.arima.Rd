@@ -187,7 +187,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
   }
 
   \item{call}{
-    the matched function call.
+    A language object. The matched function call.
   }
 }
 

@@ -17,7 +17,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     args$formula <- formula
     args$data <- data
     args$na.action <- na.action
-    call <- deparse(match.call())
+    call <- match.call()
 
     if (tolower(family) == "gaussian" || tolower(family) == "linear")
     {

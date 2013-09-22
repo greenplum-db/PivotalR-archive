@@ -5,7 +5,7 @@
 
 setGeneric ("madlib.arima",
             def = function (x, ts, ...) {
-                call <- deparse(match.call())
+                call <- match.call()
                 fit <- standardGeneric("madlib.arima")
                 fit$call <- call # call must be in generic function
                 fit

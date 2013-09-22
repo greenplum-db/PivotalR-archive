@@ -103,7 +103,7 @@ madlib.lm <- function (formula, data, na.action,
     r.ind.str <- params$ind.str
     r.col.name <- gsub("\"", "", data@.col.name)
     r.appear <- data@.appear.name
-    r.call <- deparse(match.call()) # the current function call itself
+    r.call <- match.call() # the current function call itself
     r.dummy <- data@.dummy
     r.dummy.expr <- data@.dummy.expr
     
