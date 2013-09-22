@@ -38,6 +38,7 @@
 
     is.factor <- data@.is.factor
     cols <- names(data)
+
     params <- .analyze.formula(formula, data, params$data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix)

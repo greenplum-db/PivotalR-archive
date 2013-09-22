@@ -212,7 +212,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             col <- replace.cols[i]
             new.col <- names(data)[grep(paste(col, suffix[i], sep=""),
                                         names(data))]
-            new.col <- paste("(", paste(new.col, collapse = " + "), ")",
+            new.col <- paste("(", paste("`", new.col, "`", collapse = " + ",
+                                        sep = ""), ")",
                              sep = "")
             right.hand <- gsub(paste(col, "([^_\\w]+|$)", sep = ""),
                                paste(new.col, "\\1", sep = ""),
