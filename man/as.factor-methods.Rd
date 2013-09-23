@@ -24,13 +24,6 @@
   A \code{db.Rquery} object. It has only one column which is categorial.
 }
 
-\note{
-  In regressions, a text column in the independent variables is
-  automatically treated as a factor. So in this case, \code{as.factor}
-  is optional. However, if the column is numeric, \code{as.factor} is
-  still needed.
-}
-
 \author{
   Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
   
@@ -71,9 +64,6 @@ fit3 <- madlib.lm(rings ~ as.factor(sex) + length + diameter, data = z)
 
 fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
 = z, family = "binomial")
-
-## Regressions automatically treat text columns as factors
-fit3 <- madlib.lm(rings ~ sex + length + diameter, data = z)
 }
 }
 
