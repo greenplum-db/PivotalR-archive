@@ -240,10 +240,13 @@ setMethod (
             nrow.str <- ""
         
         content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
-                
-        create.str <- paste("create ", temp.str, " ", obj.str, " \"",
-                            table.name,
-                            "\" as (", content.str, nrow.str, ") ", dist.str, sep = "")
+
+        tbn <- strsplit(table.name, "\\.")[[1]]
+        tbnn <- paste("\"", tbn, "\"", collapse = ".", sep = "")
+        
+        create.str <- paste("create ", temp.str, " ", obj.str, " ",
+                            tbnn,
+                            " as (", content.str, nrow.str, ") ", dist.str, sep = "")
 
         .db.getQuery(create.str, conn.id) # create table
 
