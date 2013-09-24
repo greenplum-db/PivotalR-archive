@@ -245,6 +245,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     if (length(name) != 1 && length(name) != 2)
         stop("The formation of object name is wrong!")
     if (length(name) == 2) {
+        if (is.temp) stop("Temporary tables may not specify a schema name!")
         schema <- name[1]
         table <- name[2]
         ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
