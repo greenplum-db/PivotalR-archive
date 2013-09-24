@@ -103,8 +103,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     return (parts)
 }
 
+## ----------------------------------------------------------------------
+
 .db.table.schema.str <- function (table)
 {
+    table <- .strip(table, "\"")
     l <- length(table)
     if (l == 2)
         return (paste("table_name = '", table[2], "' and table_schema = '",

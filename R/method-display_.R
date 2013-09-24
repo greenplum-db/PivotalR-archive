@@ -10,20 +10,26 @@ setMethod (
     signature (x = "db.data.frame"),
     function (x) {
         if (x@.table.type == "LOCAL TEMPORARY") {
-            if (is(x, "db.view"))
+            if (is(x, "db.view")) {
                 temp <- "Temp view"
-            else
+                ms <- "     "
+            } else {
                 temp <- "Temp table"
+                ms <- "      "
+            }
         } else {
-            if (is(x, "db.view"))
+            if (is(x, "db.view")) {
                 temp <- "View"
-            else
+                ms <- ""
+            } else {
                 temp <- "Table"
+                ms <- " "
+            }
         }
-        cat(temp, "      :    ", x@.content, "\n", sep = "")
-        cat("Database   :    ", dbname(x@.conn.id), "\n", sep = "")
-        cat("Host       :    ", host(x@.conn.id), "\n", sep = "")
-        cat("Connection :    ", x@.conn.id, "\n", sep = "")
+        cat(temp, "       :    ", x@.content, "\n", sep = "")
+        cat("Database", ms, "   :    ", dbname(x@.conn.id), "\n", sep = "")
+        cat("Host", ms, "       :    ", host(x@.conn.id), "\n", sep = "")
+        cat("Connection", ms, " :    ", x@.conn.id, "\n", sep = "")
     })
 
 ## -----------------------------------------------------------------------

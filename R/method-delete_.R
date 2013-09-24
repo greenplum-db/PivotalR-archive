@@ -50,6 +50,8 @@ setMethod (
     "delete",
     signature (x = "character"),
     def = function (x, conn.id = 1, is.temp = FALSE, cascade = FALSE) {
+        x <- paste("\"", .strip(strsplit(x, "\\.")[[1]], "\""), "\"",
+                   collapse = ".", sep = "")
         origin.x <- x
         warn.r <- getOption("warn")
         options(warn = -1)

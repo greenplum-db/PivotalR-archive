@@ -88,6 +88,7 @@ setMethod (
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
+    warnings <- .suppress.warnings(conn.id)
     if (is.null(table.name)) {
         table.name <- .unique.string()
         is.temp <- TRUE
@@ -116,11 +117,10 @@ setMethod (
         (is.temp && .db.existsTempTable(table, conn.id)[[1]]))
         stop("Table already exists!")
 
-    warnings <- .suppress.warnings(conn.id)
-    
     .db.writeTable(table, x, add.row.names = add.row.names,
                    distributed.by = distributed.by,
                    is.temp = is.temp, conn.id = conn.id, ...)
+
     if (length(table) == 1 && !is.temp) {
         table_schema <- .db.getQuery("select current_schema()", conn.id);
         table.str <- paste(table_schema, ".", table, sep = "")
@@ -132,8 +132,12 @@ setMethod (
                            key, "\")", sep = ""), conn.id)
 
     .restore.warnings(warnings)
-    
-    list(res = db.data.frame(x = table.name, conn.id = conn.id, key = key,
+
+    tbn <- strsplit(table.name, "\\.")[[1]]
+    tbnn <- paste("\"", .strip(tbn, "\""),
+                  "\"", collapse = ".", sep = "")
+
+    list(res = db.data.frame(x = tbnn, conn.id = conn.id, key = key,
          verbose = verbose, is.temp = is.temp),
          conn.id = conn.id)
 }
@@ -149,6 +153,8 @@ setMethod (
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL, nrow = NULL) {
+        warnings <- .suppress.warnings(conn.id(x))
+        
         if (is.null(table.name)) {
             table.name <- .unique.string()
             is.temp <- TRUE
@@ -161,8 +167,6 @@ setMethod (
         exists <- db.existsObject(table.name, conn.id, is.temp)
         if (is.temp) exists <- exists[[1]]
         if (exists) stop("The table already exists in connection ", conn.id, "!")
-
-        warnings <- .suppress.warnings(conn.id(x))
         
         if (is.temp) 
             temp.str <- "temp"
@@ -242,7 +246,8 @@ setMethod (
         content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
 
         tbn <- strsplit(table.name, "\\.")[[1]]
-        tbnn <- paste("\"", tbn, "\"", collapse = ".", sep = "")
+        tbnn <- paste("\"", .strip(tbn, "\""),
+                      "\"", collapse = ".", sep = "")
         
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             tbnn,
@@ -252,7 +257,7 @@ setMethod (
 
         .restore.warnings(warnings)
 
-        res <- db.data.frame(x = table.name, conn.id = conn.id, key = x@.key,
+        res <- db.data.frame(x = tbnn, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)
         res@.is.factor <- is.factor
         res@.factor.suffix <- suffix
@@ -276,10 +281,14 @@ setMethod (
             table.name <- .unique.string()
             is.temp <- TRUE
         }
+
+        tbn <- strsplit(table.name, "\\.")[[1]]
+        tbnn <- paste("\"", .strip(tbn, "\""),
+                      "\"", collapse = ".", sep = "")
         
-        if (table.name == content(x))
+        if (tbnn == content(x))
             stop("cannot copy an object into itself!")
-        list(res = as.db.data.frame(x[,], table.name, FALSE,
+        list(res = as.db.data.frame(x[,], tbnn, FALSE,
              is.view, is.temp, FALSE, distributed.by, nrow),
              conn.id = conn.id(x))
     })

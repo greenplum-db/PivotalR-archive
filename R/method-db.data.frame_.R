@@ -6,6 +6,8 @@
 db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
                            is.temp = FALSE)
 {
+    warnings <- .suppress.warnings(conn.id)
+    
     if (! .is.arg.string(x))
         stop("The name of the database object must be a string!")
     if (! .is.conn.id.valid(conn.id))
@@ -23,9 +25,10 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
         stop("No such object in the connection ", conn.id)
 
     if (length(table) == 1)
-        content <- paste("\"", table, "\"", sep = "")
+        content <- paste("\"", .strip(table, "\""), "\"", sep = "")
     else
-        content <- paste("\"", table, "\"", sep = "", collapse = ".")
+        content <- paste("\"", .strip(table, "\""),
+                         "\"", sep = "", collapse = ".")
     
     if (.is.view(table, conn.id))
     {
@@ -75,7 +78,9 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     if (verbose)
         message("An R object pointing to ", x,
                 " in connection ", conn.id, " is created !")
-    
+
+    .restore.warnings(warnings)
+
     return (res)
 }
 
