@@ -1,7 +1,7 @@
 PivotalR
 =======
 
-***[Download the latest tarball](https://github.com/madlib-internal/PivotalR/tarball/master)***
+### ***[Download the latest tarball](https://github.com/madlib-internal/PivotalR/tarball/master)***
 
 And install it
 
