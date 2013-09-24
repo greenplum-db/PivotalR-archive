@@ -13,6 +13,10 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     if (! .is.conn.id.valid(conn.id))
         stop("There is no such a connection to any database!")
 
+    tbn <- strsplit(x, "\\.")[[1]]
+    x <- paste("\"", .strip(tbn, "\""),
+               "\"", collapse = ".", sep = "")
+    
     ## a vector (schema_name, table_name) or just table_name
     table <- .db.analyze.table.name(x) 
     exists <- db.existsObject(x, conn.id, is.temp)
