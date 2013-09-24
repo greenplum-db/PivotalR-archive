@@ -12,7 +12,7 @@
 }
 
 \usage{
-db.disconnect(conn.id = 1, verbose = TRUE)
+db.disconnect(conn.id = 1, verbose = TRUE, force = FALSE)
 }
 
 \arguments{
@@ -23,6 +23,12 @@ db.disconnect(conn.id = 1, verbose = TRUE)
    \item{verbose}{
      A logical, default is \code{TRUE}. Whether to print a message
      during disconnection.
+   }
+
+   \item{force}{
+     A logical, default is \code{FALSE}. Whether to remove the
+     connection forcefully. This is useful when you lose the connection
+     and cannot disconnect the connection normally.
    }
 }
 

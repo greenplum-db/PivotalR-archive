@@ -104,7 +104,7 @@ db.search.path <- function (conn.id = 1, set = NULL)
 ## ---------------------------------------------------------------------- 
 
 ## disconnect a connection
-db.disconnect <- function (conn.id = 1, verbose = TRUE)
+db.disconnect <- function (conn.id = 1, verbose = TRUE, force = FALSE)
 {
     ## check whether this connection exists
     if (!.is.conn.id.valid(conn.id))
@@ -115,7 +115,7 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
     command <- paste(".db.disconnect.", conn.pkg, "(idx=", idx, ")",
                      sep = "")
     res <- eval(parse(text = command))
-    if (res)
+    if (res || force)
     {
         .localVars$db[[idx]] <- NULL
         .localVars$conn.type[[conn.pkg]] <- .localVars$conn.type[[conn.pkg]][-which(.localVars$conn.type[[conn.pkg]]==conn.id)]
@@ -129,8 +129,12 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
             .localVars$conn.id[.localVars$conn.id[,1] == id, 2] <- i
         }
 
-        if (verbose)
-            cat(paste("Connection", conn.id, "is disconnected!\n"))
+        if (verbose) {
+            if (force)
+                cat(paste("Connection", conn.id, "is forcely removed!\n"))
+            else
+                cat(paste("Connection", conn.id, "is disconnected!\n"))
+        }
     }
     else
     {
