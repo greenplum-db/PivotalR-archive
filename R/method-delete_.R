@@ -96,7 +96,8 @@ setMethod (
                 }
             }
         ## .db.removeTable(x, conn.id)
-        table <- paste(x[1], ".", x[2], sep = "")
+        table <- paste("\"", .strip(x[1], "\""),
+                       "\".\"", .strip(x[2], "\""), "\"", sep = "")
         if (cascade) cascade.str <- " cascade"
         else cascade.str <- ""
 
