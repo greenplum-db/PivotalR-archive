@@ -6,7 +6,7 @@ as.data.frame.db.table <-
         array=TRUE, ...)
 {
     df <- lookat(x, nrows=nrows, array=array)
-    if(stringsAsFactors && any(sapply(df, "class") == "character"))
+    if(stringsAsFactors && any(sapply(df, is.character))
         df[] <- lapply(df, function(x) if(is.character(x)) factor(x) else x)
     df
 }
