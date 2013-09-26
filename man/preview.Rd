@@ -34,17 +34,17 @@ array = TRUE)
 
 lookat(x, nrows = 100, array = TRUE, conn.id = 1)
 
-\method{as.data.frame}{db.table}(x, row.names = NULL, optional = FALSE,
-    nrows=100, stringsAsFactors = default.stringsAsFactors(), array =
-    TRUE, ...)
+\method{as.data.frame}{db.table}(x, nrows = 100, row.names = NULL,
+     optional = FALSE, stringsAsFactors = default.stringsAsFactors(),
+     array = TRUE, ...)
 
-\method{as.data.frame}{db.view}(x, row.names=NULL, optional=FALSE,
-    nrows=100, stringsAsFactors = default.stringsAsFactors(), array =
-    TRUE, ...)
+\method{as.data.frame}{db.view}(x, nrows = 100, row.names=NULL,
+    optional=FALSE, stringsAsFactors = default.stringsAsFactors(), array
+    = TRUE, ...)
 
-\method{as.data.frame}{db.Rquery}(x, row.names = NULL, optional = FALSE,
-    nrows=100, stringsAsFactors = default.stringsAsFactors(), array =
-    TRUE, ...)  }
+\method{as.data.frame}{db.Rquery}(x, nrows = 100, row.names = NULL,
+    optional = FALSE, stringsAsFactors = default.stringsAsFactors(),
+    array = TRUE, ...)  }
 
 \arguments{
   \item{x}{
