@@ -153,8 +153,9 @@ preview(y, 20, FALSE)
 
 ## table abalone has a column named "id"
 preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
-}
-}
+
+## use as.data.frame
+as.data.frame(x, 10) } }
 
 \keyword{methods}
 \keyword{data operation}

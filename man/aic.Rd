@@ -62,7 +62,20 @@
 }
 
 \seealso{
-    \code{\link{AIC}}, \code{\link{extractAIC}}, \code{\link{logLik}}.
+  \code{\link{AIC}}, \code{\link{extractAIC}}, \code{\link{logLik}}.
 }
+
+\examples{ \dontrun{
+
+## create a table
+x <- as.db.data.frame(abalone, "abalone")
+
+fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
+"binomial")
+
+AIC(fit)
+
+AIC(fit[[1]])
+} }
 
 
