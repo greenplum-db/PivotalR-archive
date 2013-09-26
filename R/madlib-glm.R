@@ -22,21 +22,27 @@ madlib.glm <- function (formula, data, family = "gaussian",
     if (tolower(family) == "gaussian" || tolower(family) == "linear")
     {
         fit <- do.call(madlib.lm, args)
-        fit$call <- call
+        if (is(fit, "lm.madlib")) fit$call <- call
+        else
+            for (i in seq_len(length(fit))) fit[[i]]$call <- call
         return (fit)
     }
 
     if (tolower(family) == "binomial" || tolower(family) == "logistic")
     {
         fit <- do.call(.madlib.logregr, args)
-        fit$call <- call
+        if (is(fit, "logregr.madlib")) fit$call <- call
+        else
+            for (i in seq_len(length(fit))) fit[[i]]$call <- call
         return (fit)
     }
 
     if (family == "multinomial")
     {
         fit <- do.call(.madlib.mlogregr, args)
-        fit$call <- call
+        if (is(fit, "mlogregr.madlib")) fit$call <- call
+        else
+            for (i in seq_len(length(fit))) fit[[i]]$call <- call
         return (fit)
     }
 
@@ -179,7 +185,7 @@ print.logregr.madlib.grps <- function (x,
     n.grps <- length(x)
     
     if (x[[1]]$has.intercept)
-        rows <- c("(Intercept)", x$ind.vars)
+        rows <- c("(Intercept)", x[[1]]$ind.vars)
     else
         rows <- x[[1]]$ind.vars
     for (i in seq_len(length(x[[1]]$col.name)))
