@@ -6,6 +6,12 @@
 \alias{AIC.lm.madlib}
 \alias{extractAIC.lm.madlib}
 \alias{logLik.lm.madlib}
+\alias{AIC.logregr.madlib.grps}
+\alias{extractAIC.logregr.madlib.grps}
+\alias{logLik.logregr.madlib.grps}
+\alias{AIC.lm.madlib.grps}
+\alias{extractAIC.lm.madlib.grps}
+\alias{logLik.lm.madlib.grps}
 
 \title{AIC methods for Madlib regression objects}
 
@@ -15,7 +21,10 @@
 
 \usage{
     \method{extractAIC}{logregr.madlib}(fit, scale=0, k=2, ...)
+    \method{extractAIC}{logregr.madlib.grps}(fit, scale=0, k=2, ...)
     \method{logLik}{logregr.madlib}(object, ...)
+    \method{logLik}{logregr.madlib.grps}(object, ...)
+    \method{AIC}{logregr.madlib.grps}(object, ..., k=2)
 }
 
 \arguments{
@@ -38,7 +47,9 @@
 }
 
 \value{
-    The \code{logLik} function returns an object of class \code{logLik}. The \code{extractAIC} function returns a length-2 numeric vector giving the edf and AIC respectively.
+    For ungrouped regressions, \code{logLik} returns an object of class \code{logLik}, and \code{extractAIC} returns a length-2 numeric vector giving the edf and AIC.
+    
+    For grouped regressions, \code{logLik} and \code{extractAIC} return a list giving the output of these methods for each of the component models. Similarly, \code{AIC} for a grouped regression returns a vector of the AICs for each of the component models.
 }
 
 \seealso{
