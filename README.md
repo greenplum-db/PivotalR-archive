@@ -1,15 +1,17 @@
 PivotalR
 =======
 
-### ***[Download the latest tarball](https://github.com/madlib-internal/PivotalR/tarball/master)***
+### ***[Download the latest tarball](https://github.com/madlib-internal/PivotalR/tarball/master)*** 
 
-And install it
+**NOTE:** The latest code is unstable. Use it with caution.
 
-from command line
+Install the downloaded tarball
+
+* from command line
 
         R CMD install xxxxx.tar.gz
         
-or from within R
+* or from within R
 
         > install.packages("xxxxx.tar.gz", repos = NULL, type = "source")
 
