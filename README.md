@@ -5,15 +5,18 @@ PivotalR
 
 **NOTE:** The latest code is unstable. Use it with caution.
 
-Install the downloaded tarball
+Install the downloaded tarball (suppose that the file is named as `xxxxx.tar.gz`)
 
-* from command line
+* From command line
 
-        R CMD install xxxxx.tar.gz
-        
-* or from within R
-
-        > install.packages("xxxxx.tar.gz", repos = NULL, type = "source")
+    ```bash
+    R CMD install xxxxx.tar.gz
+    ``` 
+* Or from within R
+ 
+    ```r
+    install.packages("xxxxx.tar.gz", repos = NULL, type = "source")
+    ```
 
 ***Please see [wiki](https://github.com/madlib-internal/PivotalR/wiki) and [PivotalR](http://madlib-internal.github.io/PivotalR) for more information.***
 
