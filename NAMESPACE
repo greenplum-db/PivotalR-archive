@@ -83,3 +83,12 @@ export("summary.arima.css.madlib", "print.arima.css.madlib",
 export("clean.madlib.temp")
 
 export("db.default.schemas", "db.search.path")
+
+S3method(logLik, logregr.madlib)
+S3method(logLik, logregr.madlib.grps)
+S3method(extractAIC, logregr.madlib)
+S3method(extractAIC, logregr.madlib.grps)
+S3method(AIC, logregr.madlib.grps)
+S3method(as.data.frame, db.table)
+S3method(as.data.frame, db.view)
+S3method(as.data.frame, db.Rquery)
