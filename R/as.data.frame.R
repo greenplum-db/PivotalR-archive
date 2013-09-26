@@ -1,7 +1,7 @@
 as.data.frame.db.table <-
     as.data.frame.db.view <-
     as.data.frame.db.Rquery <- function(
-        x, nrows=100, row.names=NULL, optional=FALSE, 
+        x, row.names=NULL, optional=FALSE, nrows=100,
         stringsAsFactors=default.stringsAsFactors(),
         array=TRUE, ...)
 {
