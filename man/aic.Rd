@@ -3,15 +3,15 @@
 \alias{AIC.logregr.madlib}
 \alias{extractAIC.logregr.madlib}
 \alias{logLik.logregr.madlib}
-\alias{AIC.lm.madlib}
-\alias{extractAIC.lm.madlib}
-\alias{logLik.lm.madlib}
+%% \alias{AIC.lm.madlib}
+%% \alias{extractAIC.lm.madlib}
+%% \alias{logLik.lm.madlib}
 \alias{AIC.logregr.madlib.grps}
 \alias{extractAIC.logregr.madlib.grps}
 \alias{logLik.logregr.madlib.grps}
-\alias{AIC.lm.madlib.grps}
-\alias{extractAIC.lm.madlib.grps}
-\alias{logLik.lm.madlib.grps}
+%% \alias{AIC.lm.madlib.grps}
+%% \alias{extractAIC.lm.madlib.grps}
+%% \alias{logLik.lm.madlib.grps}
 
 \title{AIC methods for Madlib regression objects}
 
