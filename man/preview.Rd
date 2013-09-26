@@ -120,7 +120,11 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
+
+  Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com} wrote the
+  \code{as.data.frame} methods.
   
   Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
   Inc. \email{user@madlib.net}

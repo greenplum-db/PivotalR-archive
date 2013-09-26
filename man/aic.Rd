@@ -46,10 +46,19 @@
     See the documentation for \code{\link{AIC}} and \code{\link{extractAIC}}.
 }
 
-\value{
-    For ungrouped regressions, \code{logLik} returns an object of class \code{logLik}, and \code{extractAIC} returns a length-2 numeric vector giving the edf and AIC.
+\value{ For ungrouped regressions, \code{logLik} returns an object of
+    class \code{logLik}, and \code{extractAIC} returns a length-2
+    numeric vector giving the edf and AIC.
     
-    For grouped regressions, \code{logLik} and \code{extractAIC} return a list giving the output of these methods for each of the component models. Similarly, \code{AIC} for a grouped regression returns a vector of the AICs for each of the component models.
+    For grouped regressions, \code{logLik} and \code{extractAIC} return
+  a list giving the output of these methods for each of the component
+  models. Similarly, \code{AIC} for a grouped regression returns a
+  vector of the AICs for each of the component models.  }
+
+\author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
+  
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
+  Inc. \email{user@madlib.net}
 }
 
 \seealso{
