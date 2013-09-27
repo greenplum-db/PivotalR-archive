@@ -196,8 +196,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     ## create a fake data.frame only to extract
     ## terms when there is "." in formula
-    fake.data <- data.frame(t(names(fdata)))
-    colnames(fake.data) <- names(fdata)
+    fake.data <- structure(vector("list", ncol(fdata)), names=names(fdata), class="data.frame")
     f.terms <- terms(f1, data = fake.data) # formula terms
     ## the 1st row is the dependent variable
     f.factors <- attr(f.terms, "factors")
@@ -307,7 +306,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
-         data = data)
+         data = data,
+         terms = f.terms)
 }
 
 ## -----------------------------------------------------------------------

@@ -72,8 +72,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
         grp <- "NULL::text"
     else
         if (db.str == "HAWQ")
-            stop("Right now MADlib on HAWQ does not support grouping ",
-                 "in logistic regression !")
+            stop("Currently MADlib on HAWQ does not support grouping ",
+                 "in logistic regression.")
         else
             grp <- paste("'", params$grp.str, "'")
 
@@ -124,7 +124,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     r.ind.vars <- gsub("\"", "", params$ind.vars)
     r.col.name <- gsub("\"", "", data@.col.name)
     r.appear <- data@.appear.name
-    r.call <- call # the current function call itself
+    r.call <- match.call() # the current function call itself (should be overwritten by madlib.glm normally)
     r.dummy <- data@.dummy
     r.dummy.expr <- data@.dummy.expr
 
@@ -147,6 +147,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$terms <- params$terms
+        rst[[i]]$nobs <- nrow(data)
         class(rst[[i]]) <- "logregr.madlib"
     }
     

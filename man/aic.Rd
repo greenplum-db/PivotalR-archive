@@ -20,6 +20,12 @@
 }
 
 \usage{
+    \method{extractAIC}{lm.madlib}(fit, scale=0, k=2, ...)
+    \method{extractAIC}{lm.madlib.grps}(fit, scale=0, k=2, ...)
+    \method{logLik}{lm.madlib}(object, ...)
+    \method{logLik}{lm.madlib.grps}(object, ...)
+    \method{AIC}{lm.madlib.grps}(object, ..., k=2)
+
     \method{extractAIC}{logregr.madlib}(fit, scale=0, k=2, ...)
     \method{extractAIC}{logregr.madlib.grps}(fit, scale=0, k=2, ...)
     \method{logLik}{logregr.madlib}(object, ...)

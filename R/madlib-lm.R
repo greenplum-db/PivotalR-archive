@@ -25,8 +25,8 @@ madlib.lm <- function (formula, data, na.action,
     ## Check for HAWQ
     db.str <- (.get.dbms.str(conn.id))$db.str
     if (db.str == "HAWQ" && hetero)
-        stop("Right now MADlib on HAWQ does not support computing ",
-             "heteroskedasticity in linear regression !")
+        stop("Currently MADlib on HAWQ does not support computing ",
+             "heteroskedasticity in linear regression.")
 
     ## suppress both SQL and R warnings
     warnings <- .suppress.warnings(conn.id)
@@ -51,8 +51,8 @@ madlib.lm <- function (formula, data, na.action,
         grp <- "NULL"
     else
         if (db.str == "HAWQ") {
-            stop("Right now MADlib on HAWQ does not support grouping ",
-                 "in linear regression !")
+            stop("Currently MADlib on HAWQ does not support grouping ",
+                 "in linear regression.")
         } else if (.madlib.version.number(conn.id) > 0.7)
             grp <- paste0("'", params$grp.str, "'")
         else
@@ -76,11 +76,6 @@ madlib.lm <- function (formula, data, na.action,
         
     ## execute and get the result, error handling is taken care of
     res <- .get.res(sql, tbl.output, conn.id)
-
-    ## drop temporary tables
-    ## HAWQ does not need to drop the output table
-    ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
-    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
@@ -125,8 +120,20 @@ madlib.lm <- function (formula, data, na.action,
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$terms <- params$terms
+        rst[[i]]$nobs <- nrow(data)
         class(rst[[i]]) <- "lm.madlib" # A single model class
+
+        # get error SS manually using predicted values
+        pred <- .predict(rst[[i]], data, "linregr_predict", "double precision", "float8")
+        y <- eval(params$terms[[2]], as.environment(data))
+        rst[[i]]$sse <- lookat(sum((y - pred)^2))[1, 1, drop=TRUE]
     }
+
+    ## drop temporary tables
+    ## HAWQ does not need to drop the output table
+    ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
+    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
     ## the class of a list of models
     class(rst) <- "lm.madlib.grps"
