@@ -152,7 +152,7 @@ setMethod (
     def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
-    distributed.by = NULL, nrow = NULL) {
+    distributed.by = NULL, nrow = NULL, field.types = NULL) {
         warnings <- .suppress.warnings(conn.id(x))
         
         if (is.null(table.name)) {
@@ -166,7 +166,8 @@ setMethod (
         
         exists <- db.existsObject(table.name, conn.id, is.temp)
         if (is.temp) exists <- exists[[1]]
-        if (exists) stop("The table already exists in connection ", conn.id, "!")
+        if (exists) stop("The table already exists in connection ",
+                         conn.id, "!")
         
         if (is.temp) 
             temp.str <- "temp"
@@ -187,8 +188,24 @@ setMethod (
         ## column, because sometimes one wants to use the original
         ## data without regarding it as a factor. For example, as the
         ## grouping column.
-        extra <- paste(x@.expr, paste("\"", names(x), "\"", sep = ""),
-                       sep = " as ", collapse = ",")
+        if (is.null(field.types)) {
+            data.types <- x@.col.data_type
+            extra <- paste(x@.expr, 
+                           paste("\"", names(x), "\"", sep = ""),
+                           sep = " as ", collapse = ",")
+        } else {
+            data.types <- character(0)
+            for (i in names(x)) {
+                if (is.null(field.types[[i]])) {
+                    .restore.warnings(warnings)
+                    stop("field.types should include all column types!")
+                }
+                data.types <- c(data.types, field.types[[i]])
+            }
+            extra <- paste(paste0("(", x@.expr, ")::", data.types),
+                           paste("\"", names(x), "\"", sep = ""),
+                           sep = " as ", collapse = ",")
+        }
         ## suffix used to avoid conflicts
         suffix <- x@.factor.suffix
         appear <- x@.col.name
@@ -220,7 +237,7 @@ setMethod (
                         is.factor <- c(is.factor, FALSE)
                         if (extra != "") extra <- paste(extra, ", ")
                         dex <- paste("(case when ", x@.expr[i], " = '",
-                                     distinct[j], "'::", x@.col.data_type[i],
+                                     distinct[j], "'::", data.types[i],
                                      " then 1 else 0 end)", sep = "")
                         extra <- paste(extra, " ", dex, " as ",
                                        "\"", new.col, "\"", sep = "")
@@ -243,7 +260,8 @@ setMethod (
         else
             nrow.str <- ""
         
-        content.str <- paste("select ", extra, " from ", tbl, where, sep = "")
+        content.str <- paste("select ", extra, " from ", tbl, where,
+                             sep = "")
 
         tbn <- strsplit(table.name, "\\.")[[1]]
         tbnn <- paste("\"", .strip(tbn, "\""),
@@ -251,9 +269,11 @@ setMethod (
         
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             tbnn,
-                            " as (", content.str, nrow.str, ") ", dist.str, sep = "")
+                            " as (", content.str, nrow.str, ") ",
+                            dist.str, sep = "")
 
-        .db.getQuery(create.str, conn.id) # create table
+        .get.res(sql = create.str, conn.id = conn.id,
+                 warns = warnings) # create table
 
         .restore.warnings(warnings)
 
@@ -276,7 +296,7 @@ setMethod (
     signature (x = "db.data.frame"),
     def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE, is.temp = FALSE,
-    distributed.by = NULL, nrow = NULL) {
+    distributed.by = NULL, nrow = NULL, field.types = NULL) {
         if (is.null(table.name)) {
             table.name <- .unique.string()
             is.temp <- TRUE
@@ -289,6 +309,6 @@ setMethod (
         if (tbnn == content(x))
             stop("cannot copy an object into itself!")
         list(res = as.db.data.frame(x[,], tbnn, FALSE,
-             is.view, is.temp, FALSE, distributed.by, nrow),
+             is.view, is.temp, FALSE, distributed.by, nrow, field.types),
              conn.id = conn.id(x))
     })

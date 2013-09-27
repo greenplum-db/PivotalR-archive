@@ -18,22 +18,21 @@
   copy of the table/view that \code{x} points to is created.
 }
 
-\usage{
-\S4method{as.db.data.frame}{character}(x, table.name = NULL, verbose = TRUE,
-conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
-NULL, is.temp = FALSE, ...)
+\usage{ \S4method{as.db.data.frame}{character}(x, table.name = NULL,
+verbose = TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
+distributed.by = NULL, is.temp = FALSE, ...
 
-\S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose = TRUE,
-conn.id = 1, add.row.names = FALSE, key = character(0), distributed.by =
-NULL, is.temp = FALSE, ...)
+\S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose =
+TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
+distributed.by = NULL, is.temp = FALSE, ...) 
 
-\S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose = TRUE,
-is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by = NULL,
-nrow = NULL)
+\S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose =
+TRUE, is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by =
+NULL, nrow = NULL, field.types = NULL)
 
-\S4method{as.db.data.frame}{db.data.frame}(x, table.name = NULL, verbose = TRUE,
-is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow = NULL)
-}
+\S4method{as.db.data.frame}{db.data.frame}(x, table.name = NULL, verbose
+= TRUE, is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow =
+NULL, field.types = NULL) }
 
 \arguments{
   \item{x}{
@@ -122,7 +121,11 @@ is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow = NULL)
 
 \code{skip} specifies number of lines to skip before reading the data,
 and it defaults to 0.
-  }
+
+\code{field.types} A list of \code{key=value} pairs, where the value is
+    a string of data type. Force the new table to use the data type for
+    the column \code{key}.
+    }
 
   \item{is.view}{
     A logical, default is \code{FALSE}, whether to create a view instead
@@ -134,12 +137,25 @@ and it defaults to 0.
     for a column that has been denoted as "factor". See
     \code{\link{as.factor}} for more details.
   }
-}
+
+  \item{field.types}{
+
+    A list of \code{key=value} pairs, where the value is a string of
+    data type. Force the new table to use the data type for the column
+    \code{key}. 
+
+  } }
 
 \value{
   A \code{db.data.frame} object. It points to a table whose name is
   given by \code{table.name} in connection \code{conn.id}. 
 
+}
+
+\note{
+
+  All the \code{as.db.data.frame} accept the option \code{field.types}. 
+  
 }
 
 \author{
@@ -185,9 +201,13 @@ preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 
 ## create a copied table
 ## x[,] converts x from db.data.frame object to db.Rquery object
-z <- as.db.data.frame(x[,], "abalone1") 
-}
-}
+z <- as.db.data.frame(x[,], "abalone1")
+
+## Force the data type, use random table name
+
+z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"))
+
+} }
 
 \keyword{utility}
 \keyword{ database }
