@@ -51,20 +51,24 @@
 ## -----------------------------------------------------------------------
 
 ## get the result
-.get.res <- function (sql, tbl.output = NULL, conn.id)
+.get.res <- function (sql, tbl.output = NULL, conn.id, warns = NULL)
 {
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
-    if (is(res, .err.class))
+    if (is(res, .err.class)) {
+        if (!is.null(warns)) .restore.warnings(warns)
         stop("Could not run SQL query !")
+    }
 
     ## retreive result
     if (!is.null(tbl.output)) {
         res <- try(.db.getQuery(paste("select * from", tbl.output),
                                 conn.id),
                    silent = TRUE)
-        if (is(res, .err.class))
+        if (is(res, .err.class)) {
+            if (!is.null(warns)) .restore.warnings(warns)
             stop("Could not retreive result from SQL query !")
+        }
     }
 
     res

@@ -241,6 +241,7 @@ db.objects <- function (search = NULL, conn.id = 1)
 ## does an object exist?
 db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
 {
+    warns <- .suppress.warnings (conn.id)
     if (length(name) == 1) name <- strsplit(name, "\\.")[[1]]
     if (length(name) != 1 && length(name) != 2)
         stop("The formation of object name is wrong!")
@@ -248,19 +249,40 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
         if (is.temp) stop("Temporary tables may not specify a schema name!")
         schema <- name[1]
         table <- name[2]
-        ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
-                                 .strip(table, "\""),
-                                 "' and table_schema = '",
-                                 .strip(schema, "\""), "'", sep = ""), conn.id)
-        if (ct == 0)
+        ct <- .get.res(sql=paste("select count(*) from ",
+                       "information_schema.tables where ",
+                       "table_name = '",
+                       .strip(table, "\""),
+                       "' and table_schema = '",
+                       .strip(schema, "\""), "'", sep = ""),
+                       conn.id=conn.id, warns=warns)
+        if (ct == 0) {
+            .restore.warnings(warns)
             FALSE
-        else
+        } else {
+            .restore.warnings(warns)
             TRUE
+        }
     } else {
         if (is.temp)
             .db.existsTempTable(name, conn.id)
-        else
-            .db.existsTable(name, conn.id)
+        else {
+            schemas <- arraydb.to.arrayr(
+                .get.res(sql="select current_schemas(True)",
+                         conn.id=conn.id, warns=warns),
+                type = "character")
+            table_schema <- character(0)
+            for (schema in schemas)
+                if (.db.existsTable(c(schema, name), conn.id))
+                    table_schema <- c(table_schema, schema)
+            if (identical(table_schema, character(0))) {
+                .restore.warnings(warns)
+                FALSE
+            } else {
+                .restore.warnings(warns)
+                TRUE
+            }
+        }
     }
 }
 
