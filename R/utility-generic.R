@@ -105,15 +105,36 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 ## ----------------------------------------------------------------------
 
-.db.table.schema.str <- function (table)
+.db.table.schema.str <- function (table, conn.id)
 {
+    warns <- .suppress.warnings(conn.id)
     table <- .strip(table, "\"")
     l <- length(table)
-    if (l == 2)
-        return (paste("table_name = '", table[2], "' and table_schema = '",
+    if (l == 2) {
+        .restore.warnings(warns)
+        return (paste("table_name = '", table[2],
+                      "' and table_schema = '",
                       table[1], "'", sep = ""))
-    else if (l == 1)
-        return (paste("table_name = '", table, "'", sep = ""))
+    } else if (l == 1) {
+        schemas <- arraydb.to.arrayr(
+            .get.res(sql="select current_schemas(True)",
+                     conn.id=conn.id, warns=warns),
+            type = "character")
+        table_schema <- character(0)
+        for (schema in schemas)
+            if (.db.existsTable(c(schema, table), conn.id)) {
+                table_schema <- c(table_schema, schema)
+                break
+            }
+        .restore.warnings(warns)
+        if (identical(table_schema, character(0))) {
+            stop("This table does not exist in the search path!")
+        } else {
+            return (paste("table_name = '", table,
+                          "' and table_schema = '", table_schema,
+                          "'", sep = ""))
+        }
+    }
 }
 
 ## -----------------------------------------------------------------------
@@ -123,7 +144,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     pick <- .db.getQuery(
         paste("select count(*) from information_schema.tables where ",
-              .db.table.schema.str(table), sep = ""), conn.id)
+              .db.table.schema.str(table, conn.id), sep = ""), conn.id)
     if (pick == 1)
         return (TRUE)
     else
@@ -137,7 +158,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     pick <- .db.getQuery(
         paste("select count(*) from information_schema.views where ",
-              .db.table.schema.str(table), sep = ""), conn.id)
+              .db.table.schema.str(table, conn.id), sep = ""), conn.id)
     if (pick == 1)
         return (TRUE)
     else

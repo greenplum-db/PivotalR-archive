@@ -55,7 +55,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
 
     col.info <- .db.getQuery(
         paste("select column_name, data_type, udt_name from information_schema.columns where ",
-              .db.table.schema.str(table), " order by ordinal_position", sep = ""), conn.id)
+              .db.table.schema.str(table, conn.id), " order by ordinal_position", sep = ""), conn.id)
 
     res@.col.name <- col.info$column_name
     res@.col.data_type <- tolower(col.info$data_type)
@@ -71,7 +71,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     ## table type (local temp)
     tbl.type <- .db.getQuery(
         paste("select table_type from information_schema.tables where ",
-              .db.table.schema.str(table), sep = ""), conn.id)
+              .db.table.schema.str(table, conn.id), sep = ""), conn.id)
 
     res@.table.type <- tbl.type$table_type
 
