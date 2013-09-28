@@ -20,7 +20,7 @@
 
 \usage{ \S4method{as.db.data.frame}{character}(x, table.name = NULL,
 verbose = TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
-distributed.by = NULL, is.temp = FALSE, ...
+distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose =
 TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),

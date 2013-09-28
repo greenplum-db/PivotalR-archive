@@ -8,14 +8,14 @@
 \title{Evaluate expressions within the context of a database table or view}
 
 \description{
-    These functions allow a \code{\link{db.table}} or \code{\link{db.view}} object to be treated as an environment, in a manner analogous to data frames.
+    These functions allow a \code{\linkS4class{db.table}} or \code{\linkS4class{db.view}} object to be treated as an environment, in a manner analogous to data frames.
 }
 
 \usage{
-    method{as.environment}{db.table}(x, ...)
-    method{as.environment}{db.view}(x, ...)
-    method{with}{db.table}(data, expr, ...)
-    method{with}{db.view}(data, expr, ...)
+    \method{as.environment}{db.table}(x, ...)
+    \method{as.environment}{db.view}(x, ...)
+    \method{with}{db.table}(data, expr, ...)
+    \method{with}{db.view}(data, expr, ...)
 }
 
 \arguments{
@@ -33,7 +33,7 @@
 \value{
     For \code{as.environment}, the created environment. Note that no data is transferred to the client; all objects in the environment are queries pointing back to the host.
     
-    For \code{with}, a \code{\link{db.Rquery}} stored query object representing the expression. Use \code{\link{preview}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
+    For \code{with}, a \code{\linkS4class{db.Rquery}} stored query object representing the expression. Use \code{\link{preview}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
 }
 
 \seealso{

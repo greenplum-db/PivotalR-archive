@@ -16,7 +16,7 @@
 \title{AIC methods for Madlib regression objects}
 
 \description{
-    Functions to extract the AIC and log-likelihood for regression models fit in Madlib. Currently only implemented for logistic regression.
+    Functions to extract the AIC and log-likelihood for regression models fit in Madlib.
 }
 
 \usage{
