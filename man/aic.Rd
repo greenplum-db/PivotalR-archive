@@ -3,15 +3,15 @@
 \alias{AIC.logregr.madlib}
 \alias{extractAIC.logregr.madlib}
 \alias{logLik.logregr.madlib}
-%% \alias{AIC.lm.madlib}
-%% \alias{extractAIC.lm.madlib}
-%% \alias{logLik.lm.madlib}
+\alias{AIC.lm.madlib}
+\alias{extractAIC.lm.madlib}
+\alias{logLik.lm.madlib}
 \alias{AIC.logregr.madlib.grps}
 \alias{extractAIC.logregr.madlib.grps}
 \alias{logLik.logregr.madlib.grps}
-%% \alias{AIC.lm.madlib.grps}
-%% \alias{extractAIC.lm.madlib.grps}
-%% \alias{logLik.lm.madlib.grps}
+\alias{AIC.lm.madlib.grps}
+\alias{extractAIC.lm.madlib.grps}
+\alias{logLik.lm.madlib.grps}
 
 \title{AIC methods for Madlib regression objects}
 
@@ -20,6 +20,12 @@
 }
 
 \usage{
+    \method{extractAIC}{lm.madlib}(fit, scale=0, k=2, ...)
+    \method{extractAIC}{lm.madlib.grps}(fit, scale=0, k=2, ...)
+    \method{logLik}{lm.madlib}(object, ...)
+    \method{logLik}{lm.madlib.grps}(object, ...)
+    \method{AIC}{lm.madlib.grps}(object, ..., k=2)
+
     \method{extractAIC}{logregr.madlib}(fit, scale=0, k=2, ...)
     \method{extractAIC}{logregr.madlib.grps}(fit, scale=0, k=2, ...)
     \method{logLik}{logregr.madlib}(object, ...)

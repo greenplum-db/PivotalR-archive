@@ -1,7 +1,7 @@
 extractAIC.logregr.madlib <- function(fit, scale=0, k=2, ...)
 {
     edf <- length(fit$coef)
-    c(edf, -2 * fit$log_likelihood + 2 * edf + (k-2) * edf)
+    c(edf, -2 * fit$log_likelihood + k * edf)
 }
 
 ## ----------------------------------------------------------------------

@@ -153,6 +153,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$terms <- params$terms
+        rst[[i]]$nobs <- nrow(data)
         class(rst[[i]]) <- "logregr.madlib"
     }
     
