@@ -1,15 +1,15 @@
 \name{as.environment}
-
+\alias{as.environment}
+\alias{with}
 \alias{as.environment.db.table}
 \alias{as.environment.db.view}
-\alias{with.db.table}
-\alias{with.db.view}
+\alias{with.db.table} \alias{with.db.view}
 
 \title{Evaluate expressions within the context of a database table or view}
 
-\description{
-    These functions allow a \code{\linkS4class{db.table}} or \code{\linkS4class{db.view}} object to be treated as an environment, in a manner analogous to data frames.
-}
+\description{ These functions allow a \code{\linkS4class{db.table}} or
+    \code{\linkS4class{db.view}} object to be treated as an environment,
+    in a manner analogous to data frames. }
 
 \usage{
     \method{as.environment}{db.table}(x, ...)
