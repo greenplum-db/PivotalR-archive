@@ -11,7 +11,7 @@ logLik.lm.madlib <- function(object, ...)
     sse <- object$sse
     n <- nobs(object)
     ll <- 0.5 * (-n * (log(2 * pi) + 1 - log(n) + log(sse)))
-    attr(ll, "df") <- length(object$coef)
+    attr(ll, "df") <- length(object$coef) + 1
     class(ll) <- "logLik"
     ll
 }
