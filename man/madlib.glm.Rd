@@ -197,6 +197,14 @@
     A \code{\linkS4class{db.data.frame}} object, which wraps the result
     table of this function.
   }
+  
+  \item{terms}{
+    A \code{\link{terms}} object, describing the terms in the model formula.
+  }
+  
+  \item{nobs}{
+    The number of observations used to fit the model.
+  }
 
   Note that if there is grouping done, and there are multiple
   \code{logregr.madlib} objects in the final result, each one of them

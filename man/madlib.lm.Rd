@@ -179,6 +179,18 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     table of this function.
   }
 
+  \item{sse}{
+    The error/residual sum of squares of the model.
+  }
+
+  \item{terms}{
+    A \code{\link{terms}} object, describing the terms in the model formula.
+  }
+  
+  \item{nobs}{
+    The number of observations used to fit the model.
+  }
+
   Note that if there is grouping done, and there are multiple
   \code{lm.madlib} objects in the final result, each one of them
   contains the same copy \code{model}.

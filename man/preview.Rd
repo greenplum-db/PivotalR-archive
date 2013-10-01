@@ -35,15 +35,15 @@ array = TRUE)
 lookat(x, nrows = 100, array = TRUE, conn.id = 1)
 
 \method{as.data.frame}{db.table}(x, row.names = NULL, optional = FALSE,
-     nrows = 100, stringsAsFactors = default.stringsAsFactors(), array =
+     nrows = NULL, stringsAsFactors = default.stringsAsFactors(), array =
      TRUE, ...)
 
 \method{as.data.frame}{db.view}(x,row.names=NULL, optional=FALSE, nrows
-    = 100, stringsAsFactors = default.stringsAsFactors(), array = TRUE,
+    = NULL, stringsAsFactors = default.stringsAsFactors(), array = TRUE,
     ...)
 
 \method{as.data.frame}{db.Rquery}(x, row.names = NULL, optional =
-    FALSE, nrows = 100, stringsAsFactors = default.stringsAsFactors(),
+    FALSE, nrows = NULL, stringsAsFactors = default.stringsAsFactors(),
     array = TRUE, ...)  }
 
 \arguments{
@@ -64,7 +64,7 @@ lookat(x, nrows = 100, array = TRUE, conn.id = 1)
   }
 
   \item{nrows}{
-    An integer, default is 100, how many rows of data. If it is
+    An integer, how many rows of data to retrieve. If it is
   \code{NULL} or \code{"all"}, then all data in the table will be send
   into R. Be careful, you do not want to do this if the data table is
   very large.
