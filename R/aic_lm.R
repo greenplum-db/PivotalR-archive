@@ -8,7 +8,9 @@ extractAIC.lm.madlib <- function(fit, scale=0, k=2, ...)
 
 logLik.lm.madlib <- function(object, ...)
 {
-    ll <- nobs(object) * log(object$sse/nobs(object))
+    sse <- object$sse
+    n <- nobs(object)
+    ll <- 0.5 * (-n * (log(2 * pi) + 1 - log(n) + log(sse)))
     attr(ll, "df") <- length(object$coef)
     class(ll) <- "logLik"
     ll
