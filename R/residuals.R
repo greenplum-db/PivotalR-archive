@@ -2,17 +2,20 @@
 ## Extract residual info
 ## ----------------------------------------------------------------------
 
-residuals.lm.madlib <- function(object, ...)
+.compute.resid <- function(object)
 {
-    with(object$data, object$terms[[2]]) - predict(object, object$data)
+    (eval(parse(text=paste0("with(object$data,",
+               deparse(object$terms[[2]]), ")")))
+     - predict(object, object$data))
 }
+
+residuals.lm.madlib <- function(object, ...)
+    .compute.resid(object)
 
 ## ----------------------------------------------------------------------
 
 residuals.logregr.madlib <- function(object, ...)
-{
-    with(object$data, object$terms[[2]]) - predict(object, object$data)
-}
+    .compute.resid(object)
 
 ## ----------------------------------------------------------------------
 
