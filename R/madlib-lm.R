@@ -16,6 +16,8 @@ madlib.lm <- function (formula, data, na.action,
     if (! is(data, "db.obj"))
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
+
+    origin.data <- data
     
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
@@ -122,12 +124,14 @@ madlib.lm <- function (formula, data, na.action,
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
         rst[[i]]$nobs <- nrow(data)
+        rst[[i]]$data <- origin.data
         class(rst[[i]]) <- "lm.madlib" # A single model class
 
-        # get error SS manually using predicted values
-        pred <- .predict(rst[[i]], data, "linregr_predict", "double precision", "float8")
-        y <- eval(params$terms[[2]], as.environment(data))
-        rst[[i]]$sse <- lookat(sum((y - pred)^2))[1, 1, drop=TRUE]
+        ## get error SS manually using predicted values
+        ## This takes too much time. Move it into isolated functions
+        ## pred <- .predict(rst[[i]], data, "linregr_predict", "double precision", "float8")
+        ## y <- eval(params$terms[[2]], as.environment(data))
+        ## rst[[i]]$sse <- lookat(sum((y - pred)^2))[1, 1, drop=TRUE]
     }
 
     ## drop temporary tables

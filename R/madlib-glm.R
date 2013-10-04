@@ -60,6 +60,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
 
+    origin.data <- data
+    
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
 
@@ -155,6 +157,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
         rst[[i]]$nobs <- nrow(data)
+        rst[[i]]$data <- origin.data
         class(rst[[i]]) <- "logregr.madlib"
     }
     

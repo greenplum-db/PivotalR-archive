@@ -84,6 +84,9 @@ export("clean.madlib.temp")
 
 export("db.default.schemas", "db.search.path")
 
+export("residuals.lm.madlib", "residuals.lm.madlib.grps",
+       "residuals.logregr.madlib", "residuals.logregr.madlib.grps")
+
 S3method(logLik, logregr.madlib)
 S3method(logLik, logregr.madlib.grps)
 S3method(logLik, lm.madlib)

@@ -206,6 +206,9 @@
     The number of observations used to fit the model.
   }
 
+  \item{data}{The original \code{db.obj} object, which wraps all the
+  data used in the database.}
+
   Note that if there is grouping done, and there are multiple
   \code{logregr.madlib} objects in the final result, each one of them
   contains the same copy \code{model}.
