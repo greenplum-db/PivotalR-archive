@@ -63,6 +63,10 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                      "function db.default.schemas or db.search.path ",
                      "to display or set the current default schemas.")
         }
+
+        res <- .get.res(paste0("set application_name = '",
+                               .this.pkg.name, "'"),
+                        conn.id = result)
         
         return (result)
     }
