@@ -1,0 +1,11 @@
+
+create or replace function pg_temp.crossprod_double2 (
+    arr1    double precision[],
+    arr2    double precision[]
+) returns double precision[] as $$
+    select array_agg(sq1.x * sq2.x)
+    from
+        (select unnest($1) as x) as sq1,
+        (select unnest($2) as x) as sq2
+$$ language sql;
+

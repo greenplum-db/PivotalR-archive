@@ -1,0 +1,13 @@
+-- used in crossprod to compute matrix multiplication
+-- see method-crossprod_.R for details
+
+create or replace function pg_temp.crossprod_double (
+    arr     double precision[]
+) returns double precision[] as $$
+    with s as (
+        select unnest($1) as x
+    )
+    select array_agg(sq1.x * sq2.x)
+    from
+        s as sq1, s as sq2
+$$ language sql;

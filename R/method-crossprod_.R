@@ -56,6 +56,7 @@ setMethod (
         } ## else
           ##   stop(deparse(substitute(x)), " is not a proper matrix!")
         m <- .col.number.all(x) # compute the column numbers including array
+        b <- a
         n <- m # if it is symmetric
   
         if (!is.symmetric) {
@@ -79,23 +80,19 @@ setMethod (
         ## expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")pg90 mad
 
         db.info <- .get.dbms.str(conn.id)
-        if (db.info$db.str == "PostgreSQL") {
-            ## expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
-            if (is.symmetric)
-                func <- .load.func("crossprod_pg_sym_double", conn.id)
-            else
-                func <- .load.func("crossprod_pg_double", conn.id)
+        if (is.symmetric) {
+            ## func <- .load.func("crossprod_double", conn.id)
+            ## expr <- paste0("sum(", func, "(", a, "))")
+            ## is.symmetric <- FALSE
+            func <- .load.func("crossprod_sym_double", conn.id)
+            expr <- paste0("sum(", func, "(", a, "))")
         } else {
-            if (is.symmetric)
-                func <- .load.func("crossprod_gpdb_sym_double", conn.id)
-            else
-                func <- .load.func("crossprod_gpdb_double", conn.id)
+            func <- .load.func("crossprod_double2", conn.id)
+            expr <- paste0("sum(", func, "(", a, ", ", b, "))")
         }
-
-        if (is.symmetric)
-            expr <- paste0(func, "(", a,", ", m, ")")
-        else
-            expr <- paste0(func, "(", a, ", ", m, ", ", b, ", ", n, ")")
+        if (db.info$db.str == "PostgreSQL") {
+            expr <- paste0(schema.madlib(conn.id), ".__array", expr)
+        } 
 
         new("db.Rcrossprod",
             .content = paste0("select ", expr, " as cross_prod from ",
