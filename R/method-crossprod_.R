@@ -80,7 +80,7 @@ setMethod (
         ## expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")pg90 mad
 
         db.info <- .get.dbms.str(conn.id)
-        if (is.symmetric) {
+        if (is.symmetric) { ## Using symmetric specific function is faster
             ## func <- .load.func("crossprod_double", conn.id)
             ## expr <- paste0("sum(", func, "(", a, "))")
             ## is.symmetric <- FALSE
