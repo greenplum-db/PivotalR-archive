@@ -6,12 +6,12 @@
 generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 {
     warnings <- .suppress.warnings(conn.id(data))
-    
+
     if (fraction > 1)
         stop("fraction cannot be larger than 1!")
     if (!is(data, "db.obj"))
         stop("data must be a db.obj!")
-    
+
     n <- dim(data)[1]
     size <- as.integer(n * fraction)
 
@@ -26,7 +26,7 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     class(res) <- "bagging.model"
 
     .restore.warnings(warnings)
-   
+
     res
 }
 
@@ -62,11 +62,11 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         else
             stop("the result type ", res.type,
                  " is not supported for vote!")
-        
+
         func <- .load.func(paste("find_majority_",
                            strsplit(func.suffix, " ")[[1]][1], sep = ""),
                            conn.id(newdata))
-        
+
         arr.str <- "array["
         for (i in seq_len(l)) {
             arr.str <- paste(arr.str, "(", pred[[i]]@.expr, ")::",
@@ -96,7 +96,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         }
 
         expr <- paste(func, "(", arr.str, ")", sep = "")
-        
+
         sql <- paste("select ", expr, " as bagging_predict from ",
                      tbl, where.str, sort$str, sep = "")
 
@@ -129,7 +129,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         if (length(k) != 0)
             return (.localVars$db[[id]]$func[k,2])
     }
-    
+
     .localVars$pkg.path <- path.package(.this.pkg.name)
     sql.file <- paste(.localVars$pkg.path, "/sql/", funcname,
                       ".sql_in", sep = "")
@@ -146,7 +146,6 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     fn.schema <- .db.getQuery(paste0("SELECT specific_schema from information_schema.routines where routine_name = '",
                                      use.name, "'"), conn.id)
 
-    
     if (is.null(.localVars$db[[id]]$func))
         .localVars$db[[id]]$func <- rbind(c(funcname, paste0(fn.schema[1,1], ".", use.name)))
     else

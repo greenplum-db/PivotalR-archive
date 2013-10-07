@@ -30,7 +30,11 @@ setMethod (
     signature (x = "db.data.frame"),
     def = function (x, cascade = FALSE) {
         ## .db.removeTable(content(x), conn.id(x))
-        s <- delete(content(x), conn.id(x), x@.table.type == "LOCAL TEMPORARY",
+        if (x@.table.type == "LOCAL TEMPORARY")
+            tbl <- gsub("^\\\"[^\"]*\\\"\\.", "", content(x))
+        else
+            tbl <- content(x)
+        s <- delete(tbl, conn.id(x), x@.table.type == "LOCAL TEMPORARY",
                     cascade)
         list(res=s, conn.id=conn.id(x)) 
     })
