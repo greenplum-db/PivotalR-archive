@@ -10,8 +10,7 @@
 }
 
 \usage{
-\S4method{sample}{db.obj}(x, size, replace = FALSE, prob = NULL,
-indexed.x = FALSE, ...)
+\S4method{sample}{db.obj}(x, size, replace = FALSE, prob = NULL, ...)
 }
 
 \arguments{
@@ -36,14 +35,6 @@ indexed.x = FALSE, ...)
   \item{prob}{
     A vector of double values, default is \code{NULL}. The
     probabilityies of each row to sample. Not implemented yet.
-  }
-
-  \item{indexed.x}{
-    A logical value, default is \code{FALSE}. Whether \code{x} is
-    already indexed, if not \code{x} will be indexed and a temporary
-    indexed table is created, otherwise \code{x} is directly used. This
-    is useful mainly for multiple sampling of one table. The user just
-    needs to index the table once for all.
   }
 
   \item{\dots}{

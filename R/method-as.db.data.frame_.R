@@ -261,6 +261,7 @@ setMethod (
             nrow.str <- ""
         
         content.str <- paste("select ", extra, " from ", tbl, where,
+                             x@.sort$str,
                              sep = "")
 
         tbn <- strsplit(table.name, "\\.")[[1]]
