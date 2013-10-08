@@ -18,7 +18,7 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     res <- list()
     idat <- .create.indexed.temp.table(data)
     for (i in 1:nbags) {
-        data.use <- sample(idat, size, replace = TRUE, indexed = TRUE)
+        data.use <- sample(idat, size, replace = TRUE)
         res[[i]] <- train(data = data.use)
         delete(data.use)
     }

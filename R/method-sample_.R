@@ -23,24 +23,6 @@ setMethod (
             .restore.warnings(warnings)
             res
         } else {
-            ## if (!indexed.x)
-            ##     y <- .create.indexed.temp.table(x)
-            ## else
-            ##     y <- x
-            ## select <- sample(seq(n), size, replace = TRUE)
-            ## freq <- table(select)
-            ## fq <- cbind(as.integer(names(freq)), as.integer(freq))
-            ## res <- as.db.data.frame(y[fq[,1],-y@.dim[2]], .unique.string(),
-            ##                         FALSE, FALSE, TRUE, FALSE, NULL, NULL)
-            ## for (i in seq_len(max(fq[,2])-1)+1) {
-            ##     z <- y[fq[fq[,2]>=i,1],-y@.dim[2]]
-            ##     sql <- paste("insert into ", content(res), " (", content(z),
-            ##                  ")", sep = "")
-            ##     .db.getQuery(sql, conn.id(x))
-            ## }
-
-            ## if (!indexed.x) delete(y)
-
             select <- sample(seq(n), size, replace = TRUE)
             freq <- table(table(select))
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
