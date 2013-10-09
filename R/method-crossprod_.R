@@ -91,7 +91,7 @@ setMethod (
             expr <- paste0("sum(", func, "(", a, ", ", b, "))")
         }
         if (db.info$db.str == "PostgreSQL") {
-            expr <- paste0(schema.madlib(conn.id), ".__array", expr)
+            expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
         } 
 
         new("db.Rcrossprod",
