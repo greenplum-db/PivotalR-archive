@@ -16,13 +16,13 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     size <- as.integer(n * fraction)
 
     res <- list()
-    idat <- .create.indexed.temp.table(data)
+    ## idat <- .create.indexed.temp.table(data)
     for (i in 1:nbags) {
-        data.use <- sample(idat, size, replace = TRUE)
+        data.use <- sample(data, size, replace = TRUE)
         res[[i]] <- train(data = data.use)
         delete(data.use)
     }
-    delete(idat)
+    ## delete(idat)
     class(res) <- "bagging.model"
 
     .restore.warnings(warnings)

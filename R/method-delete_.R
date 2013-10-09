@@ -56,6 +56,8 @@ setMethod (
     def = function (x, conn.id = 1, is.temp = FALSE, cascade = FALSE) {
         x <- paste("\"", .strip(strsplit(x, "\\.")[[1]], "\""), "\"",
                    collapse = ".", sep = "")
+        if (is.temp)
+            x <- gsub("^\\\"[^\"]*\\\"\\.", "", x)
         origin.x <- x
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -197,6 +199,17 @@ setMethod (
         conn.id <- conn.id(x[[1]]$model)
         d1 <- delete(x[[1]]$model)
         list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "bagging.model"),
+    def = function (x) {
+        conn.id <- conn.id(x[[1]]$model)
+        res <- lapply(x, delete)
+        list(res = all(unlist(res)), conn.id = conn.id)
     })
 
 

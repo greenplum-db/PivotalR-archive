@@ -218,6 +218,9 @@ db.list <- function ()
 ## list tables and views in the connection
 db.objects <- function (search = NULL, conn.id = 1)
 {
+    if (!.is.conn.id.valid(conn.id))
+        stop("Connection ID ", conn.id, " is not valid!")
+        
     res <- .db.getQuery("select table_schema, table_name from information_schema.tables", conn.id = conn.id)
 
     if (is.null(search)) {
@@ -229,7 +232,7 @@ db.objects <- function (search = NULL, conn.id = 1)
     final.res <- character(0)
     for (i in seq_len(dim(res)[1])) {
         name <- paste(res[i,1], ".", res[i,2], sep = "")
-        find <- gsub(search, "", name)
+        find <- gsub(search, "", name, perl = TRUE)
         if (find != name)
             final.res <- rbind(final.res, res[i,])
     }

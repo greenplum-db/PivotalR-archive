@@ -6,6 +6,8 @@
 db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
                            is.temp = FALSE)
 {
+    if (!.is.conn.id.valid(conn.id))
+        stop("Connection ID ", conn.id, " is not valid!")
     warnings <- .suppress.warnings(conn.id)
     
     if (! .is.arg.string(x))
