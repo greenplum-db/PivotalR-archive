@@ -18,10 +18,17 @@ To install PivotalR:
 
 * Or try out the latest development version from github by running the following code:
 
-    ```R
+    ```r
     # install.packages("devtools")
     devtools::install_github("PivotalR", "madlib-internal")
     ```
+    
+* Or download the source tarball directly from [**here**](https://github.com/madlib-internal/PivotalR/tarball/master), and 
+  then install the tarball
+
+  ```r
+  install.packages("madlib-internal-PivotalR-xxxx.tar.gz", repos = NULL, type = "source")
+  ```
 
 To get started:
 
