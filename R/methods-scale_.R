@@ -47,13 +47,13 @@ setMethod (
             ## NOTE: I am using unnest here
             ## For the reason, please see the definition of
             ## preview-db.Rcrossprod method
-            sql <- paste0("select unnest((f).mean) as mean, ",
-                          "unnest((f).std) as std, ",
-                          "n from (select ", madlib,
+            sql <- paste("select unnest((f).mean) as mean, ",
+                         "unnest((f).std) as std, ",
+                         "n from (select ", madlib,
                          ".__utils_var_scales_result(", madlib,
                          ".utils_var_scales(vec, ", col.dim,
                          ")) as f, count(vec) as n from (",
-                         content(y), ") h) s")
+                         content(y), ") h) s", sep = "")
             res <- .get.res(sql, conn.id = conn.id)
             n <- res$n[1] # row dimension
             ## savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))

@@ -4,8 +4,8 @@
 
 .compute.resid <- function(object)
 {
-    (eval(parse(text=paste0("with(object$data,",
-               deparse(object$terms[[2]]), ")")))
+    (eval(parse(text=paste("with(object$data,",
+                deparse(object$terms[[2]]), ")", sep = "")))
      - predict(object, object$data))
 }
 

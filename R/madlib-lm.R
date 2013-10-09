@@ -56,7 +56,7 @@ madlib.lm <- function (formula, data, na.action,
             stop("Currently MADlib on HAWQ does not support grouping ",
                  "in linear regression.")
         } else if (.madlib.version.number(conn.id) > 0.7)
-            grp <- paste0("'", params$grp.str, "'")
+            grp <- paste("'", params$grp.str, "'", sep = "")
         else
             grp <- paste("'{", params$grp.str, "}'::text[]")
 
@@ -65,15 +65,15 @@ madlib.lm <- function (formula, data, na.action,
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
         tbl.output <- NULL
-        sql <- paste0("select (f).* from (select ", madlib, ".linregr(",
-                      params$dep.str, ",", params$ind.str, ") as f from ",
-                      tbl.source, ") s")
+        sql <- paste("select (f).* from (select ", madlib, ".linregr(",
+                     params$dep.str, ",", params$ind.str, ") as f from ",
+                     tbl.source, ") s", sep = "")
     } else {
         tbl.output <- .unique.string()
-        sql <- paste0("select ", madlib, ".linregr_train('",
-                      tbl.source, "', '", tbl.output, "', '",
-                      params$dep.str, "', '", params$ind.str, "', ",
-                      grp, ", ", hetero, ")")
+        sql <- paste("select ", madlib, ".linregr_train('",
+                     tbl.source, "', '", tbl.output, "', '",
+                     params$dep.str, "', '", params$ind.str, "', ",
+                     grp, ", ", hetero, ")", sep = "")
     }
         
     ## execute and get the result, error handling is taken care of

@@ -71,7 +71,7 @@ setMethod (
             is.temp <- TRUE
         }
         
-        f <- paste0(getwd(), "/", x)
+        f <- paste(getwd(), "/", x, sep = "")
         if (file.exists(f)) x <- f
         else if (!file.exists(x))
             stop("the file does not exist!")
@@ -204,7 +204,7 @@ setMethod (
                 }
                 data.types <- c(data.types, field.types[[i]])
             }
-            extra <- paste(paste0("(", x@.expr, ")::", data.types),
+            extra <- paste(paste("(", x@.expr, ")::", data.types, sep = ""),
                            paste("\"", names(x), "\"", sep = ""),
                            sep = " as ", collapse = ",")
         }

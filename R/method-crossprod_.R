@@ -85,17 +85,17 @@ setMethod (
             ## expr <- paste0("sum(", func, "(", a, "))")
             ## is.symmetric <- FALSE
             func <- .load.func("crossprod_sym_double", conn.id)
-            expr <- paste0("sum(", func, "(", a, "))")
+            expr <- paste("sum(", func, "(", a, "))", sep = "")
         } else {
             func <- .load.func("crossprod_double2", conn.id)
-            expr <- paste0("sum(", func, "(", a, ", ", b, "))")
+            expr <- paste("sum(", func, "(", a, ", ", b, "))", sep = "")
         }
         if (db.info$db.str == "PostgreSQL") {
-            expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
+            expr <- paste(schema.madlib(conn.id), ".__array_", expr, sep = "")
         } 
 
         new("db.Rcrossprod",
-            .content = paste0("select ", expr, " as cross_prod from ",
+            .content = paste("select ", expr, " as cross_prod from ",
             tbl, where.str, sort$str, sep = ""),
             .expr = expr,
             .source = src,

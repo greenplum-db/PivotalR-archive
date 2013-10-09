@@ -32,12 +32,18 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         i <- which(tolower(.supported.connections) == conn.pkg.name)
         pkg.to.load <- .supported.connections[i]
         ## if the package is not installed, install it
-        if (!(conn.pkg.name %in% .get.installed.pkgs())) 
+        installed.pkgs <- .get.installed.pkgs()
+        if (!(conn.pkg.name %in% installed.pkgs)) 
         {
             message(paste("Package ", pkg.to.load,
                         " is going to be installed so that ",
                         .this.pkg.name,
-                        " could connect to databases.\n\n", sep = ""))
+                        " could connect to databases.\n", sep = ""))
+            if (conn.pkg.name == "rpostgresql" && !("dbi" %in% installed.pkgs)) {
+                message("Package DBI is also going to be installed!\n")
+                install.packages(paste(.localVars$pkg.path, "/dbi/DBI.tar.gz",
+                                       sep = ""), repos = NULL, type = "source")
+            }
             install.packages(pkgs = pkg.to.load)
             if (!(conn.pkg.name %in% .get.installed.pkgs()))
                 stop("The package could not be installed!")
@@ -64,8 +70,8 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                      "to display or set the current default schemas.")
         }
 
-        res <- .get.res(paste0("set application_name = '",
-                               .this.pkg.name, "'"),
+        res <- .get.res(paste("set application_name = '",
+                              .this.pkg.name, "'", sep = ""),
                         conn.id = result)
         
         return (result)

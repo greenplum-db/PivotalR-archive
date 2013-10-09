@@ -15,14 +15,14 @@
 {
     s <- gsub("array\\[(.*)\\]", "\\1", expr)
     if (s == expr) {
-        n1 <- as.integer(.db.getQuery(paste0(
+        n1 <- as.integer(.db.getQuery(paste(
             "select array_upper(\"", .strip(s, "\""),
             "\", 1) from ",
-            tbl, where.str, " limit 1"), conn.id))
-        n2 <- as.integer(.db.getQuery(paste0(
+            tbl, where.str, " limit 1", sep = ""), conn.id))
+        n2 <- as.integer(.db.getQuery(paste(
             "select array_lower(\"",
             .strip(s, "\""), "\", 1) from ",
-            tbl, where.str, " limit 1"), conn.id))
+            tbl, where.str, " limit 1", sep = ""), conn.id))
         n <- n1 - n2 + 1
         paste("\"", .strip(s, "\""), "\"[", seq_len(n) - 1 + n2,
               "]", sep = "")
@@ -131,10 +131,11 @@
         if (x[[col]]@.col.data_type != "array")
             cnt <- cnt + 1
         else {
-            res <- .db.getQuery(paste0("select array_upper(", col,
-                                       ",1) - array_lower(", col,
-                                       ",1) + 1 as n from (",
-                                       content(x[[col]]), " limit 1) s"),
+            res <- .db.getQuery(paste("select array_upper(", col,
+                                      ",1) - array_lower(", col,
+                                      ",1) + 1 as n from (",
+                                      content(x[[col]]), " limit 1) s",
+                                      sep = ""),
                                 conn.id(x))
             cnt <- cnt + res$n
         }

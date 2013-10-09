@@ -91,17 +91,18 @@ madlib.glm <- function (formula, data, family = "gaussian",
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
         tbl.output <- NULL
-        sql <- paste0("select (f).* from (select ", madlib,
-                      ".logregr('", tbl.source, "', '", params$dep.str,
-                      "', '", params$ind.str, "', ", max_iter,
-                      ", '", method, "', ", tolerance, ") as f) s")
+        sql <- paste("select (f).* from (select ", madlib,
+                     ".logregr('", tbl.source, "', '", params$dep.str,
+                     "', '", params$ind.str, "', ", max_iter,
+                     ", '", method, "', ", tolerance, ") as f) s",
+                     sep = "")
     } else {
         tbl.output <- .unique.string()
-        sql <- paste0("select ", madlib, ".logregr_train('",
-                      tbl.source, "', '", tbl.output, "', '",
-                      params$dep.str, "', '", params$ind.str, "', ",
-                      grp, ", ", max_iter, ", '", method, "', ",
-                      tolerance, ")")
+        sql <- paste("select ", madlib, ".logregr_train('",
+                     tbl.source, "', '", tbl.output, "', '",
+                     params$dep.str, "', '", params$ind.str, "', ",
+                     grp, ", ", max_iter, ", '", method, "', ",
+                     tolerance, ")", sep = "")
     }
 
     ## execute the logistic regression and get the result

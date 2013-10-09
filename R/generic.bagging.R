@@ -3,6 +3,8 @@
 ## Bagging method, not a wrapper of MADlib function
 ## -----------------------------------------------------------------------
 
+setClass("bagging.model")
+
 generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 {
     warnings <- .suppress.warnings(conn.id(data))
@@ -143,14 +145,16 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     res <- .db.getQuery(cmd, conn.id)
     system(paste("rm -f ", tmp.file, sep = ""))
 
-    fn.schema <- .db.getQuery(paste0("SELECT specific_schema from information_schema.routines where routine_name = '",
-                                     use.name, "'"), conn.id)
+    fn.schema <- .db.getQuery(paste("SELECT specific_schema from information_schema.routines where routine_name = '",
+                                    use.name, "'", sep = ""), conn.id)
 
     if (is.null(.localVars$db[[id]]$func))
-        .localVars$db[[id]]$func <- rbind(c(funcname, paste0(fn.schema[1,1], ".", use.name)))
+        .localVars$db[[id]]$func <- rbind(c(funcname, paste(fn.schema[1,1],
+                                                            ".", use.name, sep = "")))
     else
         .localVars$db[[id]]$func <- rbind(.localVars$db[[id]]$func,
-                                          c(funcname, paste0(fn.schema[1,1], ".", use.name)))
+                                          c(funcname, paste(fn.schema[1,1],
+                                                            ".", use.name, sep = "")))
 
-    paste0(fn.schema[1,1], ".", use.name)
+    paste(fn.schema[1,1], ".", use.name, sep = "")
 }

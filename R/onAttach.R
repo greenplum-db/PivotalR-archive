@@ -34,5 +34,5 @@
 
     ## turn on cbind implementation using cbind2
     .localVars$pkg.path <- path.package(.this.pkg.name)
-    source(paste0(.localVars$pkg.path, "/auto/enable.cbind2.R"))
+    source(paste(.localVars$pkg.path, "/auto/enable.cbind2.R", sep = ""))
 }

@@ -398,7 +398,7 @@ db.array <- function (x, ...)
     dat <- list()
     dat[[1]] <- .expand.array(x)
     for (i in seq_len(n-1)) {
-        y <- eval(parse(text = paste0("..", i)))
+        y <- eval(parse(text = paste("..", i, sep = "")))
         dat[[i+1]] <- .expand.array(y)
     }
     

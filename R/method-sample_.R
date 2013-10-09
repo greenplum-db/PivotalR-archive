@@ -31,9 +31,9 @@ setMethod (
                                     FALSE, TRUE, FALSE, NULL, sum(fq[,2]))
             for (i in seq_len(max(fq[,1])-1)+1) {
                 sz <- sum(fq[fq[,1]>=i,2])
-                sql <- paste0("insert into ", content(res), " (",
-                              content(sort(x, FALSE, "random")),
-                              " limit ", sz, ")")
+                sql <- paste("insert into ", content(res), " (",
+                             content(sort(x, FALSE, "random")),
+                             " limit ", sz, ")", sep = "")
                 .get.res(sql = sql, conn.id = conn.id(x))
             }
 
