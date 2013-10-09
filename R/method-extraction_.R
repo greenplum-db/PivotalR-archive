@@ -65,7 +65,7 @@ setMethod(
 setMethod (
     "[",
     signature (x = "db.obj"),
-    function (x, i, j, ...) {
+    function (x, i, j, ..., drop = TRUE) {
         n <- nargs()
         if (is(x, "db.Rquery"))
             x.where <- x@.where

@@ -226,7 +226,7 @@ setGeneric ("sd", signature = "x",
 setMethod (
     "sd",
     signature(x = "db.obj"),
-    function (x) {
+    function (x, na.rm = FALSE) {
         res <- .aggregate(x, "stddev", FALSE, .num.types, TRUE,
                           "double precision", "float8")
         res@.is.agg <- TRUE
@@ -248,7 +248,7 @@ setGeneric ("var", signature = "x",
 setMethod (
     "var",
     signature(x = "db.obj"),
-    function (x) {
+    function (x, y = NULL, na.rm = FALSE, use) {
         res <- .aggregate(x, "variance", FALSE, .num.types, TRUE,
                           "double precision", "float8")
         res@.is.agg <- TRUE
@@ -263,7 +263,7 @@ setGeneric ("colMeans")
 setMethod (
     "colMeans",
     signature(x = "db.obj"),
-    function (x, na.rm = FALSE, dims = 1, ...) {
+    function (x, na.rm = FALSE, dims = 1) {
         res <- .aggregate(x, "avg", FALSE, .num.types, TRUE,
                           "double precision", "float8")
         res@.is.agg <- TRUE
@@ -278,7 +278,7 @@ setGeneric ("colSums")
 setMethod (
     "colSums",
     signature(x = "db.obj"),
-    function (x, na.rm = FALSE, dims = 1, ...) {
+    function (x, na.rm = FALSE, dims = 1) {
         res <- .aggregate(x, "sum", FALSE, .num.types, TRUE,
                           x@.col.data_type, x@.col.udt_name)
         res@.is.agg <- TRUE
