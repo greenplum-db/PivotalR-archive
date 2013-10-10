@@ -1,9 +1,8 @@
 \name{as.environment}
 \alias{as.environment}
 \alias{with}
-\alias{as.environment.db.table}
-\alias{as.environment.db.view}
-\alias{with.db.table} \alias{with.db.view}
+\alias{as.environment.db.obj}
+\alias{with.db.obj}
 
 \title{Evaluate expressions within the context of a database table or view}
 
@@ -12,15 +11,13 @@
     in a manner analogous to data frames. }
 
 \usage{
-    \method{as.environment}{db.table}(x, ...)
-    \method{as.environment}{db.view}(x, ...)
-    \method{with}{db.table}(data, expr, ...)
-    \method{with}{db.view}(data, expr, ...)
+    \method{as.environment}{db.obj}(x, ...)
+    \method{with}{db.obj}(data, expr, ...)
 }
 
 \arguments{
     \item{x, data}{
-        A \code{db.table} or \code{db.view} object to treat as an environment.
+        A \code{\linkS4class{db.obj}} object to treat as an environment.
     }
     \item{expr}{
         For \code{with}, an R expression to evaluate in the context of a database table or view.

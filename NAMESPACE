@@ -104,8 +104,6 @@ S3method(as.data.frame, db.table)
 S3method(as.data.frame, db.view)
 S3method(as.data.frame, db.Rquery)
 
-S3method(as.environment, db.table)
-S3method(as.environment, db.view)
+S3method(as.environment, db.obj)
+S3method(with, db.obj)
 
-S3method(with, db.table)
-S3method(with, db.view)

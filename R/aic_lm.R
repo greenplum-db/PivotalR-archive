@@ -20,15 +20,15 @@ logLik.lm.madlib <- function(object, ...)
 ## ----------------------------------------------------------------------
 
 extractAIC.lm.madlib.grps <- function(fit, scale=0, k=2, ...)
-    lapply(extractAIC, fit, scale=scale, k=2)
+    lapply(fit, extractAIC, scale=scale, k=k, ...)
 
 ## ----------------------------------------------------------------------
 
 logLik.lm.madlib.grps <- function(object, ...)
-    lapply(logLik, object)
+    lapply(object, logLik, ...)
 
 ## ----------------------------------------------------------------------
 
 AIC.lm.madlib.grps <- function(object, ..., k=2)
-    sapply(AIC, object, k=k)
+    sapply(object, AIC, k=k, ...)
 
