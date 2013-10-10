@@ -21,7 +21,7 @@
     if (length(.localVars$conn.id) == 0)
         conn.id <- 1
     else
-        conn.id <- max(.localVars$conn.id[,2]) + 1
+        conn.id <- max(.localVars$conn.id[,1]) + 1
     
     .localVars$db[[n.db+1]] <- list(
         conn = db.connection,
@@ -36,7 +36,7 @@
         )
 
     .localVars$conn.id <- rbind(.localVars$conn.id,
-                                   c(conn.id, n.db + 1))
+                                c(conn.id, n.db + 1))
     
     .localVars$conn.type[["rpostgresql"]] <- c(
         .localVars$conn.type[["rpostgresql"]],

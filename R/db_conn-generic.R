@@ -210,10 +210,10 @@ db.list <- function ()
             else
                 cat("MADlib   :    installed in schema", schema.madlib(idx[1]), "\n")
             
-            pkg <- .localVars$db[[idx[2]]]$conn.pkg
-            id <- which(tolower(.supported.connections) == pkg)
-            cat(paste("Conn pkg :    ", .supported.connections[id],
-                      "\n", sep = ""))
+            ## pkg <- .localVars$db[[idx[2]]]$conn.pkg
+            ## id <- which(tolower(.supported.connections) == pkg)
+            ## cat(paste("Conn pkg :    ", .supported.connections[id],
+            ##           "\n", sep = ""))
         }
         cat("\n")
     }
