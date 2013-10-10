@@ -12,8 +12,11 @@ setMethod (
         if (!is.numeric(center) && !is.logical(center) ||
             !is.numeric(scale) && !is.logical(scale))
             stop("center and scale must be numeric or logical !")
-        
+
         conn.id <- conn.id(x)
+        db.str <- (.get.dbms.str(conn.id))$db.str
+        if (db.str == "HAWQ")
+            stop("HAWQ does not support this function yet!")
 
         warnings <- .suppress.warnings(conn.id)
 

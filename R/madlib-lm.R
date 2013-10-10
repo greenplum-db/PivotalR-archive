@@ -79,7 +79,10 @@ madlib.lm <- function (formula, data, na.action,
     ## execute and get the result, error handling is taken care of
     res <- .get.res(sql, tbl.output, conn.id)
 
-    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    if (db.str == "HAWQ")
+        model <- NULL
+    else
+        model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     ## reset SQL and R warning levels
     .restore.warnings(warnings)

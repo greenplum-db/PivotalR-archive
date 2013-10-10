@@ -125,6 +125,10 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
 ## load a SQL function from inst/sql/
 .load.func <- function (funcname, conn.id)
 {
+    db.str <- (.get.dbms.str(conn.id))$db.str
+    if (db.str == "HAWQ")
+        stop("HAWQ does not support creating function yet!")
+    
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
     if (!is.null(.localVars$db[[id]]$func)) {
         k <- which(.localVars$db[[id]]$func[,1] == funcname)

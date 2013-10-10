@@ -112,7 +112,10 @@ madlib.glm <- function (formula, data, family = "gaussian",
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
-    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    if (db.str == "HAWQ")
+        model <- NULL
+    else
+        model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     .restore.warnings(warnings)
 
