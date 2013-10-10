@@ -23,7 +23,7 @@ PivotalR <- function ()
     library(shiny)
     
     ## PivotalR's installation path
-    .localVars$pkg.path <- path.package(.this.pkg.name)
+    ## .localVars$pkg.path <- path.package(.this.pkg.name)
     ## gui folder installation path
     gui.dir <- paste(.localVars$pkg.path, "/gui", sep = "")
 

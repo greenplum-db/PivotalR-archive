@@ -132,7 +132,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
             return (.localVars$db[[id]]$func[k,2])
     }
 
-    .localVars$pkg.path <- path.package(.this.pkg.name)
+    ## .localVars$pkg.path <- path.package(.this.pkg.name)
     sql.file <- paste(.localVars$pkg.path, "/sql/", funcname,
                       ".sql_in", sep = "")
     use.name <- .unique.string()

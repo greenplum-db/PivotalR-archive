@@ -52,3 +52,16 @@ is.db.data.frame <- function (x)
     msg.level <- .set.msg.level(pre.warn$msg.level, pre.warn$conn.id) 
     options(warn = pre.warn$warn.r) # reset R warning level
 }
+
+## ----------------------------------------------------------------------
+
+## Find the package path, for older R path.package does not work
+.get.package.path <- function ()
+{
+    version <- gsub("^R version (\\d+\\.\\d+).*$",
+                    "\\1", R.version.string)
+    if (version != R.version.string && as.numeric(version) < 2.13) 
+        .path.package(.this.pkg.name)
+    else
+        path.package(.this.pkg.name)
+}
