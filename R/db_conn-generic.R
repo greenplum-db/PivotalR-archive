@@ -35,15 +35,15 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         installed.pkgs <- .get.installed.pkgs()
         if (!(conn.pkg.name %in% installed.pkgs)) 
         {
-            message(paste("Package ", pkg.to.load,
-                        " is going to be installed so that ",
-                        .this.pkg.name,
-                        " could connect to databases.\n", sep = ""))
             if (conn.pkg.name == "rpostgresql" && !("dbi" %in% installed.pkgs)) {
-                message("Package DBI is also going to be installed!\n")
+                message("Package DBI is going to be installed!\n")
                 install.packages(paste(.localVars$pkg.path, "/dbi/DBI.tar.gz",
                                        sep = ""), repos = NULL, type = "source")
             }
+            message(paste("Package ", pkg.to.load,
+                          " is going to be installed so that ",
+                          .this.pkg.name,
+                          " could connect to databases.\n", sep = ""))
             install.packages(pkgs = pkg.to.load)
             if (!(conn.pkg.name %in% .get.installed.pkgs()))
                 stop("The package could not be installed!")

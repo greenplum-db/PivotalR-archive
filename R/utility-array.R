@@ -27,7 +27,7 @@
         paste("\"", .strip(s, "\""), "\"[", seq_len(n) - 1 + n2,
               "]", sep = "")
     } else {
-        regmatches(s, gregexpr("[^,\\s][^,]*[^,\\s]", s, perl=T))[[1]]
+        .regmatches(s, gregexpr("[^,\\s][^,]*[^,\\s]", s, perl=T))[[1]]
     }
 }
 
