@@ -92,20 +92,21 @@ setMethod (
         }
 
         if (array) x <- .expand.array(x)
+
         res <- .db.getQuery(paste(content(x), .limit.str(nrows),
                                   sep = ""), conn.id(x))
 
         .restore.warnings(warnings)
-
-        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+        if (array && length(names(x)) == 1 && x@.col.data_type == "array") {
             if (gsub("int", "", x@.col.udt_name) != x@.col.udt_name)
                 res <- arraydb.to.arrayr(res[[1]], "integer")
             else if (gsub("float", "", x@.col.udt_name) != x@.col.udt_name)
                 res <- arraydb.to.arrayr(res[[1]], "double")
-            else if (x@.col.udt_name %in% c("_bool"))
+            else if (x@.col.udt_name == "_bool")
                 res <- arraydb.to.arrayr(res[[1]], "logical")
             else
                 res <- arraydb.to.arrayr(res[[1]], "character")
+
             if (dim(res)[1] == 1)
                 res <- as.vector(res)
         }

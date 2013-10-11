@@ -85,7 +85,7 @@ setMethod (
             i.missing <- TRUE
         else
             i.missing <- FALSE
-        
+
         if (n == 3) {
             if (!i.missing && identical(x@.key, character(0)) &&
                 !is(i, "db.Rquery")) {
@@ -233,6 +233,7 @@ setMethod (
                 stop()
             }
         }
+
         if (length(names(x)) == 1 && x@.col.data_type == "array") {
             if (is(x, "db.data.frame")) ep <- x@.col.name
             else ep <- x@.expr
@@ -273,7 +274,7 @@ setMethod (
     is.factor <- x@.is.factor[cols.i]
     factor.suffix <- x@.factor.suffix[cols.i]
     if (length(names(x)) == 1 && x@.col.data_type == "array"
-        && !is.col.i.char) {
+        && !is.col.i.char && gsub("array_agg\\(.*\\)", "", expr) == expr) {
         idx <- which(.array.udt == x@.col.udt_name)
         col.data_type <- rep(.array.dat[idx], length(cols.i))
         col.udt_name <- rep(gsub("_", "", .array.udt[idx]), length(cols.i))
