@@ -5,7 +5,12 @@
 
 setGeneric (
     "preview",
-    def = function (x, ...) standardGeneric("preview"),
+    def = function (x, ...) {
+        res <- standardGeneric("preview")
+        if (any(dim(res) == 1))
+            return (res[,,drop=TRUE])
+        res
+    },
     signature = "x")
 
 ## -----------------------------------------------------------------------
