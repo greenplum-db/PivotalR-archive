@@ -13,21 +13,24 @@
 ## returns an array of string
 .get.array.elements <- function (expr, tbl, where.str, conn.id)
 {
+    s <- gsub("array_agg\\(.*\\)", "", expr)
+    if (s == "") return (expr)
+    
     s <- gsub("array\\[(.*)\\]", "\\1", expr)
     if (s == expr) {
-        n1 <- as.integer(.db.getQuery(paste0(
+        n1 <- as.integer(.db.getQuery(paste(
             "select array_upper(\"", .strip(s, "\""),
             "\", 1) from ",
-            tbl, where.str, " limit 1"), conn.id))
-        n2 <- as.integer(.db.getQuery(paste0(
+            tbl, where.str, " limit 1", sep = ""), conn.id))
+        n2 <- as.integer(.db.getQuery(paste(
             "select array_lower(\"",
             .strip(s, "\""), "\", 1) from ",
-            tbl, where.str, " limit 1"), conn.id))
+            tbl, where.str, " limit 1", sep = ""), conn.id))
         n <- n1 - n2 + 1
         paste("\"", .strip(s, "\""), "\"[", seq_len(n) - 1 + n2,
               "]", sep = "")
     } else {
-        regmatches(s, gregexpr("[^,\\s][^,]*[^,\\s]", s, perl=T))[[1]]
+        .regmatches(s, gregexpr("[^,\\s][^,]*[^,\\s]", s, perl=T))[[1]]
     }
 }
 
@@ -59,7 +62,8 @@
     factor.suffix <- character(0)
     no.array <- TRUE
     for (i in seq_len(length(names(x)))) {
-        if (x@.col.data_type[i] != "array") {
+        if (x@.col.data_type[i] != "array" ||
+            gsub("array_agg\\(.*\\)", "", x@.expr[i]) != x@.expr[i]) {
             expr <- c(expr, x@.expr[i])
             col.name <- c(col.name, (names(x))[i])
             data.type <- c(data.type, x@.col.data_type[i])
@@ -69,6 +73,7 @@
             next
         }
         no.array <- FALSE
+
         arr <- .get.array.elements(x@.expr[i], parent, where.str,
                                    conn.id(x))
         expr <- c(expr, arr)
@@ -77,8 +82,10 @@
         data.type <- c(data.type,
                        rep(.find.array.data.type(x@.col.udt_name[i]),
                            length(arr)))
+
         udt.name <- c(udt.name, rep(gsub("_", "", x@.col.udt_name[i]),
                                     length(arr)))
+
         is.factor <- c(is.factor, rep(FALSE, length(arr)))
         factor.suffix <- c(factor.suffix, rep("", length(arr)))
     }
@@ -131,10 +138,11 @@
         if (x[[col]]@.col.data_type != "array")
             cnt <- cnt + 1
         else {
-            res <- .db.getQuery(paste0("select array_upper(", col,
-                                       ",1) - array_lower(", col,
-                                       ",1) + 1 as n from (",
-                                       content(x[[col]]), " limit 1) s"),
+            res <- .db.getQuery(paste("select array_upper(", col,
+                                      ",1) - array_lower(", col,
+                                      ",1) + 1 as n from (",
+                                      content(x[[col]]), " limit 1) s",
+                                      sep = ""),
                                 conn.id(x))
             cnt <- cnt + res$n
         }

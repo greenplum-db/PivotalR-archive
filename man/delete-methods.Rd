@@ -10,6 +10,7 @@
 \alias{delete,lm.madlib.grps-method}
 \alias{delete,logregr.madlib-method}
 \alias{delete,logregr.madlib.grps-method}
+\alias{delete,bagging.model-method}
 
 \title{ Safely delete a \code{db.obj} object or a table/view in the database }
 
@@ -40,6 +41,8 @@ FALSE)
 \S4method{delete}{logregr.madlib}(x)
 
 \S4method{delete}{logregr.madlib.grps}(x)
+
+\S4method{delete}{bagging.model}(x)
 }
 
 \arguments{
@@ -74,6 +77,8 @@ FALSE)
     \code{logregr.madlib} or \code{logregr.madlib.grps} object). In this
     case, the result model table wrapped by \code{model} will be
     deleted.
+
+    Or an object which is the result of \code{\link{generic.bagging}}.     In this case, all result model tables will be deleted.
 } 
 
 \item{conn.id}{

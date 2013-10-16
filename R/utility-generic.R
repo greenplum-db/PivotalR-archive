@@ -27,9 +27,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         }
 
         if (type == "character") {
-            elm <- regmatches(str[i],
-                              gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
-                                       str[i], perl=T))[[1]]
+            elm <- .regmatches(str[i],
+                               gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
+                                        str[i], perl=T))[[1]]
             elm <- as.character(elm)
         } else {
             elm <- strsplit(gsub("(\\{|\\})", "", str[i]), ",")[[1]]
@@ -257,9 +257,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
                            "factor(\\1)", right.hand, perl = T)
-        elm <- regmatches(right.hand,
-                          gregexpr("factor\\s*\\([^\\(\\)]+\\)",
-                                   right.hand, perl=T))[[1]]
+        elm <- .regmatches(right.hand,
+                           gregexpr("factor\\s*\\([^\\(\\)]+\\)",
+                                    right.hand, perl=T))[[1]]
         col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
                            perl = T))
         if (!all(col %in% names(data)))

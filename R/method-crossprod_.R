@@ -35,7 +35,7 @@ setMethod (
             parent <- x@.parent
             src <- x@.source
         }
-        
+
         if (is(x, "db.Rquery") && x@.where != "") {
             where.str <- paste(" where", x@.where)
             where <- x@.where
@@ -48,37 +48,54 @@ setMethod (
         if (is(x, "db.data.frame")) s <- names(x)
         else s <- x@.expr
         if (length(s) == 1 && x@.col.data_type == "array") {
-            a <- .get.array.elements(s, tbl, where.str, conn.id)
-        } else if (all(x@.col.data_type != "array"))
-            a <- paste("(", s, ")", sep = "")
-        else
-            stop(deparse(substitute(x)), " is not a proper matrix!")
-        m <- length(a)
-        n <- m
+            ## a <- .get.array.elements(s, tbl, where.str, conn.id)
+            a <- s
+        } else { # if (all(x@.col.data_type != "array"))
+            x <- db.array(x)
+            a <- x@.expr # paste("(", s, ")", sep = "")
+        } ## else
+          ##   stop(deparse(substitute(x)), " is not a proper matrix!")
+        m <- .col.number.all(x) # compute the column numbers including array
         b <- a
-
+        n <- m # if it is symmetric
+  
         if (!is.symmetric) {
             if (is(y, "db.data.frame")) s <- names(y)
             else s <- y@.expr
             if (length(s) == 1 && y@.col.data_type == "array") {
-                b <- .get.array.elements(s, tbl, where.str, conn.id)
-            } else if (all(y@.col.data_type != "array"))
-                b <- paste("(", s, ")", sep = "")
-            else
-                stop(deparse(substitute(y)), " is not a proper matrix!")
-            n <- length(b)
+                ## b <- .get.array.elements(s, tbl, where.str, conn.id)
+                b <- s
+            } else { # if (all(y@.col.data_type != "array"))
+                ## b <- paste("(", s, ")", sep = "")
+                y <- db.array(y)
+                b <- y@.expr
+            } ## else
+            ##     stop(deparse(substitute(y)), " is not a proper matrix!")
+            ## n <- length(b)
+            n <- .col.number.all(y)
         }
 
-        tmp <- outer(a, b, function(x, y){paste0(x, " * ", y)})
-        if (is.symmetric) tmp <- tmp[upper.tri(tmp, diag = TRUE)]
-        expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")
+        ## tmp <- outer(a, b, function(x, y){paste0(x, " * ", y)})
+        ## if (is.symmetric) tmp <- tmp[upper.tri(tmp, diag = TRUE)]
+        ## expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")pg90 mad
 
         db.info <- .get.dbms.str(conn.id)
-        if (db.info$db.str == "PostgreSQL")
-            expr <- paste0(schema.madlib(conn.id), ".__array_", expr)
+        if (is.symmetric) { ## Using symmetric specific function is faster
+            ## func <- .load.func("crossprod_double", conn.id)
+            ## expr <- paste0("sum(", func, "(", a, "))")
+            ## is.symmetric <- FALSE
+            func <- .load.func("crossprod_sym_double", conn.id)
+            expr <- paste("sum(", func, "(", a, "))", sep = "")
+        } else {
+            func <- .load.func("crossprod_double2", conn.id)
+            expr <- paste("sum(", func, "(", a, ", ", b, "))", sep = "")
+        }
+        if (db.info$db.str == "PostgreSQL") {
+            expr <- paste(schema.madlib(conn.id), ".__array_", expr, sep = "")
+        } 
 
         new("db.Rcrossprod",
-            .content = paste0("select ", expr, " as cross_prod from ",
+            .content = paste("select ", expr, " as cross_prod from ",
             tbl, where.str, sort$str, sep = ""),
             .expr = expr,
             .source = src,

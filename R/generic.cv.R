@@ -31,8 +31,9 @@ generic.cv <- function (train, predict, metric, data,
             fits <- train(data = cuts$train[[i]])
             pred <- predict(fits, newdata = cuts$valid[[i]])
             err <- c(err, as.numeric(metric(predicted = pred, data = cuts$valid[[i]])))
+            delete(fits)
         }
-
+        
         for (i in 1:k) {
             delete(content(cuts$train[[i]]), conn.id, TRUE)
             delete(content(cuts$valid[[i]]), conn.id, TRUE)
@@ -63,6 +64,7 @@ generic.cv <- function (train, predict, metric, data,
                 pred <- predict(fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
                                                     data = cuts$valid[[i]])))
+                delete(fits)
             }
             err <- rbind(err, err.k)
         }

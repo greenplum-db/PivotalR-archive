@@ -32,12 +32,18 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         i <- which(tolower(.supported.connections) == conn.pkg.name)
         pkg.to.load <- .supported.connections[i]
         ## if the package is not installed, install it
-        if (!(conn.pkg.name %in% .get.installed.pkgs())) 
+        installed.pkgs <- .get.installed.pkgs()
+        if (!(conn.pkg.name %in% installed.pkgs)) 
         {
+            if (conn.pkg.name == "rpostgresql" && !("dbi" %in% installed.pkgs)) {
+                message("Package DBI is going to be installed!\n")
+                install.packages(paste(.localVars$pkg.path, "/dbi/DBI.tar.gz",
+                                       sep = ""), repos = NULL, type = "source")
+            }
             message(paste("Package ", pkg.to.load,
-                        " is going to be installed so that ",
-                        .this.pkg.name,
-                        " could connect to databases.\n\n", sep = ""))
+                          " is going to be installed so that ",
+                          .this.pkg.name,
+                          " could connect to databases.\n", sep = ""))
             install.packages(pkgs = pkg.to.load)
             if (!(conn.pkg.name %in% .get.installed.pkgs()))
                 stop("The package could not be installed!")
@@ -64,8 +70,8 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                      "to display or set the current default schemas.")
         }
 
-        res <- .get.res(paste0("set application_name = '",
-                               .this.pkg.name, "'"),
+        res <- .get.res(paste("set application_name = '",
+                              .this.pkg.name, "'", sep = ""),
                         conn.id = result)
         
         return (result)
@@ -204,10 +210,10 @@ db.list <- function ()
             else
                 cat("MADlib   :    installed in schema", schema.madlib(idx[1]), "\n")
             
-            pkg <- .localVars$db[[idx[2]]]$conn.pkg
-            id <- which(tolower(.supported.connections) == pkg)
-            cat(paste("Conn pkg :    ", .supported.connections[id],
-                      "\n", sep = ""))
+            ## pkg <- .localVars$db[[idx[2]]]$conn.pkg
+            ## id <- which(tolower(.supported.connections) == pkg)
+            ## cat(paste("Conn pkg :    ", .supported.connections[id],
+            ##           "\n", sep = ""))
         }
         cat("\n")
     }
@@ -218,6 +224,9 @@ db.list <- function ()
 ## list tables and views in the connection
 db.objects <- function (search = NULL, conn.id = 1)
 {
+    if (!.is.conn.id.valid(conn.id))
+        stop("Connection ID ", conn.id, " is not valid!")
+        
     res <- .db.getQuery("select table_schema, table_name from information_schema.tables", conn.id = conn.id)
 
     if (is.null(search)) {
@@ -229,7 +238,7 @@ db.objects <- function (search = NULL, conn.id = 1)
     final.res <- character(0)
     for (i in seq_len(dim(res)[1])) {
         name <- paste(res[i,1], ".", res[i,2], sep = "")
-        find <- gsub(search, "", name)
+        find <- gsub(search, "", name, perl = TRUE)
         if (find != name)
             final.res <- rbind(final.res, res[i,])
     }

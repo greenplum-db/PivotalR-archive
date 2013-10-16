@@ -3,30 +3,32 @@
 ## Bagging method, not a wrapper of MADlib function
 ## -----------------------------------------------------------------------
 
+setClass("bagging.model")
+
 generic.bagging <- function (train, data, nbags = 10, fraction = 1)
 {
     warnings <- .suppress.warnings(conn.id(data))
-    
+
     if (fraction > 1)
         stop("fraction cannot be larger than 1!")
     if (!is(data, "db.obj"))
         stop("data must be a db.obj!")
-    
+
     n <- dim(data)[1]
     size <- as.integer(n * fraction)
 
     res <- list()
-    idat <- .create.indexed.temp.table(data)
+    ## idat <- .create.indexed.temp.table(data)
     for (i in 1:nbags) {
-        data.use <- sample(idat, size, replace = TRUE, indexed = TRUE)
+        data.use <- sample(data, size, replace = TRUE)
         res[[i]] <- train(data = data.use)
         delete(data.use)
     }
-    delete(idat)
+    ## delete(idat)
     class(res) <- "bagging.model"
 
     .restore.warnings(warnings)
-   
+
     res
 }
 
@@ -62,11 +64,11 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         else
             stop("the result type ", res.type,
                  " is not supported for vote!")
-        
+
         func <- .load.func(paste("find_majority_",
                            strsplit(func.suffix, " ")[[1]][1], sep = ""),
                            conn.id(newdata))
-        
+
         arr.str <- "array["
         for (i in seq_len(l)) {
             arr.str <- paste(arr.str, "(", pred[[i]]@.expr, ")::",
@@ -96,7 +98,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
         }
 
         expr <- paste(func, "(", arr.str, ")", sep = "")
-        
+
         sql <- paste("select ", expr, " as bagging_predict from ",
                      tbl, where.str, sort$str, sep = "")
 
@@ -123,14 +125,18 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
 ## load a SQL function from inst/sql/
 .load.func <- function (funcname, conn.id)
 {
+    db.str <- (.get.dbms.str(conn.id))$db.str
+    if (db.str == "HAWQ")
+        stop("HAWQ does not support creating function yet!")
+    
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
     if (!is.null(.localVars$db[[id]]$func)) {
         k <- which(.localVars$db[[id]]$func[,1] == funcname)
         if (length(k) != 0)
             return (.localVars$db[[id]]$func[k,2])
     }
-    
-    .localVars$pkg.path <- path.package(.this.pkg.name)
+
+    ## .localVars$pkg.path <- path.package(.this.pkg.name)
     sql.file <- paste(.localVars$pkg.path, "/sql/", funcname,
                       ".sql_in", sep = "")
     use.name <- .unique.string()
@@ -143,15 +149,16 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     res <- .db.getQuery(cmd, conn.id)
     system(paste("rm -f ", tmp.file, sep = ""))
 
-    fn.schema <- .db.getQuery(paste0("SELECT specific_schema from information_schema.routines where routine_name = '",
-                                     use.name, "'"), conn.id)
+    fn.schema <- .db.getQuery(paste("SELECT specific_schema from information_schema.routines where routine_name = '",
+                                    use.name, "'", sep = ""), conn.id)
 
-    
     if (is.null(.localVars$db[[id]]$func))
-        .localVars$db[[id]]$func <- rbind(c(funcname, paste0(fn.schema[1,1], ".", use.name)))
+        .localVars$db[[id]]$func <- rbind(c(funcname, paste(fn.schema[1,1],
+                                                            ".", use.name, sep = "")))
     else
         .localVars$db[[id]]$func <- rbind(.localVars$db[[id]]$func,
-                                          c(funcname, paste0(fn.schema[1,1], ".", use.name)))
+                                          c(funcname, paste(fn.schema[1,1],
+                                                            ".", use.name, sep = "")))
 
-    paste0(fn.schema[1,1], ".", use.name)
+    paste(fn.schema[1,1], ".", use.name, sep = "")
 }

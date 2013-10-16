@@ -92,7 +92,7 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
             expr <- paste(object[[1]]$coef, ind.vars, sep = "*",
                           collapse = " + ")
             if (func.str == "logregr_predict")
-                expr <- paste0(expr, " > 0")
+                expr <- paste(expr, " > 0", sep = "")
         }
     } else {
         l <- length(object[[1]]$grp.cols)
@@ -123,10 +123,10 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
                 expr <- paste(expr, madlib, ".", func.str, "(", coef.i,
                               ", ", ind.str, ")", sep = "")
             } else {
-                expr <- paste0(expr, paste(object[[1]]$coef, ind.vars,
-                                           sep = "*", collapse = " + "))
+                expr <- paste(expr, paste(object[[1]]$coef, ind.vars,
+                                          sep = "*", collapse = " + "), sep = "")
                 if (func.str == "logregr_predict")
-                    expr <- paste0(expr, " > 0")
+                    expr <- paste(expr, " > 0", sep = "")
             }
             
             if (i < n)

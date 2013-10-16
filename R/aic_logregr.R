@@ -17,15 +17,15 @@ logLik.logregr.madlib <- function(object, ...)
 ## ----------------------------------------------------------------------
 
 extractAIC.logregr.madlib.grps <- function(fit, scale=0, k=2, ...)
-    lapply(fit, extractAIC, scale=scale, k=k)
+    lapply(fit, extractAIC, scale=scale, k=k, ...)
 
 ## ----------------------------------------------------------------------
 
 logLik.logregr.madlib.grps <- function(object, ...)
-    lapply(object, logLik)
+    lapply(object, logLik, ...)
 
 ## ----------------------------------------------------------------------
 
 AIC.logregr.madlib.grps <- function(object, ..., k=2)
-    sapply(object, AIC, k=k)
+    sapply(object, AIC, k=k, ...)
 

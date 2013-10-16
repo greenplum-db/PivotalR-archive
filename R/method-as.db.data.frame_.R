@@ -71,7 +71,7 @@ setMethod (
             is.temp <- TRUE
         }
         
-        f <- paste0(getwd(), "/", x)
+        f <- paste(getwd(), "/", x, sep = "")
         if (file.exists(f)) x <- f
         else if (!file.exists(x))
             stop("the file does not exist!")
@@ -88,6 +88,8 @@ setMethod (
     key = character(0), distributed.by = NULL,
     is.temp = FALSE, ...)
 {
+    if (!.is.conn.id.valid(conn.id))
+        stop("Connection ID ", conn.id, " is not valid!")
     warnings <- .suppress.warnings(conn.id)
     if (is.null(table.name)) {
         table.name <- .unique.string()
@@ -163,12 +165,12 @@ setMethod (
         conn.id <- conn.id(x)
 
         dist.str <- .get.distributed.by.str(conn.id, distributed.by)
-        
         exists <- db.existsObject(table.name, conn.id, is.temp)
+
         if (is.temp) exists <- exists[[1]]
         if (exists) stop("The table already exists in connection ",
                          conn.id, "!")
-        
+
         if (is.temp) 
             temp.str <- "temp"
         else
@@ -202,10 +204,11 @@ setMethod (
                 }
                 data.types <- c(data.types, field.types[[i]])
             }
-            extra <- paste(paste0("(", x@.expr, ")::", data.types),
+            extra <- paste(paste("(", x@.expr, ")::", data.types, sep = ""),
                            paste("\"", names(x), "\"", sep = ""),
                            sep = " as ", collapse = ",")
         }
+
         ## suffix used to avoid conflicts
         suffix <- x@.factor.suffix
         appear <- x@.col.name
@@ -249,7 +252,7 @@ setMethod (
                 } 
             }
         }
-        
+
         if (x@.where != "")
             where <- paste(" where", x@.where)
         else
@@ -259,14 +262,15 @@ setMethod (
             nrow.str <- paste(" limit ", nrow, " ", sep = "")
         else
             nrow.str <- ""
-        
+
         content.str <- paste("select ", extra, " from ", tbl, where,
+                             x@.sort$str,
                              sep = "")
 
         tbn <- strsplit(table.name, "\\.")[[1]]
         tbnn <- paste("\"", .strip(tbn, "\""),
                       "\"", collapse = ".", sep = "")
-        
+
         create.str <- paste("create ", temp.str, " ", obj.str, " ",
                             tbnn,
                             " as (", content.str, nrow.str, ") ",

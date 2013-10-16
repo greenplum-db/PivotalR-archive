@@ -270,7 +270,7 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " > ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
@@ -291,7 +291,7 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " < ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
@@ -312,7 +312,7 @@ setMethod (
     ">=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " >= ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
@@ -333,7 +333,7 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " <= ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
@@ -354,7 +354,7 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " = ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")
@@ -375,7 +375,7 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste0("'", .strip(e2, "'"), "'")
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         .compare(e1, e2, " <> ", .txt.types, cast = "")
     },
     valueClass = "db.Rquery")

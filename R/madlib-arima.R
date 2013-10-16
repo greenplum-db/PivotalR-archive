@@ -135,9 +135,10 @@ setMethod (
     if (!(.strip(params$ind.vars, "\"") %in% col.names) ||
         !(.strip(params$dep.str, "\"") %in% col.names)) {
         new.src <- .unique.string()
-        res <- .get.res(sql = paste0("create table ", new.src, " as ",
+        res <- .get.res(sql = paste("create table ", new.src, " as ",
                         "select ", params$dep.str, " as tval, ",
-                        params$ind.vars, " as tid from ", tbl.source),
+                        params$ind.vars, " as tid from ", tbl.source,
+                        sep = ""),
                         conn.id = conn.id)
         if (is.tbl.source.temp) delete(tbl.source)
         is.tbl.source.temp <- TRUE
@@ -149,17 +150,17 @@ setMethod (
     ## construct SQL string
     madlib <- schema.madlib(conn.id) # MADlib schema name
     tbl.output <- .unique.string()
-    order.str <- paste0("array[", toString(order), "]")
-    optim.control.str <- paste0("tau=", tau, ", e1=", e1, ", e2=", e2,
-                                ", e3=", e3, ", hessian_delta=",
-                                hessian.delta, ", chunk_size=",
-                                chunk.size, ", param_init=\"",
-                                param.init, "\"")
-    sql <- paste0("select ", madlib, ".arima_train('",
-                  tbl.source, "', '", tbl.output, "', '",
-                  params$ind.vars, "', '", params$dep.str, "', ",
-                  grp, ", ", include.mean, ", ", order.str, ", '",
-                  optim.control.str, "')")
+    order.str <- paste("array[", toString(order), "]", sep = "")
+    optim.control.str <- paste("tau=", tau, ", e1=", e1, ", e2=", e2,
+                               ", e3=", e3, ", hessian_delta=",
+                               hessian.delta, ", chunk_size=",
+                               chunk.size, ", param_init=\"",
+                               param.init, "\"", sep = "")
+    sql <- paste("select ", madlib, ".arima_train('",
+                 tbl.source, "', '", tbl.output, "', '",
+                 params$ind.vars, "', '", params$dep.str, "', ",
+                 grp, ", ", include.mean, ", ", order.str, ", '",
+                 optim.control.str, "')", sep = "")
 
     ## execute and get the result
     res <- .get.res(sql=sql, conn.id=conn.id)
@@ -178,12 +179,12 @@ setMethod (
     if (p != 0) {
         rst$coef <- c(rst$coef, res[1,1:p])
         rst$s.e. <- c(rst$s.e., res[1,p+(1:p)])
-        coef.names <- c(coef.names, paste0("ar", 1:p))
+        coef.names <- c(coef.names, paste("ar", 1:p, sep = ""))
     }
     if (q != 0) {
         rst$coef <- c(rst$coef, res[1,2*p + (1:q)])
         rst$s.e. <- c(rst$s.e., res[1,2*p+q+(1:q)])
-        coef.names <- c(coef.names, paste0("ma", 1:q))
+        coef.names <- c(coef.names, paste("ma", 1:q, sep = ""))
     }
     if (include.mean && d == 0) {
         rst$coef <- c(rst$coef, res[1,dim(res)[2]-1])
@@ -198,18 +199,19 @@ setMethod (
     rst$time.stamp <- params$ind.vars
     rst$time.series <- params$dep.str
 
-    res <- preview(paste0(tbl.output, "_summary"), conn.id=conn.id, "all")
+    res <- preview(paste(tbl.output, "_summary", sep = ""),
+                   conn.id=conn.id, "all")
     rst$sigma2 <- res$residual_variance
     rst$loglik <- res$log_likelihood
     rst$iter.num <- res$iter_num
     rst$exec.time <- res$exec_time
     
     ## create db.data.frame object for residual table
-    rst$residuals <- db.data.frame(paste0(tbl.output, "_residual"),
+    rst$residuals <- db.data.frame(paste(tbl.output, "_residual", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
     rst$model <- db.data.frame(tbl.output, conn.id = conn.id,
                                verbose = FALSE)
-    rst$statistics <- db.data.frame(paste0(tbl.output, "_summary"),
+    rst$statistics <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
                                     conn.id = conn.id, verbose = FALSE)
 
     ## If temp.source is TRUE, the delete(...) function
@@ -275,9 +277,9 @@ predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
     tbl.output <- .unique.string()
     tbl.model <- .strip(content(object$model), "\"")
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    sql <- paste0("select ", madlib, ".arima_forecast('",
-                  tbl.model, "', '", tbl.output, "',",
-                  n.ahead, ")")
+    sql <- paste("select ", madlib, ".arima_forecast('",
+                 tbl.model, "', '", tbl.output, "',",
+                 n.ahead, ")", sep = "")
     res <- .get.res(sql=sql, conn.id=conn.id)
     rst <- db.data.frame(tbl.output, conn.id=conn.id, verbose = FALSE)
 

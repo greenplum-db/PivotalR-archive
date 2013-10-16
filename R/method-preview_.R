@@ -5,7 +5,12 @@
 
 setGeneric (
     "preview",
-    def = function (x, ...) standardGeneric("preview"),
+    def = function (x, ...) {
+        res <- standardGeneric("preview")
+        if (any(dim(res) == 1))
+            return (res[,,drop=TRUE])
+        res
+    },
     signature = "x")
 
 ## -----------------------------------------------------------------------
@@ -92,20 +97,21 @@ setMethod (
         }
 
         if (array) x <- .expand.array(x)
+
         res <- .db.getQuery(paste(content(x), .limit.str(nrows),
                                   sep = ""), conn.id(x))
 
         .restore.warnings(warnings)
-
-        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+        if (array && length(names(x)) == 1 && x@.col.data_type == "array") {
             if (gsub("int", "", x@.col.udt_name) != x@.col.udt_name)
                 res <- arraydb.to.arrayr(res[[1]], "integer")
             else if (gsub("float", "", x@.col.udt_name) != x@.col.udt_name)
                 res <- arraydb.to.arrayr(res[[1]], "double")
-            else if (x@.col.udt_name %in% c("_bool"))
+            else if (x@.col.udt_name == "_bool")
                 res <- arraydb.to.arrayr(res[[1]], "logical")
             else
                 res <- arraydb.to.arrayr(res[[1]], "character")
+
             if (dim(res)[1] == 1)
                 res <- as.vector(res)
         }
@@ -135,9 +141,9 @@ setMethod (
         ## more than 1500. So we have to use unnest to help to load a large array
         ## TODO: Create a separate array loading function to specifically deal
         ## with such situations and can be called by other functions.
-        res <- .db.getQuery(paste0("select unnest(", names(x)[1], ") as v from (",
-                                   content(x),
-                                   .limit.str(nrows), ") s"), conn.id(x))
+        res <- .db.getQuery(paste("select unnest(", names(x)[1], ") as v from (",
+                                  content(x),
+                                  .limit.str(nrows), ") s", sep = ""), conn.id(x))
 
         n <- dim(x)[1]
         dims <- x@.dim

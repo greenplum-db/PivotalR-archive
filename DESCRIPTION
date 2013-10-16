@@ -1,12 +1,12 @@
 Package: PivotalR
 Type: Package
 Title: R front-end to PostgreSQL and Pivotal (Greenplum) database, wrapper for MADlib
-Version: 0.1.6
-Date: 2013-09-09
+Version: 0.1.7
+Date: 2013-10-10
 Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>, with contributions from Data Scientist Team at Pivotal Inc.
 Maintainer: Hai Qian <hqian@gopivotal.com>
 Contact: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>
-Depends: R (>= 2.10), methods, Matrix
+Depends: R (>= 2.12.0), methods, Matrix
 Enhances: DBI, RPostgreSQL, shiny
 Description: R wrapper of Pivotal Data Fabrics running on PostgreSQL or Pivotal (Greenplum) database with parallel and distributed computation ability for big data analytics. PivotalR is a package that enables users of R to interact with the Pivotal (Greenplum) Database as well as Pivotal HD/HAWQ for Big Data analytics. It does so by providing an interface to the operations on tables/views in the database. These operations are almost the same as those of data.frame. Thus the users of R do not need to learn SQL when they operate on the objects in the database. It also provides a wrapper for MADlib, which is an open-source library for parallel and scalable in-database analytics.
 License: GPL (>= 2)

@@ -2,7 +2,7 @@ extractAIC.lm.madlib <- function(fit, scale=0, k=2, ...)
 {
     edf <- length(fit$coef)
     sse <- lookat(sum(resid(fit)^2))[1,1,drop=TRUE]
-    c(edf, nobs(fit) * log(sse/nobs(fit)) + k * edf)
+    c(edf, fit$nobs * log(sse/fit$nobs) + k * edf)
 }
 
 ## ----------------------------------------------------------------------
@@ -10,7 +10,7 @@ extractAIC.lm.madlib <- function(fit, scale=0, k=2, ...)
 logLik.lm.madlib <- function(object, ...)
 {
     sse <- lookat(sum(residuals(object)^2))[1,1,drop=TRUE]
-    n <- nobs(object)
+    n <- object$nobs
     ll <- 0.5 * (-n * (log(2 * pi) + 1 - log(n) + log(sse)))
     attr(ll, "df") <- length(object$coef) + 1
     class(ll) <- "logLik"
@@ -20,15 +20,15 @@ logLik.lm.madlib <- function(object, ...)
 ## ----------------------------------------------------------------------
 
 extractAIC.lm.madlib.grps <- function(fit, scale=0, k=2, ...)
-    lapply(extractAIC, fit, scale=scale, k=2)
+    lapply(fit, extractAIC, scale=scale, k=k, ...)
 
 ## ----------------------------------------------------------------------
 
 logLik.lm.madlib.grps <- function(object, ...)
-    lapply(logLik, object)
+    lapply(object, logLik, ...)
 
 ## ----------------------------------------------------------------------
 
 AIC.lm.madlib.grps <- function(object, ..., k=2)
-    sapply(AIC, object, k=k)
+    sapply(object, AIC, k=k, ...)
 

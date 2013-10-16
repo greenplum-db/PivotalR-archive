@@ -15,9 +15,10 @@ setGeneric (
             envir <- parent.env(parent.env(parent.env(parent.env(
                 parent.env(as.environment(-1))))))
 
-            warnings <- .suppress.warnings(conn.id)
+            warn.r <- getOption("warn")
+            options(warn = -1)
             rm(list=deparse(substitute(x)), envir=envir)
-            .restore.warnings(warnings)
+            options(warn = warn.r)
         }
         res
     },
@@ -30,7 +31,11 @@ setMethod (
     signature (x = "db.data.frame"),
     def = function (x, cascade = FALSE) {
         ## .db.removeTable(content(x), conn.id(x))
-        s <- delete(content(x), conn.id(x), x@.table.type == "LOCAL TEMPORARY",
+        if (x@.table.type == "LOCAL TEMPORARY")
+            tbl <- gsub("^\\\"[^\"]*\\\"\\.", "", content(x))
+        else
+            tbl <- content(x)
+        s <- delete(tbl, conn.id(x), x@.table.type == "LOCAL TEMPORARY",
                     cascade)
         list(res=s, conn.id=conn.id(x)) 
     })
@@ -52,6 +57,8 @@ setMethod (
     def = function (x, conn.id = 1, is.temp = FALSE, cascade = FALSE) {
         x <- paste("\"", .strip(strsplit(x, "\\.")[[1]], "\""), "\"",
                    collapse = ".", sep = "")
+        if (is.temp)
+            x <- gsub("^\\\"[^\"]*\\\"\\.", "", x)
         origin.x <- x
         warn.r <- getOption("warn")
         options(warn = -1)
@@ -157,6 +164,7 @@ setMethod (
     "delete",
     signature (x = "lm.madlib"),
     def = function (x) {
+        if (is.null(x$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x$model)
         d1 <- delete(x$model)
         list(res=d1, conn.id=conn.id)
@@ -168,6 +176,7 @@ setMethod (
     "delete",
     signature (x = "lm.madlib.grps"),
     def = function (x) {
+        if (is.null(x[[1]]$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x[[1]]$model)
         d1 <- delete(x[[1]]$model)
         list(res=d1, conn.id=conn.id)
@@ -179,6 +188,7 @@ setMethod (
     "delete",
     signature (x = "logregr.madlib"),
     def = function (x) {
+        if (is.null(x$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x$model)
         d1 <- delete(x$model)
         list(res=d1, conn.id=conn.id)
@@ -190,9 +200,21 @@ setMethod (
     "delete",
     signature (x = "logregr.madlib.grps"),
     def = function (x) {
+        if (is.null(x[[1]]$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x[[1]]$model)
         d1 <- delete(x[[1]]$model)
         list(res=d1, conn.id=conn.id)
+    })
+
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "bagging.model"),
+    def = function (x) {
+        conn.id <- conn.id(x[[1]]$model)
+        res <- lapply(x, delete)
+        list(res = all(unlist(res)), conn.id = conn.id)
     })
 
 

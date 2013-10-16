@@ -9,7 +9,7 @@ setGeneric("sample")
 setMethod (
     "sample",
     signature(x = "db.obj"),
-    function (x, size, replace = FALSE, prob = NULL, indexed.x = FALSE, ...) {
+    function (x, size, replace = FALSE, prob = NULL, ...) {
         n <- dim(x)[1]
         if (!replace && n < size)
             stop("size is larger than data size!")
@@ -23,23 +23,19 @@ setMethod (
             .restore.warnings(warnings)
             res
         } else {
-            if (!indexed.x)
-                y <- .create.indexed.temp.table(x)
-            else
-                y <- x
             select <- sample(seq(n), size, replace = TRUE)
-            freq <- table(select)
+            freq <- table(table(select))
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
-            res <- as.db.data.frame(y[fq[,1],-y@.dim[2]], .unique.string(),
-                                    FALSE, FALSE, TRUE, FALSE, NULL, NULL)
-            for (i in seq_len(max(fq[,2])-1)+1) {
-                z <- y[fq[fq[,2]>=i,1],-y@.dim[2]]
-                sql <- paste("insert into ", content(res), " (", content(z),
-                             ")", sep = "")
-                .db.getQuery(sql, conn.id(x))
+            tmp <- .unique.string()
+            res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
+                                    FALSE, TRUE, FALSE, NULL, sum(fq[,2]))
+            for (i in seq_len(max(fq[,1])-1)+1) {
+                sz <- sum(fq[fq[,1]>=i,2])
+                sql <- paste("insert into ", content(res), " (",
+                             content(sort(x, FALSE, "random")),
+                             " limit ", sz, ")", sep = "")
+                .get.res(sql = sql, conn.id = conn.id(x))
             }
-
-            if (!indexed.x) delete(y)
 
             .restore.warnings(warnings)
 
