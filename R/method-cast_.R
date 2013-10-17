@@ -1,11 +1,14 @@
 
 .attach.cast <- function(x, cast, udt)
 {
-    x <- .expand.array(x)
+    x <- x[,]
     for (i in seq_len(length(names(x)))) {
         if (x@.col.data_type[i] == "array") {
-            x@.expr[i] <- paste("(", x@.expr[i], ")::", cast, "[]",
-                                sep = "")
+            z <- .expand.array(x[,i])
+            x@.expr[i] <- paste("array[", paste("(", z@.expr, ")::",
+                                                cast, collapse = ", ",
+                                                sep = ""),
+                                "]", sep = "")
             x@.col.udt_name[i] <- paste("_", udt, sep = "")
         } else {
             x@.expr[i] <- paste("(", x@.expr[i], ")::", cast,
