@@ -107,3 +107,8 @@ S3method(as.data.frame, db.Rquery)
 S3method(as.environment, db.obj)
 S3method(with, db.obj)
 
+exportMethods("as.integer", "as.character", 
+              "as.logical", "as.numeric")
+
+export("as.double")
+
