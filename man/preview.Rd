@@ -1,4 +1,5 @@
 \name{preview}
+\alias{lk}
 \alias{lookat}
 \alias{preview}
 \alias{preview,character-method}
@@ -14,9 +15,7 @@
   Read the actual data stored in a table of database.
 }
 \description{
-  These functions read the actual data from a database table or operation, returning a \code{\link{data.frame}} or other object as appropriate.
-  \code{lookat} is actually the same as \code{preview} with
-  \code{interactive} always being \code{FALSE}.
+  These functions read the actual data from a database table or operation, returning a \code{\link{data.frame}} or other object as appropriate. \code{lookat} and \code{lk} are actually the same as \code{preview} with \code{interactive} always being \code{FALSE}.
 }
 
 \usage{
@@ -33,6 +32,8 @@ array = TRUE)
 \S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE)
 
 lookat(x, nrows = 100, array = TRUE, conn.id = 1)
+
+lk(x, nrows = 100, array = TRUE, conn.id = 1)
 
 \method{as.data.frame}{db.table}(x, row.names = NULL, optional = FALSE,
      nrows = NULL, stringsAsFactors = default.stringsAsFactors(), array =

@@ -196,3 +196,10 @@ lookat <- function (x, nrows = 100, array = TRUE, conn.id = 1)
     if (is(x, "character")) return (preview(x, conn.id, nrows, array))
     preview(x, nrows, FALSE, array)
 }
+
+## ----------------------------------------------------------------------
+
+lk <- function (x, nrows = 100, array = TRUE, conn.id = 1)
+{
+    lookat(x, nrows, array, conn.id)
+}
