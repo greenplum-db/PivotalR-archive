@@ -7,7 +7,7 @@ coef.logregr.madlib <- coef.lm.madlib <- function(object, ...)
     for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             nams <- gsub(object$col.name[i], object$appear[i], nams)
-    setNames(object$coef, rows)
+    setNames(object$coef, nams)
 }
 
 
