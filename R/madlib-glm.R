@@ -92,7 +92,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
     if (db.str == "HAWQ") {
         tbl.output <- NULL
         sql <- paste("select (f).* from (select ", madlib,
-                     ".logregr('", tbl.source, "', '", params$dep.str,
+                     ".logregr('", tbl.source, "', '",
+                     gsub("'", "''", params$dep.str),
                      "', '", params$ind.str, "', ", max_iter,
                      ", '", method, "', ", tolerance, ") as f) s",
                      sep = "")
@@ -100,7 +101,8 @@ madlib.glm <- function (formula, data, family = "gaussian",
         tbl.output <- .unique.string()
         sql <- paste("select ", madlib, ".logregr_train('",
                      tbl.source, "', '", tbl.output, "', '",
-                     params$dep.str, "', '", params$ind.str, "', ",
+                     gsub("'", "''", params$dep.str),
+                     "', '", params$ind.str, "', ",
                      grp, ", ", max_iter, ", '", method, "', ",
                      tolerance, ")", sep = "")
     }

@@ -290,7 +290,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
     dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
-    dep.var <- .replace.with.quotes(dep.var, data@.col.name)
+    ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
+    tmp <- eval(parse(text = paste("with(data, ", dep.var, ")", sep = "")))
+    dep.var <- tmp@.expr
+    
     ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
 
     ## with or without intercept
