@@ -60,4 +60,4 @@ coef(fit)
 coef(fit[[1]])
 } }
 
-
+\keyword{utility}

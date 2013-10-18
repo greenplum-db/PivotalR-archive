@@ -79,5 +79,5 @@ col.types(z)
 }
 }
 
-\keyword{math}
-\keyword{stats}
+\keyword{utility}
+\keyword{data operation}
