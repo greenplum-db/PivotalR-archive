@@ -81,3 +81,20 @@ setMethod(
 {
     .attach.cast(x, "double precision", "float8")
 })
+
+## ----------------------------------------------------------------------
+
+col.types <- function(x)
+{
+    if (!is(x, "db.obj"))
+        stop("The argument must be a db.obj object!")
+
+    res <- x@.col.data_type
+    for (i in seq_len(length(res))) {
+        if (res[i] == "array") {
+            res[i] <- paste(res[i], "of", gsub("_", "",
+                                               x@.col.udt_name[i]))
+        }
+    }
+    res
+}

@@ -11,11 +11,12 @@
 \alias{as.double,db.obj-method}
 \alias{as.logical,db.obj-method}
 \alias{as.numeric,db.obj-method}
+\alias{col.types}
 
 \title{Cast columns of \code{db.obj} objects to other types}
 
 \description{
-  Coerce \code{\linkS4class{db.obj}} object columns into other types
+  Coerce \code{\linkS4class{db.obj}} object columns into other types. \code{col.types} displays the types of each column.
 }
 
 \usage{
@@ -28,6 +29,8 @@
 \S4method{as.logical}{db.obj}(x, ...)
 
 \S4method{as.numeric}{db.obj}(x, ...)
+
+col.types(x)
 }
 
 \arguments{
@@ -42,7 +45,9 @@
 }
 
 \value{
-    A \code{\linkS4class{db.Rquery}} object, which is a SQL query which combine all columns into an array.
+    A \code{\linkS4class{db.Rquery}} object, which is a SQL query which     combine all columns into an array.
+
+\code{col.types} returns a vector of characters, which are the column types of \code{x}.
 }
 
 \author{
@@ -67,6 +72,10 @@ lookat(z, 10)
 
 z <- as.integer(x[,2] == "M")
 lookat(z, 10)
+
+col.types(x)
+
+col.types(z)
 }
 }
 

@@ -112,3 +112,5 @@ exportMethods("as.integer", "as.character",
 
 export("as.double")
 
+export("lk", "col.types")
+
