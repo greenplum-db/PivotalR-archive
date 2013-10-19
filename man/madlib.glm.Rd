@@ -286,8 +286,10 @@ array.data <- db.data.frame("tbl_has_array_column")
 
 ## Fit to y using every element of x
 ## This does not work in R's lm, but works in madlib.lm
-fit <- madlib.lm(y < 10 ~ x, data = array.data)
-    }
+fit <- madlib.glm(y < 10 ~ x, data = array.data, family = "binomial")
+
+fit <- madlib.glm(y < 10 ~ x - x[1:2], data = array.data, family = "binomial")
+}
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

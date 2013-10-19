@@ -59,6 +59,12 @@ madlib.lm <- function (formula, data, na.action,
             grp <- paste("'", params$grp.str, "'", sep = "")
         else
             grp <- paste("'{", params$grp.str, "}'::text[]")
+    
+    tmp <- eval(parse(text = paste("with(data, ",
+                      params$origin.dep, ")", sep = "")))
+    if (tmp@.col.data_type %in% c("boolean", "text", "varchar"))
+        stop("The dependent variable type is not supported ",
+             "in linear regression!")
 
     ## construct SQL string
     tbl.source <- gsub("\"", "", content(data))

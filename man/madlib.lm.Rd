@@ -254,6 +254,12 @@ array.data <- db.data.frame("tbl_has_array_column")
 ## Fit to y using every element of x
 ## This does not work in R's lm, but works in madlib.lm
 fit <- madlib.lm(y ~ x, data = array.data)
+
+fit <- madlib.lm(y ~ x - x[1], data = array.data)
+
+fit <- madlib.lm(y ~ . - x[1:2], data = array.data)
+
+fit <- madlib.lm(as.integer(y < 10) ~ . - x[1:2], data = array.data)
 }
 }
 

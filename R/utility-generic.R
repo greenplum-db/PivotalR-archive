@@ -291,6 +291,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("as.factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
+    origin.dep <- dep.var
     tmp <- eval(parse(text = paste("with(data, ", dep.var, ")", sep = "")))
     dep.var <- tmp@.expr
     
@@ -304,10 +305,23 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     labels <- .is.array(labels, data)
 
-    labels <- .replace.with.quotes(labels, data@.col.name)
+    a <- eval(parse(text = paste("with(data, c(",
+                    paste(.strip(labels, "`"), collapse = ", "), "))",
+                    sep = "")))
+    a.labels <- unlist(sapply(a, function(x) x@.expr))
+    b <- eval(parse(text = paste("with(data, c(",
+                    paste(.strip(setdiff(rownames(f.factors),
+                                         colnames(f.factors)), "`"),
+                          collapse = ", "), "))", sep = "")))
+    b.labels <- unlist(sapply(b, function(x) x@.expr))
+
+    labels <- setdiff(a.labels, b.labels)    
+    
+    ## labels <- .replace.with.quotes(labels, data@.col.name)
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0)
-        labels <- setdiff(labels, f2.labels)
+        labels <- setdiff(labels, .strip(f2.labels, "`"))
+    
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
@@ -327,7 +341,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     labels <- gsub("`", "", labels)
     ##
     
-    list(dep.str = dep.var, ind.str = ind.var, grp.str = grp,
+    list(dep.str = dep.var, origin.dep = origin.dep,
+         ind.str = ind.var, grp.str = grp,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data,
