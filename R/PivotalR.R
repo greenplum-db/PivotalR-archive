@@ -27,7 +27,7 @@ PivotalR <- function ()
     ## gui folder installation path
     gui.dir <- paste(.localVars$pkg.path, "/gui", sep = "")
 
-    message("\nWelcome to PivotalR GUI. It is free ...\n")
+    message("\nWelcome to PivotalR GUI. It is free and a beta version ...\n")
     message("Press Ctrl + c to stop.")
     shiny::runApp(gui.dir)
 }
