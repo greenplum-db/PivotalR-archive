@@ -10,19 +10,14 @@ setMethod(
     "unique",
     signature(x = "db.obj"),
     function (x, incomparables = FALSE, ...) {
-        res <- .aggregate(x, "array_agg", TRUE, NULL, FALSE, "array",
-                          paste("_", x@.col.udt_name, sep = ""),
-                          inside = "distinct ")
-        
-        if (length(names(x)) == 1 && x@.col.data_type == "array") {
-            expr <- paste("distinct ", x@.expr, sep = "")
-            res@.expr <- expr
-            res@.col.udt_name <- gsub("^_", "", res@.col.udt_name)
-            res@.content <- gsub("^select (.*) as", paste("select ",
-                                                          expr, " as",
-                                                          sep = ""),
-                                 res@.content)
-        }        
+        if (length(names(x)) != 1)
+            stop("unique can only work on objects with only one column!")
 
+        res <- x
+        res@.expr <- paste("distinct ", x@.expr, sep = "")
+        res@.content <- gsub("^select\\s+[^\\s]*\\s+as", paste("select ",
+                                                               res@.expr,
+                                                               " as", sep = ""),
+                             x@.content)
         return (res)
     })

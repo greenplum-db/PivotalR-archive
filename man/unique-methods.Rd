@@ -4,11 +4,9 @@
 
 \title{The Unique of an object}
 \description{
-    This function gives the unique valuesof a \code{db.obj}, which are
-    the column 
-    unique of a \code{db.table} or \code{db.view}. The unique values are
-    returned as arrays in one row. But for a column of array values, the
-    unique values are returned as multiple rows. 
+    This function gives the unique values of a \code{db.obj}, which are
+    the column
+    unique of a \code{db.table} or \code{db.view}. 
 }
 
 \usage{
@@ -17,7 +15,7 @@
 
 \arguments{
     \item{x}{
-        A \code{db.obj} object, which the column unique are required.
+        A \code{db.obj} object, which the column unique are to be computed. The object has to have only one column otherwise an error will be raised.
       }
 
       \item{incomparables}{
@@ -30,12 +28,7 @@
 }
 
 \value{
-    An \code{\linkS4class{db.Rquery}} with the arrays of the column
-    unique values. Each 
-    column will have one array which contains all the distinct values of
-    that column. However, if the column under consideration is already
-    an array column, then multiple rows will be returned and each row
-    contains one distinct value of the array.
+    An \code{\linkS4class{db.Rquery}}, whose column is the unique value of the column.
 }
 
 \note{This function applies only onto \code{\linkS4class{db.obj}} with
