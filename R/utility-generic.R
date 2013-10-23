@@ -285,6 +285,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     labels <- gsub(":", "*", f.labels, perl = T) # replace interaction : with *
     labels <- gsub("I\\((.*)\\)", "\\1", labels, perl = T) # remove I()
 
+    vdata <- .expand.array(data)
+    
     ## dependent variable
     ## factor does not play a role in dependent variable
     dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
@@ -292,7 +294,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
     origin.dep <- dep.var
-    tmp <- eval(parse(text = paste("with(data, ", dep.var, ")", sep = "")))
+    tmp <- eval(parse(text = paste("with(vdata, ", dep.var, ")", sep = "")))
     dep.var <- tmp@.expr
     
     ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
@@ -305,17 +307,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     labels <- .is.array(labels, data)
 
-    a <- eval(parse(text = paste("with(data, c(",
-                    paste(.strip(labels, "`"), collapse = ", "), "))",
+    a <- eval(parse(text = paste("with(vdata, c(",
+                    paste(labels, collapse = ", "), "))",
                     sep = "")))
     a.labels <- unlist(sapply(a, function(x) x@.expr))
-    b <- eval(parse(text = paste("with(data, c(",
-                    paste(.strip(setdiff(rownames(f.factors),
-                                         colnames(f.factors)), "`"),
+    b <- eval(parse(text = paste("with(vdata, c(",
+                    paste(setdiff(rownames(f.factors),
+                                  colnames(f.factors)),
                           collapse = ", "), "))", sep = "")))
     b.labels <- unlist(sapply(b, function(x) x@.expr))
 
-    labels <- setdiff(a.labels, b.labels)    
+    labels <- .strip(setdiff(a.labels, b.labels), "`")
     
     ## labels <- .replace.with.quotes(labels, data@.col.name)
     ## remove grouping columns, when there is no intercept term

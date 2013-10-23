@@ -106,7 +106,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
                      grp, ", ", max_iter, ", '", method, "', ",
                      tolerance, ")", sep = "")
     }
-
+    
     ## execute the logistic regression and get the result
     res <- .get.res(sql, tbl.output, conn.id)
 
