@@ -7,7 +7,7 @@ setGeneric (
     "preview",
     def = function (x, ..., drop=TRUE) {
         res <- standardGeneric("preview")
-        if (drop)
+        if (drop && ncol(res) == 1)
             return (res[, , drop=drop])
         res
     },
