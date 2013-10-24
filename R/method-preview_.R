@@ -5,10 +5,10 @@
 
 setGeneric (
     "preview",
-    def = function (x, ...) {
+    def = function (x, ..., drop=TRUE) {
         res <- standardGeneric("preview")
-        if (any(dim(res) == 1))
-            return (res[,,drop=TRUE])
+        if (drop)
+            return (res[, , drop=drop])
         res
     },
     signature = "x")
@@ -189,17 +189,12 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## same as preview
-lookat <- function (x, nrows = 100, array = TRUE, conn.id = 1)
+## lk is shorthand for lookat
+lk <- lookat <- function (x, nrows = 100, array = TRUE, conn.id = 1, drop=TRUE)
 {
-    if (is(x, "db.table")) return (preview(x, nrows, array = array))
-    if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE))
-    if (is(x, "character")) return (preview(x, conn.id, nrows, array))
-    preview(x, nrows, FALSE, array)
+    if (is(x, "db.table")) return (preview(x, nrows, array = array, drop=drop))
+    if (is(x, "db.Rcrossprod")) return (preview(x, nrows, FALSE, drop=drop))
+    if (is(x, "character")) return (preview(x, conn.id, nrows, array, drop=drop))
+    preview(x, nrows, FALSE, array, drop=drop)
 }
 
-## ----------------------------------------------------------------------
-
-lk <- function (x, nrows = 100, array = TRUE, conn.id = 1)
-{
-    lookat(x, nrows, array, conn.id)
-}

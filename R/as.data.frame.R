@@ -5,8 +5,8 @@ as.data.frame.db.table <-
         stringsAsFactors=default.stringsAsFactors(),
         array=TRUE, ...)
 {
-    df <- lookat(x, nrows=nrows, array=array)
-    if (stringsAsFactors && any(sapply(df, is.character)))
+    df <- lookat(x, nrows=nrows, array=array, drop=FALSE)
+    if (is.data.frame(df) && stringsAsFactors && any(sapply(df, is.character)))
         df[] <- lapply(df, function(x) if(is.character(x)) factor(x) else x)
     df
 }
