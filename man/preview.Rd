@@ -38,8 +38,8 @@ lookat(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
 \method{as.data.frame}{db.table}(x, row.names = NULL, optional = FALSE,
-     nrows = NULL, stringsAsFactors = default.stringsAsFactors(), array =
-     TRUE, ...)
+     nrows = NULL, stringsAsFactors = default.stringsAsFactors(), array
+     = TRUE, ...)
 
 \method{as.data.frame}{db.view}(x,row.names=NULL, optional=FALSE, nrows
     = NULL, stringsAsFactors = default.stringsAsFactors(), array = TRUE,
