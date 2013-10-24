@@ -19,6 +19,8 @@
 }
 
 \usage{
+preview(x, ..., drop = TRUE)
+
 \S4method{preview}{db.table}(x, nrows = 100, array = TRUE)
 
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE,
@@ -31,9 +33,9 @@ array = TRUE)
 
 \S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE)
 
-lookat(x, nrows = 100, array = TRUE, conn.id = 1)
+lookat(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
-lk(x, nrows = 100, array = TRUE, conn.id = 1)
+lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
 \method{as.data.frame}{db.table}(x, row.names = NULL, optional = FALSE,
      nrows = NULL, stringsAsFactors = default.stringsAsFactors(), array =
@@ -87,6 +89,8 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1)
   \item{stringsAsFactors}{
     Logical, whether character variables should be converted to factors.
   }
+  \item{drop}{Whether to coerce single-column tables to a vector of the
+    appropriate class.}
   \item{row.names,optional,...}{
     For compatibility with the \code{as.data.frame} generic; not used.
   }
@@ -108,14 +112,14 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   matrices in \code{x}, a list is returned and each element of the list
   is a matrix.
 
-  The \code{as.data.frame} method calls \code{lookat} with \code{nrows = NULL} to perform the conversion to a data frame.
+  The \code{as.data.frame} method calls \code{lookat} with \code{nrows = NULL} to perform the conversion to a data frame. In this case \code{drop} is set to \code{FALSE}, ie the result will always be a data frame.
 }
 
 \value{
   For \code{db.data.frame} and \code{db.Rquery} objects, a data frame. Each column in the table becomes a column
   of the returned \code{data.frame}. A column of arrays is converted into
   a column of strings, see \code{\link{arraydb.to.arrayr}} for more
-  details. 
+  details. Single-column tables created with \code{preview}, \code{lookat} or \code{lk} will be coerced to a vector if \code{drop == TRUE}.
   
   For \code{db.Rcrossprod} objects, a matrix or list of matrix objects as appropriate (see above).
 }
