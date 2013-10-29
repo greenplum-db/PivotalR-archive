@@ -14,8 +14,8 @@ madlib.lm <- function (formula, data, na.action,
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
-        stop("madlib.lm cannot be used on the object ",
-             deparse(substitute(data)))
+        stop("madlib.lm can only be used on a db.obj object, and ",
+             deparse(substitute(data)), " is not!")
 
     origin.data <- data
     
