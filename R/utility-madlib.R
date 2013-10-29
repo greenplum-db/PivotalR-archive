@@ -188,5 +188,5 @@ clean.madlib.temp <- function(conn.id = 1)
                                          collapse = " "),
                                    ", env)", sep = "")))
     }
-    gsub("\\s+", " ", paste(deparse(res), collapse = ""))
+    gsub("\\s+", " ", paste(deparse(res), collapse = " "))
 }
