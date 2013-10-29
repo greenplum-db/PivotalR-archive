@@ -75,11 +75,16 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     rst$loglik <- res$log_likelihood
     rst$standardize <- res$standardize
     rst$iter <- res$iteration_run
+    rst$ind.str <- params$ind.str
     rst$dummy <- data@.dummy
     rst$dummy.expr <- data@.dummy.expr
     rst$terms <- params$terms
     rst$model <- model
     rst$call <- call
+    rst$alpha <- alpha
+    rst$lambda <- lambda
+    rst$method <- method
+    rst$family <- family
     class(rst) <- "glmnet.madlib"
     rst
 }
@@ -137,4 +142,114 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     list(control.str = paste(names(control), " = ", as.character(control),
          sep = "", collapse = ", "), max.iter = max.iter,
          tolerance = tolerance)
+}
+
+## ----------------------------------------------------------------------
+
+summary.glmnet.madlib <- function (object, ...) object
+
+## ----------------------------------------------------------------------
+
+print.glmnet.madlib <- function (x,
+                                 digits = max(3L, getOption("digits") - 3L),
+                                 ...)
+{
+    cat("\nMADlib Elastic-net Regression Result\n")
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
+        "\n", sep = "")
+    print(x$coef)
+    print(x$intercept)
+    if (x$standardize) std.str <- ""
+    else std.str <- "not"
+    cat("The independent variables are ", std.str, " standardized.\n")
+    cat("The log-likelihood is ", x$loglik)
+    cat("The computation is done in ", x$iter, " iterations.")
+}
+
+## ----------------------------------------------------------------------
+
+predict.glmnet.madlib <- function (object, newdata, type = "default",
+                                   ...)
+{
+    if (!is(newdata, "db.obj"))
+        stop("New data for prediction must be a db.obj!")
+
+    if (!is.character(type) ||
+        !tolower(type) %in% c("default", "response"))
+        stop("type must be \"default\" or \"response\"!")
+    type <- tolower(type)
+    
+    madlib <- schema.madlib(conn.id) # MADlib schema name
+    if (is(newdata, "db.data.frame")) {
+        tbl <- content(newdata)
+        src <- tbl
+        parent <- src
+        where <- ""
+        where.str <- ""
+        sort <- list(by = "", order = "", str = "")
+    } else {
+        if (newdata@.source == newdata@.parent)
+            tbl <- newdata@.parent
+        else
+            tbl <- paste("(", newdata@.parent, ") s", sep = "")
+        src <- newdata@.source
+        parent <- newdata@.parent
+        where <- newdata@.where
+        if (where != "") where.str <- paste(" where", where)
+        else where.str <- ""
+        sort <- newdata@.sort
+    }
+
+    if (!is(newdata, "db.data.frame"))
+        ind.str <- .replace.col.with.expr(object$ind.str,
+                                          names(newdata),
+                                          newdata@.expr)
+    else
+        ind.str <- object$ind.str
+
+    if (object$family == "gaussian") {
+        expr <- paste(madlib, ".elastic_net_gaussian_predict(",
+                     "(select coef_all from ", object$model, "), ",
+                     object$intercept, ", ", ind.str, ")")
+    }
+
+    if (object$family == "binomial") {
+        if (type == "default")
+            expr <- paste(madlib, ".elastic_net_binomial_predict(",
+                          "(select coef_all from ", object$model, "), ",
+                          object$intercept, ", ", ind.str, ")")
+        else
+            expr <- paste(madlib, ".elastic_net_binomial_prob(",
+                          "(select coef_all from ", object$model, "), ",
+                          object$intercept, ", ", ind.str, ")")
+    }
+
+    sql <- paste("select ", expr, " as madlib_predict from ",
+                 tbl, where.str, sort$str, sep = "")
+
+    if (length(object$dummy) != 0) {
+        for (i in seq_len(length(object$dummy))) {
+            sql <- gsub(paste("(\"", object$dummy[i], "\"|",
+                              object$dummy[i], ")", sep = ""),
+                        object$dummy.expr[i], sql)
+            expr <- gsub(paste("(\"", object$dummy[i], "\"|",
+                               object$dummy[i], ")", sep = ""),
+                         object$dummy.expr[i], expr)
+        }
+    }
+    
+    new("db.Rquery",
+        .content = sql,
+        .expr = expr,
+        .source = src,
+        .parent = parent,
+        .conn.id = conn.id(newdata),
+        .col.name = "madlib_predict",
+        .key = character(0),
+        .col.data_type = data.type,
+        .col.udt_name = udt.name,
+        .where = where,
+        .is.factor = FALSE,
+        .factor.suffix = "",
+        .sort = sort)
 }

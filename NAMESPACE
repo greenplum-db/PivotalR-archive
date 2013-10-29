@@ -118,3 +118,7 @@ exportMethods("as.integer", "as.character",
 export("as.double")
 
 export("lk", "col.types")
+
+export("madlib.glmnet", "summary.glmnet.madlib",
+       "print.glmnet.madlib", "delete.glmnet.madlib",
+       "predict.glmnet.madlib")

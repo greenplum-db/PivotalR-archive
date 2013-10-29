@@ -217,6 +217,16 @@ setMethod (
         list(res = all(unlist(res)), conn.id = conn.id)
     })
 
+## ----------------------------------------------------------------------
+
+setMethod (
+    "delete",
+    signature (x = "glmnet.madlib"),
+    def = function (x) {
+        conn.id <- conn.id(x$model)
+        d1 <- delete(x$model)
+        list(res = d1, conn.id = conn.id)
+    })
 
 
 
