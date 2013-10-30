@@ -120,5 +120,4 @@ export("as.double")
 export("lk", "col.types")
 
 export("madlib.glmnet", "summary.glmnet.madlib",
-       "print.glmnet.madlib", "delete.glmnet.madlib",
-       "predict.glmnet.madlib")
+       "print.glmnet.madlib", "predict.glmnet.madlib")

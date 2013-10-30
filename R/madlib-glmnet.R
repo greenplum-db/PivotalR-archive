@@ -36,13 +36,15 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     
     tmp <- eval(parse(text = paste("with(data, ",
                       params$origin.dep, ")", sep = "")))
-    if (tmp@.col.data_type %in% c("boolean", "text", "varchar"))
+    if (family == "gaussian" &&
+        tmp@.col.data_type %in% c("boolean", "text", "varchar"))
         stop("The dependent variable type is not supported ",
              "in this function!")
 
     tbl.source <- gsub("\"", "", content(data))
     madlib <- schema.madlib(conn.id) # MADlib schema name
 
+    params$ind.str <- gsub("\\[1,", "\\[", params$ind.str)
     tbl.output <- .unique.string()
     sql <- paste("select ", madlib, ".elastic_net_train('", tbl.source,
                  "', '", tbl.output, "', '", params$dep.str, "', '",
@@ -59,7 +61,7 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
 
     ## prepare the result
     rst <- list()
-    rst$coef <- res$coef_all
+    rst$coef <- as.vector(arraydb.to.arrayr(res$coef_all, "double"))
     
     rows <- gsub("\"", "", params$ind.vars)
     rst$ind.vars <- rows
@@ -68,7 +70,7 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     for (i in seq_len(length(col.name))) 
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-
+    
     names(rst$coef) <- rows
     rst$intercept <- res$intercept
     names(rst$intercept) <- "(Intercept)"
@@ -138,9 +140,11 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
         tolerance <- control$tolerance
         control$tolerance <- NULL
     }
-    
-    list(control.str = paste(names(control), " = ", as.character(control),
-         sep = "", collapse = ", "), max.iter = max.iter,
+
+    list(control.str = if (is.null(names(control)) ||
+         identical(names(control), character(0))) ""
+    else paste(names(control), " = ", as.character(control),
+               sep = "", collapse = ", "), max.iter = max.iter,
          tolerance = tolerance)
 }
 
@@ -157,13 +161,15 @@ print.glmnet.madlib <- function (x,
     cat("\nMADlib Elastic-net Regression Result\n")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
+    cat("\nCoefficients:\n")
     print(x$coef)
+    cat("\n")
     print(x$intercept)
     if (x$standardize) std.str <- ""
-    else std.str <- "not"
-    cat("The independent variables are ", std.str, " standardized.\n")
+    else std.str <- " not"
+    cat("\nThe independent variables are", std.str, " standardized.\n")
     cat("The log-likelihood is ", x$loglik)
-    cat("The computation is done in ", x$iter, " iterations.")
+    cat("The computation is done in ", x$iter, " iterations.\n")
 }
 
 ## ----------------------------------------------------------------------
@@ -179,6 +185,7 @@ predict.glmnet.madlib <- function (object, newdata, type = "default",
         stop("type must be \"default\" or \"response\"!")
     type <- tolower(type)
     
+    conn.id <- conn.id(newdata)
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (is(newdata, "db.data.frame")) {
         tbl <- content(newdata)
@@ -209,19 +216,28 @@ predict.glmnet.madlib <- function (object, newdata, type = "default",
 
     if (object$family == "gaussian") {
         expr <- paste(madlib, ".elastic_net_gaussian_predict(",
-                     "(select coef_all from ", object$model, "), ",
+                     "(select coef_all from ", content(object$model), "), ",
                      object$intercept, ", ", ind.str, ")")
+        data.type <- "double precision"
+        udt.name <- "float8"
     }
 
     if (object$family == "binomial") {
-        if (type == "default")
+        if (type == "default") {
             expr <- paste(madlib, ".elastic_net_binomial_predict(",
-                          "(select coef_all from ", object$model, "), ",
+                          "(select coef_all from ", content(object$model),
+                          "), ",
                           object$intercept, ", ", ind.str, ")")
-        else
+            data.type <- "boolean"
+            udt.name <- "bool"
+        } else {
             expr <- paste(madlib, ".elastic_net_binomial_prob(",
-                          "(select coef_all from ", object$model, "), ",
+                          "(select coef_all from ", content(object$model),
+                          "), ",
                           object$intercept, ", ", ind.str, ")")
+            data.type <- "double precision"
+            udt.name <- "float8"
+        }
     }
 
     sql <- paste("select ", expr, " as madlib_predict from ",
