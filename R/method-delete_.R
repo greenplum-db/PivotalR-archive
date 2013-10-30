@@ -221,7 +221,7 @@ setMethod (
 
 setMethod (
     "delete",
-    signature (x = "elasnet.madlib"),
+    signature (x = "elnet.madlib"),
     def = function (x) {
         conn.id <- conn.id(x$model)
         d1 <- delete(x$model)
