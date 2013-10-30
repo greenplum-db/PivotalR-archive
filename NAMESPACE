@@ -119,5 +119,5 @@ export("as.double")
 
 export("lk", "col.types")
 
-export("madlib.glmnet", "summary.glmnet.madlib",
-       "print.glmnet.madlib", "predict.glmnet.madlib")
+export("madlib.elasnet", "summary.elasnet.madlib",
+       "print.elasnet.madlib", "predict.elasnet.madlib")

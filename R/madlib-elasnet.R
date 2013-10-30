@@ -3,9 +3,9 @@
 ## Wrapper function for MADlib's elastic_net function
 ## ----------------------------------------------------------------------
 
-setClass("glmnet.madlib")
+setClass("elasnet.madlib")
 
-madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
+madlib.elasnet <- function (formula, data, family = "gaussian", na.action,
                            alpha = 1, lambda = 0.1, standardize = TRUE,
                            method = "fista", control = list(), ...)
 {
@@ -15,7 +15,7 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     call <- match.call()
 
     if (!is(data, "db.obj"))
-        stop("madlib.glmnet can only be used on a db.obj object, and ",
+        stop("madlib.elasnet can only be used on a db.obj object, and ",
              deparse(substitute(data)), " is not!")
     origin.data <- data
     .check.madlib.version(data)
@@ -87,7 +87,7 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
     rst$lambda <- lambda
     rst$method <- method
     rst$family <- family
-    class(rst) <- "glmnet.madlib"
+    class(rst) <- "elasnet.madlib"
     rst
 }
 
@@ -150,11 +150,11 @@ madlib.glmnet <- function (formula, data, family = "gaussian", na.action,
 
 ## ----------------------------------------------------------------------
 
-summary.glmnet.madlib <- function (object, ...) object
+summary.elasnet.madlib <- function (object, ...) object
 
 ## ----------------------------------------------------------------------
 
-print.glmnet.madlib <- function (x,
+print.elasnet.madlib <- function (x,
                                  digits = max(3L, getOption("digits") - 3L),
                                  ...)
 {
@@ -174,7 +174,7 @@ print.glmnet.madlib <- function (x,
 
 ## ----------------------------------------------------------------------
 
-predict.glmnet.madlib <- function (object, newdata, type = "default",
+predict.elasnet.madlib <- function (object, newdata, type = "default",
                                    ...)
 {
     if (!is(newdata, "db.obj"))
