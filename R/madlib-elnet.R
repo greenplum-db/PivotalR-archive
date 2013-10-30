@@ -70,8 +70,9 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
     for (i in seq_len(length(col.name))) 
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    
+    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     names(rst$coef) <- rows
+    
     rst$intercept <- res$intercept
     names(rst$intercept) <- "(Intercept)"
     rst$loglik <- res$log_likelihood
@@ -141,9 +142,24 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
         control$tolerance <- NULL
     }
 
-    list(control.str = if (is.null(names(control)) ||
-         identical(names(control), character(0))) ""
-    else paste(names(control), " = ", as.character(control),
+    nms <- names(control)
+    for (i in seq_len(length(names(control)))) {
+        if (nms[i] %in% c("warmup", "use_active_set", "random_stepsize")) {
+            if (is.logical(control[[i]]))
+                control[[i]] <- if (control[[i]]) "t" else "f"
+            else
+                stop("The parameters warmup, use.active.set and random.stepsize ",
+                     "must use TRUE/FALSE!")
+        } else if (nms[i] == "warmup_lambdas") {
+            control[[i]] <- paste("[", paste(control[[i]], collapse = ", "),
+                                  "]", sep = "")
+        }
+        
+    }
+
+    list(control.str = if (is.null(nms) ||
+         identical(nms, character(0))) ""
+    else paste(nms, " = ", as.character(control),
                sep = "", collapse = ", "), max.iter = max.iter,
          tolerance = tolerance)
 }
@@ -162,14 +178,15 @@ print.elnet.madlib <- function (x,
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
     cat("\nCoefficients:\n")
-    print(x$coef)
+    print(format(x$coef, digits = digits), quote = FALSE)
     cat("\n")
-    print(x$intercept)
+    print(format(x$intercept, digits = digits), quote = FALSE)
     if (x$standardize) std.str <- ""
     else std.str <- " not"
-    cat("\nThe independent variables are", std.str, " standardized.\n")
-    cat("The log-likelihood is ", x$loglik)
-    cat("The computation is done in ", x$iter, " iterations.\n")
+    cat("\nThe independent variables are", std.str,
+        " standardized.\n", sep = "")
+    cat("The log-likelihood is", format(x$loglik, digits = digits))
+    cat("\nThe computation is done in", x$iter, "iterations.\n\n")
 }
 
 ## ----------------------------------------------------------------------
