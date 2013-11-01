@@ -89,16 +89,16 @@ setMethod (
         col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
-                             cmp, e2[count %% l + 1], sep = "")
+                             cmp, "(", e2[count %% l + 1], ")", sep = "")
             count <- count + 1
         } else if (e1@.col.data_type[i] == "array") {
             tmp <- .get.array.elements(e1@.expr[i], tbl, where.str,
                                        conn.id(e1))
             tn <- length(tmp)
             expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
-                                             cmp,
+                                             cmp, "(",
                                              e2[(count + seq(tn) - 1) %% l + 1],
-                                             sep = "",
+                                             ")", sep = "",
                                              collapse = ", "), "]",
                              sep = "")
             count <- count + tn

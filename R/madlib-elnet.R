@@ -6,8 +6,9 @@
 setClass("elnet.madlib")
 
 madlib.elnet <- function (formula, data, family = "gaussian", na.action,
-                           alpha = 1, lambda = 0.1, standardize = TRUE,
-                           method = "fista", control = list(), ...)
+                          alpha = 1, lambda = 0.1, standardize = TRUE,
+                          method = "fista", control = list(),
+                          glmnet = FALSE, ...)
 {
     control <- .validate.method(method, control)
     method <- tolower(method)
@@ -46,8 +47,23 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
 
     params$ind.str <- gsub("\\[1,", "\\[", params$ind.str)
     tbl.output <- .unique.string()
+
+    if (glmnet && family == "gaussian") {
+        y <- scale(eval(parse(text = paste("with(data, ",
+                              deparse(params$terms[[2]]), ")",
+                              sep = ""))), center = TRUE, scale = TRUE)
+        y.ctr <- attr(y, "scaled:center")
+        n <- nrow(data)
+        y.scl <- attr(y, "scaled:scale") * sqrt((n-1)/n)
+        lambda <- lambda / y.scl
+        y <- y / sqrt((n-1)/n)
+        dep <- y@.expr
+    } else {
+        dep <- params$dep.str
+    }
+    
     sql <- paste("select ", madlib, ".elastic_net_train('", tbl.source,
-                 "', '", tbl.output, "', '", params$dep.str, "', '",
+                 "', '", tbl.output, "', '", dep, "', '",
                  params$ind.str, "', '", family, "', ", alpha, ", ", lambda,
                  ", ", standardize, ", NULL, '", method, "', '",
                  control$control.str, "', NULL, ", control$max.iter, ", ",
@@ -75,6 +91,15 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
     
     rst$intercept <- res$intercept
     names(rst$intercept) <- "(Intercept)"
+
+    rst$glmnet <- glmnet
+    if (glmnet && family == "gaussian") {
+        rst$intercept <- rst$intercept * y.scl + y.ctr
+        rst$coef <- rst$coef * y.scl
+        rst$y.scl <- y.scl
+    } else
+        rst$y.scl <- 1
+    
     rst$loglik <- res$log_likelihood
     rst$standardize <- res$standardize
     rst$iter <- res$iteration_run
@@ -132,7 +157,7 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
 
     ## max_iter and tolerance are not in SQL's optimizer_params
     max.iter <- 10000
-    tolerance <- 1e-6
+    tolerance <- 1e-4
     if ("max_iter" %in% names(control)) {
         max.iter <- control$max_iter
         control$max_iter <- NULL
@@ -233,8 +258,10 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
 
     if (object$family == "gaussian") {
         expr <- paste(madlib, ".elastic_net_gaussian_predict(",
-                     "(select coef_all from ", content(object$model), "), ",
-                     object$intercept, ", ", ind.str, ")")
+                     "(select ", madlib, ".array_scalar_mult(coef_all,",
+                      object$y.scl, "::double precision) from ",
+                      content(object$model),
+                      "), ", object$intercept, ", ", ind.str, ")", sep = "")
         data.type <- "double precision"
         udt.name <- "float8"
     }
@@ -242,16 +269,18 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
     if (object$family == "binomial") {
         if (type == "default") {
             expr <- paste(madlib, ".elastic_net_binomial_predict(",
-                          "(select coef_all from ", content(object$model),
-                          "), ",
-                          object$intercept, ", ", ind.str, ")")
+                          "(select ", madlib, ".array_scalar_mult(coef_all,",
+                          object$y.scl, "::double precision) from ",
+                          content(object$model), "), ", object$intercept,
+                          ", ", ind.str, ")", sep = "")
             data.type <- "boolean"
             udt.name <- "bool"
         } else {
             expr <- paste(madlib, ".elastic_net_binomial_prob(",
-                          "(select coef_all from ", content(object$model),
-                          "), ",
-                          object$intercept, ", ", ind.str, ")")
+                          "(select ", madlib, ".array_scalar_mult(coef_all,",
+                          object$y.scl, "::double precision) from ",
+                          content(object$model), "), ", object$intercept,
+                          ", ", ind.str, ")", sep = "")
             data.type <- "double precision"
             udt.name <- "float8"
         }
