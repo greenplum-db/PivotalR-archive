@@ -132,3 +132,12 @@ is.db.data.frame <- function (x)
         regmatches(x, m, invert)
     }    
 }
+
+## ----------------------------------------------------------------------
+
+.format <- function(str, lst)
+{
+    for (item in names(lst))
+        str <- gsub(paste("\\{", item, "}", sep = ""), lst[[item]], str)
+    str
+}

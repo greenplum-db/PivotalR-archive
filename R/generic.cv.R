@@ -4,7 +4,7 @@
 ## -----------------------------------------------------------------------
 
 generic.cv <- function (train, predict, metric, data,
-                        params = NULL, k = 10)
+                        params = NULL, k = 10, approx.cut = TRUE)
 {
     if (!is(data, "db.obj"))
         stop("data must be a db.obj!")
@@ -13,8 +13,11 @@ generic.cv <- function (train, predict, metric, data,
 
     conn.id <- conn.id(data)
     warnings <- .suppress.warnings(conn.id)
-    
-    cuts <- .cut.data(data, k)
+
+    if (approx.cut)
+        cuts <- .approx.cut.data(data, k)
+    else
+        cuts <- .cut.data(data, k)
     for (i in 1:k) {
         cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
                                           FALSE, FALSE, TRUE, FALSE, NULL,
@@ -106,4 +109,33 @@ generic.cv <- function (train, predict, metric, data,
     for (i in 1:(dim(dat)[2]))
         std[i] <- sd(dat[,i])
     std
+}
+
+## ----------------------------------------------------------------------
+
+## cut the data in an approximate way, but faster
+.approx.cut.data <- function (x, k)
+{
+    size <- 100
+    pieces <- k * size
+    conn.id <- conn.id(x)
+    tmp <- .unique.string()
+    id.col <- .unique.string()
+    .db.getQuery(
+        .format("create temp table {tmp} as
+                     select *,
+                         trunc(random()*{pieces}+1) as {id.col}
+                     from ({tbl}) s", list(tmp=tmp, pieces=pieces,
+                                           id.col=id.col,
+                                           tbl=content(x[,]))),
+        conn.id = conn.id)
+    y <- db.data.frame(tmp, conn.id = conn.id)
+    tick <- c(0, seq(size, length.out = k-1, by = size), n)
+    valid <- list()
+    train <- list()
+    for (i in 1:k) {
+        valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
+        train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
+    }
+    list(train = train, valid = valid, inter = y)
 }
