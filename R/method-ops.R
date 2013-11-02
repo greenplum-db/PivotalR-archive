@@ -713,6 +713,14 @@ setMethod (
     "+",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 + e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 + e2)
+        }
         .operate.two(e1, e2, " + ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
@@ -725,6 +733,14 @@ setMethod (
     "-",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 - e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 - e2)
+        }
         .operate.two(e1, e2, " - ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
@@ -737,6 +753,14 @@ setMethod (
     "*",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 * e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 * e2)
+        }
         .operate.two(e1, e2, " * ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
@@ -749,6 +773,14 @@ setMethod (
     "/",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 / e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 / e2)
+        }        
         .operate.two(e1, e2, " / ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
@@ -761,6 +793,14 @@ setMethod (
     "^",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1^e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1^e2)
+        }
         .operate.two(e1, e2, " ^ ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
@@ -773,6 +813,14 @@ setMethod (
     "%%",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 %% e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 %% e2)
+        }
         .operate.two(e1, e2, " % ", list(.num.types),
                      res.type = "double precision",
                      cast = "::integer",
@@ -786,6 +834,14 @@ setMethod (
     "%/%",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 %/% e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 %/% e2)
+        }
         .operate.two(e1, e2, " / ", list(.int.types),
                      res.type = "integer",
                      cast = "::integer",
@@ -799,6 +855,14 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 > e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 > e2)
+        }
         .operate.two(e1, e2, " > ", list(.num.types, .txt.types),
                      res.type = "boolean", cast = "")
     },
@@ -810,6 +874,14 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 < e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 < e2)
+        }
         .operate.two(e1, e2, " < ", list(.num.types, .txt.types),
                      res.type = "boolean", cast = "")
     },
@@ -821,6 +893,14 @@ setMethod (
     ">=",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 >= e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 >= e2)
+        }
         .operate.two(e1, e2, " >= ", list(.num.types, .txt.types),
                      res.type = "boolean", cast = "")
     },
@@ -832,6 +912,14 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 <= e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 <= e2)
+        }
         .operate.two(e1, e2, " <= ", list(.num.types, .txt.types),
                      res.type = "boolean", cast = "")
     },
@@ -843,6 +931,14 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 == e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 == e2)
+        }
         .operate.two(e1, e2, " = ", list(.num.types, .txt.types, "boolean"),
                      res.type = "boolean", cast = "")
     },
@@ -854,6 +950,14 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 != e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 != e2)
+        }
         .operate.two(e1, e2, " <> ", list(.num.types, .txt.types, "boolean"),
                      res.type = "boolean", cast = "")
     },
@@ -865,6 +969,14 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 & e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 & e2)
+        }
         .operate.two(e1, e2, " and ", list(c("boolean")),
                      res.type = "boolean", cast = "")
     },
@@ -876,6 +988,14 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "db.obj"),
     function (e1, e2) {
+        if (e2@.is.agg) {
+            e2 <- unlist(lk(e2))
+            return (e1 | e2)
+        }
+        if (e1@.is.agg) {
+            e1 <- unlist(lk(e1))
+            return (e1 | e2)
+        }
         .operate.two(e1, e2, " or ", list(c("boolean")),
                      res.type = "boolean", cast = "")
     },

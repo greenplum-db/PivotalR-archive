@@ -35,12 +35,17 @@
     
     l <- length(names(x))
     col.name <- paste(names(x), "_", func, sep = "")
-    if ((x[[1]])@.col.data_type != "array")
+    
+    if ((x[[1]])@.col.data_type != "array" && (length(names(x)) != 1 ||
+                x@.col.data_type != "array"))
         res <- .sub.aggregate(x[[1]], func, vector, input.types, allow.bool,
                               data.type[1], udt.name[1], inside)
-    else
-        res <- .apply.func.array(x[[1]], func, vector, input.types, allow.bool,
+    else {
+        if (length(names(x)) == 1) z <- x
+        else z <- x[[1]]
+        res <- .apply.func.array(z, func, vector, input.types, allow.bool,
                                  data.type[1], udt.name[1], inside)
+    }
     res@.col.name <- col.name[1]
     for (i in seq_len(l-1)+1) {
         if (x[[i]]@.col.data_type != "array")
