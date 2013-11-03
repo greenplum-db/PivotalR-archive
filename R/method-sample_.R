@@ -17,9 +17,20 @@ setMethod (
         warnings <- .suppress.warnings(conn.id(x))
 
         if (!replace) {
+            p <- (size + 14 + sqrt(196 + 28*size)) / n
             tmp <- .unique.string()
-            res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
-                                    FALSE, TRUE, FALSE, NULL, size)
+            conn.id <- conn.id(x)
+            ## res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
+                                    ## FALSE, TRUE, FALSE, NULL, size)
+            dist.str <- .get.distributed.by.str(conn.id, x@.dist.by)
+            .db.getQuery(
+                .format("create temp table <tmp> as
+                            select * from (<tbl>) s
+                            where random() < <p> order by random()
+                            limit <size>
+                        <dist.str>", list(tmp=tmp, tbl=content(x[,]),
+                                          p=p, size=size, dist.str=dist.str)))
+            res <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE)
             .restore.warnings(warnings)
             res
         } else {
