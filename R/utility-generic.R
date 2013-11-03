@@ -75,7 +75,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     dbms.str <- (.get.dbms.str(conn.id))$db.str
     if (dbms.str != "PostgreSQL") {
-        if (is.null(distributed.by))
+        if (is.null(distributed.by) ||
+            identical(distributed.by, character(0)))
             dist.str <- "DISTRIBUTED RANDOMLY"
         else {
             if (!.is.arg.string(distributed.by))

@@ -62,7 +62,8 @@ setClass("db.data.frame",
              .appear.name = "character",
              .dummy = "character",
              .dummy.expr = "character",
-             .is.factor = "logical"
+             .is.factor = "logical",
+             .dist.by = "character"
              )
          )
 
@@ -108,7 +109,8 @@ setClass("db.Rquery",
              .is.factor = "logical", # a boolean vector
              .factor.suffix = "character",
              .sort = "list", # order by
-             .is.agg = "logical" # is this an aggrgate?
+             .is.agg = "logical", # is this an aggrgate?
+             .dist.by = "character"
              ),
          prototype = list(.is.agg = FALSE)
          )

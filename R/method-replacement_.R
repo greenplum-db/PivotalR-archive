@@ -97,7 +97,8 @@
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
         .factor.suffix = factor.suffix,
-        .sort = sort)
+        .sort = sort,
+        .dist.by = x@.dist.by)
 }
 
 ## -----------------------------------------------------------------------
@@ -183,7 +184,8 @@
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
         .factor.suffix = factor.suffix,
-        .sort = sort)
+        .sort = sort,
+        .dist.by = x@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

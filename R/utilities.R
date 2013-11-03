@@ -29,21 +29,8 @@ is.db.data.frame <- function (x)
         valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
         train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
     }
-
-    dbms <- (.get.dbms.str(conn.id))$db.str
-    if (dbms != "PostgreSQL") {
-        dist.cols <- .get.dist.policy(y)
-        if (is.na(dist.cols)) {
-            dist.by <- NULL
-        } else {
-            dist.by <- paste(dist.cols, collapse = ", ")
-        }
-    } else {
-        dist.str <- ""
-        dist.by <- ""
-    }
     
-    list(train = train, valid = valid, inter = y, dist.by = dist.by)
+    list(train = train, valid = valid, inter = y, dist.by = y@.dist.by)
 }
 
 ## ----------------------------------------------------------------------

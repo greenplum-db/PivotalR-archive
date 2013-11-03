@@ -123,13 +123,13 @@ generic.cv <- function (train, predict, metric, data,
     id.col <- .unique.string()
     dbms <- (.get.dbms.str(conn.id))$db.str
     if (dbms != "PostgreSQL") {
-        dist.cols <- .get.dist.policy(x)
-        if (is.na(dist.cols)) {
+        dist.cols <- x@.dist.by
+        if (identical(dist.cols, character(0))) {
             dist.str <- paste("distributed by (", id.col, ")", sep = "")
             dist.by <- id.col
         } else {
-            dist.by <- paste(dist.cols, collapse = ", ")
-            dist.str <- paste("distributed by (", dist.by, ")", sep = "")
+            dist.str <- paste("distributed by (", dist.cols, ")", sep = "")
+            dist.by <- dist.cols
         }
     } else {
         dist.str <- ""
