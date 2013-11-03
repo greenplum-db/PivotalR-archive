@@ -49,27 +49,57 @@ setMethod (
 ## Create an intermediate temp table with index
 .create.indexed.temp.table <- function (x, random = FALSE)
 {
-    if (random) x <- sort(x, FALSE, "random")
-    tmp <- .unique.string()
-    if (is(x, "db.data.frame"))
-        y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE,
-                              NULL, NULL)
-    else
-        y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE, FALSE,
-                              NULL, NULL)
-    tmp <- db.objects(tmp, conn.id(x))
-    id.col <- .unique.string()
-    sql <- paste("alter table ", tmp, " add column ", id.col,
-                 " bigserial", sep = "")
-    re <- .db.getQuery(sql, conn.id = conn.id(x))
+    ## if (random) x <- sort(x, FALSE, "random")
+    ## tmp <- .unique.string()
+    ## if (is(x, "db.data.frame"))
+    ##     y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE,
+    ##                           NULL, NULL)
+    ## else
+    ##     y <- as.db.data.frame(x, tmp, FALSE, FALSE, TRUE, FALSE,
+    ##                           NULL, NULL)
+    ## tmp <- db.objects(tmp, conn.id(x))
+    ## id.col <- .unique.string()
+    ## sql <- paste("alter table ", tmp, " add column ", id.col,
+    ##              " bigserial", sep = "")
+    ## re <- .db.getQuery(sql, conn.id = conn.id(x))
 
-    y@.col.name <- c(y@.col.name, id.col)
-    y@.col.data_type <- c(y@.col.data_type, "integer")
-    y@.col.udt_name <- c(y@.col.udt_name, "int4")
-    y@.factor.suffix <- c(y@.factor.suffix, "")
-    y@.appear.name <- c(y@.appear.name, id.col)
-    y@.is.factor <- c(y@.is.factor, FALSE)
-    y@.dim[2] <- y@.dim[2] + 1
-    y@.key <- id.col
-    y
+    ## y@.col.name <- c(y@.col.name, id.col)
+    ## y@.col.data_type <- c(y@.col.data_type, "integer")
+    ## y@.col.udt_name <- c(y@.col.udt_name, "int4")
+    ## y@.factor.suffix <- c(y@.factor.suffix, "")
+    ## y@.appear.name <- c(y@.appear.name, id.col)
+    ## y@.is.factor <- c(y@.is.factor, FALSE)
+    ## y@.dim[2] <- y@.dim[2] + 1
+    ## y@.key <- id.col
+    ## y
+
+    conn.id <- conn.id(x)
+    tmp <- .unique.string()
+    id.col <- .unique.string()
+    dbms <- (.get.dbms.str(conn.id))$db.str
+    if (dbms != "PostgreSQL") {
+        dist.cols <- .get.dist.policy(x)
+        if (is.na(dist.cols)) {
+            dist.str <- paste("distributed by (", id.col, ")", sep = "")
+            dist.by <- id.col
+        } else {
+            dist.by <- paste(dist.cols, collapse = ", ")
+            dist.str <- paste("distributed by (", dist.by, ")", sep = "")
+        }
+    } else {
+        dist.str <- ""
+        dist.by <- ""
+    }
+
+    if (random) random.str <- " over (order by random())"
+    else random.str <- ""
+
+    .db.getQuery(
+        .format("create temp table <tmp> as
+                    select *, row_number()<random.str> as <id.col>
+                    from (<tbl>) s <dist.str>",
+                list(tmp = tmp, id.col = id.col, tbl = content(x[,]),
+                     dist.str = dist.str)), conn.id = conn.id)
+
+    db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE)
 }

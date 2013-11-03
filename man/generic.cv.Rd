@@ -14,7 +14,7 @@
 }
 
 \usage{
-generic.cv(train, predict, metric, data, params = NULL, k = 10)
+generic.cv(train, predict, metric, data, params = NULL, k = 10, approx.cut = TRUE)
 }
 
 \arguments{
@@ -53,6 +53,10 @@ generic.cv(train, predict, metric, data, params = NULL, k = 10)
   
   \item{k}{
     An integer, default is 10. The cross-validation fold number.
+  }
+
+  \item{approx.cut}{
+    A boolean, default is TRUE. Whether to cut the data into k pieces in an approximate way, which is faster than the accurate way. For big data sets, cutting the data into k pieces in an approximate way does not affect the result.
   }
 }
 

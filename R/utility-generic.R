@@ -73,8 +73,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 ## get the distributed by string
 .get.distributed.by.str <- function(conn.id, distributed.by)
 {
-    dbms.str <- dbms(conn.id)
-    if (gsub(".*(Greenplum).*", "\\1", dbms.str, perl=T) == "Greenplum") {
+    dbms.str <- (.get.dbms.str(conn.id))$db.str
+    if (dbms.str != "PostgreSQL") {
         if (is.null(distributed.by))
             dist.str <- "DISTRIBUTED RANDOMLY"
         else {

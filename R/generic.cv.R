@@ -20,11 +20,11 @@ generic.cv <- function (train, predict, metric, data,
         cuts <- .cut.data(data, k)
     for (i in 1:k) {
         cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
+                                            FALSE, FALSE, TRUE, FALSE,
+                                            cuts$dist.by, NULL)
         cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
+                                            FALSE, FALSE, TRUE, FALSE,
+                                            cuts$dist.by, NULL)
     }
     conn.id <- conn.id(cuts$train[[1]])
 
@@ -117,19 +117,34 @@ generic.cv <- function (train, predict, metric, data,
 .approx.cut.data <- function (x, k)
 {
     size <- 100
-    pieces <- k * size
+    n <- k * size
     conn.id <- conn.id(x)
     tmp <- .unique.string()
     id.col <- .unique.string()
+    dbms <- (.get.dbms.str(conn.id))$db.str
+    if (dbms != "PostgreSQL") {
+        dist.cols <- .get.dist.policy(x)
+        if (is.na(dist.cols)) {
+            dist.str <- paste("distributed by (", id.col, ")", sep = "")
+            dist.by <- id.col
+        } else {
+            dist.by <- paste(dist.cols, collapse = ", ")
+            dist.str <- paste("distributed by (", dist.by, ")", sep = "")
+        }
+    } else {
+        dist.str <- ""
+        dist.by <- ""
+    }
     .db.getQuery(
-        .format("create temp table {tmp} as
+        .format("create temp table <tmp> as
                      select *,
-                         trunc(random()*{pieces}+1) as {id.col}
-                     from ({tbl}) s", list(tmp=tmp, pieces=pieces,
-                                           id.col=id.col,
-                                           tbl=content(x[,]))),
+                         trunc(random()*<n>+1) as <id.col>
+                     from (<tbl>) s <dist.str>",
+                list(tmp=tmp, n=n, id.col=id.col,
+                     tbl=content(x[,]), dist.str=dist.str)),
         conn.id = conn.id)
-    y <- db.data.frame(tmp, conn.id = conn.id)
+    y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE)
+    id <- ncol(y)
     tick <- c(0, seq(size, length.out = k-1, by = size), n)
     valid <- list()
     train <- list()
@@ -137,5 +152,5 @@ generic.cv <- function (train, predict, metric, data,
         valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
         train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
     }
-    list(train = train, valid = valid, inter = y)
+    list(train = train, valid = valid, inter = y, dist.by = dist.by)
 }

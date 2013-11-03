@@ -30,7 +30,20 @@ is.db.data.frame <- function (x)
         train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
     }
 
-    list(train = train, valid = valid, inter = y)
+    dbms <- (.get.dbms.str(conn.id))$db.str
+    if (dbms != "PostgreSQL") {
+        dist.cols <- .get.dist.policy(y)
+        if (is.na(dist.cols)) {
+            dist.by <- NULL
+        } else {
+            dist.by <- paste(dist.cols, collapse = ", ")
+        }
+    } else {
+        dist.str <- ""
+        dist.by <- ""
+    }
+    
+    list(train = train, valid = valid, inter = y, dist.by = dist.by)
 }
 
 ## ----------------------------------------------------------------------
@@ -138,6 +151,61 @@ is.db.data.frame <- function (x)
 .format <- function(str, lst)
 {
     for (item in names(lst))
-        str <- gsub(paste("\\{", item, "}", sep = ""), lst[[item]], str)
-    str
+        str <- gsub(paste("<", item, ">", sep = ""), lst[[item]], str)
+    gsub("\n", "", str)
+}
+
+## ----------------------------------------------------------------------
+
+## get the distributed by info
+.get.dist.policy <- function (x)
+{
+    ## get the table name and schema
+    conn.id <- conn.id(x)
+    table <- .strip(x@.name, "\"")
+    l <- length(table)
+    if (l == 2) {
+        table.name <- table[2]
+        table.schema <- table[1]
+    } else {
+        schemas <- arraydb.to.arrayr(
+            .get.res(sql="select current_schemas(True)",
+                     conn.id=conn.id, warns=warns),
+            type = "character")
+        table_schema <- character(0)
+        for (schema in schemas)
+            if (.db.existsTable(c(schema, table), conn.id)) {
+                table_schema <- c(table_schema, schema)
+                break
+            }
+        table.name <- table
+        table.schema <- table_schema
+    }
+
+    oid <- .db.getQuery(
+        .format("SELECT c.oid
+                 FROM pg_catalog.pg_class c
+                 LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                 WHERE c.relname ~ '^(<table.name>)$'
+                 AND n.nspname ~ '^(<table.schema>)$'",
+                 list(table.name=table.name,
+                                      table.schema=table.schema)), conn.id)
+    
+    attrnums <- .db.getQuery(
+        .format("SELECT attrnums
+                 FROM pg_catalog.gp_distribution_policy t
+                 WHERE localoid = '<oid>'", list(oid=as.numeric(oid))),
+        conn.id = conn.id)
+    attrnums <- as.integer(arraydb.to.arrayr(attrnums, "integer"))
+
+    if (is.na(attrnums)) return (NA)
+
+    cols <- .db.getQuery(
+        .format("SELECT attname FROM pg_attribute
+                 WHERE attrelid = '<oid>'
+                 AND (<attnum>)",
+                list(oid=oid,
+                     attnum=paste("attnum='", attrnums, "'", sep = "",
+                     collapse = " or "))), conn.id)[,,drop=TRUE]
+    cols
 }
