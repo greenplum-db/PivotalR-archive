@@ -159,10 +159,10 @@ clean.madlib.temp <- function(conn.id = 1)
     lst0 <- lst0[2:(length(lst0)-1)]
     lst <- character(0)
     for (i in 1:length(lst0)) {
-        if (gsub("value", "", lst0[i]) != lst0[i] ||
-            gsub("array", "", lst0[i]) != lst0[i] ||
-            gsub("attr", "", lst0[i]) != lst0[i]) next
-        if (gsub("<-", "", lst0[i]) != lst0[i]) {
+        if (grepl("value", lst0[i]) ||
+            grepl("array", lst0[i]) ||
+            grepl("attr", lst0[i])) next
+        if (grepl("<-", lst0[i])) {
             lst <- c(lst, lst0[i])
         } else {
             if (i != 1)
