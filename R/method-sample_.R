@@ -29,40 +29,36 @@ setMethod (
             freq <- table(table(select))
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
             
-            tmp0 <- .unique.string()
-            id.col <- .unique.string()
             m <- sum(fq[,2])
-            .db.getQuery(
-                .format("create temp table <tmp0> as
-                            select *,
-                                random() as <id.col>
-                            from (<tbl>) s order by random()
-                            limit <sz> <dist.str>",
-                        list(tmp0=tmp0, id.col=id.col, sz=m,
-                             tbl=content(x[,]),
-                             dist.str=.get.distributed.by.str(conn.id,
-                             x@.dist.by))), conn.id)
-
-            z <- db.data.frame(tmp0, conn.id = conn.id, is.temp = TRUE,
-                               verbose = FALSE)
-            ex <- ncol(z)
-            w <- z[, -ex]
             tmp <- .unique.string()
-            res <- as.db.data.frame(w, tmp, FALSE, FALSE, TRUE, FALSE,
-                                    w@.dist.by)
+            res <- as.db.data.frame(sort(x, FALSE, NULL), tmp, FALSE,
+                                    FALSE, TRUE, FALSE, x@.dist.by, m)
+            dist.str <- .get.distributed.by.str(conn.id, res@.dist.by)
             
             for (i in seq_len(max(fq[,1])-1)+1) {
                 sz <- sum(fq[fq[,1]>=i,2])
-                p <- (sz + 14 + sqrt(196 + 28*sz)) / m
-                w <- z[z[[id.col]] < p, -ex]
-                sql <- paste("insert into ", content(res), " (",
-                             content(w), " limit ", sz, ")", sep = "")
-                .get.res(sql = sql, conn.id = conn.id(x))
+                if (i == 2) {
+                    tmp1 <- .unique.string()
+                    sql <- paste("create temp table ", tmp1,
+                                 " as select * from ",
+                                 content(res), " order by random() limit ",
+                                 sz, dist.str,
+                                 sep = "")
+                } else {
+                    sql <- paste("insert into ", tmp1, " (select * from ",
+                                 content(res), " order by random() limit ",
+                                 sz, ")", sep = "")
+                }
+                .get.res(sql = sql, conn.id = conn.id)
             }
+
+            .get.res(sql = paste("insert into ", content(res),
+                     " (select * from ", tmp1, ")", sep = ""),
+                     conn.id = conn.id)
 
             .restore.warnings(warnings)
 
-            delete(z, cascade = TRUE)
+            delete(tmp1, is.temp = TRUE, cascade = TRUE)
             
             res@.dim[1] <- size
             res
