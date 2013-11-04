@@ -18,7 +18,6 @@ setMethod (
         warnings <- .suppress.warnings(conn.id)
 
         if (!replace) {
-            p <- (size + 14 + sqrt(196 + 28*size)) / n
             tmp <- .unique.string()
            
             res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
@@ -30,10 +29,6 @@ setMethod (
             freq <- table(table(select))
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
             
-            ## tmp <- .unique.string()
-            ## res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
-            ##                         FALSE, TRUE, FALSE, NULL, sum(fq[,2]))
-
             tmp0 <- .unique.string()
             id.col <- .unique.string()
             .db.getQuery(
@@ -66,6 +61,8 @@ setMethod (
 
             .restore.warnings(warnings)
 
+            delete(z, cascade = TRUE)
+            
             res@.dim[1] <- size
             res
         }
