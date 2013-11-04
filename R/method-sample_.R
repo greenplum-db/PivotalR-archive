@@ -40,10 +40,11 @@ setMethod (
                              dist.str=.get.distributed.by.str(conn.id,
                              x@.dist.by))), conn.id)
 
-            z <- db.data.frame(tmp0, conn.id = conn.id, is.temp = TRUE)
+            z <- db.data.frame(tmp0, conn.id = conn.id, is.temp = TRUE,
+                               verbose = FALSE)
             ex <- ncol(z)
 
-            sz <- sun(fq[,2])
+            sz <- sum(fq[,2])
             p <- (sz + 14 + sqrt(196 + 28*sz)) / n
             w <- z[z[[id.col]] < p, -ex]
             tmp <- .unique.string()

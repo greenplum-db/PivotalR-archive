@@ -145,11 +145,12 @@ is.db.data.frame <- function (x)
 ## ----------------------------------------------------------------------
 
 ## get the distributed by info
-.get.dist.policy <- function (x)
+.get.dist.policy <- function (table, conn.id)
 {
     ## get the table name and schema
-    conn.id <- conn.id(x)
-    table <- .strip(x@.name, "\"")
+    ## conn.id <- conn.id(x)
+    ## table <- .strip(x@.name, "\"")
+    table <- .strip(table, "\"")
     l <- length(table)
     if (l == 2) {
         table.name <- table[2]
@@ -177,7 +178,7 @@ is.db.data.frame <- function (x)
                  AND n.nspname ~ '^(<table.schema>)$'",
                  list(table.name=table.name,
                                       table.schema=table.schema)), conn.id)
-    
+
     attrnums <- .db.getQuery(
         .format("SELECT attrnums
                  FROM pg_catalog.gp_distribution_policy t
@@ -194,5 +195,6 @@ is.db.data.frame <- function (x)
                 list(oid=oid,
                      attnum=paste("attnum='", attrnums, "'", sep = "",
                      collapse = " or "))), conn.id)[,,drop=TRUE]
+
     cols
 }

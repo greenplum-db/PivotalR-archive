@@ -143,7 +143,8 @@ generic.cv <- function (train, predict, metric, data,
                 list(tmp=tmp, n=n, id.col=id.col,
                      tbl=content(x[,]), dist.str=dist.str)),
         conn.id = conn.id)
-    y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE)
+    y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE,
+                       verbose = FALSE)
     id <- ncol(y)
     tick <- c(0, seq(size, length.out = k-1, by = size), n)
     valid <- list()

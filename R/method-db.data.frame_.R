@@ -47,7 +47,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     {
         dbms <- (.get.dbms.str(conn.id))$db.str
         if (dbms != "PostgreSQL") {
-            dist.cols <- .get.dist.policy(x)
+            dist.cols <- .get.dist.policy(table, conn.id)
             if (is.na(dist.cols)) {
                 dist.by <- character(0) # distributed randomly
             } else {
