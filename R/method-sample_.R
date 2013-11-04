@@ -36,9 +36,10 @@ setMethod (
                 .format("create temp table <tmp0> as
                             select *,
                                 random() as <id.col>
-                            from (<tbl>) s limit <sz> <dist.str>",
-                        list(tmp0=tmp0, id.col=id.col, tbl=content(x[,]),
-                             sz=m,
+                            from (<tbl>) s order by random()
+                            limit <sz> <dist.str>",
+                        list(tmp0=tmp0, id.col=id.col, sz=m,
+                             tbl=content(x[,]),
                              dist.str=.get.distributed.by.str(conn.id,
                              x@.dist.by))), conn.id)
 
