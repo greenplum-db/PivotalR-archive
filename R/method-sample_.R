@@ -31,29 +31,28 @@ setMethod (
             
             tmp0 <- .unique.string()
             id.col <- .unique.string()
+            m <- sum(fq[,2])
             .db.getQuery(
                 .format("create temp table <tmp0> as
                             select *,
                                 random() as <id.col>
-                            from (<tbl>) s <dist.str>",
+                            from (<tbl>) s limit <sz> <dist.str>",
                         list(tmp0=tmp0, id.col=id.col, tbl=content(x[,]),
+                             sz=m,
                              dist.str=.get.distributed.by.str(conn.id,
                              x@.dist.by))), conn.id)
 
             z <- db.data.frame(tmp0, conn.id = conn.id, is.temp = TRUE,
                                verbose = FALSE)
             ex <- ncol(z)
-
-            sz <- sum(fq[,2])
-            p <- (sz + 14 + sqrt(196 + 28*sz)) / n
-            w <- z[z[[id.col]] < p, -ex]
+            w <- z[, -ex]
             tmp <- .unique.string()
             res <- as.db.data.frame(w, tmp, FALSE, FALSE, TRUE, FALSE,
-                                    w@.dist.by, sz)
+                                    w@.dist.by)
             
             for (i in seq_len(max(fq[,1])-1)+1) {
                 sz <- sum(fq[fq[,1]>=i,2])
-                p <- (sz + 14 + sqrt(196 + 28*sz)) / n
+                p <- (sz + 14 + sqrt(196 + 28*sz)) / m
                 w <- z[z[[id.col]] < p, -ex]
                 sql <- paste("insert into ", content(res), " (",
                              content(w), " limit ", sz, ")", sep = "")
