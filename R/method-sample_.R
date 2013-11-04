@@ -14,37 +14,53 @@ setMethod (
         if (!replace && n < size)
             stop("size is larger than data size!")
 
-        warnings <- .suppress.warnings(conn.id(x))
+        conn.id <- conn.id(x)
+        warnings <- .suppress.warnings(conn.id)
 
         if (!replace) {
             p <- (size + 14 + sqrt(196 + 28*size)) / n
             tmp <- .unique.string()
-            conn.id <- conn.id(x)
-            ## res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
-                                    ## FALSE, TRUE, FALSE, NULL, size)
-            dist.str <- .get.distributed.by.str(conn.id, x@.dist.by)
-            .db.getQuery(
-                .format("create temp table <tmp> as
-                            select * from (<tbl>) s
-                            where random() < <p> order by random()
-                            limit <size>
-                        <dist.str>", list(tmp=tmp, tbl=content(x[,]),
-                                          p=p, size=size, dist.str=dist.str)))
-            res <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE)
+           
+            res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
+                                    FALSE, TRUE, FALSE, x@.dist.by, size)
             .restore.warnings(warnings)
             res
         } else {
             select <- sample(seq(n), size, replace = TRUE)
             freq <- table(table(select))
             fq <- cbind(as.integer(names(freq)), as.integer(freq))
+            
+            ## tmp <- .unique.string()
+            ## res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
+            ##                         FALSE, TRUE, FALSE, NULL, sum(fq[,2]))
+
+            tmp0 <- .unique.string()
+            id.col <- .unique.string()
+            .db.getQuery(
+                .format("create temp table <tmp0> as
+                            select *,
+                                random() as <id.col>
+                            from (<tbl>) s <dist.str>",
+                        list(tmp0=tmp0, id.col=id.col, tbl=content(x[,]),
+                             dist.str=.get.distributed.by.str(conn.id,
+                             x@.dist.by))), conn.id)
+
+            z <- db.data.frame(tmp0, conn.id = conn.id, is.temp = TRUE)
+            ex <- ncol(z)
+
+            sz <- sun(fq[,2])
+            p <- (sz + 14 + sqrt(196 + 28*sz)) / n
+            w <- z[z[[id.col]] < p, -ex]
             tmp <- .unique.string()
-            res <- as.db.data.frame(sort(x, FALSE, "random"), tmp, FALSE,
-                                    FALSE, TRUE, FALSE, NULL, sum(fq[,2]))
+            res <- as.db.data.frame(w, tmp, FALSE, FALSE, TRUE, FALSE,
+                                    w@.dist.by, sz)
+            
             for (i in seq_len(max(fq[,1])-1)+1) {
                 sz <- sum(fq[fq[,1]>=i,2])
+                p <- (sz + 14 + sqrt(196 + 28*sz)) / n
+                w <- z[z[[id.col]] < p, -ex]
                 sql <- paste("insert into ", content(res), " (",
-                             content(sort(x, FALSE, "random")),
-                             " limit ", sz, ")", sep = "")
+                             content(w), " limit ", sz, ")", sep = "")
                 .get.res(sql = sql, conn.id = conn.id(x))
             }
 
