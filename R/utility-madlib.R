@@ -152,8 +152,9 @@ clean.madlib.temp <- function(conn.id = 1)
 ## Compute the first-derivative of any functino analytically
 ## And return the result as a string
 ## Will be used in computing margins
-.parse.deriv <- function (formula, var)
+.parse.deriv <- function (expr.str, var)
 {
+    formula <- formula(paste("~", expr.str))
     x <- deriv(formula, var)
     lst0 <- deparse(x)
     lst0 <- lst0[2:(length(lst0)-1)]
