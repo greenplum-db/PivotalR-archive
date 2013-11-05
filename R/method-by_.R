@@ -14,15 +14,31 @@ setMethod (
         else
             indx <- INDICES
         v <- lk(indx, 1, array = FALSE)
-        s <- paste(indx@.expr, "==", v, sep = "", collapse = " && ")
-        for (i in which(is.na(v)))
-            s <- gsub(paste(indx@.expr[i], "==", v[i], sep = ""),
-                      paste("is.na(", indx@.expr[i], ")", sep = ""), s)
-        use <- eval(parse(text = paste("with(data, data[", s, ",])",
-                          sep = "")))
+        add.quotes <- function (str)
+            unlist(Map(function (x)
+                       if (is.character(x)) paste("\"", x, "\"", sep = "")
+                       else x, str))
+        v <- add.quotes(v)
+        get.piece <- function (data, indx, v) {
+            s <- paste(indx@.expr, "==", v, sep = "", collapse = " && ")
+            for (i in which(is.na(v)))
+                s <- gsub(paste(indx@.expr[i], "==", v[i], sep = ""),
+                          paste("is.na(", indx@.expr[i], ")", sep = ""), s)
+            eval(parse(text = paste("with(data, data[", s, ",])",
+                       sep = "")))
+        }
+        use <- get.piece(data, indx, v)
         fit0 <- FUN(use)
         if (!is(fit0, "db.obj")) {
-            srh <- db.array(as.character(indx))
+            vals <- lk(unique(db.array(as.character(indx, array = FALSE))))
+            rst <- list(fit0)
+            for (i in nrow(vals)) {
+                w <- add.quotes(vals[i,])
+                if (all(w == v)) next
+                use <- get.piece(data, indx, w)
+                rst[[i+1]] <- FUN(use)
+            }
+            return (rst)
         } else {
             if (is(data, "db.data.frame")) {
                 parent <- content(data)
