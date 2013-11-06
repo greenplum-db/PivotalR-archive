@@ -14,37 +14,47 @@ madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1, lambda = 
 
 \arguments{
   \item{formula}{
-%%     ~~Describe \code{formula} here~~
+    A formula (or one that can be coerced to
+    that class), specifies the dependent and independent variables.
 }
   \item{data}{
-%%     ~~Describe \code{data} here~~
+    A \code{\linkS4class{db.obj}} object. Currently, this parameter is
+  mandatory. If it is an object of class \code{db.Rquery} or
+  \code{db.view}, a temporary table will be created, and further
+  computation will be done on the temporary table. After the
+  computation, the temporary will be dropped from the corresponding
+  database.
 }
   \item{family}{
-%%     ~~Describe \code{family} here~~
+    A string which indicates which form of regression to apply. Default value is "gaussian". The accepted values are: ``gaussian'' or ``linear'': Linear regression; ``binomial'' or ``logistic'': Logistic regression. The support for other families will be added in the future.
 }
-  \item{na.action}{
-%%     ~~Describe \code{na.action} here~~
+\item{na.action}{
+          A string which indicates what should happen when the data
+        contain \code{NA}s.  Future possible
+        values include \code{"na.omit"}, \code{"na.exclude"},
+        \code{"na.fail"}
+        and \code{NULL}. Currently not implemented yet.
 }
-  \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+\item{alpha}{
+  A value in [0,1], elastic net control parameter.
 }
   \item{lambda}{
-%%     ~~Describe \code{lambda} here~~
+    A positive value, the regularization parameter.
 }
   \item{standardize}{
-%%     ~~Describe \code{standardize} here~~
+    A logical, default: \code{TRUE}. Whether to normalize the data. Setting this to \code{TRUE} usually yields better results and faster convergence.
 }
   \item{method}{
-%%     ~~Describe \code{method} here~~
+    A string, default: "fista". Name of optimizer, either "fista" or "igd".
 }
   \item{control}{
-%%     ~~Describe \code{control} here~~
+    
 }
   \item{glmnet}{
-%%     ~~Describe \code{glmnet} here~~
+    
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+    More arguments, currently not implemented.
 }
 }
 
