@@ -39,8 +39,7 @@
 
 \author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{

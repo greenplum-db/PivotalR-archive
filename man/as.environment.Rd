@@ -28,19 +28,17 @@
 }
 
 \value{
-    For \code{as.environment}, the created environment. Note that no data is transferred to the client; all objects in the environment are queries pointing back to the host.
-    
-    For \code{with}, a \code{\linkS4class{db.Rquery}} stored query object representing the expression. Use \code{\link{preview}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
-  }
+  For \code{as.environment}, the created environment. Note that no data is transferred to the client; all objects in the environment are queries pointing back to the host.
 
-  \author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
+For \code{with}, a \code{\linkS4class{db.Rquery}} stored query object representing the expression. Use \code{\link{preview}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
+}
+
+\author{
+  Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
     \code{\link{as.environment}}
 }
-
-
