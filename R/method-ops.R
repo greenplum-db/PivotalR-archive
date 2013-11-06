@@ -125,7 +125,8 @@ setMethod (
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
         .factor.suffix = rep("", length(col.name)),
-        .sort = sort)
+        .sort = sort,
+        .dist.by = e1@.dist.by)
 }
 
 ## -----------------------------------------------------------------------
@@ -704,7 +705,8 @@ setMethod (
         .where = e1@.where,
         .is.factor = rep(FALSE, l),
         .factor.suffix = rep("", l),
-        .sort = sort)
+        .sort = sort,
+        .dist.by = e1@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

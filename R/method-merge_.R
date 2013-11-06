@@ -125,6 +125,7 @@ setMethod (
             .where = "",
             .is.factor = is.factor,
             .factor.suffix = factor.suffix,
-            .sort = list(by = "", order = "", str = ""))
+            .sort = list(by = "", order = "", str = ""),
+            .dist.by = x@.dist.by)
     },
     valueClass = "db.Rquery")

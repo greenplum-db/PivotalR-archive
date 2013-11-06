@@ -111,6 +111,7 @@ setMethod (
             .sort = sort,
             .is.crossprod = TRUE,
             .is.symmetric = is.symmetric,
-            .dim = c(m,n))
+            .dim = c(m,n),
+            .dist.by = x@.dist.by)
     })
 

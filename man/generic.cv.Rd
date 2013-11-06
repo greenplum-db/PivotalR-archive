@@ -14,7 +14,7 @@
 }
 
 \usage{
-generic.cv(train, predict, metric, data, params = NULL, k = 10)
+generic.cv(train, predict, metric, data, params = NULL, k = 10, approx.cut = TRUE)
 }
 
 \arguments{
@@ -54,6 +54,16 @@ generic.cv(train, predict, metric, data, params = NULL, k = 10)
   \item{k}{
     An integer, default is 10. The cross-validation fold number.
   }
+
+  \item{approx.cut}{
+    A boolean, default is TRUE. Whether to cut the data into \code{k} pieces in an approximate way, which is faster than the accurate way. For big data sets, cutting the data into k pieces in an approximate way does not affect the result. See details for more.
+  }
+}
+
+\details{
+  In order to cut the data table into \code{k} equal pieces, a column of unique id for every row needs to be attached to the data so that one can cut the data using different ranges of the row id. For example, for a 1000 rows data table, when id is 1-100, 101-200, ..., one can cut the data into 10 pieces. The id should be randomly assigned to the rows for cross-validation to use. Note that the original data is not touched in this process, instead all the data is copied to a new temporary table with the id column created in the new table. Because a unique id is to be randomly assigned to each row, this process cannot be easily parallelized.
+
+When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform random integer instead of consecutive integers is created in the temporary table. We apply the same method to cut the data using the different ranges of this column, for example, 1-100, 101-200, etc. Apparently, the \code{k} pieces of data do not have an exact equal size, and the sizes of them are only approximately equal. However, for big data sets, the differeces are relatively small and should not affect the result. This process does not generate unique ID's for the rows, but can be easily parallelized, so this method is much faster for big data sets.
 }
 
 \value{

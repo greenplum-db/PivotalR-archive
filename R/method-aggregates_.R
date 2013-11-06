@@ -140,7 +140,8 @@
         .where = where,
         .is.factor = rep(FALSE, length(names(x))),
         .factor.suffix = rep("", length(names(x))),
-        .sort = list(by = "", order = "", str = ""))
+        .sort = list(by = "", order = "", str = ""),
+        .dist.by = x@.dist.by)
 }
 
 ## -----------------------------------------------------------------------
@@ -501,7 +502,8 @@ db.array <- function (x, ...)
         .col.udt_name = udt.name,
         .is.factor = FALSE,
         .factor.suffix = "",
-        .sort = sort)
+        .sort = sort,
+        .dist.by = x@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

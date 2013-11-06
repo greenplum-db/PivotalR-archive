@@ -165,7 +165,8 @@ predict.logregr.madlib.grps <- function (object, newdata, ...)
         .where = where,
         .is.factor = FALSE,
         .factor.suffix = "",
-        .sort = sort)
+        .sort = sort,
+        .dist.by = newdata@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

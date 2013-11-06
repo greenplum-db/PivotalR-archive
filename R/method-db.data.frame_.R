@@ -40,16 +40,30 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
                    .name = table,
                    .content = content,
                    .conn.id = conn.id,
-                   .key = character(0))
+                   .key = character(0),
+                   .dist.by = character(0))
     }
     else
     {
+        dbms <- (.get.dbms.str(conn.id))$db.str
+        if (dbms != "PostgreSQL") {
+            dist.cols <- .get.dist.policy(table, conn.id)
+            if (is.na(dist.cols)) {
+                dist.by <- character(0) # distributed randomly
+            } else {
+                dist.by <- paste(dist.cols, collapse = ", ")
+            }
+        } else {
+            dist.str <- ""
+            dist.by <- ""
+        }
         ## table
         res <- new("db.table",
                    .name = table,
                    .content = content,
                    .conn.id = conn.id,
-                   .key = key)
+                   .key = key,
+                   .dist.by = dist.by)
     }
 
     col.info <- .db.getQuery(

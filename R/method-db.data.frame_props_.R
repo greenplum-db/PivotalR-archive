@@ -88,7 +88,8 @@ setMethod (
             .where = where,
             .is.factor = x@.is.factor[select],
             .factor.suffix = x@.factor.suffix[select],
-            .sort = sort)
+            .sort = sort,
+            .dist.by = x@.dist.by)
     },
     valueClass = "db.Rquery")
 
