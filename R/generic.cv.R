@@ -4,7 +4,7 @@
 ## -----------------------------------------------------------------------
 
 generic.cv <- function (train, predict, metric, data,
-                        params = NULL, k = 10)
+                        params = NULL, k = 10, verbose = TRUE)
 {
     if (!is(data, "db.obj"))
         stop("data must be a db.obj!")
@@ -13,7 +13,7 @@ generic.cv <- function (train, predict, metric, data,
 
     conn.id <- conn.id(data)
     warnings <- .suppress.warnings(conn.id)
-    
+    if (verbose) cat("Cutting the data into", k, "pieces ...\n")
     cuts <- .cut.data(data, k)
     for (i in 1:k) {
         cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
@@ -28,12 +28,14 @@ generic.cv <- function (train, predict, metric, data,
     if (is.null(params)) {
         err <- numeric(0)
         for (i in 1:k) {
+            if (verbose) cat("Running on fold", i, "now ...\n")
             fits <- train(data = cuts$train[[i]])
             pred <- predict(fits, newdata = cuts$valid[[i]])
             err <- c(err, as.numeric(metric(predicted = pred, data = cuts$valid[[i]])))
             delete(fits)
         }
-        
+
+        if (verbose) cat("Cleaning up ...\n")
         for (i in 1:k) {
             delete(content(cuts$train[[i]]), conn.id, TRUE)
             delete(content(cuts$valid[[i]]), conn.id, TRUE)
@@ -41,6 +43,7 @@ generic.cv <- function (train, predict, metric, data,
         delete(content(cuts$inter), conn.id, TRUE)
 
         .restore.warnings(warnings)
+        if (verbose) cat("Done.\n")
         
         data.frame(err = mean(err), err.std = sd(err))
     } else {
@@ -50,9 +53,11 @@ generic.cv <- function (train, predict, metric, data,
             if (length(params[[i]]) > l) l <- length(params[[i]])
         err <- numeric(0)
         for (i in 1:k) {
+            if (verbose) cat("Running on fold", i, "now ...\n")
             err.k <- numeric(0)
             for (j in 1:l) {
                 arg.list <- .create.args(arg.names, j)
+                if (verbose) cat("parameters", toString(arg.list), "...\n")
                 if (i == 1) {
                     if (j == 1)
                         args <- as.vector(unlist(arg.list))
@@ -72,6 +77,7 @@ generic.cv <- function (train, predict, metric, data,
         args <- as.data.frame(args)
         names(args) <- arg.names
 
+        if (verbose) cat("Cleaning up ...\n")
         for (i in 1:k) {
             delete(cuts$train[[i]])
             delete(cuts$valid[[i]])
@@ -79,6 +85,7 @@ generic.cv <- function (train, predict, metric, data,
         delete(cuts$inter)
 
         .restore.warnings(warnings)
+        if (verbose) cat("Done.\n")
         
         cbind(args,
               data.frame(err = colMeans(err), err.std = .colSds(err)))
