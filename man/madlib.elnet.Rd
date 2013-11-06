@@ -1,16 +1,17 @@
 \name{madlib.elnet}
 \alias{madlib.elnet}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-%%  ~~function to do ... ~~
+  MADlib's elastic net regularization for generalized linear models
 }
+
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  This function wraps MAdlib's elastic net regularization for generalized linear models. Currently linear and logistic regressions are supported.  
 }
 \usage{
 madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1, lambda = 0.1, standardize = TRUE, method = "fista", control = list(), glmnet = FALSE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{formula}{
 %%     ~~Describe \code{formula} here~~
@@ -46,22 +47,25 @@ madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1, lambda = 
 %%     ~~Describe \code{\dots} here~~
 }
 }
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
+
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  
 }
+
 \references{
 %% ~put references to the literature/web site here ~
 }
+
 \author{
-%%  ~~who you are~~
+  Author: Predictive Analytics Team at Pivotal Inc.  
+
+  Maintainer: Hai Qian \email{hqian@gopivotal.com}
 }
+
 \note{
 %%  ~~further notes~~
 }
