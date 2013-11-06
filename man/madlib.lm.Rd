@@ -194,19 +194,18 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   contains the same copy \code{model}.
 }
 
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc.
+
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+}
 \references{
   [1] Wikipedia: Breusch-Pagan test,
   \url{http://en.wikipedia.org/wiki/Breusch-Pagan_test}
   [2] Documentation of linear regression in MADlib v0.6,
   \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}.
 }
-
-\author{
-  Author: Predictive Analytics Team at Pivotal Inc.
-
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}
-}
-
 \note{
   \code{|} is not part of standard R formula object, but many R packages
   use \code{|} to add their own functionalities into formula

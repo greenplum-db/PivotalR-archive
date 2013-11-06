@@ -63,7 +63,7 @@ madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1, lambda = 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.  
 
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \note{

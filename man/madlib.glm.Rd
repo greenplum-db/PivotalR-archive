@@ -214,6 +214,19 @@
   contains the same copy \code{model}.
 }
 
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc.
+
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+}
+
+\note{
+  See \code{\link{madlib.lm}}'s note for more about the formula format.
+
+  For logistic regression, the dependent variable MUST be a logical
+  variable with values being \code{TRUE} or \code{FALSE}.
+}
+
 \references{
     [1] Documentation of linear regression in MADlib v0.6,
     \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}
@@ -232,20 +245,6 @@
 
     [6] Wikipedia: Odds ratio,
     \url{http://en.wikipedia.org/wiki/Odds_ratio} 
-}
-
-\author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
-
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
-}
-
-\note{
-  See \code{\link{madlib.lm}}'s note for more about the formula format.
-
-  For logistic regression, the dependent variable MUST be a logical
-  variable with values being \code{TRUE} or \code{FALSE}.
 }
 
 \seealso{
