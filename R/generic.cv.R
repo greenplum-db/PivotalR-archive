@@ -6,24 +6,45 @@
 generic.cv <- function (train, predict, metric, data,
                         params = NULL, k = 10, verbose = TRUE)
 {
-    if (!is(data, "db.obj"))
-        stop("data must be a db.obj!")
     if (!is.null(params) && (!is.list(params) || is.data.frame(params)))
         stop("params must be a list!")
 
-    conn.id <- conn.id(data)
-    warnings <- .suppress.warnings(conn.id)
-    if (verbose) cat("Cutting the data into", k, "pieces ...\n")
-    cuts <- .cut.data(data, k)
-    for (i in 1:k) {
-        cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
-        cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
+    if (is(data, "db.obj")) {
+        conn.id <- conn.id(data)
+        warnings <- .suppress.warnings(conn.id)
+        if (verbose) {
+            message("Computation in-database ...")
+            cat("Cutting the data row-wise into", k, "pieces ...\n")
+        }
+        cuts <- .cut.data(data, k)
+        for (i in 1:k) {
+            cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
+                                                FALSE, FALSE, TRUE, FALSE, NULL,
+                                                NULL)
+            cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
+                                                FALSE, FALSE, TRUE, FALSE, NULL,
+                                                NULL)
+        }
+    } else {
+        if (verbose) {
+            message("Computation in memory ...")
+            cat("Cutting the data row-wise into", k, "pieces ...\n")
+        }
+        n <- nrow(data)
+        idx <- sample(seq_len(n), n)
+        sz <- n %/% k
+        cuts <- list(train = list(), valid = list())
+        for (i in seq_len(k)) {
+            if (i == k) {
+                range.v <- ((k-1) * sz):n
+            } else {
+                range.v <- (1:sz) + (i-1)*sz
+            }
+            range.t <- setdiff(1:n, range.v)
+            cuts$train[[i]] <- data[idx[range.t],]
+            cuts$valid[[i]] <- data[idx[range.v],]
+        }        
     }
-    conn.id <- conn.id(cuts$train[[1]])
 
     if (is.null(params)) {
         err <- numeric(0)
@@ -35,16 +56,17 @@ generic.cv <- function (train, predict, metric, data,
             delete(fits)
         }
 
-        if (verbose) cat("Cleaning up ...\n")
-        for (i in 1:k) {
-            delete(content(cuts$train[[i]]), conn.id, TRUE)
-            delete(content(cuts$valid[[i]]), conn.id, TRUE)
-        }
-        delete(content(cuts$inter), conn.id, TRUE)
-
-        .restore.warnings(warnings)
-        if (verbose) cat("Done.\n")
+        if (is(data, "db.obj")) {
+            if (verbose) cat("Cleaning up ...\n")
+            for (i in 1:k) {
+                delete(content(cuts$train[[i]]), conn.id, TRUE)
+                delete(content(cuts$valid[[i]]), conn.id, TRUE)
+            }
+            delete(content(cuts$inter), conn.id, TRUE)
+            .restore.warnings(warnings)
+        } 
         
+        if (verbose) cat("Done.\n")
         data.frame(err = mean(err), err.std = sd(err))
     } else {
         arg.names <- names(params)
@@ -57,7 +79,7 @@ generic.cv <- function (train, predict, metric, data,
             err.k <- numeric(0)
             for (j in 1:l) {
                 arg.list <- .create.args(arg.names, j)
-                if (verbose) cat("parameters", toString(arg.list), "...\n")
+                if (verbose) cat("    parameters", toString(arg.list), "...\n")
                 if (i == 1) {
                     if (j == 1)
                         args <- as.vector(unlist(arg.list))
@@ -77,16 +99,17 @@ generic.cv <- function (train, predict, metric, data,
         args <- as.data.frame(args)
         names(args) <- arg.names
 
-        if (verbose) cat("Cleaning up ...\n")
-        for (i in 1:k) {
-            delete(cuts$train[[i]])
-            delete(cuts$valid[[i]])
+        if (is(data, "db.obj")) {
+            if (verbose) cat("Cleaning up ...\n")
+            for (i in 1:k) {
+                delete(cuts$train[[i]])
+                delete(cuts$valid[[i]])
+            }
+            delete(cuts$inter)
+            .restore.warnings(warnings)
         }
-        delete(cuts$inter)
 
-        .restore.warnings(warnings)
         if (verbose) cat("Done.\n")
-        
         cbind(args,
               data.frame(err = colMeans(err), err.std = .colSds(err)))
     }
