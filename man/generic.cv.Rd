@@ -14,7 +14,8 @@
 }
 
 \usage{
-generic.cv(train, predict, metric, data, params = NULL, k = 10, approx.cut = TRUE)
+generic.cv(train, predict, metric, data, params = NULL, k = 10,
+approx.cut = TRUE, verbose = TRUE)
 }
 
 \arguments{
@@ -57,6 +58,10 @@ generic.cv(train, predict, metric, data, params = NULL, k = 10, approx.cut = TRU
 
   \item{approx.cut}{
     A boolean, default is TRUE. Whether to cut the data into \code{k} pieces in an approximate way, which is faster than the accurate way. For big data sets, cutting the data into k pieces in an approximate way does not affect the result. See details for more.
+  }
+
+  \item{verbose}{
+    A logical value, default is \code{TRUE}. Whether to print 
   }
 }
 

@@ -158,7 +158,7 @@ is.db.data.frame <- function (x)
     } else {
         schemas <- arraydb.to.arrayr(
             .get.res(sql="select current_schemas(True)",
-                     conn.id=conn.id, warns=warns),
+                     conn.id=conn.id, warns=NULL),
             type = "character")
         table_schema <- character(0)
         for (schema in schemas)

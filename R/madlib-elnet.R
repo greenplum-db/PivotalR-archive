@@ -12,6 +12,7 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
 {
     control <- .validate.method(method, control)
     method <- tolower(method)
+    if (method == "sgd") method <- "igd"
     family <- .validate.family(family)
     call <- match.call()
 
@@ -106,6 +107,7 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
     rst$ind.str <- params$ind.str
     rst$dummy <- data@.dummy
     rst$dummy.expr <- data@.dummy.expr
+    rst$appear <- appear
     rst$terms <- params$terms
     rst$model <- model
     rst$call <- call
@@ -169,13 +171,13 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
 
     nms <- names(control)
     for (i in seq_len(length(names(control)))) {
-        if (nms[i] %in% c("warmup", "use_active_set", "random_stepsize")) {
+        if (nms[i] %in% c("warmup", "use.active.set", "random.stepsize")) {
             if (is.logical(control[[i]]))
                 control[[i]] <- if (control[[i]]) "t" else "f"
             else
                 stop("The parameters warmup, use.active.set and random.stepsize ",
                      "must use TRUE/FALSE!")
-        } else if (nms[i] == "warmup_lambdas") {
+        } else if (nms[i] == "warmup.lambdas") {
             control[[i]] <- paste("[", paste(control[[i]], collapse = ", "),
                                   "]", sep = "")
         }

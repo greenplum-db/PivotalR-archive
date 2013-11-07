@@ -127,6 +127,10 @@ NOT recommended to directly manipulate the internal slots of these objects.
       logical value, whether this object represents an aggregate
       operation.
     }
+
+      \item{\code{.dist.by}:}{
+    A string, the distribution policy for the original data table, which is used to construct this \code{db.Rquery} object, when using Greenplum database or HAWQ. It can be \code{character(0)}, which means the original data table is distributed randomly. Or it can be a string of column names separated by comma, which are the columns that are used in the "distributed by" when the original table was created.
+  }
   }
 }
 
