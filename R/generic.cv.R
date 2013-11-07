@@ -5,7 +5,7 @@
 
 generic.cv <- function (train, predict, metric, data,
                         params = NULL, k = 10, approx.cut = TRUE,
-                        verbose = TRUE)
+                        verbose = TRUE, find.min = TRUE)
 {
     if (!is.null(params) && (!is.list(params) || is.data.frame(params)))
         stop("params must be a list!")
@@ -71,7 +71,7 @@ generic.cv <- function (train, predict, metric, data,
         }
 
         if (verbose) cat("Done.\n")
-        data.frame(err = mean(err), err.std = sd(err))
+        return (data.frame(err = mean(err), err.std = sd(err)))
     } else {
         arg.names <- names(params)
         l <- 0
@@ -82,7 +82,7 @@ generic.cv <- function (train, predict, metric, data,
             if (verbose) cat("Running on fold", i, "now ...\n")
             err.k <- numeric(0)
             for (j in 1:l) {
-                arg.list <- .create.args(arg.names, j)
+                arg.list <- .create.args(arg.names, params, j)
                 if (verbose) cat("    parameters", toString(arg.list), "...\n")
                 if (i == 1) {
                     if (j == 1)
@@ -114,8 +114,17 @@ generic.cv <- function (train, predict, metric, data,
         }
 
         if (verbose) cat("Done.\n")
-        cbind(args,
-              data.frame(err = colMeans(err), err.std = .colSds(err)))
+        rst <- cbind(args,
+                     data.frame(err = colMeans(err),
+                                err.std = .colSds(err)))
+        if (verbose) cat("Fitting the best model using the whole data set ...\n")
+        if (find.min) best <- which(min(rst$err))
+        else best <- which(max(rst$err))
+        arg.list <- .create.args(arg.names, params, best)
+        arg.list$data <- data
+        best.fit <- do.call(train, arg.list)
+        arg.list$data <- NULL
+        list(errs = rst, best = best.fit, best.params = arg.list)
     }
 }
 

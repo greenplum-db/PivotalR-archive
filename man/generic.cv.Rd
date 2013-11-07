@@ -15,7 +15,7 @@
 
 \usage{
 generic.cv(train, predict, metric, data, params = NULL, k = 10,
-approx.cut = TRUE, verbose = TRUE)
+approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
 }
 
 \arguments{
@@ -53,7 +53,7 @@ approx.cut = TRUE, verbose = TRUE)
   }
   
   \item{k}{
-    An integer, default is 10. The cross-validation fold number.
+    An integer, default is 10. The cross-validation fold number.  
   }
 
   \item{approx.cut}{
@@ -62,6 +62,10 @@ approx.cut = TRUE, verbose = TRUE)
 
   \item{verbose}{
     A logical value, default is \code{TRUE}. Whether to print 
+  }
+
+  \item{find.min}{
+    A logical value, default is \code{TRUE}. Whether the best set of parameters produces the mode with the minimum metric value. Then a model will be trained on the whole data set using the best set of parameters. If it is \code{FALSE}, the parameter set with the maximum metric value will be used. This is ignored if \code{params} is \code{NULL}.
   }
 }
 
