@@ -197,6 +197,10 @@ summary.elnet.madlib <- function (object, ...) object
 
 ## ----------------------------------------------------------------------
 
+show.elnet.madlib <- function (object) print(object)
+
+## ----------------------------------------------------------------------
+
 print.elnet.madlib <- function (x,
                                  digits = max(3L, getOption("digits") - 3L),
                                  ...)

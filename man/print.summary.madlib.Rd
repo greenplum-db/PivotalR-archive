@@ -5,8 +5,7 @@
 \title{Display the results from summary function in a pretty format}
 
 \description{
-    This function prints the results from \code{madlib.summary} in a human-readable
-    format.
+    This function prints the results from \code{\link{madlib.summary}} in a human-readable format.
 }
 
 \usage{
@@ -34,10 +33,6 @@
       Further arguments passed to or from other methods.
       This is currently not implemented.
     }
-}
-
-\value{
-    No value is returned
 }
 
 \author{

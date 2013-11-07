@@ -227,6 +227,3 @@ setMethod (
         d1 <- delete(x$model)
         list(res = d1, conn.id = conn.id)
     })
-
-
-

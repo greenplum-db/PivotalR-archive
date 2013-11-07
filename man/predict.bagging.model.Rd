@@ -39,7 +39,7 @@
 
 \value{
   A \code{\linkS4class{db.Rquery}} object, which contains the SQL query
-  to compute the prediction.
+  to compute the prediction. One can use the function \code{\link{lk}} to look at the values.
 }
 
 \author{

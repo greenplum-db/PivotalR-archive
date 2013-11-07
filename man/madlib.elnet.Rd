@@ -28,7 +28,7 @@ glmnet = FALSE, ...)
   database.
 }
   \item{family}{
-    A string which indicates which form of regression to apply. Default value is "gaussian". The accepted values are: ``gaussian'' or ``linear'': Linear regression; ``binomial'' or ``logistic'': Logistic regression. The support for other families will be added in the future.
+    A string which indicates which form of regression to apply. Default value is "gaussian". The accepted values are: "gaussian" or "linear": Linear regression; "binomial" or "logistic": Logistic regression. The support for other families will be added in the future.
 }
 \item{na.action}{
           A string which indicates what should happen when the data
@@ -61,7 +61,7 @@ A numeric value, default is 4.0. Initial backtracking step size. At each iterati
 A numeric value, default is 2. If stepsize does not work stepsize / eta is tried. Must be greater than 1.
 
 - \code{use.active.set}
-A logical value, default is FALSE. If use_active_set is TRUE, an active-set method is used to speed up the computation. Considerable speedup is obtained by organizing the iterations around the active set of features—those with nonzero coefficients. After a complete cycle through all the variables, we iterate on only the active set until convergence. If another complete cycle does not change the active set, we are done, otherwise the process is repeated.
+A logical value, default is FALSE. If use_active_set is TRUE, an active-set method is used to speed up the computation. Considerable speedup is obtained by organizing the iterations around the active set of features -- those with nonzero coefficients. After a complete cycle through all the variables, we iterate on only the active set until convergence. If another complete cycle does not change the active set, we are done, otherwise the process is repeated.
 
 - \code{activeset.tolerance}
 A numeric value, default is the value of the tolerance argument (see below). The value of tolerance used during active set calculation.
