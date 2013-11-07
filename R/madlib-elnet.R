@@ -62,6 +62,8 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
     } else {
         dep <- params$dep.str
     }
+
+    if (family == "binomial") dep <- paste("(", dep, ")::boolean", sep = "")
     
     sql <- paste("select ", madlib, ".elastic_net_train('", tbl.source,
                  "', '", tbl.output, "', '", dep, "', '",

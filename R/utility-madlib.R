@@ -34,7 +34,7 @@
         data <- as.db.data.frame(x = params$data,
                                  table.name = tbl.source,
                                  is.temp = FALSE, verbose = FALSE,
-                                 ditributed.by = params$data@.dist.by)
+                                 distributed.by = params$data@.dist.by)
     }
 
     is.factor <- data@.is.factor
