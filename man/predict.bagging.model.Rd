@@ -39,14 +39,13 @@
 
 \value{
   A \code{\linkS4class{db.Rquery}} object, which contains the SQL query
-  to compute the prediction.
+  to compute the prediction. One can use the function \code{\link{lk}} to look at the values.
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{

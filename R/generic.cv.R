@@ -4,55 +4,84 @@
 ## -----------------------------------------------------------------------
 
 generic.cv <- function (train, predict, metric, data,
-                        params = NULL, k = 10)
+                        params = NULL, k = 10, approx.cut = TRUE,
+                        verbose = TRUE, find.min = TRUE)
 {
-    if (!is(data, "db.obj"))
-        stop("data must be a db.obj!")
     if (!is.null(params) && (!is.list(params) || is.data.frame(params)))
         stop("params must be a list!")
 
-    conn.id <- conn.id(data)
-    warnings <- .suppress.warnings(conn.id)
-    
-    cuts <- .cut.data(data, k)
-    for (i in 1:k) {
-        cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
-        cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
-                                          FALSE, FALSE, TRUE, FALSE, NULL,
-                                          NULL)
+    if (is(data, "db.obj")) {
+        conn.id <- conn.id(data)
+        warnings <- .suppress.warnings(conn.id)
+        if (verbose) {
+            message("Computation in-database ...")
+            cat("Cutting the data row-wise into", k, "pieces ...\n")
+        }
+        if (approx.cut)
+            cuts <- .approx.cut.data(data, k)
+        else
+            cuts <- .cut.data(data, k)
+        for (i in 1:k) {
+            cuts$train[[i]] <- as.db.data.frame(cuts$train[[i]], .unique.string(),
+                                                FALSE, FALSE, TRUE, FALSE, NULL,
+                                                NULL)
+            cuts$valid[[i]] <- as.db.data.frame(cuts$valid[[i]], .unique.string(),
+                                                FALSE, FALSE, TRUE, FALSE, NULL,
+                                                NULL)
+        }
+    } else {
+        if (verbose) {
+            message("Computation in memory ...")
+            cat("Cutting the data row-wise into", k, "pieces ...\n")
+        }
+        n <- nrow(data)
+        idx <- sample(seq_len(n), n)
+        sz <- n %/% k
+        cuts <- list(train = list(), valid = list())
+        for (i in seq_len(k)) {
+            if (i == k) {
+                range.v <- ((k-1) * sz):n
+            } else {
+                range.v <- (1:sz) + (i-1)*sz
+            }
+            range.t <- setdiff(1:n, range.v)
+            cuts$train[[i]] <- data[idx[range.t],]
+            cuts$valid[[i]] <- data[idx[range.v],]
+        }
     }
-    conn.id <- conn.id(cuts$train[[1]])
 
     if (is.null(params)) {
         err <- numeric(0)
         for (i in 1:k) {
+            if (verbose) cat("Running on fold", i, "now ...\n")
             fits <- train(data = cuts$train[[i]])
-            pred <- predict(fits, newdata = cuts$valid[[i]])
-            err <- c(err, as.numeric(metric(predicted = pred, data = cuts$valid[[i]])))
+            pred <- predict(object = fits, newdata = cuts$valid[[i]])
+            err <- c(err, as.numeric(metric(predicted = pred, actual = cuts$valid[[i]])))
             delete(fits)
         }
-        
-        for (i in 1:k) {
-            delete(content(cuts$train[[i]]), conn.id, TRUE)
-            delete(content(cuts$valid[[i]]), conn.id, TRUE)
-        }
-        delete(content(cuts$inter), conn.id, TRUE)
 
-        .restore.warnings(warnings)
-        
-        data.frame(err = mean(err), err.std = sd(err))
+        if (is(data, "db.obj")) {
+            if (verbose) cat("Cleaning up ...\n")
+            for (i in 1:k) {
+                delete(content(cuts$train[[i]]), conn.id, TRUE)
+                delete(content(cuts$valid[[i]]), conn.id, TRUE)
+            }
+            delete(content(cuts$inter), conn.id, TRUE)
+            .restore.warnings(warnings)
+        }
+
+        if (verbose) cat("Done.\n")
+        return (list(err = mean(err), err.std = sd(err)))
     } else {
         arg.names <- names(params)
-        l <- 0
-        for (i in seq_len(length(params)))
-            if (length(params[[i]]) > l) l <- length(params[[i]])
+        l <- max(sapply(params, length))
         err <- numeric(0)
         for (i in 1:k) {
+            if (verbose) cat("Running on fold", i, "now ...\n")
             err.k <- numeric(0)
             for (j in 1:l) {
-                arg.list <- .create.args(arg.names, j)
+                arg.list <- .create.args(arg.names, params, j)
+                if (verbose) cat("    parameters", toString(arg.list), "...\n")
                 if (i == 1) {
                     if (j == 1)
                         args <- as.vector(unlist(arg.list))
@@ -61,27 +90,40 @@ generic.cv <- function (train, predict, metric, data,
                 }
                 arg.list$data <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
-                pred <- predict(fits, newdata = cuts$valid[[i]])
+                pred <- predict(object = fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
-                                                    data = cuts$valid[[i]])))
+                                                    actual = cuts$valid[[i]])))
                 delete(fits)
             }
             err <- rbind(err, err.k)
         }
 
+        rownames(args) <- NULL
         args <- as.data.frame(args)
         names(args) <- arg.names
 
-        for (i in 1:k) {
-            delete(cuts$train[[i]])
-            delete(cuts$valid[[i]])
+        if (verbose) cat("Done.\n")
+        rownames(err) <- NULL
+        rst <- list(avg = colMeans(err), std = .colSds(err), vals = err)
+        if (verbose) cat("Fitting the best model using the whole data set ... ")
+        if (find.min) best <- which.min(rst$avg)
+        else best <- which.max(rst$avg)
+        arg.list <- .create.args(arg.names, params, best)
+        arg.list$data <- data
+        best.fit <- do.call(train, arg.list)
+        arg.list$data <- NULL
+        if (verbose) cat("Done.\n")
+        if (is(data, "db.obj")) {
+            if (verbose) cat("Cleaning up ...\n")
+            for (i in 1:k) {
+                delete(cuts$train[[i]])
+                delete(cuts$valid[[i]])
+            }
+            delete(cuts$inter)
+            .restore.warnings(warnings)
         }
-        delete(cuts$inter)
-
-        .restore.warnings(warnings)
-        
-        cbind(args,
-              data.frame(err = colMeans(err), err.std = .colSds(err)))
+        res <- list(metric = rst, params = args, best = best.fit, best.params = arg.list)
+        class(res) <- "cv.generic"
     }
 }
 
@@ -90,10 +132,10 @@ generic.cv <- function (train, predict, metric, data,
 .create.args <- function (arg.names, params, i)
 {
     res <- list()
-    for (i in seq_len(length(arg.names))) {
-        l <- length(params[[arg.names[i]]])
-        j <- i %% l
-        res[[arg.names[i]]] <- params[[arg.names[i]]][j]
+    for (k in seq_len(length(arg.names))) {
+        l <- length(params[[arg.names[k]]])
+        j <- (i-1) %% l + 1
+        res[[arg.names[k]]] <- params[[arg.names[k]]][j]
     }
     res
 }
@@ -107,3 +149,82 @@ generic.cv <- function (train, predict, metric, data,
         std[i] <- sd(dat[,i])
     std
 }
+
+## ----------------------------------------------------------------------
+
+## cut the data in an approximate way, but faster
+.approx.cut.data <- function (x, k)
+{    
+    conn.id <- conn.id(x)
+    tmp <- .unique.string()
+    id.col <- .unique.string()
+    dbms <- (.get.dbms.str(conn.id))$db.str
+    if (dbms != "PostgreSQL") {
+        dist.cols <- x@.dist.by
+        if (identical(dist.cols, character(0))) {
+            dist.str <- paste("distributed by (", id.col, ")", sep = "")
+            dist.by <- id.col
+        } else {
+            dist.str <- paste("distributed by (", dist.cols, ")", sep = "")
+            dist.by <- dist.cols
+        }
+    } else {
+        dist.str <- ""
+        dist.by <- ""
+    }
+    if (is(x, "db.data.frame")) tbl <- content(x)
+    else {
+        if (x@.parent == x@.source)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
+    }
+    random.col <- x[,1]
+    random.col@.expr <- "random()"
+    random.col@.col.name <- id.col
+    random.col@.col.data_type <- "double precision"
+    random.col@.col.udt_name <- "float8"
+    random.col@.is.factor <- FALSE
+    random.col@.factor.suffix <- ""
+    random.col@.content <- gsub("select\\s+.*\\s+from",
+                                paste("select random() as", id.col, "from"),
+                                random.col@.content)
+    x[[id.col]] <- random.col
+    y <- as.db.data.frame(x, is.temp = TRUE, verbose = FALSE, pivot = FALSE)
+    id <- ncol(y)
+    size <- 1 / k
+    tick <- c(0, seq(size, length.out = k-1, by = size), 1)
+    valid <- list()
+    train <- list()
+    for (i in 1:k) {
+        valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
+        train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
+    }
+    list(train = train, valid = valid, inter = y, dist.by = dist.by)
+}
+
+## ----------------------------------------------------------------------
+
+## plot.cv.generic <- function (x, ...) 
+## {
+##     cvobj = x
+##     xlab = "params"
+##     if (sign.lambda < 0) 
+##         xlab = paste("-", xlab, sep = "")
+##     plot.args = list(x = sign.lambda * log(cvobj$lambda), y = cvobj$cvm, 
+##         ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
+##         type = "n")
+##     new.args = list(...)
+##     if (length(new.args)) 
+##         plot.args[names(new.args)] = new.args
+##     do.call("plot", plot.args)
+##     error.bars(sign.lambda * log(cvobj$lambda), cvobj$cvup, cvobj$cvlo, 
+##         width = 0.01, col = "darkgrey")
+##     points(sign.lambda * log(cvobj$lambda), cvobj$cvm, pch = 20, 
+##         col = "red")
+##     axis(side = 3, at = sign.lambda * log(cvobj$lambda), labels = paste(cvobj$nz), 
+##         tick = FALSE, line = 0)
+##     abline(v = sign.lambda * log(cvobj$lambda.min), lty = 3)
+##     abline(v = sign.lambda * log(cvobj$lambda.1se), lty = 3)
+##     invisible()
+## }

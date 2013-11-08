@@ -115,7 +115,8 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
             .where = where,
             .is.factor = FALSE,
             .factor.suffix = "",
-            .sort = sort)
+            .sort = sort,
+            .dist.by = newdata@.dist.by)
     } else
         stop("combine method must be \"mean\" or \"vote\"!")
 }

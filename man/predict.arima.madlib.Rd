@@ -3,7 +3,7 @@
 
 \title{Forecast from MADlib's ARIMA fits}
 
-\description{Forecast from models fitted by \code{linlk{madlib.arima}}}
+\description{Forecast from models fit by \code{linlk{madlib.arima}}}
 
 \usage{
 \method{predict}{arima.css.madlib}(object, n.ahead = 1, ...)
@@ -26,14 +26,13 @@
 \value{
   A \code{\linkS4class{db.table}} object, which points to a table that
   contains the forecasted values. The table has two columns: steps_ahead
-  and forecast_value.
+  and forecast_value. One can use the function \code{\link{lk}} to look at the values.
 }
 
 \author{
- Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+ Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{

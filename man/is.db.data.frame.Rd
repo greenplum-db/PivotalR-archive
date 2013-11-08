@@ -25,10 +25,9 @@ The input can be of any type.
 A logical.  Returns   \code{TRUE} if the input is of type \code{db.data.frame}
 }
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 } 
 
 \seealso{

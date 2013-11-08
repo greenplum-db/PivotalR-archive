@@ -27,7 +27,8 @@ setMethod (
                 .where = x@.where,
                 .is.factor = TRUE,
                 .factor.suffix = .unique.string(),
-                .sort = x@.sort)
+                .sort = x@.sort,
+                .dist.by = x@.dist.by)
         } else {
             new("db.Rquery",
                 .content = x@.content,
@@ -42,7 +43,8 @@ setMethod (
                 .where = x@.where,
                 .is.factor = TRUE,
                 .factor.suffix = .unique.string(),
-                .sort = x@.sort)
+                .sort = x@.sort,
+                .dist.by = x@.dist.by)
         }
     },
     valueClass = "db.Rquery")

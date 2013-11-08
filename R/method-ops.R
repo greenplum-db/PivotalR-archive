@@ -85,20 +85,22 @@ setMethod (
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
         col.data_type[i] <- res.type
-        col.udt_name[i] <- res.type
+        col.udt_name[i] <- res.udt
         col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
+            e2.str <- (if (e2[count %% l + 1] == "") "" else paste(
+                "(", e2[count %% l + 1], ")", sep = ""))
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
-                             cmp, e2[count %% l + 1], sep = "")
+                             cmp, e2.str, sep = "")
             count <- count + 1
         } else if (e1@.col.data_type[i] == "array") {
             tmp <- .get.array.elements(e1@.expr[i], tbl, where.str,
                                        conn.id(e1))
             tn <- length(tmp)
+            e2.str <- (if (e2[(count + seq(tn) - 1) %% l + 1] == "") ""
+            else paste("(", e2[count %% l + 1], ")", sep = ""))
             expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
-                                             cmp,
-                                             e2[(count + seq(tn) - 1) %% l + 1],
-                                             sep = "",
+                                             cmp, e2.str, sep = "",
                                              collapse = ", "), "]",
                              sep = "")
             count <- count + tn
@@ -125,7 +127,8 @@ setMethod (
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
         .factor.suffix = rep("", length(col.name)),
-        .sort = sort)
+        .sort = sort,
+        .dist.by = e1@.dist.by)
 }
 
 ## -----------------------------------------------------------------------
@@ -704,7 +707,8 @@ setMethod (
         .where = e1@.where,
         .is.factor = rep(FALSE, l),
         .factor.suffix = rep("", l),
-        .sort = sort)
+        .sort = sort,
+        .dist.by = e1@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

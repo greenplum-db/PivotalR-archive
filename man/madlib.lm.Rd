@@ -171,7 +171,7 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
     we are dealing with the factor variables, where the dummy variable
     names can be very long due to the inserting of a random string to
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
-    for details.
+    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorial variables, but do not contain any important information.
   }
 
   \item{model}{
@@ -194,20 +194,18 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
   contains the same copy \code{model}.
 }
 
+
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc.
+
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+}
 \references{
   [1] Wikipedia: Breusch-Pagan test,
   \url{http://en.wikipedia.org/wiki/Breusch-Pagan_test}
   [2] Documentation of linear regression in MADlib v0.6,
   \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}.
 }
-
-\author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
-
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}, Hai Qian \email{hai.qian@gopivotal.com}
-}
-
 \note{
   \code{|} is not part of standard R formula object, but many R packages
   use \code{|} to add their own functionalities into formula

@@ -61,10 +61,10 @@
   models. Similarly, \code{AIC} for a grouped regression returns a
   vector of the AICs for each of the component models.  }
 
-\author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
+\author{
+  Author: Hong Ooi, Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{

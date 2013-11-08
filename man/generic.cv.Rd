@@ -14,7 +14,8 @@
 }
 
 \usage{
-generic.cv(train, predict, metric, data, params = NULL, k = 10)
+generic.cv(train, predict, metric, data, params = NULL, k = 10,
+approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
 }
 
 \arguments{
@@ -33,8 +34,8 @@ generic.cv(train, predict, metric, data, params = NULL, k = 10)
   
   \item{metric}{
     A metric function. It must have only two arguments named
-    \code{predicted} and \code{data}, where \code{predicted} is the
-    redictions. 
+    \code{predicted} and \code{actual}, where \code{predicted} is the
+    redictions and \code{actual} is the actual value. This function shoud measure the difference between the predicted and actual values and produce a single numeric value.
   }
   
   \item{data}{
@@ -52,20 +53,63 @@ generic.cv(train, predict, metric, data, params = NULL, k = 10)
   }
   
   \item{k}{
-    An integer, default is 10. The cross-validation fold number.
+    An integer, default is 10. The cross-validation fold number.  
+  }
+
+  \item{approx.cut}{
+    A boolean, default is TRUE. Whether to cut the data into \code{k} pieces in an approximate way, which is faster than the accurate way. For big data sets, cutting the data into k pieces in an approximate way does not affect the result. See details for more.
+  }
+
+  \item{verbose}{
+    A logical value, default is \code{TRUE}. Whether to print 
+  }
+
+  \item{find.min}{
+    A logical value, default is \code{TRUE}. Whether the best set of parameters produces the mode with the minimum metric value. Then a model will be trained on the whole data set using the best set of parameters. If it is \code{FALSE}, the parameter set with the maximum metric value will be used. This is ignored if \code{params} is \code{NULL}.
   }
 }
 
+\details{
+  In order to cut the data table into \code{k} equal pieces, a column of unique id for every row needs to be attached to the data so that one can cut the data using different ranges of the row id. For example, for a 1000 rows data table, when id is 1-100, 101-200, ..., one can cut the data into 10 pieces. The id should be randomly assigned to the rows for cross-validation to use. Note that the original data is not touched in this process, instead all the data is copied to a new temporary table with the id column created in the new table. Because a unique id is to be randomly assigned to each row, this process cannot be easily parallelized.
+
+When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform random integer instead of consecutive integers is created in the temporary table. We apply the same method to cut the data using the different ranges of this column, for example, 1-100, 101-200, etc. Apparently, the \code{k} pieces of data do not have an exact equal size, and the sizes of them are only approximately equal. However, for big data sets, the differeces are relatively small and should not affect the result. This process does not generate unique ID's for the rows, but can be easily parallelized, so this method is much faster for big data sets.
+}
+
 \value{
-  A \code{data.frame}, which contains two elements: \code{err} and
-  \code{err.std}, which are the errors and 
+  If \code{params} is \code{NULL}, this function returns
+  a \code{list}, which contains two elements: \code{err} and
+  \code{err.std}, which are the errors and its standard deviation.
+
+  If \code{params} is not \code{NULL}, this function returns a \code{cv.generic} object, which is a \code{list} that contains the following items:
+
+\item{metric}{
+  A list, which contains
+
+  - \code{avg} The average metric value for each set of parameters.
+
+  - \code{std} The standard deviation for the metric values of each set   of parameters.
+
+- \code{vals} A matrix that contains all the metric value measured, whose rows correspond to different set of parameters, and columns correspond to different folds of cross-validation.
+}
+
+\item{params}{
+  A data.frame, which contains all the parameter sets.
+}
+
+\item{best}{
+  The fit that has the optimum metric value.
+}
+
+\item{best.params}{
+  A list, the set of parameters that produces the optimum metric value.
+}
+
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
@@ -86,6 +130,32 @@ err <- generic.cv(function(data) {
                   function(predicted, data) {
                       lookat(mean((data$rings - predicted)^2))
                   }, data = y)
+
+## -------------------------------------------
+
+x <- matrix(rnorm(100*20),100,20)
+y <- rnorm(100, 0.1, 2)
+
+dat <- as.data.frame(cbind(x, y))
+
+delete("eldata")
+z <- as.db.data.frame(dat, "eldata")
+
+g <- generic.cv(
+    train = function (data, alpha, lambda) {
+        madlib.elnet(y ~ ., data = data, family = "gaussian", alpha = alpha, lambda = lambda, control = list(random.stepsize=TRUE))
+    },
+    predict = predict,
+    metric = function (predicted, actual) {
+        lk(mean((actual$y - predicted)^2))
+    },
+    data = dat,
+    params = list(alpha=1, lambda=seq(0,0.2,0.1)),
+    k = 5, find.min = TRUE)
+
+plot(g$params$lambda, g$metric$avg, type = 'b')
+
+g$best
 }
 }
 

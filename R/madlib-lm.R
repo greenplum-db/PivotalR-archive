@@ -14,8 +14,8 @@ madlib.lm <- function (formula, data, na.action,
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
-        stop("madlib.lm cannot be used on the object ",
-             deparse(substitute(data)))
+        stop("madlib.lm can only be used on a db.obj object, and ",
+             deparse(substitute(data)), " is not!")
 
     origin.data <- data
     
@@ -188,6 +188,7 @@ print.lm.madlib.grps <- function (x,
     for (i in seq_len(length(x[[1]]$col.name))) 
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
+    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Linear Regression Result\n")
@@ -274,6 +275,7 @@ print.lm.madlib <- function (x,
     for (i in seq_len(length(x$col.name))) 
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
+    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Linear Regression Result\n")

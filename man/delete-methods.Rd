@@ -11,6 +11,7 @@
 \alias{delete,logregr.madlib-method}
 \alias{delete,logregr.madlib.grps-method}
 \alias{delete,bagging.model-method}
+\alias{delete,elnet.madlib-method}
 
 \title{ Safely delete a \code{db.obj} object or a table/view in the database }
 
@@ -43,6 +44,8 @@ FALSE)
 \S4method{delete}{logregr.madlib.grps}(x)
 
 \S4method{delete}{bagging.model}(x)
+
+\S4method{delete}{elnet.madlib}(x)
 }
 
 \arguments{
@@ -78,7 +81,9 @@ FALSE)
     case, the result model table wrapped by \code{model} will be
     deleted.
 
-    Or an object which is the result of \code{\link{generic.bagging}}.     In this case, all result model tables will be deleted.
+    Or an object which is the result of \code{\link{generic.bagging}}.         In this case, all result model tables will be deleted.
+
+Or an object which is the result of \code{\link{madlib.elnet}}. In this casem all result model tables will be deleted.
 } 
 
 \item{conn.id}{
@@ -109,10 +114,9 @@ FALSE)
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{

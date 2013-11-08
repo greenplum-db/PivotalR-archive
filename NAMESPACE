@@ -118,3 +118,6 @@ exportMethods("as.integer", "as.character",
 export("as.double")
 
 export("lk", "col.types")
+
+export("madlib.elnet", "summary.elnet.madlib",
+       "print.elnet.madlib", "predict.elnet.madlib")

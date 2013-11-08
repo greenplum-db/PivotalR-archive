@@ -296,7 +296,8 @@ setMethod (
         .where = where,
         .is.factor = is.factor,
         .factor.suffix = factor.suffix,
-        .sort = sort)
+        .sort = sort,
+        .dist.by = x@.dist.by)
 }
 
 ## -----------------------------------------------------------------------

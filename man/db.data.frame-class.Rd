@@ -96,7 +96,11 @@ NOT recommended to directly manipulate the internal slots of these objects.
     create dummy column names which are
     used only for factor support.
   }
+
+  \item{\code{.dist.by}:}{
+    A string, the distribution policy when using Greenplum database or HAWQ. It can be \code{character(0)}, which means the data table is distributed randomly. Or it can be a string of column names separated by comma, which are the columns that are used in the "distributed by" when the table was created.
   }
+}
 }
 
 \section{Extends}{
@@ -120,10 +124,9 @@ Class \code{\linkS4class{db.obj}}, directly.
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc. \email{user@madlib.net}
+  Author: Predictive Analytics Team at Pivotal Inc.
   
-  Maintainer: Hai Qian \email{hqian@gopivotal.com}, Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
