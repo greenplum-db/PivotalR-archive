@@ -90,6 +90,7 @@ generic.cv <- function (train, predict, metric, data,
                 }
                 arg.list$data <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
+                print(fits)
                 pred <- predict(object = fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
                                                     actual = cuts$valid[[i]])))
@@ -170,16 +171,25 @@ generic.cv <- function (train, predict, metric, data,
         dist.str <- ""
         dist.by <- ""
     }
-    .db.getQuery(
-        .format("create temp table <tmp> as
-                     select *,
-                         random() as <id.col>
-                     from (<tbl>) s <dist.str>",
-                list(tmp=tmp, id.col=id.col,
-                     tbl=content(x[,]), dist.str=dist.str)),
-        conn.id = conn.id)
-    y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE,
-                       verbose = FALSE)
+    if (is(x, "db.data.frame")) tbl <- content(x)
+    else {
+        if (x@.parent == x@.source)
+            tbl <- x@.parent
+        else
+            tbl <- paste("(", x@.parent, ") s", sep = "")
+    }
+    random.col <- x[,1]
+    random.col@.expr <- "random()"
+    random.col@.col.name <- id.col
+    random.col@.col.data_type <- "double precision"
+    random.col@.col.udt_name <- "float8"
+    random.col@.is.factor <- FALSE
+    random.col@.factor.suffix <- ""
+    random.col@.content <- gsub("select\\s+.*\\s+from",
+                                paste("select random() as", id.col, "from"),
+                                random.col@.content)
+    x[[id.col]] <- random.col
+    y <- as.db.data.frame(x, is.temp = TRUE, verbose = FALSE, pivot = FALSE)
     id <- ncol(y)
     size <- 1 / k
     tick <- c(0, seq(size, length.out = k-1, by = size), 1)

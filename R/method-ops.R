@@ -85,7 +85,7 @@ setMethod (
     col.name <- rep("", length(names(e1)))
     for (i in seq_len(length(names(e1)))) {
         col.data_type[i] <- res.type
-        col.udt_name[i] <- res.type
+        col.udt_name[i] <- res.udt
         col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
             e2.str <- (if (e2[count %% l + 1] == "") "" else paste(
