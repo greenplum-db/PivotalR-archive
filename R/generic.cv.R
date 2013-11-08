@@ -71,7 +71,7 @@ generic.cv <- function (train, predict, metric, data,
         }
 
         if (verbose) cat("Done.\n")
-        return (data.frame(err = mean(err), err.std = sd(err)))
+        return (list(err = mean(err), err.std = sd(err)))
     } else {
         arg.names <- names(params)
         l <- max(sapply(params, length))
@@ -90,7 +90,6 @@ generic.cv <- function (train, predict, metric, data,
                 }
                 arg.list$data <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
-                print(fits)
                 pred <- predict(object = fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
                                                     actual = cuts$valid[[i]])))
@@ -104,6 +103,7 @@ generic.cv <- function (train, predict, metric, data,
         names(args) <- arg.names
 
         if (verbose) cat("Done.\n")
+        rownames(err) <- NULL
         rst <- list(avg = colMeans(err), std = .colSds(err), vals = err)
         if (verbose) cat("Fitting the best model using the whole data set ... ")
         if (find.min) best <- which.min(rst$avg)
@@ -122,7 +122,8 @@ generic.cv <- function (train, predict, metric, data,
             delete(cuts$inter)
             .restore.warnings(warnings)
         }
-        list(errs = rst, params = args, best = best.fit, best.params = arg.list)
+        res <- list(metric = rst, params = args, best = best.fit, best.params = arg.list)
+        class(res) <- "cv.generic"
     }
 }
 
@@ -201,3 +202,29 @@ generic.cv <- function (train, predict, metric, data,
     }
     list(train = train, valid = valid, inter = y, dist.by = dist.by)
 }
+
+## ----------------------------------------------------------------------
+
+## plot.cv.generic <- function (x, ...) 
+## {
+##     cvobj = x
+##     xlab = "params"
+##     if (sign.lambda < 0) 
+##         xlab = paste("-", xlab, sep = "")
+##     plot.args = list(x = sign.lambda * log(cvobj$lambda), y = cvobj$cvm, 
+##         ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
+##         type = "n")
+##     new.args = list(...)
+##     if (length(new.args)) 
+##         plot.args[names(new.args)] = new.args
+##     do.call("plot", plot.args)
+##     error.bars(sign.lambda * log(cvobj$lambda), cvobj$cvup, cvobj$cvlo, 
+##         width = 0.01, col = "darkgrey")
+##     points(sign.lambda * log(cvobj$lambda), cvobj$cvm, pch = 20, 
+##         col = "red")
+##     axis(side = 3, at = sign.lambda * log(cvobj$lambda), labels = paste(cvobj$nz), 
+##         tick = FALSE, line = 0)
+##     abline(v = sign.lambda * log(cvobj$lambda.min), lty = 3)
+##     abline(v = sign.lambda * log(cvobj$lambda.1se), lty = 3)
+##     invisible()
+## }

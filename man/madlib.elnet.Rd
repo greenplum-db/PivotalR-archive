@@ -205,12 +205,22 @@ A numeric value, the value of tolerance used during warmup. The default is the s
   \code{\link{generic.cv}} does k-fold cross-validation. See the examples there about how to use elastic net together with cross-validation.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+x <- matrix(rnorm(100*20),100,20)
+y <- rnorm(100, 0.1, 2)
 
-## The function is currently defined as
-"madlib.elnet"
+dat <- as.data.frame(cbind(x, y))
+
+delete("eldata")
+z <- as.db.data.frame(dat, "eldata")
+
+fit <- madlib.elnet(y ~ ., data = z, alpha = 0.2, lambda = 0.05, control = list(random.stepsize=TRUE))
+
+fit
+
+lk(mean((z$y - predict(fit, z))^2)) # mean square error
+
+}
 }
 
 \keyword{madlib}

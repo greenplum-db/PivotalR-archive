@@ -76,8 +76,34 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 }
 
 \value{
-  A \code{data.frame}, which contains two elements: \code{err} and
-  \code{err.std}, which are the errors and 
+  If \code{params} is \code{NULL}, this function returns
+  a \code{list}, which contains two elements: \code{err} and
+  \code{err.std}, which are the errors and its standard deviation.
+
+  If \code{params} is not \code{NULL}, this function returns a \code{cv.generic} object, which is a \code{list} that contains the following items:
+
+\item{metric}{
+  A list, which contains
+
+  - \code{avg} The average metric value for each set of parameters.
+
+  - \code{std} The standard deviation for the metric values of each set   of parameters.
+
+- \code{vals} A matrix that contains all the metric value measured, whose rows correspond to different set of parameters, and columns correspond to different folds of cross-validation.
+}
+
+\item{params}{
+  A data.frame, which contains all the parameter sets.
+}
+
+\item{best}{
+  The fit that has the optimum metric value.
+}
+
+\item{best.params}{
+  A list, the set of parameters that produces the optimum metric value.
+}
+
 }
 
 \author{
@@ -104,6 +130,32 @@ err <- generic.cv(function(data) {
                   function(predicted, data) {
                       lookat(mean((data$rings - predicted)^2))
                   }, data = y)
+
+## -------------------------------------------
+
+x <- matrix(rnorm(100*20),100,20)
+y <- rnorm(100, 0.1, 2)
+
+dat <- as.data.frame(cbind(x, y))
+
+delete("eldata")
+z <- as.db.data.frame(dat, "eldata")
+
+g <- generic.cv(
+    train = function (data, alpha, lambda) {
+        madlib.elnet(y ~ ., data = data, family = "gaussian", alpha = alpha, lambda = lambda, control = list(random.stepsize=TRUE))
+    },
+    predict = predict,
+    metric = function (predicted, actual) {
+        lk(mean((actual$y - predicted)^2))
+    },
+    data = dat,
+    params = list(alpha=1, lambda=seq(0,0.2,0.1)),
+    k = 5, find.min = TRUE)
+
+plot(g$params$lambda, g$metric$avg, type = 'b')
+
+g$best
 }
 }
 
