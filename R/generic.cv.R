@@ -55,8 +55,8 @@ generic.cv <- function (train, predict, metric, data,
         for (i in 1:k) {
             if (verbose) cat("Running on fold", i, "now ...\n")
             fits <- train(data = cuts$train[[i]])
-            pred <- predict(fits, newdata = cuts$valid[[i]])
-            err <- c(err, as.numeric(metric(predicted = pred, data = cuts$valid[[i]])))
+            pred <- predict(object = fits, newdata = cuts$valid[[i]])
+            err <- c(err, as.numeric(metric(predicted = pred, actual = cuts$valid[[i]])))
             delete(fits)
         }
 
@@ -74,13 +74,10 @@ generic.cv <- function (train, predict, metric, data,
         return (data.frame(err = mean(err), err.std = sd(err)))
     } else {
         arg.names <- names(params)
-        l <- 0
-        for (i in seq_len(length(params)))
-            if (length(params[[i]]) > l) l <- length(params[[i]])
+        l <- max(sapply(params, length))
         err <- numeric(0)
         for (i in 1:k) {
             if (verbose) cat("Running on fold", i, "now ...\n")
-            print(paste(nrow(cuts$train[[i]]), nrow(cuts$valid[[i]])))
             err.k <- numeric(0)
             for (j in 1:l) {
                 arg.list <- .create.args(arg.names, params, j)
@@ -93,17 +90,28 @@ generic.cv <- function (train, predict, metric, data,
                 }
                 arg.list$data <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
-                pred <- predict(fits, newdata = cuts$valid[[i]])
+                pred <- predict(object = fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
-                                                    data = cuts$valid[[i]])))
+                                                    actual = cuts$valid[[i]])))
                 delete(fits)
             }
             err <- rbind(err, err.k)
         }
 
+        rownames(args) <- NULL
         args <- as.data.frame(args)
         names(args) <- arg.names
 
+        if (verbose) cat("Done.\n")
+        rst <- list(avg = colMeans(err), std = .colSds(err), vals = err)
+        if (verbose) cat("Fitting the best model using the whole data set ... ")
+        if (find.min) best <- which.min(rst$avg)
+        else best <- which.max(rst$avg)
+        arg.list <- .create.args(arg.names, params, best)
+        arg.list$data <- data
+        best.fit <- do.call(train, arg.list)
+        arg.list$data <- NULL
+        if (verbose) cat("Done.\n")
         if (is(data, "db.obj")) {
             if (verbose) cat("Cleaning up ...\n")
             for (i in 1:k) {
@@ -113,20 +121,7 @@ generic.cv <- function (train, predict, metric, data,
             delete(cuts$inter)
             .restore.warnings(warnings)
         }
-
-        if (verbose) cat("Done.\n")
-        rst <- cbind(args,
-                     data.frame(err = colMeans(err),
-                                err.std = .colSds(err)))
-        if (verbose) cat("Fitting the best model using the whole data set ... ")
-        if (find.min) best <- which(min(rst$err))
-        else best <- which(max(rst$err))
-        arg.list <- .create.args(arg.names, params, best)
-        arg.list$data <- data
-        best.fit <- do.call(train, arg.list)
-        arg.list$data <- NULL
-        if (verbose) cat("Done.\n")
-        list(errs = rst, best = best.fit, best.params = arg.list)
+        list(errs = rst, params = args, best = best.fit, best.params = arg.list)
     }
 }
 
@@ -135,10 +130,10 @@ generic.cv <- function (train, predict, metric, data,
 .create.args <- function (arg.names, params, i)
 {
     res <- list()
-    for (i in seq_len(length(arg.names))) {
-        l <- length(params[[arg.names[i]]])
-        j <- i %% l
-        res[[arg.names[i]]] <- params[[arg.names[i]]][j]
+    for (k in seq_len(length(arg.names))) {
+        l <- length(params[[arg.names[k]]])
+        j <- (i-1) %% l + 1
+        res[[arg.names[k]]] <- params[[arg.names[k]]][j]
     }
     res
 }

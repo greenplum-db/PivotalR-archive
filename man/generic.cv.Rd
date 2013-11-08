@@ -34,8 +34,8 @@ approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
   
   \item{metric}{
     A metric function. It must have only two arguments named
-    \code{predicted} and \code{data}, where \code{predicted} is the
-    redictions. 
+    \code{predicted} and \code{actual}, where \code{predicted} is the
+    redictions and \code{actual} is the actual value. This function shoud measure the difference between the predicted and actual values and produce a single numeric value.
   }
   
   \item{data}{
