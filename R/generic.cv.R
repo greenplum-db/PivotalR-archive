@@ -80,6 +80,7 @@ generic.cv <- function (train, predict, metric, data,
         err <- numeric(0)
         for (i in 1:k) {
             if (verbose) cat("Running on fold", i, "now ...\n")
+            print(paste(nrow(cuts$train[[i]]), nrow(cuts$valid[[i]])))
             err.k <- numeric(0)
             for (j in 1:l) {
                 arg.list <- .create.args(arg.names, params, j)
@@ -117,13 +118,14 @@ generic.cv <- function (train, predict, metric, data,
         rst <- cbind(args,
                      data.frame(err = colMeans(err),
                                 err.std = .colSds(err)))
-        if (verbose) cat("Fitting the best model using the whole data set ...\n")
+        if (verbose) cat("Fitting the best model using the whole data set ... ")
         if (find.min) best <- which(min(rst$err))
         else best <- which(max(rst$err))
         arg.list <- .create.args(arg.names, params, best)
         arg.list$data <- data
         best.fit <- do.call(train, arg.list)
         arg.list$data <- NULL
+        if (verbose) cat("Done.\n")
         list(errs = rst, best = best.fit, best.params = arg.list)
     }
 }
@@ -155,9 +157,7 @@ generic.cv <- function (train, predict, metric, data,
 
 ## cut the data in an approximate way, but faster
 .approx.cut.data <- function (x, k)
-{
-    size <- 100
-    n <- k * size
+{    
     conn.id <- conn.id(x)
     tmp <- .unique.string()
     id.col <- .unique.string()
@@ -178,7 +178,7 @@ generic.cv <- function (train, predict, metric, data,
     .db.getQuery(
         .format("create temp table <tmp> as
                      select *,
-                         trunc(random()*<n>+1) as <id.col>
+                         random() as <id.col>
                      from (<tbl>) s <dist.str>",
                 list(tmp=tmp, n=n, id.col=id.col,
                      tbl=content(x[,]), dist.str=dist.str)),
@@ -186,7 +186,8 @@ generic.cv <- function (train, predict, metric, data,
     y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE,
                        verbose = FALSE)
     id <- ncol(y)
-    tick <- c(0, seq(size, length.out = k-1, by = size), n)
+    size <- 1 / k
+    tick <- c(0, seq(size, length.out = k-1, by = size), 1)
     valid <- list()
     train <- list()
     for (i in 1:k) {
