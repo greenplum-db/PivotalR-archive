@@ -180,7 +180,7 @@ generic.cv <- function (train, predict, metric, data,
                      select *,
                          random() as <id.col>
                      from (<tbl>) s <dist.str>",
-                list(tmp=tmp, n=n, id.col=id.col,
+                list(tmp=tmp, id.col=id.col,
                      tbl=content(x[,]), dist.str=dist.str)),
         conn.id = conn.id)
     y <- db.data.frame(tmp, conn.id = conn.id, is.temp = TRUE,
