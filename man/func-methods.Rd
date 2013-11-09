@@ -1,5 +1,5 @@
 \name{Func-methods}
-
+\alias{Math Functions}
 \alias{exp}
 \alias{abs}
 \alias{log}
@@ -46,13 +46,13 @@
 \S4method{asin}{db.obj}(x)
 \S4method{acos}{db.obj}(x)
 \S4method{atan}{db.obj}(x)
-\S4method{atan2}{db.obj,db.obj}(x)
-\S4method{atan2}{db.obj,numeric}(x)
-\S4method{atan2}{numeric,db.obj}(x)
+\S4method{atan2}{db.obj,db.obj}(y, x)
+\S4method{atan2}{db.obj,numeric}(y, x)
+\S4method{atan2}{numeric,db.obj}(y, x)
 }
 
 \arguments{
-  \item{x}{
+  \item{x,y}{
     \code{\linkS4class{db.obj}} object. The function applies to each
   column of the \code{\linkS4class{db.obj}} object. If a column is an
   array, then the function applies onto each element of the array. If

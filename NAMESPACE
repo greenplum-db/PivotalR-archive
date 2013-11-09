@@ -121,3 +121,6 @@ export("lk", "col.types")
 
 export("madlib.elnet", "summary.elnet.madlib",
        "print.elnet.madlib", "predict.elnet.madlib")
+
+exportMethods("sin", "cos", "tan", "asin", "acos", "atan",
+              "atan2")
