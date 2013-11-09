@@ -143,7 +143,8 @@ z <- as.db.data.frame(dat, "eldata")
 
 g <- generic.cv(
     train = function (data, alpha, lambda) {
-        madlib.elnet(y ~ ., data = data, family = "gaussian", alpha = alpha, lambda = lambda, control = list(random.stepsize=TRUE))
+        madlib.elnet(y ~ ., data = data, family = "gaussian", alpha =
+alpha, lambda = lambda, control = list(random.stepsize=TRUE))
     },
     predict = predict,
     metric = function (predicted, actual) {

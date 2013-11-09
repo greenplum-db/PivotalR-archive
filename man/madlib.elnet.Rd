@@ -214,7 +214,8 @@ dat <- as.data.frame(cbind(x, y))
 delete("eldata")
 z <- as.db.data.frame(dat, "eldata")
 
-fit <- madlib.elnet(y ~ ., data = z, alpha = 0.2, lambda = 0.05, control = list(random.stepsize=TRUE))
+fit <- madlib.elnet(y ~ ., data = z, alpha = 0.2, lambda = 0.05, control
+= list(random.stepsize=TRUE))
 
 fit
 
