@@ -22,7 +22,7 @@
 \usage{
 \S4method{as.integer}{db.obj}(x, ...)
 
-\S4method{as.character}{db.obj}(x, ...)
+\S4method{as.character}{db.obj}(x, array = TRUE, ...)
 
 \S4method{as.double}{db.obj}(x, ...)
 
@@ -36,6 +36,10 @@ col.types(x)
 \arguments{
     \item{x}{
       A \code{\linkS4class{db.obj}} object. All columns of the object will be converted into the target type. If the column contains arrays, the array will be converted into an array of the target type.
+    }
+
+    \item{array}{
+      A logical, default is \code{TRUE}. If \code{array} is \code{TRUE}, then an array column is converted into an array of strings. If \code{array} is \code{FALSE}, then an array column is converted into a string column, i.e. \code{array[1,2,3]} is casted into \code{'\{1,2,3\}'}.
     }
 
     \item{\dots}{

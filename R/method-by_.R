@@ -19,24 +19,33 @@ setMethod (
                        if (is.character(x)) paste("\"", x, "\"", sep = "")
                        else x, str))
         v <- add.quotes(v)
-        get.piece <- function (data, indx, v) {
-            s <- paste(indx@.expr, "==", v, sep = "", collapse = " && ")
+        get.piece <- function (x, indx, v) {
+            s <- paste(gsub("\"", "`", indx@.expr), "==", v, sep = "",
+                       collapse = " && ")
             for (i in which(is.na(v)))
-                s <- gsub(paste(indx@.expr[i], "==", v[i], sep = ""),
+                s <- gsub(paste(gsub("\"", "`", indx@.expr[i]), "==", v[i],
+                                sep = ""),
                           paste("is.na(", indx@.expr[i], ")", sep = ""), s)
-            eval(parse(text = paste("with(data, data[", s, ",])",
+            eval(parse(text = paste("with(x, x[", s, ",])",
                        sep = "")))
         }
         use <- get.piece(data, indx, v)
         fit0 <- FUN(use)
         if (!is(fit0, "db.obj")) {
             vals <- lk(unique(db.array(as.character(indx, array = FALSE))))
-            rst <- list(fit0)
-            for (i in nrow(vals)) {
+            if (!is.data.frame(vals))
+                vals <- data.frame(V1 = vals, stringsAsFactors = F)
+            rst <- list(list(index = NULL, result = fit0))
+            count <- 1
+            for (i in seq_len(nrow(vals))) {
                 w <- add.quotes(vals[i,])
-                if (all(w == v)) next
+                if (all(w == v)) {
+                    rst[[1]]$index <- vals[i,]
+                    next
+                }
                 use <- get.piece(data, indx, w)
-                rst[[i+1]] <- FUN(use)
+                rst[[count+1]] <- list(index = vals[i,], result = FUN(use))
+                count <- count + 1
             }
             return (rst)
         } else {
