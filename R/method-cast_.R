@@ -1,9 +1,9 @@
 
-.attach.cast <- function(x, cast, udt)
+.attach.cast <- function(x, cast, udt, array = TRUE)
 {
     x <- x[,]
     for (i in seq_len(length(names(x)))) {
-        if (x@.col.data_type[i] == "array") {
+        if (array && x@.col.data_type[i] == "array") {
             z <- .expand.array(x[,i])
             x@.expr[i] <- paste("array[", paste("(", z@.expr, ")::",
                                                 cast, collapse = ", ",
@@ -45,9 +45,9 @@ setMethod(
 setMethod(
     "as.character",
     signature(x = "db.obj"),
-    def = function(x, ...)
+    def = function(x, array = TRUE, ...)
 {
-    .attach.cast(x, "text", "text")
+    .attach.cast(x, "text", "text", array)
 })
 
 ## ----------------------------------------------------------------------

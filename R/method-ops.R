@@ -78,7 +78,7 @@ setMethod (
     else where.str <- ""
 
     sort <- .generate.sort(e1)
-    
+
     expr <- rep("", length(names(e1)))
     col.data_type <- rep("", length(names(e1)))
     col.udt_name <- rep("", length(names(e1)))
@@ -87,7 +87,9 @@ setMethod (
         col.data_type[i] <- res.type
         col.udt_name[i] <- res.udt
         col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
-        if (e1@.col.data_type[i] %in% data.types || is.na(data.types)) {
+        s <- e2[count %% l + 1]
+        whole.array <- is.character(s) && grepl("^\\{", .strip(s)) && grepl("\\}$", .strip(s))
+        if (e1@.col.data_type[i] %in% data.types || is.na(data.types) || whole.array) {
             e2.str <- (if (e2[count %% l + 1] == "") "" else paste(
                 "(", e2[count %% l + 1], ")", sep = ""))
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
@@ -110,7 +112,7 @@ setMethod (
             expr[i] <- "NULL"
         }
     }
-   
+
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
@@ -595,7 +597,7 @@ setMethod (
 ## Arith operators for db.Rquery and db.Rquery
 
 ## operator for two db.obj objects
-.operate.two <- function (e1, e2, op, data.types, 
+.operate.two <- function (e1, e2, op, data.types,
                           res.type = "boolean",
                           cast = "::double precision",
                           res.udt = "bool")
@@ -631,7 +633,7 @@ setMethod (
     if (e1@.parent != e2@.parent || !.eql.where(e1@.where, e2@.where))
         stop("How can you match the rows of two objects",
              " if they are not derived from the same thing!")
-    
+
     expr <- rep("", length(names(e1)))
     col.data_type <- rep("", length(names(e1)))
     col.udt_name <- rep("", length(names(e1)))
@@ -673,7 +675,7 @@ setMethod (
                              "]", sep = "")
             break
         }
-        
+
         for (k in seq_len(length(data.types)))
             if (e1@.col.data_type[i1] %in% data.types[[k]]) {
                 v <- k
@@ -690,7 +692,7 @@ setMethod (
         col.name[i] <- paste(names(e1)[i1], "_", names(e2)[i2],
                              "_opr", sep = "")
     }
-    
+
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
     new("db.Rquery",
@@ -784,7 +786,7 @@ setMethod (
         if (e1@.is.agg) {
             e1 <- unlist(lk(e1))
             return (e1 / e2)
-        }        
+        }
         .operate.two(e1, e2, " / ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
