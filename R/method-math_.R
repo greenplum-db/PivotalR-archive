@@ -58,3 +58,13 @@ setMethod ("atan2",
            signature(y = "db.obj", x = "db.obj"),
            function (y, x) atan(y/x),
            valueClass = "db.Rquery")
+
+setMethod ("atan2",
+           signature(y = "numeric", x = "db.obj"),
+           function (y, x) atan(y/x),
+           valueClass = "db.Rquery")
+
+setMethod ("atan2",
+           signature(y = "db.obj", x = "numeric"),
+           function (y, x) atan(y/x),
+           valueClass = "db.Rquery")
