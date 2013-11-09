@@ -41,9 +41,14 @@
 }
 
 \value{
-  A \code{db.Rquery} object, which is actually the SQL query that does
+  The type of the returned value depends on the return type of   \code{FUN}.
+
+If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then this function returns
+  a \code{db.Rquery} object, which is actually the SQL query that does
   the "GROUP BY". It computes the group-by values. The result can be
   viewed using \code{\link{preview}} or \code{\link{lookat}}.
+
+  If the return type of \code{FUN} is not a \code{\linkS4class{db.obj}} object, then this function returns a list, which contains a number of sub-lists. Each sub-list contains two items: (1) \code{index}, an array of strings, a set of distinct values of the \code{INDICES} converted to string; and (2) \code{result}, the result produced by \code{FUN} applying onto the group of data that has the set of distinct values. The total number of sub-lists is equal to the total number of groups of data partitioned by \code{INDICES}.
 }
 
 \author{
@@ -75,6 +80,12 @@ preview(by(x, x$sex, mean))
 preview(by(x[,-c(1,2)], x$sex, mean))
 preview(by(x[,-c(1,2)], x[,2], mean)) # the same
 preview(by(x[,-c(1,2)], x[,"sex"], mean)) # the same
+
+## The return type of FUN is not db.obj
+dat <- as.db.data.frame(abalone)
+
+## Fit linear model to each group of data
+by(dat, dat$sex, function(x) madlib.lm(rings ~ . - id - sex, data = x))
 }
 }
 
