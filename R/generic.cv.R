@@ -199,17 +199,15 @@ generic.cv <- function (train, predict, metric, data,
     list(train = train, valid = valid, inter = y, dist.by = dist.by)
 }
 
-## ----------------------------------------------------------------------
+## ## ----------------------------------------------------------------------
 
 ## plot.cv.generic <- function (x, ...) 
 ## {
 ##     cvobj = x
 ##     xlab = "params"
-##     if (sign.lambda < 0) 
-##         xlab = paste("-", xlab, sep = "")
-##     plot.args = list(x = sign.lambda * log(cvobj$lambda), y = cvobj$cvm, 
-##         ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
-##         type = "n")
+##     plot.args = list(x = , y = x$metric$avg, 
+##     ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
+##     type = "n")
 ##     new.args = list(...)
 ##     if (length(new.args)) 
 ##         plot.args[names(new.args)] = new.args
