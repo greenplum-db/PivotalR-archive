@@ -14,8 +14,17 @@
 \alias{sign,db.obj-method}
 \alias{sqrt,db.obj-method}
 \alias{factorial,db.obj-method}
+\alias{sin,db.obj-method}
+\alias{cos,db.obj-method}
+\alias{asin,db.obj-method}
+\alias{acos,db.obj-method}
+\alias{atan,db.obj-method}
+\alias{tan,db.obj-method}
+\alias{atan2,db.obj,db.obj-method}
+\alias{atan2,db.obj,numeric-method}
+\alias{atan2,numeric,db.obj-method}
 
-\title{Functions that take \code{\linkS4class{db.obj}} objects as the
+\title{Mathematical functions that take \code{\linkS4class{db.obj}} objects as the
   argument} 
 
 \description{
@@ -31,6 +40,15 @@
 \S4method{sign}{db.obj}(x)
 \S4method{sqrt}{db.obj}(x)
 \S4method{factorial}{db.obj}(x)
+\S4method{sin}{db.obj}(x)
+\S4method{cos}{db.obj}(x)
+\S4method{tan}{db.obj}(x)
+\S4method{asin}{db.obj}(x)
+\S4method{acos}{db.obj}(x)
+\S4method{atan}{db.obj}(x)
+\S4method{atan2}{db.obj,db.obj}(x)
+\S4method{atan2}{db.obj,numeric}(x)
+\S4method{atan2}{numeric,db.obj}(x)
 }
 
 \arguments{
