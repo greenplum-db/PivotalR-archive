@@ -71,6 +71,16 @@ madlib.elnet <- function (formula, data,
 
     if (family == "binomial") dep <- paste("(", dep, ")::boolean", sep = "")
 
+    if (family == "gaussian" && method == "cd") {
+        return (.elnet.gaus.cd(data, params$ind.vars, params$dep,
+                               alpha, lambda, standardize, control))
+    }
+
+    if (family == "binomial" && method == "cd") {
+        return (.elnet.binom.cd(data, params$ind.vars, params$dep,
+                                alpha, lambda, standardize, control))
+    }
+
     sql <- paste("select ", madlib, ".elastic_net_train('", tbl.source,
                  "', '", tbl.output, "', '", dep, "', '",
                  params$ind.str, "', '", family, "', ", alpha, ", ", lambda,
