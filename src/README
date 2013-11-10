@@ -1,0 +1,4 @@
+
+Files under src/ are those that will be used by R scripts directly.
+
+Detailed implementations are under separated namespaces. Each namespace has a separated sub-directory.
