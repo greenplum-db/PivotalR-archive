@@ -1,30 +1,12 @@
 
 # both of the following two choices for PKG_LIBS work
-# PKG_LIBS = -Wl,--whole-archive -ladp -lnet -lsim -lslv -Ladp -Lnet -Lsim -Lslv -Wl,-no-whole-archive
-PKG_LIBS = -Wl,--whole-archive \
-	adp/libadp.a net/libnet.a sim/libsim.a slv/libslv.a coms/libcoms.a \
-	-Wl,-no-whole-archive
+# PKG_LIBS = -Wl,--whole-archive -ladp -Wl,-no-whole-archive
+PKG_LIBS = -Wl,--whole-archive adp/libadp.a -Wl,-no-whole-archive
 
-PKG_CXXFLAGS = -Wall -std=c++0x
+PKG_CXXFLAGS = -Wall
 
-$(SHLIB): adp/libadp.a net/libnet.a sim/libsim.a slv/libslv.a coms/libcoms.a
+$(SHLIB): adp/libadp.a
 
 adp/libadp.a:
 	@(cd adp && $(MAKE) libadp.a \
 	CXX="$(CXX)" CPPFLAGS="$(ALL_CPPFLAGS)" CXXFLAGS="$(ALL_CXXFLAGS)" AR="$(AR)")
-
-net/libnet.a:
-	@(cd net && $(MAKE) libnet.a \
-	CXX="$(CXX)" CPPFLAGS="$(ALL_CPPFLAGS)" CXXFLAGS="$(ALL_CXXFLAGS)" AR="$(AR)")
-
-sim/libsim.a:
-	@(cd sim && $(MAKE) libsim.a \
-	CXX="$(CXX)" CPPFLAGS="$(ALL_CPPFLAGS)" CXXFLAGS="$(ALL_CXXFLAGS)" AR="$(AR)")
-
-slv/libslv.a:
-	@(cd slv && $(MAKE) libslv.a \
-	CXX="$(CXX)" CPPFLAGS="$(ALL_CPPFLAGS)" CXXFLAGS="$(ALL_CXXFLAGS)" AR="$(AR)")
-	
-coms/libcoms.a:
-	@(cd coms && $(MAKE) libcoms.a \
-	CXX="$(CXX)" CPPFLAGS="$(ALL_CPPFLAGS)" CXXFLAGS="$(ALL_CXXFLAGS)" AR="$(AR)"	)

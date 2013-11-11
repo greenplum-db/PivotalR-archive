@@ -67,13 +67,15 @@ madlib.elnet <- function (formula, data,
         dep <- y@.expr
     } else {
         dep <- params$dep.str
+        y.scl <- 1
     }
 
     if (family == "binomial") dep <- paste("(", dep, ")::boolean", sep = "")
 
     if (family == "gaussian" && method == "cd") {
         return (.elnet.gaus.cd(data, params$ind.vars, params$dep,
-                               alpha, lambda, standardize, control))
+                               alpha, lambda, standardize, control, glmnet,
+                               y.scl, y.ctr))
     }
 
     if (family == "binomial" && method == "cd") {
