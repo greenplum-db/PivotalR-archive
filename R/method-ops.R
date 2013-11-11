@@ -271,12 +271,27 @@ setMethod (
 
 ## -----------------------------------------------------------------------
 
+.replace.timestamp <- function (e1, res, s, op)
+{
+    types <- col.types(e1)
+    for (i in seq_len(length(types))) {
+        if (grepl("timestamp", types[i])) {
+            res@.expr[i] <- paste(e1@.expr[i], op, s, "::timestamp", sep = "")
+            res@.content <- gsub(paste("NULL as \"", res@.col.name[i], "\"", sep = ""),
+                                paste(res@.expr[i], " as \"", res@.col.name[i], "\"", sep = ""),
+                                res@.content)
+        }
+    }
+    res
+}
+
 setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " > ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " > ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " > ")
     },
     valueClass = "db.Rquery")
 
@@ -297,7 +312,8 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " < ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " < ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " < ")
     },
     valueClass = "db.Rquery")
 
@@ -318,7 +334,8 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " >= ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " >= ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " >= ")
     },
     valueClass = "db.Rquery")
 
@@ -339,7 +356,8 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " <= ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " <= ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " <= ")
     },
     valueClass = "db.Rquery")
 
@@ -360,7 +378,8 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " = ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " = ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " = ")
     },
     valueClass = "db.Rquery")
 
@@ -381,7 +400,8 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        .compare(e1, e2, " <> ", .txt.types, cast = "")
+        res <- .compare(e1, e2, " <> ", .txt.types, cast = "")
+        .replace.timestamp(e1, res, e2, " <> ")
     },
     valueClass = "db.Rquery")
 
