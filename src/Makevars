@@ -1,7 +1,5 @@
 
-# both of the following two choices for PKG_LIBS work
-# PKG_LIBS = -Wl,--whole-archive -ladp -Wl,-no-whole-archive
-PKG_LIBS = -Wl,--whole-archive adp/libadp.a -Wl,-no-whole-archive
+PKG_LIBS = adp/libadp.a
 
 PKG_CXXFLAGS = -Wall
 
