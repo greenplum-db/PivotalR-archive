@@ -121,7 +121,7 @@ setMethod (
             ## }
             if (is(i, "db.Rquery")) {
                 if (all(i@.col.data_type == "boolean")) {
-                    return (i)
+                    return (x[i,])
                 } else {
                     i <- as.vector(unlist(.db.getQuery(paste(content(i), "limit 1"), conn.id(x))))
                     if (length(i) > length(names(x)))
