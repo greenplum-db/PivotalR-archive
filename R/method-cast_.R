@@ -84,6 +84,58 @@ setMethod(
 
 ## ----------------------------------------------------------------------
 
+setMethod(
+    "as.Date",
+    signature(x = "db.obj"),
+    def = function(x, ...)
+{
+    .attach.cast(x, "date", "date")
+})
+
+## ----------------------------------------------------------------------
+
+as.time <- function(x, ...)
+{
+    if (!is(x, "ob.obj"))
+        stop("This function only applies to db.obj objects!")
+    .attach.cast(x, "time", "time")
+}
+
+## ----------------------------------------------------------------------
+
+as.timestamp <- function(x, ...)
+{
+    if (!is(x, "ob.obj"))
+        stop("This function only applies to db.obj objects!")
+    .attach.cast(x, "timestamp", "timestamp")
+}
+
+## ----------------------------------------------------------------------
+
+as.interval <- function(x, ...)
+{
+    if (!is(x, "ob.obj"))
+        stop("This function only applies to db.obj objects!")
+    .attach.cast(x, "interval", "interval")
+}
+
+## ----------------------------------------------------------------------
+
+db.date.style <- function (conn.id = 1, set = NULL)
+{
+    if (is.null(set)) {
+        res <- .get.res(sql = "show datestyle", conn.id = conn.id)
+        return (res)
+    } else {
+        res <- try(.db.getQuery(paste("set datestyle to", set),
+                                conn.id), silent = TRUE)
+        if (is(res, .err.class))
+            stop("unrecognized \"datestyle\" key word ", set, "!")
+    }
+}
+
+## ----------------------------------------------------------------------
+
 col.types <- function(x)
 {
     if (!is(x, "db.obj"))

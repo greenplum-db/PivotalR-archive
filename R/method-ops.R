@@ -271,19 +271,28 @@ setMethod (
 
 ## -----------------------------------------------------------------------
 
+## convert string to time types
 .replace.timestamp <- function (e1, res, s, op)
 {
     types <- col.types(e1)
+    time.types <- c("timestamp", "time", "date", "interval")
     for (i in seq_len(length(types))) {
-        if (grepl("timestamp", types[i])) {
-            res@.expr[i] <- paste(e1@.expr[i], op, s, "::timestamp", sep = "")
-            res@.content <- gsub(paste("NULL as \"", res@.col.name[i], "\"", sep = ""),
-                                paste(res@.expr[i], " as \"", res@.col.name[i], "\"", sep = ""),
+        for (t in time.types) {
+            if (grepl(t, types[i])) {
+                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
+                res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
+                                           "\"", sep = ""),
+                                paste(res@.expr[i], " as \"",
+                                      res@.col.name[i], "\"", sep = ""),
                                 res@.content)
+                break
+            }
         }
     }
     res
 }
+
+## ----------------------------------------------------------------------
 
 setMethod (
     ">",

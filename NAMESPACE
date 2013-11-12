@@ -113,9 +113,9 @@ S3method(coef, lm.madlib)
 S3method(coef, lm.madlib.grps)
 
 exportMethods("as.integer", "as.character",
-              "as.logical", "as.numeric")
+              "as.logical", "as.numeric", "as.Date")
 
-export("as.double")
+export("as.double", "as.time", "as.timestamp", "as.interval", "db.date.style")
 
 export("lk", "col.types")
 

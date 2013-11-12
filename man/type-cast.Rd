@@ -11,12 +11,17 @@
 \alias{as.double,db.obj-method}
 \alias{as.logical,db.obj-method}
 \alias{as.numeric,db.obj-method}
+\alias{as.Date,db.obj-method}
+\alias{db.date.style}
+\alias{as.time}
+\alias{as.timestamp}
+\alias{as.interval}
 \alias{col.types}
 
 \title{Cast columns of \code{db.obj} objects to other types}
 
 \description{
-  Coerce \code{\linkS4class{db.obj}} object columns into other types. \code{col.types} displays the types of each column.
+  Coerce \code{\linkS4class{db.obj}} object columns into other types. \code{col.types} displays the types of each column. \code{as.Date} converts to date (no time of day); \code{as.time} converts to time of day (no date); \code{as.timestamp} converts to both date and time; \code{as.interval} converts to time interval. \code{db.date.style} can display or set the date style for a particular connection.
 }
 
 \usage{
@@ -29,6 +34,16 @@
 \S4method{as.logical}{db.obj}(x, ...)
 
 \S4method{as.numeric}{db.obj}(x, ...)
+
+\S4method{as.Date}{db.obj}(x, ...)
+
+db.date.style(conn.id = 1, set = NULL)
+
+as.time(x, ...)
+
+as.timestamp(x, ...)
+
+as.interval(x, ...)
 
 col.types(x)
 }
@@ -45,6 +60,14 @@ col.types(x)
     \item{\dots}{
       further arguments passed to or from other methods
       This is currently not implemented.
+    }
+
+    \item{conn.id}{
+      An integer, default is 1. The connection ID for the database connection.
+    }
+
+    \item{set}{
+      A string, default is \code{NULL}. It can be \code{"us"} or \code{"european"}. If it is \code{NULL}, \code{db.date.style} displays the current date style in the connected database. Otherwise, it sets the date style for the connected database.
     }
 }
 
