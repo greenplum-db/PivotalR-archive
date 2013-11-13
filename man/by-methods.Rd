@@ -28,7 +28,7 @@
   }
 
   \item{FUN}{
-    An aggregate function, which will be applied onto each group of the data.
+    A function, which will be applied onto each group of the data. The result of \code{FUN} can be of \code{\linkS4class{db.obj}} type or any other data types that R supports.
   }
 
   \item{\dots}{

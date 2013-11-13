@@ -10,7 +10,7 @@
   model, which is specified by the training function, prediction
   function, and metric function. The user might need to write wrappers
   for the functions so that they satisfy the format requirements
-  desceribed in the following.
+  desceribed in the following. This function works on both in-memory and in-database data.
 }
 
 \usage{
@@ -40,7 +40,7 @@ approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
   
   \item{data}{
     A \code{\linkS4class{db.obj}} object, which wraps the data in the
-    database, used for cross-validation.
+    database, used for cross-validation. Or a \code{data.frame}, which contains data in memory.
   }
   
   \item{params}{

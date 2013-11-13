@@ -53,7 +53,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 ## -----------------------------------------------------------------------
 
 .madlib.logregr <- function (formula, data, na.action, method = "irls",
-                             max_iter = 10000, tolerance = 1e-5)
+                             max.iter = 10000, tolerance = 1e-5)
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
@@ -93,7 +93,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
         sql <- paste("select (f).* from (select ", madlib,
                      ".logregr('", tbl.source, "', '",
                      gsub("'", "''", params$dep.str),
-                     "', '", params$ind.str, "', ", max_iter,
+                     "', '", params$ind.str, "', ", max.iter,
                      ", '", method, "', ", tolerance, ") as f) s",
                      sep = "")
     } else {
@@ -102,7 +102,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
                      tbl.source, "', '", tbl.output, "', '",
                      gsub("'", "''", params$dep.str),
                      "', '", params$ind.str, "', ",
-                     grp, ", ", max_iter, ", '", method, "', ",
+                     grp, ", ", max.iter, ", '", method, "', ",
                      tolerance, ")", sep = "")
     }
     
@@ -355,7 +355,7 @@ show.logregr.madlib <- function (object)
 ## -----------------------------------------------------------------------
 
 .madlib.mlogregr <- function (formula, data, na.action, method = "irls",
-                              max_iter = 10000, tolerance = 1e-5, call)
+                              max.iter = 10000, tolerance = 1e-5, call)
 {
     stop("To be implemented!")
 }

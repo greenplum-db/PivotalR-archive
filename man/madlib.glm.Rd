@@ -71,7 +71,7 @@
         (stochastic gradient descent algorithm [5]). The algorithm names for
         logistic regression.
 
-        \code{max_iter}: An integer, default is 10000. The maximum
+        \code{max.iter}: An integer, default is 10000. The maximum
         number of iterations that the algorithms will run.
 
         \code{tolerance}: A numeric value, default is 1e-5. The stopping
