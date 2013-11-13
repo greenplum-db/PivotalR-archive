@@ -160,8 +160,8 @@ madlib.elnet <- function (formula, data,
     if (!is.character(method)) stop("method must be \"fista\" or \"igd\"!")
     method <- tolower(method)
     if (!is.list(control)) stop("control must be a list of parameters!")
-    if (! method %in% c("fista", "igd"))
-        stop("MADlib only supports FISTA and IGD!")
+    if (! method %in% c("fista", "igd", "cd"))
+        stop("PivotalR only supports FISTA, IGD and CD!")
     if (method == "igd" &&
         !all(names(control) %in% c("step.size", "step.decay", "threshold",
                                    "warmup", "warmup.lambdas",
@@ -172,7 +172,10 @@ madlib.elnet <- function (formula, data,
                                    "warmup.lambdas", "warmup.lambda.no",
                                    "warmup.tolerance", "use.active.set",
                                    "activeset.tolerance", "random.stepsize",
-                                   "max.iter", "tolerance")))
+                                   "max.iter", "tolerance")) ||
+        method == "cd" &&
+        !all(names(control) %in% c("max.iter", "tolerance",
+                                   "use.active.set")))
         stop("Some of the control parameters are not supported!")
 
     names(control) <- gsub("\\.", "_", names(control))
@@ -188,6 +191,10 @@ madlib.elnet <- function (formula, data,
         tolerance <- control$tolerance
         control$tolerance <- NULL
     }
+    if (!"use.active.set" %in% names(control))
+        control$use_active_set <- FALSE
+
+    use.active.set <- control$use_active_set
 
     nms <- names(control)
     for (i in seq_len(length(names(control)))) {
@@ -207,7 +214,7 @@ madlib.elnet <- function (formula, data,
          identical(nms, character(0))) ""
     else paste(nms, " = ", as.character(control),
                sep = "", collapse = ", "), max.iter = max.iter,
-         tolerance = tolerance)
+         tolerance = tolerance, use.active.set = use.active.set)
 }
 
 ## ----------------------------------------------------------------------

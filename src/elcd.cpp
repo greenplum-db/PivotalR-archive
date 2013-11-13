@@ -49,22 +49,25 @@ extern "C"
         int count = 0;
         do {
             for (int i = 0; i < n; i++) {
-                if (active_set)
-                    if (active_now) continue;
+                if (active_set && active_now) continue;
                 double sum = 0;
                 for (int j = 0; j < n; j++)
                     if (coef(j) != 0) sum += xx(i,j) * coef(j);
-                double z = (xy(i) - coef(i)*mx(i) - sum) / N + coef(i);
-                coef(i) = soft_thresh(z, al) / (xx(i,i) + denom);
+                double z;
+                if (standardize)
+                    z = (xy(i) - sum) / N + coef(i);
+                else
+                    z = (xy(i) - coef(i)*mx(i) - sum) / N + coef(i);
+                coef(i) = soft_thresh(z, al) / (xx(i,i)/N + denom);
             }
             count++;
             if (count > maxit) break;
             double diff = 0;
-            for (int j = 0; j < n; j++)
-                if (prev[j] != 0)
-                    diff += fabs((prev[j] - coef(j)) / prev[j]);
+            for (int i = 0; i < n; i++)
+                if (prev[i] != 0)
+                    diff += fabs((prev[i] - coef(i)) / prev[i]);
                 else
-                    diff += fabs(prev[j] - coef(j));
+                    diff += fabs(prev[i] - coef(i));
             diff /= n;
             if (diff < tol) {
                 if (active_now && active_set)
@@ -78,17 +81,15 @@ extern "C"
                 coef(n) = my;
                 for (int i = 0; i < n; i++)
                     coef(n) = coef(n) - mx(i) * coef(i);
-            } else {
-                coef(n) = 0;
-            }
+            } 
             for (int i = 0; i < n; i++) prev[i] = coef(i);
         } while (true);
 
         if (standardize) {
-            coef(n+1) = my;
+            coef(n) = my;
             for (int i = 0; i < n; i++) {
-                coef(i) = coef(i) / sqrt(sx(i));
-                coef(n+1) = coef(n+1) - coef(i) * mx(i);
+                coef(i) = coef(i) / sx(i);
+                coef(n) = coef(n) - coef(i) * mx(i);
             }
         }
 

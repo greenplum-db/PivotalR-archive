@@ -1,4 +1,5 @@
 # exportPattern("^[^\\.]")
+useDynLib(PivotalR)
 
 export("db.connect", "db.disconnect", "db.list")
 
