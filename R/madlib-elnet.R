@@ -162,7 +162,7 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
     ## max_iter and tolerance are not in SQL's optimizer_params
     max.iter <- 10000
     tolerance <- 1e-4
-    if ("max_iter" %in% names(control)) {
+    if ("max.iter" %in% names(control)) {
         max.iter <- control$max_iter
         control$max_iter <- NULL
     }
@@ -183,7 +183,6 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
             control[[i]] <- paste("[", paste(control[[i]], collapse = ", "),
                                   "]", sep = "")
         }
-        
     }
 
     list(control.str = if (is.null(nms) ||
