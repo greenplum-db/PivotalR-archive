@@ -41,9 +41,14 @@ setMethod(
             .create.db.Rquery(x, cols.i = i, x.where)
         } else if (na == 3) {
             if (identical(x@.key, character(0))) {
-                message("Error : there is no unique ID associated",
-                        " with each row of the table!")
-                stop()
+                if (identical(i, logical(0))) {
+                    return (structure(vector("list", length(names(x))),
+                                      names = names(x), class = "data.frame"))
+                } else {
+                    message("Error : there is no unique ID associated",
+                            " with each row of the table!")
+                    stop()
+                }
             }
             if (x.where != "") {
                 x.where <- paste("(", x.where, ") and ", sep = "")
@@ -89,9 +94,14 @@ setMethod (
         if (n == 3) {
             if (!i.missing && identical(x@.key, character(0)) &&
                 !is(i, "db.Rquery")) {
-                message("Error : there is no unique ID associated",
-                        " with each row of the table!")
-                stop()
+                if (identical(i, logical(0)))
+                    return (structure(vector("list", length(names(x))),
+                                      names = names(x), class = "data.frame"))
+                else {
+                    message("Error : there is no unique ID associated",
+                            " with each row of the table!")
+                    stop()
+                }
             }
             if (!i.missing && is(i, "db.Rquery")) {
                 if (length(i@.expr) > 1 || i@.col.data_type != "boolean") {
@@ -148,9 +158,15 @@ setMethod (
                                                  where.str, rb, sep = ""))
             } else if (!is(i, "db.Rquery")) {
                 if (identical(x@.key, character(0))) {
-                    message("Error : there is no unique ID associated",
-                            " with each row of the table!")
-                    stop()
+                    if (identical(i, logical(0))) {
+                        return (structure(vector("list", length(names(x))),
+                                          names = names(x),
+                                          class = "data.frame"))
+                    } else {
+                        message("Error : there is no unique ID associated",
+                                " with each row of the table!")
+                        stop()
+                    }
                 }
 
                 ## where.str <- paste(x@.key, "=", i, collapse = " or ")
@@ -222,8 +238,9 @@ setMethod (
             cols.i <- .gwhich(names(x), cols.i)
             nss <- names(x)
         } else {
-            message("Error : column does not exist!")
-            stop()
+            return (NULL)
+            ## message("Error : column does not exist!")
+            ## stop()
         }            
     } else if (is(cols.i, "numeric") || is.null(cols.i)) {
         if (!is.null(cols.i)) {
