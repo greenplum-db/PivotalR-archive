@@ -345,7 +345,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ##
     
     list(dep.str = dep.var, origin.dep = origin.dep,
-         ind.str = ind.var, grp.str = grp,
+         ind.str = ind.var, grp.str = grp, grp.vars = f2.labels,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data,
