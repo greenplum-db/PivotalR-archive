@@ -5,7 +5,7 @@
 
 setClass("elnet.madlib")
 
-madlib.elnet <- function (formula, data, family = "gaussian", na.action,
+madlib.elnet <- function (formula, data, family = "gaussian", na.action = NULL,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
                           method = "fista", control = list(),
                           glmnet = FALSE, ...)
@@ -29,7 +29,7 @@ madlib.elnet <- function (formula, data, family = "gaussian", na.action,
 
     warnings <- .suppress.warnings(conn.id)
 
-    analyzer <- .get.params(formula, data)
+    analyzer <- .get.params(formula, data, na.action)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp

@@ -9,7 +9,7 @@ setClass("lm.madlib.grps")
 ## na.action is a place holder
 ## will implement later in R (using temp table), or will implement
 ## in MADlib
-madlib.lm <- function (formula, data, na.action, 
+madlib.lm <- function (formula, data, na.action = NULL, 
                        hetero = FALSE, ...) # param name too long
 {
     ## make sure fitting to db.obj
@@ -34,7 +34,7 @@ madlib.lm <- function (formula, data, na.action,
     warnings <- .suppress.warnings(conn.id)
 
     ## analyze the formula
-    analyzer <- .get.params(formula, data)
+    analyzer <- .get.params(formula, data, na.action)
 
     ## For db.view or db.R.query, create a temporary table
     ## For pivoted db.Rquery, realize the pivoting
