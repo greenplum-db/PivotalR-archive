@@ -180,6 +180,11 @@ setMethod (
         else
             obj.str <- "table"
 
+        if (x@.where != "")
+            where <- paste(" where", x@.where)
+        else
+            where <- ""
+        
         if (x@.source == x@.parent)
             tbl <- x@.parent
         else
@@ -225,7 +230,7 @@ setMethod (
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
             ## scan through the table only once
-            sql <- paste(sql, " from ", tbl, sep = "")
+            sql <- paste(sql, " from ", tbl, where, sep = "")
             distincts <- .db.getQuery(sql, conn.id)
             idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
@@ -252,11 +257,6 @@ setMethod (
                 } 
             }
         }
-
-        if (x@.where != "")
-            where <- paste(" where", x@.where)
-        else
-            where <- ""
 
         if (!is.null(nrow))
             nrow.str <- paste(" limit ", nrow, " ", sep = "")
