@@ -16,15 +16,16 @@ setMethod(
         warn.r <- getOption("warn")
         options(warn = -1)
 
-        cond <- Reduce(function (v, w) v & w,
+        cond <- Reduce(function (v, w) v | w,
                        Filter(function (v) !is.null(v),
                               unlist(Map(function (v)
-                                         with(object, eval(parse(
-                                             text = paste("is.na(", gsub("\"",
-                                             "`", v), ")", sep = "")))),
+                                         eval(parse(text = paste(
+                                                    "with(object, is.na(",
+                                                    gsub("\"", "`", v), "))",
+                                                    sep = ""))),
                                          vars))))
         
         options(warn = warn.r)
-        x[cond,]
+        x[!(cond),]
     }
 })

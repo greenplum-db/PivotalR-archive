@@ -124,3 +124,5 @@ export("madlib.elnet", "summary.elnet.madlib",
 
 exportMethods("sin", "cos", "tan", "asin", "acos", "atan",
               "atan2")
+
+exportMethods("na.omit")

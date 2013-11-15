@@ -185,6 +185,11 @@ setMethod (
         else
             tbl <- paste("(", x@.parent, ") s", sep = "")
 
+        if (x@.where != "")
+            where <- paste(" where", x@.where)
+        else
+            where <- ""
+
         ## deal with factor, if exists
         ## We still need to keep the original non-factor
         ## column, because sometimes one wants to use the original
@@ -220,13 +225,14 @@ setMethod (
             cats <- x@.expr[x@.is.factor]
             sql <- "select "
             for (i in seq_len(length(cats))) {
-                sql <- paste(sql, "array_agg(distinct case when ", cats[i], " is NULL then 'NULL' else",
+                sql <- paste(sql, "array_agg(distinct case when ", cats[i],
+                             " is NULL then 'NULL' else ",
                              cats[i], "::text end) as ",
                              "distinct_", i, sep = "")
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
             ## scan through the table only once
-            sql <- paste(sql, " from ", tbl, sep = "")
+            sql <- paste(sql, " from ", tbl, where, sep = "")
             distincts <- .db.getQuery(sql, conn.id)
             idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
@@ -253,11 +259,6 @@ setMethod (
                 } 
             }
         }
-
-        if (x@.where != "")
-            where <- paste(" where", x@.where)
-        else
-            where <- ""
 
         if (!is.null(nrow))
             nrow.str <- paste(" limit ", nrow, " ", sep = "")

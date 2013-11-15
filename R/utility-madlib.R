@@ -26,11 +26,12 @@
     n <- ncol(data)
     params <- .analyze.formula(formula, data)
 
-    if (!is.na(na.action))
+    if (!is.null(na.action)) {
         params$data <- na.action(params$data, vars =
-                                 with(params, c(dep.str, grp.vars,
-                                                ind.vars,
+                                 with(params, c(origin.dep, grp.vars,
+                                                origin.ind,
                                                 names(data)[data@.is.factor])))
+        }
 
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE

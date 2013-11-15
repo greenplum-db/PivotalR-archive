@@ -53,11 +53,17 @@
         } else {
             if (is.null(case))
                 x.names[idx] <- value@.expr[i]
-            else
+            else {
+                if (is.na(value@.expr[i]))
+                    vstr <- "NULL"
+                else
+                    vstr <- paste(value@.expr[i], "::", x@.col.data_type[idx],
+                                  sep = "")
                 x.names[idx] <- paste("case when ", case, " then ",
-                                      value@.expr[i], "::", x@.col.data_type[idx],
+                                      vstr,
                                       " else ", x.expr[idx],
                                       " end", sep = "")
+            }
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
             is.factor[idx] <- value@.is.factor[i]
@@ -131,11 +137,18 @@
             if (is.null(case))
                 x.names[idx] <- as.character(value)
             else
-                if (case[i] != "NULL")
+                if (case[i] != "NULL") {
+                    if (is.na(value))
+                        vstr <- "NULL"
+                    else
+                        vstr <- paste(value, "::",
+                                      x@.col.data_type[idx],
+                                      sep = "")
                     x.names[idx] <- paste("case when ", case[i], " then ",
-                                          value, "::", x@.col.data_type[idx],
+                                          vstr,
                                           " else ", x@.expr[idx],
                                           " end", sep = "")
+                }
             x.col.data_type[idx] <- type
             x.col.udt_name[idx] <- udt
             is.factor[idx] <- FALSE
