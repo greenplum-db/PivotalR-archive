@@ -198,3 +198,31 @@ is.db.data.frame <- function (x)
 
     cols
 }
+
+## ----------------------------------------------------------------------
+
+## get extra strings like where and sort etc
+.get.extra.str <- function(data)
+{
+    if (is(data, "db.data.frame")) {
+        tbl <- content(data)
+        src <- tbl
+        parent <- src
+        where <- ""
+        where.str <- ""
+        sort <- list(by = "", order = "", str = "")
+    } else {
+        if (data@.source == data@.parent)
+            tbl <- data@.parent
+        else
+            tbl <- paste("(", data@.parent, ") s", sep = "")
+        src <- data@.source
+        parent <- data@.parent
+        where <- data@.where
+        if (where != "") where.str <- paste(" where", where)
+        else where.str <- ""
+        sort <- data@.sort
+    }
+
+    list(tbl = tbl, where = where, where.str = where.str, sort = sort)
+}

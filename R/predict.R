@@ -33,7 +33,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
     if (type == "response")
         .predict(object, newdata, "logregr_predict", "boolean", "bool")
     else {
-
+        .predict.prob(object, newdata) # only for logistic regression
     }
 }
 
@@ -45,7 +45,14 @@ predict.logregr.madlib.grps <- function (object, newdata,
         stop("New data for prediction must be a db.obj!")
     
     db.str <- (.get.dbms.str(conn.id(newdata)))$db.str
+    if (db.str == "HAWQ") stop("HAWQ does not support this!")
     madlib <- schema.madlib(conn.id(newdata))
+
+    strs <- .get.extra.str(newdata)
+    tbl <- strs$tbl
+    where <- strs$where
+    where.str <- strs$where.str
+    sort <- strs$sort
 }
 
 ## -----------------------------------------------------------------------
@@ -59,27 +66,13 @@ predict.logregr.madlib.grps <- function (object, newdata,
         stop("New data for prediction must be a db.obj!")
 
     db.str <- (.get.dbms.str(conn.id(newdata)))$db.str
-
     madlib <- schema.madlib(conn.id(newdata))
-    if (is(newdata, "db.data.frame")) {
-        tbl <- content(newdata)
-        src <- tbl
-        parent <- src
-        where <- ""
-        where.str <- ""
-        sort <- list(by = "", order = "", str = "")
-    } else {
-        if (newdata@.source == newdata@.parent)
-            tbl <- newdata@.parent
-        else
-            tbl <- paste("(", newdata@.parent, ") s", sep = "")
-        src <- newdata@.source
-        parent <- newdata@.parent
-        where <- newdata@.where
-        if (where != "") where.str <- paste(" where", where)
-        else where.str <- ""
-        sort <- newdata@.sort
-    }
+    
+    strs <- .get.extra.str(newdata)
+    tbl <- strs$tbl
+    where <- strs$where
+    where.str <- strs$where.str
+    sort <- strs$sort
     
     if (db.str != "HAWQ") {
         if (!is(newdata, "db.data.frame"))
