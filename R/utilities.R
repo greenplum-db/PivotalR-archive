@@ -224,5 +224,6 @@ is.db.data.frame <- function (x)
         sort <- data@.sort
     }
 
-    list(tbl = tbl, where = where, where.str = where.str, sort = sort)
+    list(tbl = tbl, where = where, where.str = where.str, sort = sort,
+         src = src, parent = parent)
 }

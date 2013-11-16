@@ -20,16 +20,18 @@ predict.lm.madlib.grps <- function (object, newdata, ...)
 predict.logregr.madlib <- function (object, newdata,
                                     type = c("response", "prob"), ...)
 {
+    type <- match.arg(type)
     if (type == "response")
         .predict(object, newdata, "logregr_predict", "boolean", "bool")
     else {
-
+        .predict.prob(object, newdata) # only for logistic regression
     }
 }
 
 predict.logregr.madlib.grps <- function (object, newdata,
                                          type = c("response", "prob"), ...)
 {
+    type <- match.arg(type)
     if (type == "response")
         .predict(object, newdata, "logregr_predict", "boolean", "bool")
     else {
@@ -53,7 +55,9 @@ predict.logregr.madlib.grps <- function (object, newdata,
     where <- strs$where
     where.str <- strs$where.str
     sort <- strs$sort
-    fun.str <- paste(madlib, ".", "elastic_net_binomial_prob", sep = "")
+    src <- strs$src
+    parent <- strs$parent
+    func.str <- paste(madlib, ".", "elastic_net_binomial_prob", sep = "")
 
     if (!is(newdata, "db.data.frame"))
         ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
@@ -135,8 +139,8 @@ predict.logregr.madlib.grps <- function (object, newdata,
         .conn.id = conn.id(newdata),
         .col.name = "madlib_predict",
         .key = character(0),
-        .col.data_type = data.type,
-        .col.udt_name = udt.name,
+        .col.data_type = "double precision",
+        .col.udt_name = "float8",
         .where = where,
         .is.factor = FALSE,
         .factor.suffix = "",
@@ -162,6 +166,8 @@ predict.logregr.madlib.grps <- function (object, newdata,
     where <- strs$where
     where.str <- strs$where.str
     sort <- strs$sort
+    src <- strs$src
+    parent <- strs$parent
     
     if (db.str != "HAWQ") {
         if (!is(newdata, "db.data.frame"))
