@@ -17,14 +17,35 @@ predict.lm.madlib.grps <- function (object, newdata, ...)
 
 ## -----------------------------------------------------------------------
 
-predict.logregr.madlib <- function (object, newdata, ...)
+predict.logregr.madlib <- function (object, newdata,
+                                    type = c("response", "prob"), ...)
 {
-    .predict(object, newdata, "logregr_predict", "boolean", "bool")
+    if (type == "response")
+        .predict(object, newdata, "logregr_predict", "boolean", "bool")
+    else {
+
+    }
 }
 
-predict.logregr.madlib.grps <- function (object, newdata, ...)
+predict.logregr.madlib.grps <- function (object, newdata,
+                                         type = c("response", "prob"), ...)
 {
-    .predict(object, newdata, "logregr_predict", "boolean", "bool")
+    if (type == "response")
+        .predict(object, newdata, "logregr_predict", "boolean", "bool")
+    else {
+
+    }
+}
+
+## predict probability only for binomial models
+.predict.prob <- function(object, newdata)
+{
+    if (is(object, "logregr.madlib")) object <- list(object)
+    if (!is(newdata, "db.obj"))
+        stop("New data for prediction must be a db.obj!")
+    
+    db.str <- (.get.dbms.str(conn.id(newdata)))$db.str
+    madlib <- schema.madlib(conn.id(newdata))
 }
 
 ## -----------------------------------------------------------------------
