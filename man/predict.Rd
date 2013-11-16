@@ -18,9 +18,9 @@
 
 \method{predict}{lm.madlib.grps}(object, newdata, ...)
 
-\method{predict}{logregr.madlib}(object, newdata, ...)
+\method{predict}{logregr.madlib}(object, newdata, type = c("response", "prob"), ...)
 
-\method{predict}{logregr.madlib.grps}(object, newdata, ...)
+\method{predict}{logregr.madlib.grps}(object, newdata, type = c("response", "prob"), ...)
 }
 
 \arguments{
@@ -32,6 +32,10 @@
   \item{newdata}{
     A \code{db.obj} object, which contains the information about the
     real data in the database.
+  }
+
+  \item{type}{
+    A string, default is \code{"response"}, which produces the \code{TRUE} or \code{FALSE} prediction. If it is \code{"prob"}, this function computes the probabilities for \code{TRUE} cases.
   }
   
   \item{\dots}{
