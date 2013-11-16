@@ -52,7 +52,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
 ## -----------------------------------------------------------------------
 
-.madlib.logregr <- function (formula, data, na.action, method = "irls",
+.madlib.logregr <- function (formula, data, na.action = NULL, method = "irls",
                              max.iter = 10000, tolerance = 1e-5)
 {
     ## make sure fitting to db.obj
