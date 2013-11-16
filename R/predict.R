@@ -5,14 +5,14 @@
 
 predict.lm.madlib <- function (object, newdata, ...)
 {
-    .predict(object, newdata, "linregr_predict", "double precision",
-             "float8")
+    .predict(object, newdata, "elastic_net_gaussian_predict",
+             "double precision", "float8")
 }
 
 predict.lm.madlib.grps <- function (object, newdata, ...)
 {
-    .predict(object, newdata, "linregr_predict", "double precision",
-             "float8")
+    .predict(object, newdata, "elastic_net_gaussian_predict",
+             "double precision", "float8")
 }
 
 ## -----------------------------------------------------------------------
@@ -22,7 +22,8 @@ predict.logregr.madlib <- function (object, newdata,
 {
     type <- match.arg(type)
     if (type == "response")
-        .predict(object, newdata, "logregr_predict", "boolean", "bool")
+        .predict(object, newdata, "elastic_net_binomial_predict", "boolean",
+                 "bool")
     else {
         .predict.prob(object, newdata) # only for logistic regression
     }
@@ -33,7 +34,8 @@ predict.logregr.madlib.grps <- function (object, newdata,
 {
     type <- match.arg(type)
     if (type == "response")
-        .predict(object, newdata, "logregr_predict", "boolean", "bool")
+        .predict(object, newdata, "elastic_net_binomial_predict", "boolean",
+                 "bool")
     else {
         .predict.prob(object, newdata) # only for logistic regression
     }
@@ -107,7 +109,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
             }
             coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
                             sep = "")
-            expr <- paste(func.str, "(", coef, ", ", intercept, ", ",
+            expr <- paste(expr, func.str, "(", coef, ", ", intercept, ", ",
                           ind.str, ")", sep = "")
             
             if (i < n)
@@ -168,35 +170,42 @@ predict.logregr.madlib.grps <- function (object, newdata,
     sort <- strs$sort
     src <- strs$src
     parent <- strs$parent
-    
+
+    if (!is(newdata, "db.data.frame"))
+        ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
+                                           names(newdata),
+                                           newdata@.expr)
+    else
+        ind.vars <- object[[1]]$ind.vars
     if (db.str != "HAWQ") {
-        if (!is(newdata, "db.data.frame"))
-            ind.str <- .replace.col.with.expr(object[[1]]$ind.str,
-                                              names(newdata),
-                                              newdata@.expr)
-        else
-            ind.str <- object[[1]]$ind.str
+        ind.str <- paste("array[", paste(ind.vars, collapse = ","), "]",
+                         sep = "")
     } else {
-        if (!is(newdata, "db.data.frame"))
-            ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
-                                               names(newdata),
-                                               newdata@.expr)
-        else
-            ind.vars <- object[[1]]$ind.vars
         if (object[[1]]$has.intercept) ind.vars <- c(1, ind.vars)
     }
     
     ## deal with groups
-    coef.i <- which(names(object[[1]]) == "coef")
-    grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
+    ## coef.i <- which(names(object[[1]]) == "coef")
+    ## grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
 
     if (length(object[[1]]$grp.cols) == 0) {
         if (db.str != "HAWQ") {
-            coef <- paste("array[", paste(object[[1]]$coef,
-                                          collapse = ", "), "]",
+            if (object[[1]]$has.intercept) {
+                coef <- object[[1]]$coef[-1]
+                intercept <- object[[1]]$coef[1]
+            } else {
+                coef <- object[[1]]$coef
+                intercept <- 0
+            }
+            coef <- paste("array[", paste(coef, collapse = ", "), "]",
                           sep = "")
-            expr <- paste(madlib, ".", func.str, "(", coef, ", ",
-                          ind.str, ")", sep = "")
+            expr <- paste(madlib, ".", func.str, "(", coef, ", ", intercept,
+                          ", ", ind.str, ")", sep = "")
+            ## coef <- paste("array[", paste(object[[1]]$coef,
+            ##                               collapse = ", "), "]",
+            ##               sep = "")
+            ## expr <- paste(madlib, ".", func.str, "(", coef, ", ",
+            ##               ind.str, ")", sep = "")
         } else {
             expr <- paste(object[[1]]$coef, ind.vars, sep = "*",
                           collapse = " + ")
@@ -224,11 +233,22 @@ predict.logregr.madlib.grps <- function (object, newdata,
             expr <- paste(expr, tmp, " then ", sep = "")
         
             if (db.str != "HAWQ") {
-                coef.i <- paste("array[", paste(object[[i]]$coef,
-                                                collapse = ", "),
-                                "]", sep = "")
-                expr <- paste(expr, madlib, ".", func.str, "(", coef.i,
-                              ", ", ind.str, ")", sep = "")
+                if (object[[i]]$has.intercept) {
+                    coef <- object[[i]]$coef[-1]
+                    intercept <- object[[i]]$coef[1]
+                } else {
+                    coef <- object[[i]]$coef
+                    intercept <- 0
+                }
+                coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
+                                sep = "")
+                expr <- paste(expr, madlib, ".", func.str, "(", coef, ", ",
+                              intercept, ", ", ind.str, ")", sep = "")
+                ## coef.i <- paste("array[", paste(object[[i]]$coef,
+                ##                                 collapse = ", "),
+                ##                 "]", sep = "")
+                ## expr <- paste(expr, madlib, ".", func.str, "(", coef.i,
+                ##               ", ", ind.str, ")", sep = "")
             } else {
                 expr <- paste(expr, paste(object[[1]]$coef, ind.vars,
                                           sep = "*", collapse = " + "), sep = "")
