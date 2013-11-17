@@ -11,7 +11,7 @@ setClass("logregr.madlib.grps")
 ## family specific parameters are in control, which
 ## is a list of parameters
 madlib.glm <- function (formula, data, family = "gaussian",
-                        na.action = "na.omit", control = list(), ...)
+                        na.action = NULL, control = list(), ...)
 {
     args <- control
     args$formula <- formula
