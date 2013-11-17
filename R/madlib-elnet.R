@@ -5,11 +5,15 @@
 
 setClass("elnet.madlib")
 
-madlib.elnet <- function (formula, data, family = "gaussian", na.action,
+madlib.elnet <- function (formula, data,
+                          family = c("gaussian", "linear", "binomial", "logistic"),
+                          na.action,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
-                          method = "fista", control = list(),
+                          method = c("fista", "igd", "sgd"), control = list(),
                           glmnet = FALSE, ...)
 {
+    family <- match.arg(family)
+    method <- match.arg(family)
     control <- .validate.method(method, control)
     method <- tolower(method)
     if (method == "sgd") method <- "igd"

@@ -10,9 +10,11 @@ setClass("logregr.madlib.grps")
 ## na.action is a place holder
 ## family specific parameters are in control, which
 ## is a list of parameters
-madlib.glm <- function (formula, data, family = "gaussian",
+madlib.glm <- function (formula, data,
+                        family = c("gaussian", "linear", "binomial", "logistic"),
                         na.action = NULL, control = list(), ...)
 {
+    family <- match.arg(family)
     args <- control
     args$formula <- formula
     args$data <- data
