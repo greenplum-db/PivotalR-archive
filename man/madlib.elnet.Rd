@@ -9,9 +9,10 @@
   This function wraps MAdlib's elastic net regularization for generalized linear models. Currently linear and logistic regressions are supported.  
 }
 \usage{
-madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1,
-lambda = 0.1, standardize = TRUE, method = "fista", control = list(),
-glmnet = FALSE, ...)
+madlib.elnet(formula, data, family = c("gaussian", "linear", "binomial",
+"logistic"), na.action, alpha = 1, lambda = 0.1, standardize = TRUE,
+method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
+...)
 }
 
 \arguments{

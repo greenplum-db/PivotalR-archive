@@ -17,7 +17,8 @@
 }
 
 \usage{
-    madlib.glm(formula, data, family = "gaussian", na.action, control = list(), ...)
+madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
+"logistic"), na.action, control = list(), ...)
 }
 
 \arguments{
