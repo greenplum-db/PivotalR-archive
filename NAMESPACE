@@ -126,3 +126,8 @@ exportMethods("sin", "cos", "tan", "asin", "acos", "atan",
               "atan2")
 
 export("grepl")
+
+exportMethods("as.list")
+
+export("array.len")
+

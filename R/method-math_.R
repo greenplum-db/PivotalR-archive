@@ -54,6 +54,8 @@ setMethod ("atan",
 
 ## ----------------------------------------------------------------------
 
+setGeneric("atan2")
+
 setMethod ("atan2",
            signature(y = "db.obj", x = "db.obj"),
            function (y, x) atan(y/x),

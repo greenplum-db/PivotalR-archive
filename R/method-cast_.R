@@ -84,6 +84,8 @@ setMethod(
 
 ## ----------------------------------------------------------------------
 
+setGeneric("as.Date")
+
 setMethod(
     "as.Date",
     signature(x = "db.obj"),
