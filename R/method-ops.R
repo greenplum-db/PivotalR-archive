@@ -1058,3 +1058,21 @@ setMethod (
         .compare(x, "", " is NULL", NA, "", "boolean", "")
     },
     valueClass = "db.Rquery")
+
+## ----------------------------------------------------------------------
+
+setGeneric("grepl")
+
+setMethod(
+    "grepl",
+    signature(pattern = "character", x = "db.obj"),
+    function (pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE,
+              useBytes = FALSE)
+{
+    pattern <- paste("'", .strip(as.character(pattern), "'"), "'", sep = "")
+    if (fixed) pattern <- gsub("\\", "\\\\", pattern)
+    if (ignore.case) cmp <- "~*"
+    else cmp <- "~"
+    res <- .compare(x, pattern, cmp, .txt.types, cast = "")
+    res
+})
