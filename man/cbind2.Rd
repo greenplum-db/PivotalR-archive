@@ -44,7 +44,9 @@ x and y.
 
 \seealso{
   \code{\link{db.array}} combines columns of a table/view into an
-  array. 
+  array.
+
+  \code{\link{array.len}} measures the length of the array in an array column.
 }
 \examples{
 \dontrun{
@@ -63,8 +65,12 @@ z <- cbind(x$rings, predict(fit, x))
 plot(lookat(z, 100))
 
 ## expand the db.obj
-unlist(Map(function(x) if (col.types(x) == "text") "a"
-                       else lk(mean(x))), as.list(x))
+unlist(Map(function(x)
+               if (col.types(x) == "text")
+                   paste(lk(unique(x)), collapse="-", sep="")
+               else
+                   lk(mean(x))),
+           as.list(x))
 }
 }
 
