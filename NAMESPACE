@@ -124,3 +124,7 @@ export("madlib.elnet", "summary.elnet.madlib",
 
 exportMethods("sin", "cos", "tan", "asin", "acos", "atan",
               "atan2")
+
+exportMethods("as.list")
+
+export("array.len")

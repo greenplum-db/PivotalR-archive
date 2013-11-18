@@ -3,6 +3,8 @@
 ## It is the opposite of cbind
 ## ----------------------------------------------------------------------
 
+setGeneric("as.list")
+
 setMethod(
     "as.list",
     signature(x = "db.obj"),
