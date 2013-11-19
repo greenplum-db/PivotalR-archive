@@ -23,7 +23,7 @@ extern "C"
 
     SEXP elcd(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP ralpha,
               SEXP rlambda, SEXP rstandardize, SEXP ractive_set,
-              SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef)
+              SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter)
     {
         Rmatrix<double> xx(rxx);
         Rvector<double> xy(rxy);
@@ -38,6 +38,7 @@ extern "C"
         int maxit = *(INTEGER(rmaxit));
         double tol = *(REAL(rtol));
         int N = *(INTEGER(rN));
+        double* iter = REAL(riter);
         
         int n = coef.size() - 1;
         double* prev = new double[n];
@@ -92,6 +93,8 @@ extern "C"
                 coef(n) = coef(n) - coef(i) * mx(i);
             }
         }
+
+        *iter = count; // number of iterations
 
         delete [] prev;
         return R_NilValue;

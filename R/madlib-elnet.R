@@ -75,7 +75,7 @@ madlib.elnet <- function (formula, data,
     if (family == "gaussian" && method == "cd") {
         return (.elnet.gaus.cd(data, params$ind.vars, params$dep,
                                alpha, lambda, standardize, control, glmnet,
-                               y.scl, y.ctr))
+                               y.scl, y.ctr, params, call))
     }
 
     if (family == "binomial" && method == "cd") {

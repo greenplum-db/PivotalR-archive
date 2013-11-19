@@ -5,7 +5,7 @@
 
 ## Gaussian coordinate descent method
 .elnet.gaus.cd <- function (data, x, y, alpha, lambda, standardize, control,
-                            glmnet, y.scl, y.ctr)
+                            glmnet, y.scl, y.ctr, params, call)
 {
     n <- length(x)
     N <- nrow(data)
@@ -50,10 +50,11 @@
     xx <- lk(crossprod(x))
     xy <- lk(crossprod(x, y))
     coef <- rep(0, n+1) # including the intercept
+    iter <- 0
     rst <- .Call("elcd", as.matrix(xx), as.vector(xy), mx, my, sx, alpha,
                  lambda, standardize, control$use.active.set,
                  as.integer(control$max.iter), control$tolerance,
-                 as.integer(N), coef, PACKAGE = "PivotalR")
+                 as.integer(N), coef, iter, PACKAGE = "PivotalR")
     intercept <- coef[n+1]
     coef <- coef[1:n]
     if (glmnet) {
@@ -63,7 +64,7 @@
 
     rst <- list(coef = coef, intercept = intercept)
     rows <- gsub("\"", "", ind.vars)
-    ## rst$ind.vars <- rows
+    rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
     for (i in seq_len(length(col.name))) 
@@ -72,6 +73,22 @@
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
+    rst$iter <- iter
+    rst$glmnet <- glmnet
+    rst$y.scl <- y.scl
+    rst$standardize <- standardize
+    rst$ind.str <- params$ind.str
+    rst$dummy <- data@.dummy
+    rst$dummy.expr <- data@.dummy.expr
+    rst$appear <- appear
+    rst$terms <- params$terms
+    rst$model <- NA
+    rst$call <- call
+    rst$alpha <- alpha
+    rst$lambda <- lambda
+    rst$method <- "cd"
+    rst$family <- "gaussian"
+    class(rst) <- "elnet.madlib"
     rst
 }
 
