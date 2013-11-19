@@ -6,11 +6,11 @@
 }
 
 \description{
-  This function wraps MAdlib's elastic net regularization for generalized linear models. Currently linear and logistic regressions are supported.  
+  This function wraps MAdlib's elastic net regularization for generalized linear models. Currently linear and logistic regressions are supported.
 }
 \usage{
 madlib.elnet(formula, data, family = c("gaussian", "linear", "binomial",
-"logistic"), na.action, alpha = 1, lambda = 0.1, standardize = TRUE,
+"logistic"), na.action = NULL, alpha = 1, lambda = 0.1, standardize = TRUE,
 method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
 ...)
 }
@@ -33,10 +33,10 @@ method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
 }
 \item{na.action}{
           A string which indicates what should happen when the data
-        contain \code{NA}s.  Future possible
-        values include \code{"na.omit"}, \code{"na.exclude"},
+        contain \code{NA}s.  Possible
+        values include \code{\link{na.omit}}, \code{"na.exclude"},
         \code{"na.fail"}
-        and \code{NULL}. Currently not implemented yet.
+        and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
 }
 \item{alpha}{
   A numeric value in [0,1], elastic net control parameter.
@@ -102,7 +102,7 @@ A vector of numeric values, default is \code{NULL}. The lambda value series to u
 An integer Default: 15. How many lambdas are used in warm-up. If warmup_lambdas is not NULL, this value is overridden by the number of provided lambda values.
 
 - \code{warmup.tolerance}
-A numeric value, the value of tolerance used during warmup. The default is the same as the tolerance value. 
+A numeric value, the value of tolerance used during warmup. The default is the same as the tolerance value.
 }
   \item{glmnet}{
     A logical value, default is \code{FALSE}. The R package \code{glmnet} states that "Note also that for gaussian, glmnet standardizes y to have unit variance before computing its lambda sequence (and then unstandardizes the resulting coefficients); if you wish to reproduce/compare results with other software, best to supply a standardized y." So if the user wants to compare the result of this function with that of \code{glmnet}, he can set this value to be \code{TRUE}, which tells this function to do the same data transformation as \code{glmnet} in the "gaussian" case so that one can easily compare the results.
@@ -193,7 +193,7 @@ A numeric value, the value of tolerance used during warmup. The default is the s
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc.  
+  Author: Predictive Analytics Team at Pivotal Inc.
 
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }

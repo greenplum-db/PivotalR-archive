@@ -18,7 +18,7 @@
 
 \usage{
 madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
-"logistic"), na.action, control = list(), ...)
+"logistic"), na.action = NULL, control = list(), ...)
 }
 
 \arguments{
@@ -48,10 +48,10 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 
     \item{na.action}{
         A string which indicates what should happen when the data
-        contain \code{NA}s.  Future possible
-        values include \code{"na.omit"}, \code{"na.exclude"},
-        \code{"na.fail"} 
-        and \code{NULL}. Currently not implemented yet.
+        contain \code{NA}s. Possible
+        values include \code{\link{na.omit}}, \code{"na.exclude"},
+        \code{"na.fail"}
+        and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
     }
 
     \item{control}{
@@ -62,7 +62,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
         \code{hetero}. A logical, deafult is \code{FALSE}. If it is
   \code{TRUE}, then Breusch-Pagan test is performed on the fitting model
   and the corresponding test statistic and p-value are computed.
-        
+
         For logistic regression, one can pass the following
         extra parameters:
 
@@ -97,10 +97,10 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
   For the logistic regression, the returned value is similar to that of
   the linear regression.  If there is no grouping (i.e. no \code{|} in the formula), the result
   is a \code{logregr.madlib} object. Otherwise, it is a
-  \code{logregr.madlib.grps} 
+  \code{logregr.madlib.grps}
   object, which is just a list of \code{logregr.madlib} objects.
 
-  A \code{logregr.madlib} object 
+  A \code{logregr.madlib} object
   a list which contains the following items:
 
   \item{grouping column(s)}{
@@ -133,8 +133,8 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 
   \item{z_stats}{
     A numeric matrix, the z-statistics for each coefficient. Each row is
-    for a 
-    fitting to a group of the data. 
+    for a
+    fitting to a group of the data.
   }
 
   \item{p_values}{
@@ -145,7 +145,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
   \item{odds_ratios}{
     A numeric array, the odds ratios [6] for the fittings for all groups.
   }
-  
+
   \item{condition_no}{
       A numeric array, the condition number for all combinations of the
     grouping column values.
@@ -198,11 +198,11 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
     A \code{\linkS4class{db.data.frame}} object, which wraps the result
     table of this function.
   }
-  
+
   \item{terms}{
     A \code{\link{terms}} object, describing the terms in the model formula.
   }
-  
+
   \item{nobs}{
     The number of observations used to fit the model.
   }
@@ -231,7 +231,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 \references{
     [1] Documentation of linear regression in MADlib v0.6,
     \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}
-    
+
     [2] Documentation of logistic regression in MADlib v0.6,
     \url{http://doc.madlib.net/v0.6/group__grp__logreg.html}
 
@@ -245,7 +245,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
     \url{http://en.wikipedia.org/wiki/Stochastic_gradient_descent}
 
     [6] Wikipedia: Odds ratio,
-    \url{http://en.wikipedia.org/wiki/Odds_ratio} 
+    \url{http://en.wikipedia.org/wiki/Odds_ratio}
 }
 
 \seealso{

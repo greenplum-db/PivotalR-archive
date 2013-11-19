@@ -7,7 +7,7 @@ setClass("elnet.madlib")
 
 madlib.elnet <- function (formula, data,
                           family = c("gaussian", "linear", "binomial", "logistic"),
-                          na.action,
+                          na.action = NULL,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
                           method = c("fista", "igd", "sgd"), control = list(),
                           glmnet = FALSE, ...)
@@ -33,13 +33,13 @@ madlib.elnet <- function (formula, data,
 
     warnings <- .suppress.warnings(conn.id)
 
-    analyzer <- .get.params(formula, data)
+    analyzer <- .get.params(formula, data, na.action)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     if (!is.null(params$grp.str))
         stop("Grouping calculation is not supported right now!")
-    
+
     tmp <- eval(parse(text = paste("with(data, ",
                       params$origin.dep, ")", sep = "")))
     if (family == "gaussian" &&
@@ -68,7 +68,7 @@ madlib.elnet <- function (formula, data,
     }
 
     if (family == "binomial") dep <- paste("(", dep, ")::boolean", sep = "")
-    
+
     sql <- paste("select ", madlib, ".elastic_net_train('", tbl.source,
                  "', '", tbl.output, "', '", dep, "', '",
                  params$ind.str, "', '", family, "', ", alpha, ", ", lambda,
@@ -85,17 +85,17 @@ madlib.elnet <- function (formula, data,
     ## prepare the result
     rst <- list()
     rst$coef <- as.vector(arraydb.to.arrayr(res$coef_all, "double"))
-    
+
     rows <- gsub("\"", "", params$ind.vars)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
-    for (i in seq_len(length(col.name))) 
+    for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     names(rst$coef) <- rows
-    
+
     rst$intercept <- res$intercept
     names(rst$intercept) <- "(Intercept)"
 
@@ -106,7 +106,7 @@ madlib.elnet <- function (formula, data,
         rst$y.scl <- y.scl
     } else
         rst$y.scl <- 1
-    
+
     rst$loglik <- res$log_likelihood
     rst$standardize <- res$standardize
     rst$iter <- res$iteration_run
@@ -237,7 +237,7 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
         !tolower(type) %in% c("default", "response"))
         stop("type must be \"default\" or \"response\"!")
     type <- tolower(type)
-    
+
     conn.id <- conn.id(newdata)
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (is(newdata, "db.data.frame")) {
@@ -310,7 +310,7 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
                          object$dummy.expr[i], expr)
         }
     }
-    
+
     new("db.Rquery",
         .content = sql,
         .expr = expr,

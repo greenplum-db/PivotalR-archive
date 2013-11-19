@@ -58,7 +58,8 @@ setMethod (
 ## operation between an db.obj and a single value
 .compare <- function (e1, e2, cmp, data.types,
                       prefix = "", res.type = "boolean",
-                      cast = "::double precision", res.udt = "bool")
+                      cast = "::double precision", res.udt = "bool",
+                      restore.array = TRUE)
 {
     if (is(e1, "db.data.frame")) e1 <- e1[,]
 
@@ -82,11 +83,14 @@ setMethod (
     expr <- rep("", length(names(e1)))
     col.data_type <- rep("", length(names(e1)))
     col.udt_name <- rep("", length(names(e1)))
-    col.name <- rep("", length(names(e1)))
-    for (i in seq_len(length(names(e1)))) {
+    ## col.name <- rep("", length(names(e1)))
+    col.name <- paste(names(e1), "_opr", sep = "")
+    i <- 1
+    len <- length(names(e1))
+    while (i <= len) {
         col.data_type[i] <- res.type
         col.udt_name[i] <- res.udt
-        col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
+        ## col.name[i] <- paste(names(e1)[i], "_opr", sep = "")
         s <- e2[count %% l + 1]
         whole.array <- is.character(s) && grepl("^\\{", .strip(s)) && grepl("\\}$", .strip(s))
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types) || whole.array) {
@@ -95,21 +99,54 @@ setMethod (
             expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
                              cmp, e2.str, sep = "")
             count <- count + 1
+            i <- i + 1
         } else if (e1@.col.data_type[i] == "array") {
             tmp <- .get.array.elements(e1@.expr[i], tbl, where.str,
                                        conn.id(e1))
             tn <- length(tmp)
-            e2.str <- (if (e2[(count + seq(tn) - 1) %% l + 1] == "") ""
-            else paste("(", e2[count %% l + 1], ")", sep = ""))
-            expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
-                                             cmp, e2.str, sep = "",
-                                             collapse = ", "), "]",
-                             sep = "")
+            ## e2.str <- (if (e2[(count + seq(tn) - 1) %% l + 1] == "") ""
+            ## else paste("(", e2[count %% l + 1], ")", sep = ""))
+
+            if (cast == "")
+                e2.str <- e2[(count + seq(tn) - 1) %% l + 1]
+            else
+                e2.str <- paste("(", e2[(count + seq(tn) - 1) %% l + 1], ")",
+                                sep = "")
+
+            if (restore.array) {
+                expr[i] <- paste("array[", paste(prefix, "(", tmp, ")", cast,
+                                                 cmp, e2.str, sep = "",
+                                                 collapse = ", "), "]",
+                                 sep = "")
+                col.data_type[i] <- "array"
+                col.udt_name[i] <- paste("_", res.udt, sep = "")
+                i <- i + 1
+            } else {
+                expr.t <- paste(prefix, "(", tmp, ")", cast, cmp, e2.str,
+                                sep = "")
+                expr <- c(expr[seq_len(i-1)], expr.t,
+                          expr[(i+1)+seq_len(length(expr)-i)])
+                col.data_type <- c(col.data_type[seq_len(i-1)],
+                                   rep("boolean", tn),
+                                   col.data_type[(i+1)+
+                                                 seq_len(length(
+                                                     col.data_type)-i)])
+                col.udt_name<- c(col.udt_name[seq_len(i-1)],
+                                   rep("bool", tn),
+                                   col.udt_name[(i+1)+
+                                                seq_len(length(
+                                                    col.udt_name)-i)])
+                col.name <- c(col.name[seq_len(i-1)],
+                              paste(col.name[i], "_", seq_len(tn), sep=""),
+                              col.name[(i+1)+seq_len(length(col.name)-i)])
+                i <- i + tn
+                len <- len + tn - 1
+            }
             count <- count + tn
-            col.data_type[i] <- "array"
-            col.udt_name[i] <- paste("_", res.udt, sep = "")
         } else {
             expr[i] <- "NULL"
+            count <- count + 1
+            i <- i + 1
         }
     }
 
@@ -1055,7 +1092,21 @@ setMethod (
     "is.na",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", " is NULL", NA, "", "boolean", "")
+        ## if (array)
+        ##     .compare(x, "", " is NULL", NA, "", "boolean", "",
+        ##              restore.array = FALSE)
+        ## else
+        res <- .compare(x, "", " is NULL", NA, "", "boolean", "")
+        if (length(x@.col.data_type) == 1 && x@.col.data_type == "array") {
+            .check.madlib.version(x, 1.3)
+            madlib <- schema.madlib(conn.id(x))
+            tmp <- paste(res@.expr, " or ", madlib,
+                         ".array_contains_null(", x@.expr, ")", sep="")
+            res@.content <- gsub("^select .* as", paste("select", tmp, "as"),
+                                 res@.content)
+            res@.expr <- tmp
+        }
+        res
     },
     valueClass = "db.Rquery")
 

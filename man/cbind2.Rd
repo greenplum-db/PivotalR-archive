@@ -22,6 +22,10 @@
   logical, default is \code{FALSE}. When it is \code{TRUE}, the array columns are also expanded and all the elements are put into the resulting list. Otherwise, an array column is treated as a single item in the result.
 }
 
+\item{\dots}{
+  Not implemented yet.
+}
+
 }
 \details{
     The main use of 'cbind2' is to be called by 'cbind()'

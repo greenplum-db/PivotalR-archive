@@ -226,7 +226,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)    
     
     right.hand <- paste(f.labels, collapse = "+")
-    if (refresh) {
+    if (refresh) { # second pass
         replace.cols <- cols[is.factor]
         suffix <- suffix[is.factor]
         n.order <- order(nchar(replace.cols), decreasing = TRUE)
@@ -236,14 +236,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             col <- replace.cols[i]
             new.col <- names(data)[grep(paste(col, suffix[i], sep=""),
                                         names(data))]
-            new.col <- paste("(", paste("`", new.col, "`", collapse = " + ",
-                                        sep = ""), ")",
-                             sep = "")
+            if (identical(new.col, character(0))) 
+                new.col <- "1"
+            else
+                new.col <- paste("(", paste("`", new.col, "`",
+                                            collapse = " + ",
+                                            sep = ""), ")", sep = "")
             right.hand <- gsub(paste(col, "([^_\\w]+|$)", sep = ""),
                                paste(new.col, "\\1", sep = ""),
                                right.hand, perl = TRUE)
         }
-    } else {
+    } else { # first pass
         ## # make all text columns to be factor
         ## for (i in seq_len(length(names(data)))) {
         ##     if (data@.col.data_type[i] %in% .txt.types) {
@@ -307,7 +310,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         intercept.str <- "1,"
 
     labels <- .is.array(labels, data)
-
+    orig.labels <- labels
     a <- eval(parse(text = paste("with(vdata, c(",
                     paste(labels, collapse = ", "), "))",
                     sep = "")))
@@ -345,7 +348,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ##
     
     list(dep.str = dep.var, origin.dep = origin.dep,
-         ind.str = ind.var, grp.str = grp,
+         origin.ind = orig.labels,
+         ind.str = ind.var, grp.str = grp, grp.vars = f2.labels,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data,

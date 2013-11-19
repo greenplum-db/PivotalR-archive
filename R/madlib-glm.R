@@ -54,7 +54,7 @@ madlib.glm <- function (formula, data,
 
 ## -----------------------------------------------------------------------
 
-.madlib.logregr <- function (formula, data, na.action, method = "irls",
+.madlib.logregr <- function (formula, data, na.action = NULL, method = "irls",
                              max.iter = 10000, tolerance = 1e-5)
 {
     ## make sure fitting to db.obj
@@ -62,20 +62,20 @@ madlib.glm <- function (formula, data,
         stop("madlib.lm can only be used on a db.obj object, and ",
              deparse(substitute(data)), " is not!")
     origin.data <- data
-    
+
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
 
     warnings <- .suppress.warnings(conn.id(data))
 
-    analyzer <- .get.params(formula, data)
+    analyzer <- .get.params(formula, data, na.action)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     tbl.source <- analyzer$tbl.source
 
     db.str <- (.get.dbms.str(conn.id(data)))$db.str
-    
+
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL::text"
@@ -107,7 +107,7 @@ madlib.glm <- function (formula, data,
                      grp, ", ", max.iter, ", '", method, "', ",
                      tolerance, ")", sep = "")
     }
-    
+
     ## execute the logistic regression and get the result
     res <- .get.res(sql, tbl.output, conn.id)
 
@@ -167,7 +167,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$data <- origin.data
         class(rst[[i]]) <- "logregr.madlib"
     }
-    
+
     class(rst) <- "logregr.madlib.grps" # use this to track summary
 
     if (n.grps == 1) return (rst[[1]])
@@ -195,7 +195,7 @@ print.logregr.madlib.grps <- function (x,
                                        ...)
 {
     n.grps <- length(x)
-    
+
     if (x[[1]]$has.intercept)
         rows <- c("(Intercept)", x[[1]]$ind.vars)
     else
@@ -294,7 +294,7 @@ print.logregr.madlib <- function (x,
     cat("\nMADlib Logistic Regression Result\n")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
- 
+
     cat("\n---------------------------------------\n\n")
     if (length(x$grp.cols) != 0)
     {
@@ -302,13 +302,13 @@ print.logregr.madlib <- function (x,
             cat(col, ": ", x[[col]], ",\n", sep = "")
         cat("\n")
     }
-    
+
     cat("Coefficients:\n")
     coef <- format(x$coef, digits = digits)
     std.err <- format(x$std_err, digits = digits)
     z.stats <- format(x$z_stats, digits = digits)
     odds.ratios <- format(x$odds_ratios, digits = digits)
-    
+
     stars <- rep("", length(x$p_values))
     for (j in seq(length(x$p_values))) {
         if (is.na(x$p_values[j]) || is.nan(x$p_values[j])) {
@@ -326,7 +326,7 @@ print.logregr.madlib <- function (x,
         else
             stars[j] <- " "
     }
-    
+
     p.values <- paste(format(x$p_values, digits = digits),
                       stars)
     output <- data.frame(cbind(Estimate = coef,
@@ -336,13 +336,13 @@ print.logregr.madlib <- function (x,
                                `Odds ratio` = odds.ratios),
                          row.names = rows, check.names = FALSE)
     print(format(output, justify = "left"))
-    
+
     cat("---\n")
     cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
     cat("Log likelihood:", x$log_likelihood, "\n")
     cat("Condition Number:", x$condition_no, "\n")
     cat("Number of iterations:", x$num_iterations, "\n")
-    
+
     cat("\n")
 }
 

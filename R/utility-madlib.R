@@ -21,9 +21,17 @@
 ## -----------------------------------------------------------------------
 
 ## Analyze the formula and get each terms
-.get.params <- function (formula, data)
+.get.params <- function (formula, data, na.action = NULL)
 {
+    n <- ncol(data)
     params <- .analyze.formula(formula, data)
+
+    if (!is.null(na.action)) {
+        params$data <- na.action(params$data, vars =
+                                 with(params, c(origin.dep, grp.vars,
+                                                origin.ind,
+                                                names(data)[data@.is.factor])))
+        }
 
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
@@ -46,7 +54,7 @@
 
     list(data = data, params = params,
          is.tbl.source.temp = is.tbl.source.temp,
-         tbl.source = tbl.source)
+         tbl.source = tbl.source, is.factor = is.factor[seq(n)])
 }
 
 ## -----------------------------------------------------------------------

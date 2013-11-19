@@ -108,7 +108,7 @@ madlib.version <- function (conn.id = 1)
         message("\nWarning: Madlib does not exist in database ", dbname(conn.id),
                 " schema ", schema.madlib(conn.id), ".")
         message("So all functions starting with 'madlib.' will not work.")
-        message("But you can still use other functions.")
+        message("But you can still use other functions with just a few exceptions.")
         return (character(0))
     }
     return (as.character(res))
