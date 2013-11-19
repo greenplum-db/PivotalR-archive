@@ -4,7 +4,7 @@
 \alias{cbind2,db.obj,db.obj-method}
 \title{Combine two \code{db.obj} Objects by Columns}
 \description{
-  \code{cbind2} or \code{cbind} combine two or multiple \code{\linkS4class{db.obj}} objects to form a new \code{db.obj}. And \code{as.list} does the opposite and expand a \code{db.obj} object into a list of \code{db.obj} objects with each one of them representing one column of the original \code{db.obj} object.
+  \code{cbind2} or \code{cbind} combine two or multiple \code{\linkS4class{db.obj}} objects to form a new \code{db.obj}. And \code{as.list} does the opposite and expand a \code{db.obj} object into a list of \code{db.obj} objects with each one of them representing one column of the original \code{db.obj} object. \code{as.list} is usually used together with \code{Reduce} and \code{Map}.
 }
 
 \usage{
@@ -42,9 +42,9 @@ x and y.
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
-} 
+}
 
 \seealso{
   \code{\link{db.array}} combines columns of a table/view into an
@@ -63,7 +63,7 @@ x <- db.data.frame('abalone') # use default connection 1
 fit <- madlib.lm(rings ~ . - id - sex, data = x)
 
 ## create a db.Rquery object that has two columns
-z <- cbind(x$rings, predict(fit, x)) 
+z <- cbind(x$rings, predict(fit, x))
 
 ## plot prediction v.s. real value
 plot(lookat(z, 100))
@@ -75,6 +75,9 @@ unlist(Map(function(x)
                else
                    lk(mean(x))),
            as.list(x))
+
+## sum of all columns (excluding the 2nd column)
+Reduce(function(left, right) left + right, as.list(x[-2]))
 }
 }
 

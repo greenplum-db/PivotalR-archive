@@ -11,7 +11,7 @@ setMethod(
     function (x, array = FALSE, ...)
 {
     res <- NULL
-    for (i in seq_length(names(x))) {
+    for (i in seq_len(length(names(x)))) {
         if (x@.col.data_type[i] == "array" && array) {
             len <- array.len(x[,i])
             for (j in seq_len(len)) res <- c(res, x[,i][j])
@@ -42,5 +42,5 @@ array.len <- function (x)
     else
         where.str <- ""
     arr <- .get.array.elements(x@.expr, parent, where.str, conn.id(x))
-    length(arr)   
+    length(arr)
 }
