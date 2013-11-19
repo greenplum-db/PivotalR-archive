@@ -51,10 +51,11 @@
     xy <- lk(crossprod(x, y))
     coef <- rep(0, n+1) # including the intercept
     iter <- 0
-    rst <- .Call("elcd", as.matrix(xx), as.vector(xy), mx, my, sx, alpha,
-                 lambda, standardize, control$use.active.set,
+    loglik <- 0
+    rst <- .Call("elcd", as.matrix(xx), as.vector(xy), mx, my, sx, y.scl,
+                 alpha, lambda, standardize, control$use.active.set,
                  as.integer(control$max.iter), control$tolerance,
-                 as.integer(N), coef, iter, PACKAGE = "PivotalR")
+                 as.integer(N), coef, iter, loglik, PACKAGE = "PivotalR")
     intercept <- coef[n+1]
     coef <- coef[1:n]
     if (glmnet) {
@@ -74,6 +75,7 @@
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- iter
+    rst$loglik <- loglik
     rst$glmnet <- glmnet
     rst$y.scl <- y.scl
     rst$standardize <- standardize
@@ -98,15 +100,34 @@
 .elnet.binom.cd <- function (data, x, y, alpha, lambda, standardize, control)
 {
     n <- length(x)
+    N <- nrow(data)
+    ind.vars <- x
     x <- eval(parse(text = paste("with(data, c(",
-                    paste(x, collapse = ", "), "))", sep = "")))
-    x <- db.array(Reduce(cbind, x[-1], x[[1]]))
-    y <- eval(parse(text = paste("with(data, ", y, ")", sep = "")))
+                    paste(gsub("\"", "`", x), collapse = ", "), "))",
+                    sep = "")))
+    x <- Reduce(cbind, x[-1], x[[1]])
+    y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
+                    sep = "")))
+    tmp <- scale(cbind(x, y))
+    centers <- attr(tmp, "scaled:center")
+    sds <- attr(tmp, "scaled:scale")
+    if (standardize) {
+        x <- tmp[-(n+1)] * sqrt(N/(N-1))
+        y <- tmp[n+1] * sds[n+1]
+        mx <- centers[-(n+1)]
+        my <- centers[n+1]
+        sx <- sds[-(n+1)] * sqrt((N-1)/N)
+    } else {
+        my <- tail(centers, 1)
+        mx <- centers[-(n+1)]
+        sx <- 1
+    }
     xx <- lk(crossprod(x))
     xy <- lk(crossprod(x, y))
-    coef <- rep(0, n)
-    intercept <- 0
-    rst <- .Call("elcd", xx, xy, alpha, lambda, standardize,
-          control$use.active.set, control$max.iter, control$tolerance,
-          coef, intercept, PACKAGE = "PivotalR")
+    coef <- rep(0, n+1)
+    iter <- 0
+    loglik <- 0
+    rst <- .Call("elcd_binom", xx, xy, alpha, lambda, standardize,
+                 control$use.active.set, control$max.iter, control$tolerance,
+                 coef, intercept, PACKAGE = "PivotalR")
 }

@@ -21,15 +21,17 @@ extern "C"
         return 0;
     }
 
-    SEXP elcd(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP ralpha,
-              SEXP rlambda, SEXP rstandardize, SEXP ractive_set,
-              SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter)
+    SEXP elcd(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
+              SEXP ralpha, SEXP rlambda, SEXP rstandardize, SEXP ractive_set,
+              SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter,
+              SEXP rloglik)
     {
         Rmatrix<double> xx(rxx);
         Rvector<double> xy(rxy);
         Rvector<double> mx(rmx);
         double my = *(REAL(rmy));
         Rvector<double> sx(rsx);
+        double sy = *(REAL(rsy));
         Rvector<double> coef(rcoef);
         double alpha = *(REAL(ralpha));
         double lambda = *(REAL(rlambda));
@@ -39,6 +41,7 @@ extern "C"
         double tol = *(REAL(rtol));
         int N = *(INTEGER(rN));
         double* iter = REAL(riter);
+        double* loklik = REAL(rloglik);
         
         int n = coef.size() - 1;
         double* prev = new double[n];
@@ -86,6 +89,30 @@ extern "C"
             for (int i = 0; i < n; i++) prev[i] = coef(i);
         } while (true);
 
+        // compute the log-likelihood
+        *loglik = 0;
+        if (standardize) {
+            *loglik += 1;
+            for (int i = 0; i < n; i++)
+                *loglik += 2 * coef(i) * xy(i);
+        } else {
+            tmp_int = coef(n) - my;
+            *loglik += sy * sy + 2 * tmp_int * my;
+            for (int i = 0; i < n; i++)
+                *loglik += 2 * coef(n) * coef(i) * mx
+                    + 2 * coef(i) * xy(i);
+        }
+        for (int i = 0; i < n; i++)
+            for (int j = i; j < n; j++)
+                if (i == j)
+                    *loglik += coef(i) * coef(j) * xx(i,i);
+                else
+                    *loglik += 2 * coef(i) * coef(j) * xx(i,j);
+        *loglik /= N;
+        for (int i = 0; i < n; i++)
+            *loglik += denom * coef(i) * coef(i) / 2 + lambda * fabs(coef(i));
+        
+        // un-standardize if standardize = TRUE
         if (standardize) {
             coef(n) = my;
             for (int i = 0; i < n; i++) {
