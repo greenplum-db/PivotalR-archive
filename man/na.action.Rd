@@ -36,11 +36,14 @@
 }
 
 \seealso{
-
+  \code{\link{madlib.lm}}, \code{\link{madlib.glm}} for linear and logistic regressions.
 }
 
 \examples{
-
+\dontrun{
+dat <- as.db.data.frame(abalone, "abalone")
+madlib.lm(rings ~ . - sex - id, data = dat, na.action = na.omit)
+}
 }
 
 \keyword{utility}

@@ -19,7 +19,7 @@
 }
 
 \usage{
-madlib.lm(formula, data, na.action, hetero = FALSE, ...)
+madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 }
 
 \arguments{
@@ -41,9 +41,9 @@ madlib.lm(formula, data, na.action, hetero = FALSE, ...)
 
   \item{na.action}{
     A string which indicates what should happen when the data
-    contain \code{NA}s. Future possible
-  values include \code{"na.omit"}, \code{"na.exclude"}, \code{"na.fail"}
-  and \code{NULL}. Currently not implemented yet. 
+    contain \code{NA}s. Possible
+  values include \code{\link{na.omit}}, \code{"na.exclude"}, \code{"na.fail"}
+  and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
   }
 
   \item{hetero}{

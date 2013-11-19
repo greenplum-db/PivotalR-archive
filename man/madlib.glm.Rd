@@ -17,7 +17,7 @@
 }
 
 \usage{
-    madlib.glm(formula, data, family = "gaussian", na.action, control = list(), ...)
+madlib.glm(formula, data, family = "gaussian", na.action = NULL, control = list(), ...)
 }
 
 \arguments{
@@ -47,10 +47,10 @@
 
     \item{na.action}{
         A string which indicates what should happen when the data
-        contain \code{NA}s.  Future possible
-        values include \code{"na.omit"}, \code{"na.exclude"},
+        contain \code{NA}s. Possible
+        values include \code{\link{na.omit}}, \code{"na.exclude"},
         \code{"na.fail"} 
-        and \code{NULL}. Currently not implemented yet.
+        and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
     }
 
     \item{control}{

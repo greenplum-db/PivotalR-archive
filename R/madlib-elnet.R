@@ -5,7 +5,8 @@
 
 setClass("elnet.madlib")
 
-madlib.elnet <- function (formula, data, family = "gaussian", na.action = NULL,
+madlib.elnet <- function (formula, data, family = "gaussian",
+                          na.action = NULL,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
                           method = "fista", control = list(),
                           glmnet = FALSE, ...)

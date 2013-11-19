@@ -9,9 +9,9 @@
   This function wraps MAdlib's elastic net regularization for generalized linear models. Currently linear and logistic regressions are supported.  
 }
 \usage{
-madlib.elnet(formula, data, family = "gaussian", na.action, alpha = 1,
-lambda = 0.1, standardize = TRUE, method = "fista", control = list(),
-glmnet = FALSE, ...)
+madlib.elnet(formula, data, family = "gaussian", na.action = NULL,
+alpha = 1, lambda = 0.1, standardize = TRUE, method = "fista",
+control = list(), glmnet = FALSE, ...)
 }
 
 \arguments{
@@ -32,10 +32,10 @@ glmnet = FALSE, ...)
 }
 \item{na.action}{
           A string which indicates what should happen when the data
-        contain \code{NA}s.  Future possible
-        values include \code{"na.omit"}, \code{"na.exclude"},
+        contain \code{NA}s.  Possible
+        values include \code{\link{na.omit}}, \code{"na.exclude"},
         \code{"na.fail"}
-        and \code{NULL}. Currently not implemented yet.
+        and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
 }
 \item{alpha}{
   A numeric value in [0,1], elastic net control parameter.
