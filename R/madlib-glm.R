@@ -88,7 +88,8 @@ madlib.glm <- function (formula, data,
 
     ## construct SQL string
     conn.id <- conn.id(data)
-    tbl.source <- gsub("\"", "", content(data))
+    ## tbl.source <- gsub("\"", "", content(data))
+    tbl.source <- content(data)
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
         tbl.output <- NULL

@@ -3,6 +3,8 @@
 ## inplement in R space
 ## ----------------------------------------------------------------------
 
+setGeneric("na.omit")
+
 setMethod(
     "na.omit",
     signature(object = "db.obj"),

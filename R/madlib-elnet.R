@@ -35,6 +35,7 @@ madlib.elnet <- function (formula, data,
 
     analyzer <- .get.params(formula, data, na.action)
     data <- analyzer$data
+
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     if (!is.null(params$grp.str))
@@ -47,7 +48,8 @@ madlib.elnet <- function (formula, data,
         stop("The dependent variable type is not supported ",
              "in this function!")
 
-    tbl.source <- gsub("\"", "", content(data))
+    ## tbl.source <- gsub("\"", "", content(data))
+    tbl.source <- content(data)
     madlib <- schema.madlib(conn.id) # MADlib schema name
 
     params$ind.str <- gsub("\\[1,", "\\[", params$ind.str)

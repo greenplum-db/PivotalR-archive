@@ -120,7 +120,8 @@ setMethod (
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
-    tbl.source <- gsub("\"", "", content(data))
+    ## tbl.source <- gsub("\"", "", content(data))
+    tbl.source <- content(data)
     
     if (length(params$ind.vars) != 1)
         stop("Only one time stamp is allowed !")

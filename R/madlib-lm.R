@@ -67,7 +67,8 @@ madlib.lm <- function (formula, data, na.action = NULL,
              "in linear regression!")
 
     ## construct SQL string
-    tbl.source <- gsub("\"", "", content(data))
+    ## tbl.source <- gsub("\"", "", content(data))
+    tbl.source <- content(data)
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db.str == "HAWQ") {
         tbl.output <- NULL

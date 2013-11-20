@@ -31,7 +31,7 @@
                                  with(params, c(origin.dep, grp.vars,
                                                 origin.ind,
                                                 names(data)[data@.is.factor])))
-        }
+    }
 
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
