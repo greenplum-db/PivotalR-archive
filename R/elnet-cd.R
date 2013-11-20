@@ -108,26 +108,47 @@
     x <- Reduce(cbind, x[-1], x[[1]])
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
-    tmp <- scale(cbind(x, y))
+    tmp <- scale(x)
     centers <- attr(tmp, "scaled:center")
     sds <- attr(tmp, "scaled:scale")
     if (standardize) {
-        x <- tmp[-(n+1)] * sqrt(N/(N-1))
-        y <- tmp[n+1] * sds[n+1]
-        mx <- centers[-(n+1)]
-        my <- centers[n+1]
-        sx <- sds[-(n+1)] * sqrt((N-1)/N)
+        x <- tmp * sqrt(N/(N-1))
+        mx <- centers
+        sx <- sds * sqrt((N-1)/N)
     } else {
-        my <- tail(centers, 1)
-        mx <- centers[-(n+1)]
+        mx <- centers
         sx <- 1
     }
-    xx <- lk(crossprod(x))
-    xy <- lk(crossprod(x, y))
+    ## xx <- lk(crossprod(x))
+    ## xy <- lk(crossprod(x, y))
     coef <- rep(0, n+1)
     iter <- 0
     loglik <- 0
-    rst <- .Call("elcd_binom", xx, xy, alpha, lambda, standardize,
-                 control$use.active.set, control$max.iter, control$tolerance,
-                 coef, intercept, PACKAGE = "PivotalR")
+    newton <- .update.newton(x, y, coef)
+
+}
+
+## ----------------------------------------------------------------------
+
+.update.newton <- function (x, y, coef, alpha, lambda)
+{
+    n <- length(coef) - 1 # exclude the intercept
+    intercept <- coef[n+1]
+    coef <- coef[1:n]
+    mid <- cbind(x, y)
+    mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(coef*x))
+    mid$p <- 1 / (1 + exp(-1 * mid$lin))
+    f <- as.db.data.frame(mid, is.view = TRUE)
+    w <- with(f, p * (1 - p))
+    z <- with(f, lin + (y - p) / (p * (1 - p)))
+    xx <- lk(crossprod(x, w * x))
+    xy <- lk(crossprod(w * x, y))
+    ms <- unlist(lk(mean(cbind(w * x, x, y))))
+    mwx <- ms[1:n]
+    mx <- ms[1:n + n]
+    my <- last(ms, 1)
+    rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my
+                 alpha, lambda, control$use.active.set, control$max.iter,
+                 control$tolerance, coef, iter, PACKAGE = "PivotalR")
+    coef
 }
