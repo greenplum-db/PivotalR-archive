@@ -47,8 +47,12 @@
             sx <- 1
         }
     }
-    xx <- as.matrix(lk(crossprod(x)))
-    xy <- as.vector(lk(crossprod(x, y)))
+    compute <- lk(cbind(crossprod(x), crossprod(x, y)))
+    compute <- as.db.data.frame(compute)
+    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
+    xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
+    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
+    xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
     coef <- rep(0, n+1) # including the intercept
     iter <- 0
     loglik <- 0
@@ -151,9 +155,9 @@
     compute <- lk(cbind(crossprod(x, w*x), crossprod(w*x, y),
                         mean(cbind(w * x, x, y))))
     compute <- as.db.data.frame(compute)
-    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n);
+    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
-    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1);
+    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
     ms <- unlist(lk(compute[,3]))
     mwx <- ms[1:n]
