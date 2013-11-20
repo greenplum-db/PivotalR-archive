@@ -13,7 +13,7 @@ madlib.elnet <- function (formula, data,
                           glmnet = FALSE, ...)
 {
     family <- match.arg(family)
-    method <- match.arg(family)
+    method <- match.arg(method)
     control <- .validate.method(method, control)
     method <- tolower(method)
     if (method == "sgd") method <- "igd"
