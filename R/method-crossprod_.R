@@ -104,7 +104,7 @@ setMethod (
             .col.name = "cross_prod",
             .key = character(0),
             .where = where,
-            .col.data_type = "array",
+            .col.data_type = "crossprod",
             .col.udt_name = "_float",
             .is.factor = FALSE,
             .factor.suffix = "",

@@ -124,8 +124,15 @@
     coef <- rep(0, n+1)
     iter <- 0
     loglik <- 0
-    newton <- .update.newton(x, y, coef)
+    repeat {
+        newton <- .update.newton(x, y, coef)
+        diff <- abs(coef - newton)
+        diff[coef != 0] <- diff[coef != 0] / coef[coef != 0]
+        diff <- mean(diff)
+        if (diff <= control$tolerance) break
+    }
 
+    ## prepare the result
 }
 
 ## ----------------------------------------------------------------------
@@ -141,14 +148,17 @@
     f <- as.db.data.frame(mid, is.view = TRUE)
     w <- with(f, p * (1 - p))
     z <- with(f, lin + (y - p) / (p * (1 - p)))
-    xx <- lk(crossprod(x, w * x))
-    xy <- lk(crossprod(w * x, y))
-    ms <- unlist(lk(mean(cbind(w * x, x, y))))
+    compute <- lk(cbind(crossprod(x, w*x), crossprod(w*x, y),
+                        mean(cbind(w * x, x, y))))
+    xx <- compute[[1]]
+    xy <- compute[[2]]
+    ms <- compute[[3]]
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
     my <- last(ms, 1)
     rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my
                  alpha, lambda, control$use.active.set, control$max.iter,
                  control$tolerance, coef, iter, PACKAGE = "PivotalR")
+    delete(f)
     coef
 }

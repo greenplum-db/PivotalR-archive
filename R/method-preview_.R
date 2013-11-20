@@ -86,6 +86,24 @@ setMethod (
     def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
         warnings <- .suppress.warnings(conn.id(x))
 
+        add.crossprod <- FALSE
+        if (length(names(x)) > 1 && "crossprod" %in% x@.col.data_type) {
+            select <- which(x@.col.data_type == "crossprod")
+            rst <- list()
+            for (i in select) {
+                z <- x[,i]
+                class(z) <- "db.Rcrossprod"
+                rst[[names(x)[i]]] <- lk(z)
+            }
+            if (length(select) == length(names(x)))
+                return (rst)
+            else {
+                left <- setdiff(1:length(names(x)), select)
+                x <- x[left]
+                add.crossprod <- TRUE
+            }                
+        }            
+
         if (interactive) {
             cat(deparse(substitute(x)),
                 "is just a query in R and does not point to any object in the database",
@@ -115,8 +133,12 @@ setMethod (
             if (dim(res)[1] == 1)
                 res <- as.vector(res)
         }
-           
-        return (res)
+
+        if (add.crossprod) {
+            rst[[length(rst)+1]] <- res
+            return (rst)
+        } else
+            return (res)
     })
 
 ## -----------------------------------------------------------------------
