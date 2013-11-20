@@ -108,6 +108,7 @@ generic.cv <- function (train, predict, metric, data,
         if (verbose) cat("Fitting the best model using the whole data set ... ")
         if (find.min) best <- which.min(rst$avg)
         else best <- which.max(rst$avg)
+
         arg.list <- .create.args(arg.names, params, best)
         arg.list$data <- data
         best.fit <- do.call(train, arg.list)
@@ -172,13 +173,7 @@ generic.cv <- function (train, predict, metric, data,
         dist.str <- ""
         dist.by <- ""
     }
-    if (is(x, "db.data.frame")) tbl <- content(x)
-    else {
-        if (x@.parent == x@.source)
-            tbl <- x@.parent
-        else
-            tbl <- paste("(", x@.parent, ") s", sep = "")
-    }
+
     random.col <- x[,1]
     random.col@.expr <- "random()"
     random.col@.col.name <- id.col
@@ -189,6 +184,7 @@ generic.cv <- function (train, predict, metric, data,
     random.col@.content <- gsub("select\\s+.*\\s+from",
                                 paste("select random() as", id.col, "from"),
                                 random.col@.content)
+
     x[[id.col]] <- random.col
     y <- as.db.data.frame(x, is.temp = TRUE, verbose = FALSE, pivot = FALSE)
     id <- ncol(y)
