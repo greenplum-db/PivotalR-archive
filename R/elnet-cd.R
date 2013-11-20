@@ -47,12 +47,12 @@
             sx <- 1
         }
     }
-    xx <- lk(crossprod(x))
-    xy <- lk(crossprod(x, y))
+    xx <- as.matrix(lk(crossprod(x)))
+    xy <- as.vector(lk(crossprod(x, y)))
     coef <- rep(0, n+1) # including the intercept
     iter <- 0
     loglik <- 0
-    rst <- .Call("elcd", as.matrix(xx), as.vector(xy), mx, my, sx, y.scl,
+    rst <- .Call("elcd", xx, xy, mx, my, sx, y.scl,
                  alpha, lambda, standardize, control$use.active.set,
                  as.integer(control$max.iter), control$tolerance,
                  as.integer(N), coef, iter, loglik, PACKAGE = "PivotalR")
@@ -150,9 +150,12 @@
     z <- with(f, lin + (y - p) / (p * (1 - p)))
     compute <- lk(cbind(crossprod(x, w*x), crossprod(w*x, y),
                         mean(cbind(w * x, x, y))))
-    xx <- compute[[1]]
-    xy <- compute[[2]]
-    ms <- compute[[3]]
+    compute <- as.db.data.frame(compute)
+    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n);
+    xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
+    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1);
+    xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
+    ms <- unlist(lk(compute[,3]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
     my <- last(ms, 1)
@@ -160,5 +163,6 @@
                  alpha, lambda, control$use.active.set, control$max.iter,
                  control$tolerance, coef, iter, PACKAGE = "PivotalR")
     delete(f)
+    delete(compute)
     coef
 }
