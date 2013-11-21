@@ -130,9 +130,9 @@ extern "C"
     }
 
     // ----------------------------------------------------------------------
-    SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP mx, SEXP my,
+    SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx, SEXP rmy,
                     SEXP ralpha, SEXP rlambda, SEXP ractive_set,
-                    SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef)
+                    SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter)
     {
         Rmatrix<double> xx(rxx);
         Rvector<double> xy(rxy);

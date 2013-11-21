@@ -165,7 +165,8 @@
     my <- last(ms, 1)
     rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my
                  alpha, lambda, control$use.active.set, control$max.iter,
-                 control$tolerance, coef, iter, PACKAGE = "PivotalR")
+                 control$tolerance, as.integer(N), coef, iter,
+                 PACKAGE = "PivotalR")
     delete(f)
     delete(compute)
     coef
