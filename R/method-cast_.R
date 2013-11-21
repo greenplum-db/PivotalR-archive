@@ -1,10 +1,10 @@
 
 .attach.cast <- function(x, cast, udt, array = TRUE)
 {
-    x <- x[,]
+    ## x <- x[,]
     for (i in seq_len(length(names(x)))) {
         if (array && x@.col.data_type[i] == "array") {
-            z <- .expand.array(x[,i])
+            z <- x[names(x)[i]][,]
             x@.expr[i] <- paste("array[", paste("(", z@.expr, ")::",
                                                 cast, collapse = ", ",
                                                 sep = ""),
@@ -17,6 +17,7 @@
             x@.col.udt_name[i] <- udt
         }
     }
+
     if (x@.where != "") where.str <- paste(" where", x@.where)
     else where.str <- ""
     i.str <- paste(x@.expr, paste("\"", x@.col.name, "\"", sep = ""),
