@@ -53,6 +53,7 @@
     xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
+    delete(compute)
     coef <- rep(0, n+1) # including the intercept
     iter <- 0
     loglik <- 0
@@ -137,11 +138,42 @@
     }
 
     ## prepare the result
+    intercept <- coef[n+1]
+    coef <- coef[1:n]
+     rst <- list(coef = coef, intercept = intercept)
+    rows <- gsub("\"", "", ind.vars)
+    rst$ind.vars <- rows
+    col.name <- gsub("\"", "", data@.col.name)
+    appear <- data@.appear.name
+    for (i in seq_len(length(col.name))) 
+        if (col.name[i] != appear[i])
+            rows <- gsub(col.name[i], appear[i], rows)
+    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    names(rst$coef) <- rows
+    names(rst$intercept) <- "(Intercept)"
+    rst$iter <- iter
+    rst$loglik <- loglik
+    rst$glmnet <- glmnet
+    rst$y.scl <- y.scl
+    rst$standardize <- standardize
+    rst$ind.str <- params$ind.str
+    rst$dummy <- data@.dummy
+    rst$dummy.expr <- data@.dummy.expr
+    rst$appear <- appear
+    rst$terms <- params$terms
+    rst$model <- NA
+    rst$call <- call
+    rst$alpha <- alpha
+    rst$lambda <- lambda
+    rst$method <- "cd"
+    rst$family <- "binomial"
+    class(rst) <- "elnet.madlib"
+    rst
 }
 
 ## ----------------------------------------------------------------------
 
-.update.newton <- function (x, y, coef, alpha, lambda)
+.update.newton <- function (x, y, coef, alpha, lambda, N)
 {
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
