@@ -140,7 +140,7 @@
     ## prepare the result
     intercept <- coef[n+1]
     coef <- coef[1:n]
-     rst <- list(coef = coef, intercept = intercept)
+    rst <- list(coef = coef, intercept = intercept)
     rows <- gsub("\"", "", ind.vars)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
@@ -152,7 +152,7 @@
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- iter
-    rst$loglik <- loglik
+    rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda)
     rst$glmnet <- glmnet
     rst$y.scl <- y.scl
     rst$standardize <- standardize
@@ -202,4 +202,25 @@
     delete(f)
     delete(compute)
     coef
+}
+
+## ----------------------------------------------------------------------
+
+.elnet.binom.loglik <- function(coef, intercept, x, y, alpha, lambda)
+{
+    conn.id <- conn.id(x)
+    coef.str <- "array[" %+% ("," %.% coef) %+% "]"
+    x.str <- "array[" %+% ("," %.% x@.expr) %+% "]"
+    y.str <- y@.expr
+    if (x@.source == x@.parent)
+        tbl <- x@.parent
+    else
+        tbl <- "(" %+% x@.parent %+% ") s"
+    madlib <- schema.madlib(conn.id) # MADlib schema name
+    sql <- paste("select avg(", madlib,
+                 ".__elastic_net_binomial_loglikelihood(", coef.str, ", ",
+                 intercept, ", ", x.str, ", ", y.str, ")) as loss from ",
+                 tbl, sep = "")
+    loss <- .get.res(sql, conn.id = conn.id)
+    -(loss + lambda*((1-alpha)*sum(coef^2)/2 + alpha*sum(abs(coef))))
 }

@@ -93,25 +93,25 @@ extern "C"
         // compute the log-likelihood
         *loglik = 0;
         if (standardize) {
-            *loglik += 1;
+            *loglik -= 1;
             for (int i = 0; i < n; i++)
-                *loglik += 2 * coef(i) * xy(i);
+                *loglik -= 2 * coef(i) * xy(i);
         } else {
             tmp_int = coef(n) - my;
-            *loglik += sy * sy + 2 * tmp_int * my;
+            *loglik -= sy * sy + 2 * tmp_int * my;
             for (int i = 0; i < n; i++)
-                *loglik += 2 * coef(n) * coef(i) * mx
+                *loglik -= 2 * coef(n) * coef(i) * mx
                     + 2 * coef(i) * xy(i);
         }
         for (int i = 0; i < n; i++)
             for (int j = i; j < n; j++)
                 if (i == j)
-                    *loglik += coef(i) * coef(j) * xx(i,i);
+                    *loglik -= coef(i) * coef(j) * xx(i,i);
                 else
-                    *loglik += 2 * coef(i) * coef(j) * xx(i,j);
+                    *loglik -= 2 * coef(i) * coef(j) * xx(i,j);
         *loglik /= N;
         for (int i = 0; i < n; i++)
-            *loglik += denom * coef(i) * coef(i) / 2 +
+            *loglik -= denom * coef(i) * coef(i) / 2 +
                 alpha * lambda * fabs(coef(i));
         
         // un-standardize if standardize = TRUE
