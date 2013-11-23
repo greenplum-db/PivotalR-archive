@@ -63,7 +63,8 @@ madlib.elnet <- function (formula, data,
 
     if (family == "binomial" && method == "cd") {
         return (.elnet.binom.cd(data, params$ind.vars, params$dep,
-                                alpha, lambda, standardize, control))
+                                alpha, lambda, standardize, control, params,
+                                call))
     }
 
     if (glmnet && family == "gaussian") {
@@ -176,7 +177,7 @@ madlib.elnet <- function (formula, data,
                                    "max.iter", "tolerance")) ||
         method == "cd" &&
         !all(names(control) %in% c("max.iter", "tolerance",
-                                   "use.active.set")))
+                                   "use.active.set", "verbose")))
         stop("Some of the control parameters are not supported!")
 
     names(control) <- gsub("\\.", "_", names(control))
@@ -290,8 +291,12 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
         ind.str <- object$ind.str
 
     if (object$family == "gaussian") {
+        if (object$method == "cd")
+            coef.str <- "array[" %+% ("," %.% object$coef) %+% "]"
+        else
+            coef.str <- "coef_all"
         expr <- paste(madlib, ".elastic_net_gaussian_predict(",
-                     "(select ", madlib, ".array_scalar_mult(coef_all,",
+                     "(select ", madlib, ".array_scalar_mult(", coef.str, ",",
                       object$y.scl, "::double precision) from ",
                       content(object$model),
                       "), ", object$intercept, ", ", ind.str, ")", sep = "")
@@ -300,9 +305,14 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
     }
 
     if (object$family == "binomial") {
+        if (object$method == "cd")
+            coef.str <- "array[" %+% ("," %.% object$coef) %+% "]"
+        else
+            coef.str <- "coef_all"
         if (type == "default") {
             expr <- paste(madlib, ".elastic_net_binomial_predict(",
-                          "(select ", madlib, ".array_scalar_mult(coef_all,",
+                          "(select ", madlib, ".array_scalar_mult(",
+                          coef.str, ",",
                           object$y.scl, "::double precision) from ",
                           content(object$model), "), ", object$intercept,
                           ", ", ind.str, ")", sep = "")
@@ -310,7 +320,8 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
             udt.name <- "bool"
         } else {
             expr <- paste(madlib, ".elastic_net_binomial_prob(",
-                          "(select ", madlib, ".array_scalar_mult(coef_all,",
+                          "(select ", madlib, ".array_scalar_mult(",
+                          coef.str, ",",
                           object$y.scl, "::double precision) from ",
                           content(object$model), "), ", object$intercept,
                           ", ", ind.str, ")", sep = "")

@@ -7,6 +7,10 @@
 .elnet.gaus.cd <- function (data, x, y, alpha, lambda, standardize, control,
                             glmnet, params, call)
 {
+    if (is.null(params$verbose) || params$verbose)
+        message("Warning: The coordinate descent algorithm implemented ",
+                "here may not work very well when the number of features ",
+                "is larger than a couple of thousands!")
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
@@ -110,8 +114,13 @@
 ## ----------------------------------------------------------------------
 
 ## Binomial coordinate descent method
-.elnet.binom.cd <- function (data, x, y, alpha, lambda, standardize, control)
+.elnet.binom.cd <- function (data, x, y, alpha, lambda, standardize, control,
+                             params, call)
 {
+    if (is.null(params$verbose) || params$verbose)
+        message("Warning: The coordinate descent algorithm implemented ",
+                "here may not work very well when the number of features ",
+                "is larger than a couple of thousands!")
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
