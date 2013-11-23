@@ -141,20 +141,19 @@
         mx <- centers
         sx <- 1
     }
-    ## xx <- lk(crossprod(x))
-    ## xy <- lk(crossprod(x, y))
     coef <- rep(0, n+1)
     iter <- 0
     loglik <- 0
     out.iter <- 0
     inner.iter <- 0
     repeat {
+        prev <- coef; prev[1] <- 0; prev[1] <- coef[1]
         newton <- .update.newton(x, y, coef, alpha, lambda, N, control)
-        diff <- abs(coef - newton$coef)
-        diff[coef != 0] <- diff[coef != 0] / coef[coef != 0]
-        diff <- mean(diff)
         out.iter <- out.iter + 1
         inner.iter <- inner.iter + newton$iter
+        diff <- abs(prev - newton$coef)
+        diff[prev != 0] <- diff[prev != 0] / coef[prev != 0]
+        diff <- mean(diff)
         coef <- newton$coef
         if (diff <= control$tolerance) break
     }
@@ -175,8 +174,12 @@
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- c(out.iter, inner.iter)
     rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda)
+    if (standardize) {
+        rst$coef <- rst$coef / sx
+        rst$intercept <- rst$intercept - sum(rst$coef * mx)
+    }
     rst$glmnet <- glmnet
-    rst$y.scl <- y.scl
+    rst$y.scl <- 1
     rst$standardize <- standardize
     rst$ind.str <- params$ind.str
     rst$dummy <- data@.dummy
@@ -199,29 +202,31 @@
 {
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
-    coef <- coef[1:n]
+    rcoef <- coef[1:n]
     mid <- cbind(x, as.integer(y))
     names(mid) <- c(names(mid)[1:n], "y")
-    mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(coef*x))
+    mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
     w <- with(f, p * (1 - p))
     z <- with(f, lin + (y - p) / (p * (1 - p)))
     x <- f[,1:n]
     y <- as.numeric(f[,n+1])
-    compute <- cbind(crossprod(x, w*x), crossprod(w*x, y),
-                     mean(cbind(w * x, x, y)))
+    compute <- cbind(crossprod(x, w*x), crossprod(w*x, z),
+                     mean(cbind(w * x, x, z, w*z, w)))
     compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
-    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
+    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
-    ms <- unlist(lk(compute[,3]))
+    ms <- unlist(lk(compute[,-c(1,2)]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
-    my <- tail(ms, 1)
+    my <- ms[2*n+1]
+    mwz <- ms[2*n+2]
+    mw <- ms[2*n+3]
     iter <- 0
-    rst <- .Call("elcd_binom", xx, xy, mwx, mx, my,
+    rst <- .Call("elcd_binom", xx, xy, mwx, mx, my, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
@@ -243,11 +248,15 @@
         tbl <- x@.parent
     else
         tbl <- "(" %+% x@.parent %+% ") s"
+    where <- y@.where
+    if (where != "") where.str <- paste(" where", where)
+    else where.str <- ""
+    sort <- y@.sort
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select avg(", madlib,
                  ".__elastic_net_binomial_loglikelihood(", coef.str, ", ",
-                 intercept, ", ", x.str, ", ", y.str, ")) as loss from ",
-                 tbl, sep = "")
-    loss <- .get.res(sql, conn.id = conn.id)
+                 intercept, ", ", y.str, ", ", x.str, ")) as loss from ",
+                 tbl, where.str, sort$str, sep = "")
+    loss <- as.numeric(.get.res(sql, conn.id = conn.id))
     -(loss + lambda*((1-alpha)*sum(coef^2)/2 + alpha*sum(abs(coef))))
 }

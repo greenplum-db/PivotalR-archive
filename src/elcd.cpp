@@ -123,14 +123,15 @@ extern "C"
         }
 
         *iter = count; // number of iterations
-
+        
         delete [] prev;
         return R_NilValue;
     }
 
     // ----------------------------------------------------------------------
     SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx, SEXP rmy,
-                    SEXP ralpha, SEXP rlambda, SEXP ractive_set,
+                    SEXP rmwz, SEXP rmw, SEXP ralpha, SEXP rlambda,
+                    SEXP ractive_set,
                     SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter)
     {
         Rmatrix<double> xx(rxx);
@@ -138,6 +139,8 @@ extern "C"
         Rvector<double> mwx(rmwx);
         Rvector<double> mx(rmx);
         double my = *(REAL(rmy));
+        double mwz = *(REAL(rmwz));
+        double mw = *(REAL(rmw));
         Rvector<double> coef(rcoef);
         double alpha = *(REAL(ralpha));
         double lambda = *(REAL(rlambda));
@@ -162,7 +165,7 @@ extern "C"
                 for (int j = 0; j < n; j++)
                     if (coef(j) != 0) sum += xx(i,j) * coef(j);
                 double z;
-                z = (xy(i) - coef(n)*mwx(i) - sum) / N +
+                z = (xy(i) - sum) / N - coef(n)*mwx(i) +
                     coef(i) * xx(i,i)/N;
                 coef(i) = soft_thresh(z, al) / (xx(i,i)/N + denom);
             }
@@ -183,9 +186,10 @@ extern "C"
             } else {
                 if (! active_now) active_now = true;
             }
-            coef(n) = my;
+            coef(n) = mwz;
             for (int i = 0; i < n; i++)
-                coef(n) = coef(n) - mx(i) * coef(i);
+                coef(n) -= mwx(i) * coef(i);
+            coef(n) /= mw;
             for (int i = 0; i < n; i++) prev[i] = coef(i);
         } while (true);
 
