@@ -146,11 +146,16 @@
     coef <- rep(0, n+1)
     iter <- 0
     loglik <- 0
+    out.iter <- 0
+    inner.iter <- 0
     repeat {
-        newton <- .update.newton(x, y, coef)
-        diff <- abs(coef - newton)
+        newton <- .update.newton(x, y, coef, alpha, lambda, N, control)
+        diff <- abs(coef - newton$coef)
         diff[coef != 0] <- diff[coef != 0] / coef[coef != 0]
         diff <- mean(diff)
+        out.iter <- out.iter + 1
+        inner.iter <- inner.iter + newton$iter
+        coef <- newton$coef
         if (diff <= control$tolerance) break
     }
 
@@ -168,7 +173,7 @@
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
-    rst$iter <- iter
+    rst$iter <- c(out.iter, inner.iter)
     rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda)
     rst$glmnet <- glmnet
     rst$y.scl <- y.scl
@@ -190,17 +195,20 @@
 
 ## ----------------------------------------------------------------------
 
-.update.newton <- function (x, y, coef, alpha, lambda, N)
+.update.newton <- function (x, y, coef, alpha, lambda, N, control)
 {
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
     coef <- coef[1:n]
-    mid <- cbind(x, y)
+    mid <- cbind(x, as.integer(y))
+    names(mid) <- c(names(mid)[1:n], "y")
     mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(coef*x))
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
-    f <- as.db.data.frame(mid, is.view = TRUE)
+    f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
     w <- with(f, p * (1 - p))
     z <- with(f, lin + (y - p) / (p * (1 - p)))
+    x <- f[,1:n]
+    y <- as.numeric(f[,n+1])
     compute <- cbind(crossprod(x, w*x), crossprod(w*x, y),
                      mean(cbind(w * x, x, y)))
     compute <- as.db.data.frame(compute, verbose = FALSE)
@@ -211,14 +219,16 @@
     ms <- unlist(lk(compute[,3]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
-    my <- last(ms, 1)
-    rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my,
-                 alpha, lambda, control$use.active.set, control$max.iter,
+    my <- tail(ms, 1)
+    iter <- 0
+    rst <- .Call("elcd_binom", xx, xy, mwx, mx, my,
+                 alpha, lambda, control$use.active.set,
+                 as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")
     delete(f)
     delete(compute)
-    coef
+    list(coef = coef, iter = iter)
 }
 
 ## ----------------------------------------------------------------------

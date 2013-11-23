@@ -56,13 +56,13 @@ madlib.elnet <- function (formula, data,
     tbl.output <- .unique.string()
 
     if (family == "gaussian" && method == "cd") {
-        return (.elnet.gaus.cd(data, params$ind.vars, params$dep,
+        return (.elnet.gaus.cd(data, params$origin.ind, params$origin.dep,
                                alpha, lambda, standardize, control, glmnet,
                                params, call))
     }
 
     if (family == "binomial" && method == "cd") {
-        return (.elnet.binom.cd(data, params$ind.vars, params$dep,
+        return (.elnet.binom.cd(data, params$origin.ind, params$origin.dep,
                                 alpha, lambda, standardize, control, params,
                                 call))
     }
@@ -245,7 +245,15 @@ print.elnet.madlib <- function (x,
     cat("\nThe independent variables are", std.str,
         " standardized.\n", sep = "")
     cat("The log-likelihood is", format(x$loglik, digits = digits))
-    cat("\nThe computation is done in", x$iter, "iterations.\n\n")
+    if (x$method != "cd")
+        cat("\nThe computation is done with", x$iter, "iterations.\n\n")
+    else if (x$family == "gaussian")
+        cat("\nThe computation is done with", x$iter,
+            "iterations in memory.\n\n")
+    else if (x$family == "binomial")
+        cat("\nThe computation is done with", x$iter[1],
+            "iterations in database and", x$iter[2],
+            "iterations in memory.\n\n")
 }
 
 ## ----------------------------------------------------------------------
