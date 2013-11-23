@@ -163,7 +163,8 @@ setMethod (
         ## more than 1500. So we have to use unnest to help to load a large array
         ## TODO: Create a separate array loading function to specifically deal
         ## with such situations and can be called by other functions.
-        res <- .db.getQuery(paste("select unnest(", names(x)[1], ") as v from (",
+        res <- .db.getQuery(paste("select unnest(\"", names(x)[1],
+                                  "\") as v from (",
                                   content(x),
                                   .limit.str(nrows), ") s", sep = ""), conn.id(x))
 

@@ -9,7 +9,7 @@ madlib.elnet <- function (formula, data,
                           family = c("gaussian", "linear", "binomial", "logistic"),
                           na.action = NULL,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
-                          method = c("fista", "igd", "sgd"), control = list(),
+                          method = c("fista", "igd", "sgd", "cd"), control = list(),
                           glmnet = FALSE, ...)
 {
     family <- match.arg(family)
@@ -68,6 +68,7 @@ madlib.elnet <- function (formula, data,
     } else {
         dep <- params$dep.str
         y.scl <- 1
+        y.ctr <- 0
     }
 
     if (family == "binomial") dep <- paste("(", dep, ")::boolean", sep = "")

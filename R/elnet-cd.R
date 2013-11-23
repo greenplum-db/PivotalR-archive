@@ -29,35 +29,39 @@
             mx <- centers
             my <- 0
             sx <- sds * sqrt((N-1)/N)
+            sy <- 1
         } else {
             x <- tmp[-(n+1)] * sqrt(N/(N-1))
             y <- tmp[n+1] * sds[n+1]
             mx <- centers[-(n+1)]
             my <- centers[n+1]
             sx <- sds[-(n+1)] * sqrt((N-1)/N)
+            sy <- sds[n+1] * sqrt((N-1)/N)
         }
     } else {
         if (glmnet) {
             my <- 0
             mx <- centers
             sx <- 1
+            sy <- 1
         } else {
             my <- tail(centers, 1)
             mx <- centers[-(n+1)]
             sx <- 1
+            sy <- sds[n+1] * sqrt((N-1)/N)
         }
     }
-    compute <- lk(cbind(crossprod(x), crossprod(x, y)))
-    compute <- as.db.data.frame(compute)
+    compute <- cbind(crossprod(x), crossprod(x, y))
+    compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
-    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
+    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
     delete(compute)
     coef <- rep(0, n+1) # including the intercept
     iter <- 0
     loglik <- 0
-    rst <- .Call("elcd", xx, xy, mx, my, sx, y.scl,
+    rst <- .Call("elcd", xx, xy, mx, my, sx, sy,
                  alpha, lambda, standardize, control$use.active.set,
                  as.integer(control$max.iter), control$tolerance,
                  as.integer(N), coef, iter, loglik, PACKAGE = "PivotalR")
@@ -184,9 +188,9 @@
     f <- as.db.data.frame(mid, is.view = TRUE)
     w <- with(f, p * (1 - p))
     z <- with(f, lin + (y - p) / (p * (1 - p)))
-    compute <- lk(cbind(crossprod(x, w*x), crossprod(w*x, y),
-                        mean(cbind(w * x, x, y))))
-    compute <- as.db.data.frame(compute)
+    compute <- cbind(crossprod(x, w*x), crossprod(w*x, y),
+                     mean(cbind(w * x, x, y)))
+    compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(n,1)
@@ -195,7 +199,7 @@
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
     my <- last(ms, 1)
-    rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my
+    rst <- .Call("elcd_binom", as.matrix(xx), as.vector(xy), mwx, mx, my,
                  alpha, lambda, control$use.active.set, control$max.iter,
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")

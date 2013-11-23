@@ -41,7 +41,7 @@ extern "C"
         double tol = *(REAL(rtol));
         int N = *(INTEGER(rN));
         double* iter = REAL(riter);
-        double* loklik = REAL(rloglik);
+        double* loglik = REAL(rloglik);
         
         int n = coef.size() - 1;
         double* prev = new double[n];
@@ -61,7 +61,7 @@ extern "C"
                 if (standardize)
                     z = (xy(i) - sum) / N + coef(i);
                 else
-                    z = (xy(i) - coef(n)*mx(i) - sum) / N +
+                    z = (xy(i) - sum) / N - coef(n)*mx(i) +
                         coef(i) * xx(i,i)/N;
                 coef(i) = soft_thresh(z, al) / (xx(i,i)/N + denom);
             }
@@ -85,7 +85,7 @@ extern "C"
             if (!standardize) {
                 coef(n) = my;
                 for (int i = 0; i < n; i++)
-                    coef(n) = coef(n) - mx(i) * coef(i);
+                    coef(n) -= mx(i) * coef(i);
             } 
             for (int i = 0; i < n; i++) prev[i] = coef(i);
         } while (true);
@@ -93,22 +93,21 @@ extern "C"
         // compute the log-likelihood
         *loglik = 0;
         if (standardize) {
-            *loglik -= 1;
+            *loglik -= sy * sy * N / 2;
             for (int i = 0; i < n; i++)
-                *loglik -= 2 * coef(i) * xy(i);
+                *loglik += coef(i) * xy(i);
         } else {
-            tmp_int = coef(n) - my;
-            *loglik -= sy * sy + 2 * tmp_int * my;
+            *loglik -= sy * sy * N / 2 + (coef(n) - my) * (coef(n) - my) * N / 2;
             for (int i = 0; i < n; i++)
-                *loglik -= 2 * coef(n) * coef(i) * mx
-                    + 2 * coef(i) * xy(i);
+                *loglik -= coef(n) * coef(i) * mx(i) * N
+                    - coef(i) * xy(i);
         }
         for (int i = 0; i < n; i++)
             for (int j = i; j < n; j++)
                 if (i == j)
-                    *loglik -= coef(i) * coef(j) * xx(i,i);
+                    *loglik -= 0.5 * coef(i) * coef(j) * xx(i,i);
                 else
-                    *loglik -= 2 * coef(i) * coef(j) * xx(i,j);
+                    *loglik -= coef(i) * coef(j) * xx(i,j);
         *loglik /= N;
         for (int i = 0; i < n; i++)
             *loglik -= denom * coef(i) * coef(i) / 2 +
