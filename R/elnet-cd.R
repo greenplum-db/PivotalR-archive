@@ -41,6 +41,7 @@
             y <- y - my
             sx <- sds[-(n+1)] * sqrt((N-1)/N)
             sy <- sds[n+1] * sqrt((N-1)/N)
+            y.scl <- 1
         }
     } else {
         if (glmnet) {
@@ -57,6 +58,7 @@
             mx <- centers[-(n+1)]
             sx <- 1
             sy <- sds[n+1] * sqrt((N-1)/N)
+            y.scl <- 1
         }
     }
     compute <- cbind(crossprod(x), crossprod(x, y))
