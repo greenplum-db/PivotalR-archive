@@ -374,7 +374,8 @@ setMethod (
     "[<-",
     signature (x = "db.obj", value = "db.Rquery"),
     function (x, i, j, value) {
-        n <- length(sys.calls()[[1]]) - 1
+        ## n <- length(sys.calls()[[1]]) - 1
+        n <- nargs()
         if (is(value, "db.Rquery") && value@.is.agg) {
             value <- as.numeric(lookat(value))
             if (missing(i) && missing(j)) {
@@ -438,7 +439,8 @@ setMethod (
     signature (x = "db.obj", value = "character"),
     function (x, i, j, value) {
         value <- paste("'", value, "'", sep = "")
-        n <- length(sys.calls()[[1]]) - 1
+        ## n <- length(sys.calls()[[1]]) - 1
+        n <- nargs()
         if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
             x <- .expand.array(x)
             if (n == 3)
@@ -483,7 +485,8 @@ setMethod (
     "[<-",
     signature (x = "db.obj", value = "integer"),
     function (x, i, j, value) {
-        n <- length(sys.calls()[[1]]) - 1
+        ## n <- length(sys.calls()[[1]]) - 1
+        n <- nargs()
         if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
             x <- .expand.array(x)
             if (n == 3)
@@ -526,7 +529,7 @@ setMethod (
     "[<-",
     signature (x = "db.obj", value = "numeric"),
     function (x, i, j, value) {
-        n <- length(sys.calls()[[1]]) - 1
+        n <- nargs()
         if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
             x <- .expand.array(x)
             if (n == 3)
@@ -573,7 +576,8 @@ setMethod (
     "[<-",
     signature (x = "db.obj", value = "logical"),
     function (x, i, j, value) {
-        n <- length(sys.calls()[[1]]) - 1
+        ## n <- length(sys.calls()[[1]]) - 1
+        n <- nargs()
         if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
             x <- .expand.array(x)
             if (n == 3)

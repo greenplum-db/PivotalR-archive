@@ -211,7 +211,11 @@
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
     w <- with(f, p * (1 - p))
-    z <- with(f, lin + (y - p) / (p * (1 - p)))
+    w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
+    f$p[f$p < 1e-5] <- 0
+    f$p[f$p > 1 - 1e-5] <- 1
+    ## z <- with(f, lin + (y - p) / w)
+    z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
     y <- as.numeric(f[,n+1])
     compute <- cbind(crossprod(x, w*x), crossprod(w*x, z),
