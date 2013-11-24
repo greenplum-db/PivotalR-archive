@@ -53,7 +53,7 @@ extern "C"
         int count = 0;
         do {
             for (int i = 0; i < n; i++) {
-                if (active_set && active_now) continue;
+                if (active_set && active_now && coef(i) == 0) continue;
                 double sum = 0;
                 for (int j = 0; j < n; j++)
                     if (coef(j) != 0) sum += xx(i,j) * coef(j);
@@ -160,7 +160,7 @@ extern "C"
         int count = 0;
         do {
             for (int i = 0; i < n; i++) {
-                if (active_set && active_now) continue;
+                if (active_set && active_now && coef(i) == 0) continue;
                 double sum = 0;
                 for (int j = 0; j < n; j++)
                     if (coef(j) != 0) sum += xx(i,j) * coef(j);

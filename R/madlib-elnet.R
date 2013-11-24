@@ -14,10 +14,10 @@ madlib.elnet <- function (formula, data,
 {
     family <- match.arg(family)
     method <- match.arg(method)
-    control <- .validate.method(method, control)
+    family <- .validate.family(family)
+    control <- .validate.method(method, family, control)
     method <- tolower(method)
     if (method == "sgd") method <- "igd"
-    family <- .validate.family(family)
     call <- match.call()
 
     if (!is(data, "db.obj"))
@@ -157,13 +157,14 @@ madlib.elnet <- function (formula, data,
 
 ## ----------------------------------------------------------------------
 
-.validate.method <- function (method, control)
+.validate.method <- function (method, family, control)
 {
     if (!is.character(method)) stop("method must be \"fista\" or \"igd\"!")
     method <- tolower(method)
     if (!is.list(control)) stop("control must be a list of parameters!")
     if (! method %in% c("fista", "igd", "cd"))
         stop("PivotalR only supports FISTA, IGD and CD!")
+    origin.control <- control
     if (method == "igd" &&
         !all(names(control) %in% c("step.size", "step.decay", "threshold",
                                    "warmup", "warmup.lambdas",
@@ -175,7 +176,11 @@ madlib.elnet <- function (formula, data,
                                    "warmup.tolerance", "use.active.set",
                                    "activeset.tolerance", "random.stepsize",
                                    "max.iter", "tolerance")) ||
-        method == "cd" &&
+        method == "cd" && family == "binomial" &&
+        !all(names(control) %in% c("max.iter", "tolerance",
+                                   "use.active.set", "verbose",
+                                   "warmup", "warmup.lambda.no")) ||
+        method == "cd" && family == "gaussian" &&
         !all(names(control) %in% c("max.iter", "tolerance",
                                    "use.active.set", "verbose")))
         stop("Some of the control parameters are not supported!")
@@ -217,7 +222,8 @@ madlib.elnet <- function (formula, data,
          identical(nms, character(0))) ""
     else paste(nms, " = ", as.character(control),
                sep = "", collapse = ", "), max.iter = max.iter,
-         tolerance = tolerance, use.active.set = use.active.set)
+         tolerance = tolerance, use.active.set = use.active.set,
+         control = origin.control)
 }
 
 ## ----------------------------------------------------------------------
@@ -259,16 +265,13 @@ print.elnet.madlib <- function (x,
 
 ## ----------------------------------------------------------------------
 
-predict.elnet.madlib <- function (object, newdata, type = "default",
-                                   ...)
+predict.elnet.madlib <- function (object, newdata,
+                                  type = c("response", "prob"),
+                                  ...)
 {
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
-
-    if (!is.character(type) ||
-        !tolower(type) %in% c("default", "response"))
-        stop("type must be \"default\" or \"response\"!")
-    type <- tolower(type)
+    type <- match.arg(type)
 
     conn.id <- conn.id(newdata)
     madlib <- schema.madlib(conn.id) # MADlib schema name
@@ -320,7 +323,7 @@ predict.elnet.madlib <- function (object, newdata, type = "default",
         else
             coef.str <- ("(select coef_all from " %+% content(object$model)
                          %+% ")")
-        if (type == "default") {
+        if (type == "response") {
             expr <- paste(madlib, ".elastic_net_binomial_predict(",
                           coef.str, ", ", object$intercept,
                           ", ", ind.str, ")", sep = "")

@@ -148,16 +148,32 @@
     loglik <- 0
     out.iter <- 0
     inner.iter <- 0
+    if (!is.null(control$control$warmup) && control$control$warmup) {
+        if (!is.null(control$control$warmup.lambda.no))
+            lno <- control$control$warmup.lambda.no
+        else
+            lno <- 5
+        if (lno != as.integer(lno))
+            stop("warmup.lambda.no must be an integer!")
+        lambdas <- c(exp(seq(log(1e2 * lambda), log(lambda + 1e-4),
+                             length.out = lno)), lambda)
+    } else {
+        lambdas <- lambda
+    }
+    lc <- 1
     repeat {
         prev <- coef; prev[1] <- 0; prev[1] <- coef[1]
-        newton <- .update.newton(x, y, coef, alpha, lambda, N, control)
+        newton <- .update.newton(x, y, coef, alpha, lambdas[lc], N, control)
         out.iter <- out.iter + 1
         inner.iter <- inner.iter + newton$iter
         diff <- abs(prev - newton$coef)
         diff[prev != 0] <- diff[prev != 0] / coef[prev != 0]
         diff <- mean(diff)
         coef <- newton$coef
-        if (diff <= control$tolerance) break
+        if (diff <= control$tolerance || inner.iter > control$max.iter) {
+            if (lc == length(lambdas) || inner.iter > control$max.iter) break
+            else lc <- lc + 1
+        }
     }
 
     ## prepare the result
