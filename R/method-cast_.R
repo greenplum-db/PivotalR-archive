@@ -1,7 +1,13 @@
 
 .attach.cast <- function(x, cast, udt, array = TRUE)
 {
-    ## x <- x[,]
+    if (is(x, "db.data.frame")) {
+        if (length(names(x)) == 1 && x@.col.data_type == "array")
+            x <- db.array(x)
+        else
+            x <- x[,]
+    }
+ 
     for (i in seq_len(length(names(x)))) {
         if (array && x@.col.data_type[i] == "array") {
             z <- x[names(x)[i]][,]
@@ -99,7 +105,7 @@ setMethod(
 
 as.time <- function(x, ...)
 {
-    if (!is(x, "ob.obj"))
+    if (!is(x, "db.obj"))
         stop("This function only applies to db.obj objects!")
     .attach.cast(x, "time", "time")
 }
@@ -108,7 +114,7 @@ as.time <- function(x, ...)
 
 as.timestamp <- function(x, ...)
 {
-    if (!is(x, "ob.obj"))
+    if (!is(x, "db.obj"))
         stop("This function only applies to db.obj objects!")
     .attach.cast(x, "timestamp", "timestamp")
 }
@@ -117,7 +123,7 @@ as.timestamp <- function(x, ...)
 
 as.interval <- function(x, ...)
 {
-    if (!is(x, "ob.obj"))
+    if (!is(x, "db.obj"))
         stop("This function only applies to db.obj objects!")
     .attach.cast(x, "interval", "interval")
 }

@@ -32,15 +32,16 @@ array.len <- function (x)
         stop(deparse(substitute(x)), " must be a db.obj object containing a ",
              "single array column!")
     x <- x[,]
-    if (x@.source == x@.parent)
-        parent <- x@.parent
-    else
-        parent <- paste("(", x@.parent, ") s", sep = "")
-    where <- x@.where
-    if (x@.where != "")
-        where.str <- paste(" where", x@.where)
-    else
-        where.str <- ""
-    arr <- .get.array.elements(x@.expr, parent, where.str, conn.id(x))
-    length(arr)
+    ## if (x@.source == x@.parent)
+    ##     parent <- x@.parent
+    ## else
+    ##     parent <- paste("(", x@.parent, ") s", sep = "")
+    ## where <- x@.where
+    ## if (x@.where != "")
+    ##     where.str <- paste(" where", x@.where)
+    ## else
+    ##     where.str <- ""
+    ## arr <- .get.array.elements(x@.expr, parent, where.str, conn.id(x))
+    ## length(arr)
+    length(names(x))
 }
