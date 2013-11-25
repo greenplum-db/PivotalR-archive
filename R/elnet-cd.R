@@ -250,7 +250,8 @@
     mwz <- ms[2*n+2]
     mw <- ms[2*n+3]
     iter <- 0
-    rst <- .Call("elcd_binom", xx, xy, mwx, mx, my, mwz, mw,
+    coef <- rep(0, n+1)
+    rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
