@@ -69,6 +69,7 @@
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
     delete(compute)
     coef <- rep(0, n+1) # including the intercept
+    ## coef <- rnorm(n+1, 0, 1e-6)
     iter <- 0
     loglik <- 0
     rst <- .Call("elcd", xx, xy, mx, my, sx, sy,
@@ -144,6 +145,7 @@
         sx <- 1
     }
     coef <- rep(0, n+1)
+    ## coef <- rnorm(n+1, 0, 1e-6)
     iter <- 0
     loglik <- 0
     out.iter <- 0

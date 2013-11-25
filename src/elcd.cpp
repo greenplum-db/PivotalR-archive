@@ -7,6 +7,11 @@
 #include <Rinternals.h>
 #include <Rmath.h>
 
+#include <vector>
+#include <algorithm>    // random_shuffle
+#include <ctime>        // std::time
+#include <cstdlib>      // std::rand, std::srand
+
 extern "C"
 {
     using adp::Rvector;
@@ -20,6 +25,18 @@ extern "C"
         if (z < 0 && -z > lambda) return (z + lambda);
         return 0;
     }
+
+    // ----------------------------------------------------------------------
+
+    std::vector<int> random_index(int n)
+    {
+        std::vector<int> res(n,0);
+        for (int i = 0; i < n; i++) res[i] = i;
+        std::random_shuffle(res.begin(), res.end());
+        return res;
+    }
+
+    // ----------------------------------------------------------------------
 
     SEXP elcd(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
               SEXP ralpha, SEXP rlambda, SEXP rstandardize, SEXP ractive_set,
@@ -50,9 +67,14 @@ extern "C"
         double al = alpha * lambda;
         double denom = lambda * (1 - alpha);
 
+        std::vector<int> idx(n,0);
+        for (int i = 0; i < n; i++) idx[i] = i;
+
         int count = 0;
         do {
-            for (int i = 0; i < n; i++) {
+            std::random_shuffle(idx.begin(), idx.end());
+            for (int id = 0; id < n; id++) {
+                int i = idx[id];
                 if (active_set && active_now && coef(i) == 0) continue;
                 double sum = 0;
                 for (int j = 0; j < n; j++)
@@ -129,6 +151,7 @@ extern "C"
     }
 
     // ----------------------------------------------------------------------
+    
     SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx, SEXP rmy,
                     SEXP rmwz, SEXP rmw, SEXP ralpha, SEXP rlambda,
                     SEXP ractive_set,
@@ -157,9 +180,14 @@ extern "C"
         double al = alpha * lambda;
         double denom = lambda * (1 - alpha);
 
+        std::vector<int> idx(n,0);
+        for (int i = 0; i < n; i++) idx[i] = i;
+        
         int count = 0;
         do {
-            for (int i = 0; i < n; i++) {
+            std::random_shuffle(idx.begin(), idx.end());
+            for (int id = 0; id < n; id++) {
+                int i = idx[id];
                 if (active_set && active_now && coef(i) == 0) continue;
                 double sum = 0;
                 for (int j = 0; j < n; j++)
