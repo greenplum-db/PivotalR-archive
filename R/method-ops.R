@@ -192,7 +192,8 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " > ", .num.types)
+        res <- .compare(e1, e2, " > ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -212,7 +213,8 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " < ", .num.types)
+        res <- .compare(e1, e2, " < ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -232,7 +234,8 @@ setMethod(
     ">=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " >= ", .num.types)
+        res <- .compare(e1, e2, " >= ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -252,7 +255,8 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " <= ", .num.types)
+        res <- .compare(e1, e2, " <= ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -272,7 +276,8 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " = ", .num.types)
+        res <- .compare(e1, e2, " = ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -292,7 +297,8 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " <> ", .num.types)
+        res <- .compare(e1, e2, " <> ", .num.types)
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -337,7 +343,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " > ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " > ")
+        res <- .replace.timestamp(e1, res, e2, " > ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -359,7 +366,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " < ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " < ")
+        res <- .replace.timestamp(e1, res, e2, " < ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -381,7 +389,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " >= ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " >= ")
+        res <- .replace.timestamp(e1, res, e2, " >= ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -403,7 +412,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " <= ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " <= ")
+        res <- .replace.timestamp(e1, res, e2, " <= ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -425,7 +435,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " = ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " = ")
+        res <- .replace.timestamp(e1, res, e2, " = ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -447,7 +458,8 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " <> ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " <> ")
+        res <- .replace.timestamp(e1, res, e2, " <> ")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -467,7 +479,8 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "")
+        res <- .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -477,7 +490,8 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "")
+        res <- .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -935,8 +949,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 > e2)
         }
-        .operate.two(e1, e2, " > ", list(.num.types, .txt.types),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " > ", list(.num.types, .txt.types),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -954,8 +969,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 < e2)
         }
-        .operate.two(e1, e2, " < ", list(.num.types, .txt.types),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " < ", list(.num.types, .txt.types),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -973,8 +989,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 >= e2)
         }
-        .operate.two(e1, e2, " >= ", list(.num.types, .txt.types),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " >= ", list(.num.types, .txt.types),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -992,8 +1009,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 <= e2)
         }
-        .operate.two(e1, e2, " <= ", list(.num.types, .txt.types),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " <= ", list(.num.types, .txt.types),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1011,8 +1029,10 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 == e2)
         }
-        .operate.two(e1, e2, " = ", list(.num.types, .txt.types, "boolean"),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " = ", list(.num.types, .txt.types,
+                                                "boolean"),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1030,8 +1050,10 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 != e2)
         }
-        .operate.two(e1, e2, " <> ", list(.num.types, .txt.types, "boolean"),
+        res <- .operate.two(e1, e2, " <> ", list(.num.types, .txt.types,
+                                                 "boolean"),
                      res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1049,8 +1071,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 & e2)
         }
-        .operate.two(e1, e2, " and ", list(c("boolean")),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " and ", list(c("boolean")),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1068,8 +1091,9 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 | e2)
         }
-        .operate.two(e1, e2, " or ", list(c("boolean")),
-                     res.type = "boolean", cast = "")
+        res <- .operate.two(e1, e2, " or ", list(c("boolean")),
+                            res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1079,8 +1103,9 @@ setMethod (
     "!",
     signature(x = "db.obj"),
     function (x) {
-        .compare(x, "", "", c("boolean"), prefix = "not ",
-                 res.type = "boolean", cast = "")
+        res <- .compare(x, "", "", c("boolean"), prefix = "not ",
+                        res.type = "boolean", cast = "")
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1106,7 +1131,8 @@ setMethod (
                                  res@.content)
             res@.expr <- tmp
         }
-        res
+        ## res
+        .force.factors(res)
     },
     valueClass = "db.Rquery")
 
@@ -1125,7 +1151,8 @@ setMethod(
     if (ignore.case) cmp <- "~*"
     else cmp <- "~"
     res <- .compare(x, pattern, cmp, .txt.types, cast = "")
-    res
+    ## res
+    .force.factors(res)
 })
 
 ## ----------------------------------------------------------------------

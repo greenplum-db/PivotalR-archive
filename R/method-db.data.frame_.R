@@ -101,6 +101,19 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
 
     .restore.warnings(warnings)
 
+    res <- .force.factors(res)
+
     return (res)
 }
 
+## ----------------------------------------------------------------------
+
+.force.factors <- function (x, stringsAsFactors = default.stringsAsFactors())
+{
+    col.type <- col.types(x)
+    for (i in seq_len(length(col.type)))
+        if (col.type[i] %in% .txt.types && stringsAsFactors ||
+            col.type[i] == "boolean")
+            if (!x@.is.factor[i]) x[,i] <- as.factor(x[,i])
+    x
+}
