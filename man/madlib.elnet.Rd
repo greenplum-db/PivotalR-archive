@@ -10,9 +10,9 @@
 }
 \usage{
 madlib.elnet(formula, data, family = c("gaussian", "linear", "binomial",
-"logistic"), na.action = NULL, alpha = 1, lambda = 0.1, standardize = TRUE,
-method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
-...)
+"logistic"), na.action = NULL, alpha = 1, lambda = 0.1, standardize =
+TRUE, method = c("fista", "igd", "sgd", "cd"), control = list(), glmnet
+= FALSE, ...)
 }
 
 \arguments{
@@ -39,7 +39,14 @@ method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
         and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
 }
 \item{alpha}{
-  A numeric value in [0,1], elastic net control parameter.
+  A numeric value in [0,1], elastic net mixing parameter. The
+          penalty is defined as
+
+                     (1-alpha)/2||beta||_2^2+alpha||beta||_1.           
+          
+          'alpha=1' is the lasso penalty, and 'alpha=0' the ridge
+          penalty.
+
 }
   \item{lambda}{
     A positive numeric value, the regularization parameter.
@@ -48,7 +55,7 @@ method = c("fista", "igd", "sgd"), control = list(), glmnet = FALSE,
     A logical, default: \code{TRUE}. Whether to normalize the data. Setting this to \code{TRUE} usually yields better results and faster convergence.
 }
   \item{method}{
-    A string, default: "fista". Name of optimizer, either "fista" or "igd"/"sgd". "fista" means the fast iterative shrinkage-thresholding algorithm [1], and "sgd" implements the stochastic gradient descent algorithm [2].
+    A string, default: "fista". Name of optimizer, "fista", "igd"/"sgd" or "cd". "fista" means the fast iterative shrinkage-thresholding algorithm [1], and "sgd" implements the stochastic gradient descent algorithm [2]. "cd" implements the coordinate descent algorithm [5].
 }
   \item{control}{
     A list, which contains the control parameters for the optimizers.
@@ -86,7 +93,7 @@ Due to the stochastic nature of SGD, we can only obtain very small values for th
  A logical value, the default is \code{True}. Whether to run the computation on multiple segments.
 SGD is a sequential algorithm in nature. When running in a distributed manner, each segment of the data runs its own SGD model and then the models are averaged to get a model for each iteration. This averaging might slow down the convergence speed, although we also acquire the ability to process large datasets on multiple machines. This algorithm, therefore, provides the parallel option to allow you to choose whether to do parallel computation.
 
-(3) The common control parameters for both optimizers:
+(3) The common control parameters for both "fista" and "sgd" optimizers:
 
 - \code{max.iter} An integer, default is 10000. The maximum number of iterations that are allowed.
 
@@ -103,13 +110,38 @@ An integer Default: 15. How many lambdas are used in warm-up. If warmup_lambdas 
 
 - \code{warmup.tolerance}
 A numeric value, the value of tolerance used during warmup. The default is the same as the tolerance value.
+
+(4) The control parameters for "cd" optimizer include
+
+\code{max.iter}, \code{tolerance}, \code{use.active.set} and \code{verbose} for \code{family = "gaussian"}
+
+\code{max.iter}, \code{tolerance}, \code{use.active.set}, \code{verbose}, \code{warmup}, \code{warmup.lambda.no} for \code{family   = "binomial"}
+
+All parameters have been explained above. The only one left is \code{verbose}.
+
+\code{verbose} A logical value, whether to output the warning message for "cd" optimizer. See the note section for details.
 }
   \item{glmnet}{
-    A logical value, default is \code{FALSE}. The R package \code{glmnet} states that "Note also that for gaussian, glmnet standardizes y to have unit variance before computing its lambda sequence (and then unstandardizes the resulting coefficients); if you wish to reproduce/compare results with other software, best to supply a standardized y." So if the user wants to compare the result of this function with that of \code{glmnet}, he can set this value to be \code{TRUE}, which tells this function to do the same data transformation as \code{glmnet} in the "gaussian" case so that one can easily compare the results.
+    A logical value, default is \code{FALSE}. The R package \code{glmnet} states that "Note also that for gaussian, glmnet standardizes y to have unit variance before computing its lambda sequence (and then unstandardizes the resulting coefficients); if you wish to reproduce/compare results with other software, best to supply a standardized y." So if the user wants to compare the result of this function with that of \code{glmnet}, he can set this value to be \code{TRUE}, which tells this function to do the same data transformation as \code{glmnet} in the "gaussian" case so that one can easily compare the results. When \code{family = "binomial"}, this parameter is ignored.
 }
   \item{\dots}{
     More arguments, currently not implemented.
+  }
 }
+
+\note{
+  The coordinate descent (\code{method = "cd"}) algorithm is currently only available in PivotalR. In the future, we will also implement it in MADlib. The idea is to do some part of the computation in memory. Due to the memory usage liimitation of the database, this method cannot handle the fitting where the number of features is too large (a couple of thousands). 
+}
+
+\details{
+  the objective function for
+     \code{"gaussian"} is
+
+                       1/2  RSS/nobs + lambda*penalty,                  
+     
+     and for the other models it is
+
+                       -loglik/nobs + lambda*penalty.   
 }
 
 \value{
@@ -149,7 +181,7 @@ A numeric value, the value of tolerance used during warmup. The default is the s
 
   \item{model}{
     A \code{\linkS4class{db.data.frame}} object, which wraps the result
-    table of this function.
+    table of this function. When \code{method = "cd"}, there is no result table, because all the results are in R side.
   }
 
   \item{call}{
@@ -190,6 +222,8 @@ A numeric value, the value of tolerance used during warmup. The default is the s
 [3] Elastic net regularization. http://en.wikipedia.org/wiki/Elastic_net_regularization
 
 [4] Kevin P. Murphy, Machine Learning: A Probabilistic Perspective, The MIT Press, Chap 13.4, 2012.
+
+[5] Jerome Friedman, Trevor Hastie and Rob Tibshirani, Regularization Paths for Generalized Linear Models via Coordinate Descent, Journal of Statistical Software, Vol. 33(1), 2010.
 }
 
 \author{

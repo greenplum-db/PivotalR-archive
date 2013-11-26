@@ -198,7 +198,7 @@
         rst$coef <- rst$coef / sx
         rst$intercept <- rst$intercept - sum(rst$coef * mx)
     }
-    rst$glmnet <- glmnet
+    rst$glmnet <- FALSE
     rst$y.scl <- 1
     rst$standardize <- standardize
     rst$ind.str <- params$ind.str
