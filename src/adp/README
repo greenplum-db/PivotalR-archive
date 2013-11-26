@@ -1,0 +1,6 @@
+
+Adapters between R and C++
+
+One can more easily access R data structures
+
+Rcpp might be better, but it only supports R >= 3.0.0

@@ -1127,3 +1127,8 @@ setMethod(
     res <- .compare(x, pattern, cmp, .txt.types, cast = "")
     res
 })
+
+## ----------------------------------------------------------------------
+
+`%+%` <- function (e1, e2) paste(e1, e2, sep = "")
+`%.%` <- function (e1, e2) paste(e2, collapse = e1)

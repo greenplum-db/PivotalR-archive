@@ -23,7 +23,6 @@
             x@.col.udt_name[i] <- udt
         }
     }
-
     if (x@.where != "") where.str <- paste(" where", x@.where)
     else where.str <- ""
     i.str <- paste(x@.expr, paste("\"", x@.col.name, "\"", sep = ""),
