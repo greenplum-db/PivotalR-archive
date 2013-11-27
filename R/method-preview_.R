@@ -178,7 +178,7 @@ setMethod (
                 rst <- new("dspMatrix", uplo = "U", x = res[,1], Dim = as.integer(dims))
             else
                 rst <- new("dgeMatrix", x = res[,1], Dim = as.integer(dims))
-            if (x@.inverse) rst <- solve(rst)
+            ## if (x@.inverse) rst <- solve(rst)
         } else {
             rst <- list()
             l <- dim(res)[1] / n
@@ -191,7 +191,7 @@ setMethod (
                 else
                     rst[[i]] <- new("dgeMatrix", x = res[(i-1)*l + seq(l),1],
                                     Dim = as.integer(dims))
-                if (x@.inverse) rst[[i]] <- solve(rst[[i]])
+                ## if (x@.inverse) rst[[i]] <- solve(rst[[i]])
             }
         }
         

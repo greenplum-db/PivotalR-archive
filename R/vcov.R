@@ -37,7 +37,20 @@ vcov.lm.madlib <- function(object, ...)
     mn <- lk(compute[,1]) * n / (n - k)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)
     xx@.is.symmetric <- TRUE; xx <- solve(lk(xx))
-    mn * xx    
+    delete(compute)
+    res <- mn * xx    
+    
+    if (objects$has.intercept)
+        rows <- c("(Intercept)", object$ind.vars)
+    else
+        rows <- object$ind.vars
+    for (i in seq_len(length(object$col.name))) 
+        if (object$col.name[i] != object$appear[i])
+            rows <- gsub(object$col.name[i], object$appear[i], rows)
+    colnames(res) <- rows
+    rownames(res) <- rows
+
+    res
 }
 
 ## ----------------------------------------------------------------------
@@ -51,10 +64,21 @@ vcov.logregr.madlib <- function(object, ...)
     x <- .extract.regr.x(object)
     cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
-    xx <- lk(crossprod(x, a*x))
-    solve(xx)
+    xx <- solve(lk(crossprod(x, a*x)))
+
+    if (objects$has.intercept)
+        rows <- c("(Intercept)", object$ind.vars)
+    else
+        rows <- object$ind.vars
+    for (i in seq_len(length(object$col.name))) 
+        if (object$col.name[i] != object$appear[i])
+            rows <- gsub(object$col.name[i], object$appear[i], rows)
+    colnames(xx) <- rows
+    rownames(xx) <- rows
+
+    xx
 }
 
 ## ----------------------------------------------------------------------
 
-vcov.loregr.madlib.grps <- function(object, ...) lapply(object, vcov)
+vcov.logregr.madlib.grps <- function(object, ...) lapply(object, vcov)
