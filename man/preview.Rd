@@ -68,7 +68,7 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
   \item{nrows}{
     An integer, how many rows of data to retrieve. If it is
-  \code{NULL} or \code{"all"}, then all data in the table will be send
+  \code{NULL} or \code{"all"} or a non-positive value, then all data in the table will be send
   into R. Be careful, you do not want to do this if the data table is
   very large.
   }

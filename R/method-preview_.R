@@ -17,7 +17,8 @@ setGeneric (
 
 .limit.str <- function (nrows)
 {
-    if (is.null(nrows) || (is.character(nrows) && nrows == "all"))
+    if (is.null(nrows) || (is.character(nrows) && nrows == "all") ||
+        nrows <= 0)
         limit.str <- ""
     else if (is.numeric(nrows))
         limit.str <- paste(" limit ", nrows, sep = "")

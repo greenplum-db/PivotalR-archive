@@ -72,6 +72,16 @@
     func(.localVars$db[[idx]]$conn, query)
 }
 
+## ----------------------------------------------------------------------
+
+.db.clearResult.rpostgresql <- function(res)
+{
+    func <- getMethod("dbClearResult",
+                      signature=c("PostgreSQLResult"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(res)
+}
+
 ## -----------------------------------------------------------------------
 
 .db.fetch.rpostgresql <- function(res, n)

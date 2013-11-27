@@ -336,6 +336,16 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
 
 ## ----------------------------------------------------------------------
 
+.db.clearResult <- function(res)
+{
+    id <- .localVars$conn.id[.localVars$conn.id[,1] == res[[2]], 2]
+    command <- paste(".db.clearResult.", .localVars$db[[id]]$conn.pkg,
+                     "(res$res)", sep = "")
+    eval(parse(text = command))
+}
+
+## ----------------------------------------------------------------------
+
 .db.getQuery <- function (query, conn.id = 1)
 {
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]

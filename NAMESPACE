@@ -133,3 +133,5 @@ exportMethods("as.list")
 export("array.len")
 
 exportMethods("na.omit")
+
+export("db.q")
