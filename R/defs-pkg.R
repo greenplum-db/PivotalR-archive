@@ -122,7 +122,9 @@ setClass("db.Rcrossprod",
          representation(
              .is.crossprod = "logical", # is the column a crossprod
              .is.symmetric = "logical", # is the column crossprod symmetric
-             .dim = "numeric"), # 
+             .dim = "numeric",
+             .inverse = "logical"),
+         prototype = list(.inverse = FALSE),
          contains = "db.Rquery")
 
 ## -----------------------------------------------------------------------

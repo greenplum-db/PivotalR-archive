@@ -227,3 +227,27 @@ is.db.data.frame <- function (x)
     list(tbl = tbl, where = where, where.str = where.str, sort = sort,
          src = src, parent = parent)
 }
+
+## ----------------------------------------------------------------------
+
+setGeneric("rowSums")
+
+setMethod("rowSums",
+    signature(x = "db.obj"),
+    function (x, na.rm = FALSE, dims = 1, ...)
+    {
+        Reduce(function(l,r) l+r, as.list(x))
+    }
+)
+
+## ----------------------------------------------------------------------
+
+setGeneric("rowMeans")
+
+setMethod("rowMeans",
+    signature(x = "db.obj"),
+    function (x, na.rm = FALSE, dims = 1, ...)
+    {
+        rowSums(x) / length(names(x))
+    }
+)

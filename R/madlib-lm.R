@@ -133,8 +133,22 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
-        rst[[i]]$nobs <- nrow(data)
-        rst[[i]]$data <- origin.data
+
+        if (length(r.grp.cols) != 0) {
+            cond <- Reduce(function(l, r) l & r,
+                           Map(function(x) {
+                               if (is.na(rst[[i]][[x]]))
+                                   is.na(origin.data[,x])
+                               else
+                                   origin.data[,x] == rst[[i]][[x]]
+                               }, r.grp.cols))
+            rst[[i]]$data <- origin.data[cond,]
+        } else
+            rst[[i]]$data <- origin.data
+
+        rst[[i]]$origin.data <- origin.data
+        rst[[i]]$nobs <- nrow(rst[[i]]$data)
+
         class(rst[[i]]) <- "lm.madlib" # A single model class
 
         ## get error SS manually using predicted values
