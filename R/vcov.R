@@ -40,7 +40,7 @@ vcov.lm.madlib <- function(object, ...)
     delete(compute)
     res <- mn * xx    
     
-    if (objects$has.intercept)
+    if (object$has.intercept)
         rows <- c("(Intercept)", object$ind.vars)
     else
         rows <- object$ind.vars
@@ -66,7 +66,7 @@ vcov.logregr.madlib <- function(object, ...)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
     xx <- solve(lk(crossprod(x, a*x)))
 
-    if (objects$has.intercept)
+    if (object$has.intercept)
         rows <- c("(Intercept)", object$ind.vars)
     else
         rows <- object$ind.vars
