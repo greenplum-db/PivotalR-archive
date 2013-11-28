@@ -17,10 +17,10 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind, x[-1], x[[1]])
+    x <- Reduce(cbind2, x[-1], x[[1]])
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
-    tmp <- scale(cbind(x, y))
+    tmp <- scale(cbind2(x, y))
     centers <- attr(tmp, "scaled:center")
     sds <- attr(tmp, "scaled:scale")
     if (standardize) {
@@ -61,7 +61,7 @@
             y.scl <- 1
         }
     }
-    compute <- cbind(crossprod(x), crossprod(x, y))
+    compute <- cbind2(crossprod(x), crossprod(x, y))
     compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
@@ -130,7 +130,7 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind, x[-1], x[[1]])
+    x <- Reduce(cbind2, x[-1], x[[1]])
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(x)
@@ -198,6 +198,7 @@
         rst$coef <- rst$coef / sx
         rst$intercept <- rst$intercept - sum(rst$coef * mx)
     }
+
     rst$glmnet <- FALSE
     rst$y.scl <- 1
     rst$standardize <- standardize
@@ -223,7 +224,7 @@
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
     rcoef <- coef[1:n]
-    mid <- cbind(x, as.integer(y))
+    mid <- cbind2(x, as.integer(y))
     names(mid) <- c(names(mid)[1:n], "y")
     mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
@@ -236,8 +237,8 @@
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
     y <- as.numeric(f[,n+1])
-    compute <- cbind(crossprod(x, w*x), crossprod(w*x, z),
-                     mean(cbind(w * x, x, z, w*z, w)))
+    compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
+                                mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
     compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
