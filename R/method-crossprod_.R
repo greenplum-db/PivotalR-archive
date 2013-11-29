@@ -80,19 +80,32 @@ setMethod (
         ## expr <- paste0("sum(array[", paste0(tmp, collapse = ", "), "])")pg90 mad
 
         db.info <- .get.dbms.str(conn.id)
-        if (is.symmetric) { ## Using symmetric specific function is faster
-            ## func <- .load.func("crossprod_double", conn.id)
-            ## expr <- paste0("sum(", func, "(", a, "))")
-            ## is.symmetric <- FALSE
-            func <- .load.func("crossprod_sym_double", conn.id)
-            expr <- paste("sum(", func, "(", a, "))", sep = "")
+        madlib <- schema.madlib(conn.id)
+        quick <- db.q("select count(*)  from pg_catalog.pg_proc p LEFT JOIN",
+                      "pg_catalog.pg_namespace n ON n.oid = p.pronamespace",
+                      "where p.proname ~ '^(pivotalr_crossprod)$' and",
+                      "n.nspname ~ '^(madlib)$'", conn.id = conn.id, verbose = FALSE)
+        if (quick == 0) {
+            if (is.symmetric) { ## Using symmetric specific function is faster
+                ## func <- .load.func("crossprod_double", conn.id)
+                ## expr <- paste0("sum(", func, "(", a, "))")
+                ## is.symmetric <- FALSE
+                func <- .load.func("crossprod_sym_double", conn.id)
+                expr <- paste("sum(", func, "(", a, "))", sep = "")
+            } else {
+                func <- .load.func("crossprod_double2", conn.id)
+                expr <- paste("sum(", func, "(", a, ", ", b, "))", sep = "")
+            }
+            if (db.info$db.str == "PostgreSQL") {
+                expr <- paste(madlib, ".__array_", expr, sep = "")
+            }
         } else {
-            func <- .load.func("crossprod_double2", conn.id)
-            expr <- paste("sum(", func, "(", a, ", ", b, "))", sep = "")
+            if (is.symmetric)
+                expr <- paste(madlib, ".pivotalr_crossprod_sym(", a, ")", sep = "")
+            else
+                expr <- paste(madlib, ".pivotalr_crossprod(", a, ", ",
+                              b, ")", sep = "")
         }
-        if (db.info$db.str == "PostgreSQL") {
-            expr <- paste(schema.madlib(conn.id), ".__array_", expr, sep = "")
-        } 
 
         new("db.Rcrossprod",
             .content = paste("select ", expr, " as cross_prod from ",
