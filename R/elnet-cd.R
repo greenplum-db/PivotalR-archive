@@ -144,6 +144,18 @@
         mx <- centers
         sx <- 1
     }
+
+    ## tx <- x
+    ## tx$const <- 1
+    ## ty <- as.integer(y)
+    ## ty[y==1,] <- 10
+    ## ty[y==0,] <- -10
+    ## xx <- lk(crossprod(tx))
+    ## xy <- lk(crossprod(tx,ty))
+    ## sol <- as.numeric(solve(xx) %*% xy)
+    ## print(sol)
+
+    ## coef <- sol
     coef <- rep(0, n+1)
     ## coef <- rnorm(n+1, 0, 1e-6)
     iter <- 0
@@ -227,18 +239,20 @@
     intercept <- coef[n+1]
     rcoef <- coef[1:n]
     mid <- cbind2(x, as.integer(y))
-    names(mid) <- c(names(mid)[1:n], "y")
+    names(mid) <- c(paste("x", 1:n, sep = ""), "y")
     
     mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
     
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
+    mid$w <- mid$p * (1 - mid$p)
+    ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
+    ## mid$p[mid$p < 1e-5] <- 0
+    ## mid$p[mid$p > 1 - 1e-5] <- 1
     
-    f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
+    f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
     
-    w <- with(f, p * (1 - p))
-    ## w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
-    ## f$p[f$p < 1e-5] <- 0
-    ## f$p[f$p > 1 - 1e-5] <- 1
+    w <- f$w
+    ## w <- f$p * (1 - f$p)
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
     
