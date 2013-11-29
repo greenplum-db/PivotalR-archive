@@ -9,7 +9,7 @@ setMethod("ifelse",
     function (test, yes, no)
     {
         if (length(names(test)) != 1 || col.types(test) != "boolean")
-            stop(deparse(substitue(test)), " must have only one column",
+            stop(deparse(substitute(test)), " must have only one column",
                  " and the column type is boolean!")
         x <- test
         x$res <- no
