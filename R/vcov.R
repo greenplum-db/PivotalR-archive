@@ -14,13 +14,13 @@
                            z@.content)
         x[[object$dummy[i]]] <- z
     }
-    res <- Reduce(cbind, eval(parse(text = "with(x, c(" %+%
+    res <- Reduce(cbind2, eval(parse(text = "with(x, c(" %+%
                                     ("," %.% object$ind.vars) %+% "))")))
     if (object$has.intercept) {
         z <- res
         intercept <- .unique.string()
         z[[intercept]] <- 1
-        res <- cbind(z[[intercept]], res)
+        res <- cbind2(z[[intercept]], res)
     }
     res
 }
@@ -32,7 +32,7 @@ vcov.lm.madlib <- function(object, ...)
     x <- .extract.regr.x(object)
     n <- nrow(object$data)
     k <- length(names(x))
-    compute <- cbind(mean(residuals(object)^2), crossprod(x))
+    compute <- cbind2(mean(residuals(object)^2), crossprod(x))
     compute <- as.db.data.frame(compute, verbose = FALSE)
     mn <- lk(compute[,1]) * n / (n - k)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)

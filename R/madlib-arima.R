@@ -31,14 +31,14 @@ setMethod (
         stop("ARIMA can only have one time stamp column and ",
              "one time series value column !")
     
-    data <- cbind(x, ts)
+    data <- cbind2(x, ts)
     f.str <- paste(names(x), "~", names(ts))
 
     ## grouping is a list of db.Rquery
     if (!is.null(by)) {
         grp.names <- character(0)
         for (i in seq_len(length(by))) {
-            data <- cbind(data, by[[i]])
+            data <- cbind2(data, by[[i]])
             grp.names <- c(grp.names, names(by[[i]]))
         }
         f.str <- paste(f.str, "|", paste(grp.names, collapse = "+"))
