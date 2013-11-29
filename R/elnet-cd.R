@@ -228,24 +228,31 @@
     rcoef <- coef[1:n]
     mid <- cbind2(x, as.integer(y))
     names(mid) <- c(names(mid)[1:n], "y")
+    
     mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
+    
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
+    
     f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
+    
     w <- with(f, p * (1 - p))
-    w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
-    f$p[f$p < 1e-5] <- 0
-    f$p[f$p > 1 - 1e-5] <- 1
+    ## w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
+    ## f$p[f$p < 1e-5] <- 0
+    ## f$p[f$p > 1 - 1e-5] <- 1
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
-
+    
     compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
                                 mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
+    
     compute <- as.db.data.frame(compute, verbose = FALSE)
-
+    
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
+    
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
+    
     ms <- unlist(lk(compute[,-c(1,2)]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
@@ -254,11 +261,13 @@
     mw <- ms[2*n+3]
     iter <- 0
     ## coef <- rep(0, n+1)
+    
     rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")
+    
     delete(f)
     delete(compute)
     list(coef = coef, iter = iter)
