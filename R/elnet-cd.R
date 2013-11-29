@@ -165,6 +165,8 @@
     lc <- 1
     repeat {
         prev <- coef; prev[1] <- 0; prev[1] <- coef[1]
+        ## prev <- rep(0, length(coef))
+        ## for (i in seq_len(length(prev))) prev[i] <- coef[i]
         newton <- .update.newton(x, y, coef, alpha, lambdas[lc], N, control)
         out.iter <- out.iter + 1
         inner.iter <- inner.iter + newton$iter
@@ -233,13 +235,13 @@
     w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
     f$p[f$p < 1e-5] <- 0
     f$p[f$p > 1 - 1e-5] <- 1
-    ## z <- with(f, lin + (y - p) / w)
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
-    y <- as.numeric(f[,n+1])
+
     compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
                                 mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
     compute <- as.db.data.frame(compute, verbose = FALSE)
+
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
@@ -251,7 +253,7 @@
     mwz <- ms[2*n+2]
     mw <- ms[2*n+3]
     iter <- 0
-    coef <- rep(0, n+1)
+    ## coef <- rep(0, n+1)
     rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
@@ -281,7 +283,8 @@
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select avg(", madlib,
                  ".__elastic_net_binomial_loglikelihood(", coef.str, ", ",
-                 intercept, ", ", y.str, ", ", x.str, ")) as loss from ",
+                 intercept, ", (", y.str, ")::boolean, ", x.str,
+                 ")) as loss from ",
                  tbl, where.str, sort$str, sep = "")
     loss <- as.numeric(.get.res(sql, conn.id = conn.id))
     -(loss + lambda*((1-alpha)*sum(coef^2)/2 + alpha*sum(abs(coef))))
