@@ -15,9 +15,9 @@ setMethod(
 
         res <- x
         res@.expr <- paste("distinct ", x@.expr, sep = "")
-        res@.content <- gsub("^select\\s+.*\\s+as", paste("select ",
-                                                               res@.expr,
-                                                               " as", sep = ""),
+        ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
+        res@.content <- gsub("^select .* as",
+                             paste("select ", res@.expr, " as", sep = ""),
                              x@.content)
         return (res)
     })

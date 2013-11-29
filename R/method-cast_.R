@@ -2,9 +2,12 @@
 .attach.cast <- function(x, cast, udt, array = TRUE)
 {
     if (is(x, "db.data.frame")) {
-        if (length(names(x)) == 1 && x@.col.data_type == "array")
-            x <- db.array(x)
-        else
+        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+            if (array)
+                x <- db.array(x)
+            else
+                x <- x[[names(x)]]
+        } else
             x <- x[,]
     }
  

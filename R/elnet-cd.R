@@ -255,7 +255,7 @@
     ## w <- f$p * (1 - f$p)
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
-    
+
     compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
                                 mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
     
