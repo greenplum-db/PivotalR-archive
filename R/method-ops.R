@@ -554,7 +554,8 @@ setMethod (
             e1 <- e1[[names(e1)]]
             res <- e1
             madlib <- schema.madlib(conn.id(e1))
-            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr, ", ",
+            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr,
+                               "::double precision[], ",
                                e2, "::double precision)", sep = "")
             res@.col.name <- paste(e1@.col.name, "_opr", sep = "")
             ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
@@ -859,7 +860,8 @@ setMethod (
             e2 <- e2[,]
             res <- e1
             madlib <- schema.madlib(conn.id(e1))
-            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr, ", (",
+            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr,
+                               "::double precision[], (",
                                e2@.expr, ")::double precision)", sep = "")
             res@.col.name <- paste(e1@.col.name, "_opr", sep = "")
             ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",

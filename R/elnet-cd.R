@@ -238,13 +238,18 @@
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
     rcoef <- coef[1:n]
-    mid <- cbind2(x, as.integer(y))
-    names(mid) <- c(paste("x", 1:n, sep = ""), "y")
+    ## mid <- cbind2(x, as.integer(y))
+    ## names(mid) <- c(paste("x", 1:n, sep = ""), "y")
+    mid <- as.integer(y)
+    names(mid) <- "y"
     
-    mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
+    ## mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
+    mid$lin <- intercept + rowSums(rcoef * x)
     
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     mid$w <- mid$p * (1 - mid$p)
+    mid$wx <- mid$w * db.array(x)
+    mid$x <- db.array(x)
     ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
@@ -254,10 +259,10 @@
     w <- f$w
     ## w <- f$p * (1 - f$p)
     z <- f$lin + (f$y - f$p) / w
-    x <- f[,1:n]
 
-    compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
-                                mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
+    compute <- Reduce(cbind2, c(crossprod(f$x, f$wx), crossprod(f$wx, z),
+                                mean(Reduce(cbind2,
+                                            c(f$wx, f$x, z, w*z, w)))))
     
     compute <- as.db.data.frame(compute, verbose = FALSE)
     
