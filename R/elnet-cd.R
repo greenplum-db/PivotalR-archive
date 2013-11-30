@@ -7,6 +7,7 @@
 .elnet.gaus.cd <- function (data, x, y, alpha, lambda, standardize, control,
                             glmnet, params, call)
 {
+    warnings <- .suppress.warnings(conn.id(data))
     if (is.null(params$verbose) || params$verbose)
         message("Warning: The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
@@ -43,6 +44,9 @@
             sy <- sds[n+1] * sqrt((N-1)/N)
             y.scl <- 1
         }
+        ## mid <- as.db.data.frame(cbind2(db.array(x), y), verbose = FALSE)
+        ## x <- mid[,1]
+        ## y <- mid[,2]
     } else {
         if (glmnet) {
             my <- 0
@@ -111,6 +115,8 @@
     rst$method <- "cd"
     rst$family <- "gaussian"
     class(rst) <- "elnet.madlib"
+    ## if (standardize) delete(mid)
+    .restore.warnings(warnings)
     rst
 }
 
@@ -120,6 +126,7 @@
 .elnet.binom.cd <- function (data, x, y, alpha, lambda, standardize, control,
                              params, call)
 {
+    warnings <- .suppress.warnings(conn.id(data))
     if (is.null(params$verbose) || params$verbose)
         message("Warning: The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
@@ -140,6 +147,9 @@
         x <- tmp * sqrt(N/(N-1))
         mx <- centers
         sx <- sds * sqrt((N-1)/N)
+        mid <- as.db.data.frame(cbind2(db.array(x), y), verbose = FALSE)
+        x <- mid[,1]
+        y <- mid[,2]
     } else {
         mx <- centers
         sx <- 1
@@ -207,7 +217,9 @@
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- c(out.iter, inner.iter)
+
     rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda)
+
     if (standardize) {
         rst$coef <- rst$coef / sx
         rst$intercept <- rst$intercept - sum(rst$coef * mx)
@@ -228,6 +240,8 @@
     rst$method <- "cd"
     rst$family <- "binomial"
     class(rst) <- "elnet.madlib"
+    if (standardize) delete(mid)
+    .restore.warnings(warnings)
     rst
 }
 
@@ -238,35 +252,37 @@
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
     rcoef <- coef[1:n]
-    mid <- cbind2(x, as.integer(y))
-    names(mid) <- c(paste("x", 1:n, sep = ""), "y")
-    
-    mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
-    
+
+    mid <- as.integer(y)
+    names(mid) <- "y"
+
+    mid$lin <- intercept + rowSums(rcoef * x)
+
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     mid$w <- mid$p * (1 - mid$p)
+    mid$wx <- mid$w * db.array(x)
+    mid$x <- db.array(x)
     ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
-    
-    f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
-    
-    w <- f$w
-    ## w <- f$p * (1 - f$p)
-    z <- f$lin + (f$y - f$p) / w
-    x <- f[,1:n]
 
-    compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
-                                mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
-    
+    f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
+
+    w <- f$w
+    z <- f$lin + (f$y - f$p) / w
+
+    compute <- Reduce(cbind2, c(crossprod(f$x, f$wx), crossprod(f$wx, z),
+                                mean(Reduce(cbind2,
+                                            c(f$wx, f$x, z, w*z, w)))))
+
     compute <- as.db.data.frame(compute, verbose = FALSE)
-    
+
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
     
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
-    
+
     ms <- unlist(lk(compute[,-c(1,2)]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
@@ -275,13 +291,13 @@
     mw <- ms[2*n+3]
     iter <- 0
     ## coef <- rep(0, n+1)
-    
+
     rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")
-    
+
     delete(f)
     delete(compute)
     list(coef = coef, iter = iter)

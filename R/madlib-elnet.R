@@ -58,12 +58,14 @@ madlib.elnet <- function (formula, data,
     tbl.output <- .unique.string()
 
     if (family == "gaussian" && method == "cd") {
+        .restore.warnings(warnings)
         return (.elnet.gaus.cd(data, params$origin.ind, params$origin.dep,
                                alpha, lambda, standardize, control, glmnet,
                                params, call))
     }
 
     if (family == "binomial" && method == "cd") {
+        .restore.warnings(warnings)
         return (.elnet.binom.cd(data, params$origin.ind, params$origin.dep,
                                 alpha, lambda, standardize, control, params,
                                 call))
