@@ -11,26 +11,25 @@
 }
 
 \usage{
-    \method{vcov}{lm.madlib.grps}(object, ...)
-    \method{vcov}{lm.madlib}(object, ...)
-    \method{vcov}{logregr.madlib.grps}(object, ...)
-    \method{vcov}{logregr.madlib}(object, ...)
+\S4method{ifelse}{db.obj}(test, yes, no)
 }
 
 \arguments{
-    \item{object}{
-        The regression model object, of class \code{lm.madlib}, \code{lm.madlib.grps}, \code{logregr.madlib}, \code{logregr.madlib.grps}.
+    \item{test}{
+      A \code{db.obj} object, which has only one column. The column can be casted into boolean values.
     }
  
-    \item{...}{
-        Other arguments, not used.
+    \item{yes}{
+      A normal value or a \code{db.obj} object. It is the returned value when \code{test} is \code{TRUE}.
+    }
+
+    \item{no}{
+      The returned value when \code{test} is \code{FALSE}.
     }
 }
 
 \value{
-  For \code{lm.madlib} and \code{logregr.madlib} objects, this function   returns the variance-covariance matrix of the main parameters.
-
-For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a list of models for multiple groups of data, returns a list, each of which is the variance-cocariance matrix for the model of each group of data.
+  A \code{\linkS4class{db.obj}} which has the same length in-database as   \code{test}.
 }
 
 \author{
@@ -40,19 +39,14 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
 }
 
 \seealso{
-  \code{\link{madlib.lm}}, \code{\link{madlib.glm}} for MADlib regression wrappers
+  \code{\linkS4class{db.obj}}
 }
 
 \examples{ \dontrun{
 ## create a table
 x <- as.db.data.frame(abalone, "abalone")
 
-fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
-"binomial")
-
-vcov(fit)
-
-vcov(fit[[1]])
+## create a new db.obj with one-column,
+## and values "small" or "big"
+z <- ifelse(x$rings < 10, "small", "big")
 } }
-
-

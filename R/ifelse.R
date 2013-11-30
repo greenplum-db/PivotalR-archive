@@ -8,12 +8,13 @@ setMethod("ifelse",
     signature(test = "db.obj"),
     function (test, yes, no)
     {
-        if (length(names(test)) != 1 || col.types(test) != "boolean")
+        test <- test[,]
+        if (length(names(test)) != 1)
             stop(deparse(substitute(test)), " must have only one column",
-                 " and the column type is boolean!")
+                 " and the column type can be casted into boolean!")
         x <- test
         x$res <- no
-        x$res[test,] <- yes
+        x$res[as.logical(test),] <- yes
         x$res
     }
 )
