@@ -232,17 +232,22 @@ is.db.data.frame <- function (x)
 
 setGeneric("rowSums")
 
+.row.action <- function (x, action)
+{
+    x <- db.array(x)[,]
+    ## Reduce(function(l,r) l+r, as.list(x))
+    res <- x[,1]
+    res@.expr <- paste(x@.expr, collapse = action)
+    res@.content <- gsub("^select 1 as", paste("select", res@.expr, "as"),
+                         res@.content)
+    res
+}
+
 setMethod("rowSums",
     signature(x = "db.obj"),
     function (x, na.rm = FALSE, dims = 1, ...)
     {
-        x <- db.array(x)[,]
-        ## Reduce(function(l,r) l+r, as.list(x))
-        res <- x[,1]
-        res@.expr <- paste(x@.expr, collapse = "+")
-        res@.content <- gsub("^select 1 as", paste("select", res@.expr, "as"),
-                             res@.content)
-        res
+        .row.action(x, "+")
     }
 )
 
@@ -257,3 +262,41 @@ setMethod("rowMeans",
         rowSums(x) / length(names(x))
     }
 )
+
+## ----------------------------------------------------------------------
+
+## combine a list of db.obj faster than using reduce
+.combine.list <- function (lst)
+{
+    n <- length(lst)
+    for (i in seq_len(n))
+        if (is(lst[[i]], "db.data.frame")) {
+            if (ncol(lst[[i]]) == 1 && lst[[i]]@.col.data_type == "array")
+                lst[[i]] <- db.array(lst[[i]])
+            else
+                lst[[i]] <- lst[[i]][,]
+        }
+
+    res <- lst[[1]]
+    res@.expr <- sapply(lst, function(x) x@.expr)
+    res@.col.name <- sapply(lst, function(x) x@.col.name)
+    res@.col.data_type <- sapply(lst, function(x) x@.col.data_type)
+    res@.col.udt_name <- sapply(lst, function(x) x@.col.udt_name)
+    res@.is.factor <- sapply(lst, function(x) x@.is.factor)
+    res@.factor.suffix <- sapply(lst, function(x) x@.factor.suffix)
+    res@.is.agg <- sapply(lst, function(x) x@.is.agg)
+
+    if (res@.source == res@.parent)
+        tbl <- res@.parent
+    else
+        tbl <- "(" %+% res@.parent %+% ") s"
+    where <- res@.where
+    if (where != "") where.str <- paste(" where", where)
+    else where.str <- ""
+    sort <- res@.sort
+    res@.content <- paste("select ",
+                          paste(res@.expr, "as", res@.col.name,
+                                collapse = ","),
+                          " from ", tbl, where.str, sort$str, sep = "")
+    res
+}

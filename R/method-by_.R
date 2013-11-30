@@ -10,7 +10,8 @@ setMethod (
     signature(data = "db.obj"),
     function (data, INDICES, FUN, ..., simplify = TRUE) {
         if (is.list(INDICES))
-            indx <- Reduce(cbind2, INDICES[-1], INDICES[[1]])
+            ## indx <- Reduce(cbind2, INDICES[-1], INDICES[[1]])
+            indx <- .combine.list(INDICES)
         else
             indx <- INDICES
         v <- lk(indx, 1, array = FALSE)

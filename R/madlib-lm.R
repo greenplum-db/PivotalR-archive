@@ -135,13 +135,13 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$terms <- params$terms
 
         if (length(r.grp.cols) != 0) {
-            cond <- Reduce(function(l, r) l & r,
-                           Map(function(x) {
-                               if (is.na(rst[[i]][[x]]))
-                                   is.na(origin.data[,x])
-                               else
-                                   origin.data[,x] == rst[[i]][[x]]
-                               }, r.grp.cols))
+            ## cond <- Reduce(function(l, r) l & r,
+            cond <- .combine.list(Map(function(x) {
+                if (is.na(rst[[i]][[x]]))
+                    is.na(origin.data[,x])
+                else
+                    origin.data[,x] == rst[[i]][[x]]
+            }, r.grp.cols), "&")
             rst[[i]]$data <- origin.data[cond,]
         } else
             rst[[i]]$data <- origin.data

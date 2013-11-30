@@ -14,8 +14,10 @@
                            z@.content)
         x[[object$dummy[i]]] <- z
     }
-    res <- Reduce(cbind2, eval(parse(text = "with(x, c(" %+%
-                                    ("," %.% object$ind.vars) %+% "))")))
+    ## res <- Reduce(cbind2, eval(parse(text = "with(x, c(" %+%
+    ##                                 ("," %.% object$ind.vars) %+% "))")))
+    res <- .combine.list(eval(parse(text = "with(x, c(" %+% (","
+                                    %.% object$ind.vars) %+% "))")))
     if (object$has.intercept) {
         z <- res
         intercept <- .unique.string()
@@ -62,7 +64,8 @@ vcov.lm.madlib.grps <- function(object, ...) lapply(object, vcov)
 vcov.logregr.madlib <- function(object, ...)
 {
     x <- .extract.regr.x(object)
-    cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
+    ## cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
+    cx <- rowSums(object$coef * x)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
     xx <- solve(lk(crossprod(x, a*x)))
 

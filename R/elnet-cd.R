@@ -18,7 +18,8 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind2, x[-1], x[[1]])
+    ## x <- Reduce(cbind2, x[-1], x[[1]])
+    x <- .combine.list(x)
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(cbind2(x, y))
@@ -137,7 +138,8 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind2, x[-1], x[[1]])
+    ## x <- Reduce(cbind2, x[-1], x[[1]])
+    x <- .combine.list(x)
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(x)
