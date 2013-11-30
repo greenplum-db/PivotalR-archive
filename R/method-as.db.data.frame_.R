@@ -164,7 +164,10 @@ setMethod (
         
         conn.id <- conn.id(x)
 
-        dist.str <- .get.distributed.by.str(conn.id, distributed.by)
+        if (is.view)
+            dist.str <- ""
+        else
+            dist.str <- .get.distributed.by.str(conn.id, distributed.by)
         exists <- db.existsObject(table.name, conn.id, is.temp)
 
         if (is.temp) exists <- exists[[1]]

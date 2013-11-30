@@ -186,8 +186,12 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
     The number of observations used to fit the model.
   }
 
-  \item{data}{The original \code{db.obj} object, which wraps all the
-  data used in the database.}
+  \item{data}{A \code{db.obj} object, which wraps all the
+  data used in the database. If there are fittings for multiple groups,   then this is only the wrapper for the data in one group.}
+
+\item{origin.data}{
+  The original \code{db.obj} object. When there is no grouping, it is equal to \code{data} above, otherwise it is the "sum" of \code{data} from all groups.
+}
   
   Note that if there is grouping done, and there are multiple
   \code{lm.madlib} objects in the final result, each one of them

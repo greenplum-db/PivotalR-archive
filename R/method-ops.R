@@ -549,8 +549,23 @@ setMethod (
     "*",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " * ", .num.types, res.type = "double precision",
-                 res.udt = "float8")
+        if (length(names(e1)) == 1 && e1@.col.data_type == "array" &&
+            length(e2) == 1) {
+            e1 <- e1[[names(e1)]]
+            res <- e1
+            madlib <- schema.madlib(conn.id(e1))
+            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr, ", ",
+                               e2, "::double precision)", sep = "")
+            res@.col.name <- paste(e1@.col.name, "_opr", sep = "")
+            ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
+            res@.content <- gsub("^select .* as",
+                                 paste("select ", res@.expr, " as", sep = ""),
+                                 e1@.content)
+            return (res)
+        } else {
+            .compare(e1, e2, " * ", .num.types, res.type = "double precision",
+                     res.udt = "float8")
+        }
     },
     valueClass = "db.Rquery")
 
@@ -833,9 +848,34 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 * e2)
         }
-        .operate.two(e1, e2, " * ", list(.num.types),
-                     res.type = "double precision",
-                     res.udt = "float8")
+        if (length(names(e1)) == 1 && e1@.col.data_type == "array" &&
+            length(names(e2)) == 1 && e2@.col.data_type %in% .num.types) {
+            if (! conn.eql(conn.id(e1), conn.id(e2)))
+                stop("The two objects are not in the same database!")
+            if (!.eql.parent(e1, e2))
+                stop("x and y cannot match because they originate",
+                     " from different sources!")
+            e1 <- e1[[names(e1)]]
+            e2 <- e2[,]
+            res <- e1
+            madlib <- schema.madlib(conn.id(e1))
+            res@.expr <- paste(madlib, ".array_scalar_mult(", e1@.expr, ", (",
+                               e2@.expr, ")::double precision)", sep = "")
+            res@.col.name <- paste(e1@.col.name, "_opr", sep = "")
+            ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
+            res@.content <- gsub("^select .* as",
+                                 paste("select ", res@.expr, " as", sep = ""),
+                                 e1@.content)
+            return (res)
+        } else if (length(names(e2)) == 1 && e2@.col.data_type == "array" &&
+                   length(names(e1)) == 1 &&
+                   e1@.col.data_type %in% .num.types) {
+            return (e2 * e1)
+        } else {
+            .operate.two(e1, e2, " * ", list(.num.types),
+                         res.type = "double precision",
+                         res.udt = "float8")
+        }
     },
     valueClass = "db.Rquery")
 
@@ -1102,7 +1142,9 @@ setMethod (
             madlib <- schema.madlib(conn.id(x))
             tmp <- paste(res@.expr, " or ", madlib,
                          ".array_contains_null(", x@.expr, ")", sep="")
-            res@.content <- gsub("^select .* as", paste("select", tmp, "as"),
+            ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
+            res@.content <- gsub("^select .* as",
+                                 paste("select", tmp, "as"),
                                  res@.content)
             res@.expr <- tmp
         }

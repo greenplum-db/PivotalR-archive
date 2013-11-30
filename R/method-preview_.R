@@ -87,24 +87,24 @@ setMethod (
     def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
         warnings <- .suppress.warnings(conn.id(x))
 
-        add.crossprod <- FALSE
-        if (length(names(x)) > 1 && "crossprod" %in% x@.col.data_type) {
-            select <- which(x@.col.data_type == "crossprod")
-            rst <- list()
-            for (i in select) {
-                z <- x[,i]
-                class(z) <- "db.Rcrossprod"
-                rst[[names(x)[i]]] <- lk(z)
-            }
-            if (length(select) == length(names(x)))
-                return (rst)
-            else {
-                left <- setdiff(1:length(names(x)), select)
-                x <- x[left]
-                add.crossprod <- TRUE
-            }                
-        }            
-
+        ## add.crossprod <- FALSE
+        ## if (length(names(x)) > 1 && "crossprod" %in% x@.col.data_type) {
+        ##     select <- which(x@.col.data_type == "crossprod")
+        ##     rst <- list()
+        ##     for (i in select) {
+        ##         z <- x[,i]
+        ##         class(z) <- "db.Rcrossprod"
+        ##         rst[[names(x)[i]]] <- lk(z)
+        ##     }
+        ##     if (length(select) == length(names(x)))
+        ##         return (rst)
+        ##     else {
+        ##         left <- setdiff(1:length(names(x)), select)
+        ##         x <- x[left]
+        ##         add.crossprod <- TRUE
+        ##     }                
+        ## }    
+        
         if (interactive) {
             cat(deparse(substitute(x)),
                 "is just a query in R and does not point to any object in the database",
@@ -135,11 +135,11 @@ setMethod (
                 res <- as.vector(res)
         }
 
-        if (add.crossprod) {
-            rst[[length(rst)+1]] <- res
-            return (rst)
-        } else
-            return (res)
+        ## if (add.crossprod) {
+        ##     rst[[length(rst)+1]] <- res
+        ##     return (rst)
+        ## } else
+        return (res)
     })
 
 ## -----------------------------------------------------------------------
@@ -178,6 +178,7 @@ setMethod (
                 rst <- new("dspMatrix", uplo = "U", x = res[,1], Dim = as.integer(dims))
             else
                 rst <- new("dgeMatrix", x = res[,1], Dim = as.integer(dims))
+            ## if (x@.inverse) rst <- solve(rst)
         } else {
             rst <- list()
             l <- dim(res)[1] / n
@@ -190,9 +191,10 @@ setMethod (
                 else
                     rst[[i]] <- new("dgeMatrix", x = res[(i-1)*l + seq(l),1],
                                     Dim = as.integer(dims))
+                ## if (x@.inverse) rst[[i]] <- solve(rst[[i]])
             }
         }
-
+        
         .restore.warnings(warnings)
            
         return (rst)

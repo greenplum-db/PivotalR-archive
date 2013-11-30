@@ -17,10 +17,10 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind, x[-1], x[[1]])
+    x <- Reduce(cbind2, x[-1], x[[1]])
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
-    tmp <- scale(cbind(x, y))
+    tmp <- scale(cbind2(x, y))
     centers <- attr(tmp, "scaled:center")
     sds <- attr(tmp, "scaled:scale")
     if (standardize) {
@@ -61,7 +61,7 @@
             y.scl <- 1
         }
     }
-    compute <- cbind(crossprod(x), crossprod(x, y))
+    compute <- cbind2(crossprod(x), crossprod(x, y))
     compute <- as.db.data.frame(compute, verbose = FALSE)
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
@@ -130,7 +130,7 @@
     x <- eval(parse(text = paste("with(data, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
-    x <- Reduce(cbind, x[-1], x[[1]])
+    x <- Reduce(cbind2, x[-1], x[[1]])
     y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(x)
@@ -144,6 +144,18 @@
         mx <- centers
         sx <- 1
     }
+
+    ## tx <- x
+    ## tx$const <- 1
+    ## ty <- as.integer(y)
+    ## ty[y==1,] <- 10
+    ## ty[y==0,] <- -10
+    ## xx <- lk(crossprod(tx))
+    ## xy <- lk(crossprod(tx,ty))
+    ## sol <- as.numeric(solve(xx) %*% xy)
+    ## print(sol)
+
+    ## coef <- sol
     coef <- rep(0, n+1)
     ## coef <- rnorm(n+1, 0, 1e-6)
     iter <- 0
@@ -165,6 +177,8 @@
     lc <- 1
     repeat {
         prev <- coef; prev[1] <- 0; prev[1] <- coef[1]
+        ## prev <- rep(0, length(coef))
+        ## for (i in seq_len(length(prev))) prev[i] <- coef[i]
         newton <- .update.newton(x, y, coef, alpha, lambdas[lc], N, control)
         out.iter <- out.iter + 1
         inner.iter <- inner.iter + newton$iter
@@ -198,6 +212,7 @@
         rst$coef <- rst$coef / sx
         rst$intercept <- rst$intercept - sum(rst$coef * mx)
     }
+
     rst$glmnet <- FALSE
     rst$y.scl <- 1
     rst$standardize <- standardize
@@ -223,26 +238,35 @@
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
     rcoef <- coef[1:n]
-    mid <- cbind(x, as.integer(y))
-    names(mid) <- c(names(mid)[1:n], "y")
+    mid <- cbind2(x, as.integer(y))
+    names(mid) <- c(paste("x", 1:n, sep = ""), "y")
+    
     mid$lin <- intercept + Reduce(function(l,r) l+r, as.list(rcoef*x))
+    
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
-    f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
-    w <- with(f, p * (1 - p))
-    w[f$p < 1e-5 | f$p > 1 - 1e-5] <- 1e-5
-    f$p[f$p < 1e-5] <- 0
-    f$p[f$p > 1 - 1e-5] <- 1
-    ## z <- with(f, lin + (y - p) / w)
+    mid$w <- mid$p * (1 - mid$p)
+    ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
+    ## mid$p[mid$p < 1e-5] <- 0
+    ## mid$p[mid$p > 1 - 1e-5] <- 1
+    
+    f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
+    
+    w <- f$w
+    ## w <- f$p * (1 - f$p)
     z <- f$lin + (f$y - f$p) / w
     x <- f[,1:n]
-    y <- as.numeric(f[,n+1])
-    compute <- cbind(crossprod(x, w*x), crossprod(w*x, z),
-                     mean(cbind(w * x, x, z, w*z, w)))
+
+    compute <- Reduce(cbind2, c(crossprod(x, w*x), crossprod(w*x, z),
+                                mean(Reduce(cbind2, c(w * x, x, z, w*z, w)))))
+    
     compute <- as.db.data.frame(compute, verbose = FALSE)
+    
     xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
     xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
+    
     xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
     xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
+    
     ms <- unlist(lk(compute[,-c(1,2)]))
     mwx <- ms[1:n]
     mx <- ms[1:n + n]
@@ -250,12 +274,14 @@
     mwz <- ms[2*n+2]
     mw <- ms[2*n+3]
     iter <- 0
-    coef <- rep(0, n+1)
+    ## coef <- rep(0, n+1)
+    
     rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")
+    
     delete(f)
     delete(compute)
     list(coef = coef, iter = iter)
@@ -280,7 +306,8 @@
     madlib <- schema.madlib(conn.id) # MADlib schema name
     sql <- paste("select avg(", madlib,
                  ".__elastic_net_binomial_loglikelihood(", coef.str, ", ",
-                 intercept, ", ", y.str, ", ", x.str, ")) as loss from ",
+                 intercept, ", (", y.str, ")::boolean, ", x.str,
+                 ")) as loss from ",
                  tbl, where.str, sort$str, sep = "")
     loss <- as.numeric(.get.res(sql, conn.id = conn.id))
     -(loss + lambda*((1-alpha)*sum(coef^2)/2 + alpha*sum(abs(coef))))

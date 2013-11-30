@@ -135,3 +135,10 @@ export("array.len")
 exportMethods("na.omit")
 
 export("db.q")
+
+export("vcov.lm.madlib", "vcov.lm.madlib.grps",
+       "vcov.logregr.madlib.grps", "vcov.logregr.madlib")
+
+exportMethods("ifelse", "rowSums", "rowMeans")
+
+
