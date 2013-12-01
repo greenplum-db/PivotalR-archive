@@ -162,7 +162,8 @@ generic.cv <- function (train, predict, metric, data,
     dbms <- (.get.dbms.str(conn.id))$db.str
     if (dbms != "PostgreSQL") {
         dist.cols <- x@.dist.by
-        if (identical(dist.cols, character(0))) {
+        if (identical(dist.cols, character(0)) ||
+            !all(dist.cols %in% x@.col.name)) {
             dist.str <- paste("distributed by (", id.col, ")", sep = "")
             dist.by <- id.col
         } else {

@@ -164,7 +164,7 @@ setMethod (
         
         conn.id <- conn.id(x)
 
-        if (is.view)
+        if (is.view || !all(distributed.by %in% x@.col.name))
             dist.str <- ""
         else
             dist.str <- .get.distributed.by.str(conn.id, distributed.by)
