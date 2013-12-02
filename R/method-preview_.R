@@ -33,19 +33,24 @@ setMethod (
     "preview",
     signature (x = "db.table"),
     def = function (x, nrows = 100, array = TRUE) {
-        warn.r <- getOption("warn")
-        options(warn = -1)
-        if (array) {
-            x <- .expand.array(x)
-            res <- .db.getQuery(paste("select * from (", content(x), ") s",
-                                      .limit.str(nrows), sep = ""),
-                                conn.id(x))
-        } else 
-            res <- .db.getQuery(paste("select * from ", content(x),
-                                      .limit.str(nrows), sep = ""),
-                                conn.id(x))
-        options(warn = warn.r) # reset R warning level
-        res
+        ## warn.r <- getOption("warn")
+        ## options(warn = -1)
+        ## if (array) {
+        ##     x <- .expand.array(x)
+        ##     res <- .db.getQuery(paste("select * from (", content(x), ") s",
+        ##                               .limit.str(nrows), sep = ""),
+        ##                         conn.id(x))
+        ## } else 
+        ##     res <- .db.getQuery(paste("select * from ", content(x),
+        ##                               .limit.str(nrows), sep = ""),
+        ##                         conn.id(x))
+        ## options(warn = warn.r) # reset R warning level
+        ## res
+        if (length(names(x)) == 1 && x@.col.data_type == "array")
+            z <- x[[names(x)]]
+        else
+            z <- x[,]
+        lk(z, nrows=nrows, array=array)
     })
 
 ## -----------------------------------------------------------------------
@@ -54,8 +59,8 @@ setMethod (
     "preview",
     signature (x = "db.view"),
     def = function (x, nrows = 100, interactive = FALSE, array = TRUE) {
-        warn.r <- getOption("warn")
-        options(warn = -1)
+        ## warn.r <- getOption("warn")
+        ## options(warn = -1)
         if (interactive) {
             cat(deparse(substitute(x)),
                 "points to a view in the database",
@@ -66,17 +71,22 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        if (array) {
-            x <- .expand.array(x)
-            res <- .db.getQuery(paste("select * from (", content(x), ") s",
-                                      .limit.str(nrows), sep = ""),
-                                conn.id(x))
-        } else 
-            res <- .db.getQuery(paste("select * from ", content(x),
-                                      .limit.str(nrows), sep = ""),
-                                conn.id(x))
-        options(warn = warn.r) # reset R warning level
-        res
+        ## if (array) {
+        ##     x <- .expand.array(x)
+        ##     res <- .db.getQuery(paste("select * from (", content(x), ") s",
+        ##                               .limit.str(nrows), sep = ""),
+        ##                         conn.id(x))
+        ## } else 
+        ##     res <- .db.getQuery(paste("select * from ", content(x),
+        ##                               .limit.str(nrows), sep = ""),
+        ##                         conn.id(x))
+        ## options(warn = warn.r) # reset R warning level
+        ## res
+        if (length(names(x)) == 1 && x@.col.data_type == "array")
+            z <- x[[names(x)]]
+        else
+            z <- x[,]
+        lk(z, nrows=nrows, array=array)
     })
 
 ## -----------------------------------------------------------------------
@@ -115,30 +125,32 @@ setMethod (
             if (go == "no" || go == "n") return
         }
 
-        if (array) x <- .expand.array(x)
+        ## if (array) x <- .expand.array(x)
 
         res <- .db.getQuery(paste(content(x), .limit.str(nrows),
                                   sep = ""), conn.id(x))
 
         .restore.warnings(warnings)
-        if (array && length(names(x)) == 1 && x@.col.data_type == "array") {
-            if (gsub("int", "", x@.col.udt_name) != x@.col.udt_name)
-                res <- arraydb.to.arrayr(res[[1]], "integer")
-            else if (gsub("float", "", x@.col.udt_name) != x@.col.udt_name)
-                res <- arraydb.to.arrayr(res[[1]], "double")
-            else if (x@.col.udt_name == "_bool")
-                res <- arraydb.to.arrayr(res[[1]], "logical")
-            else
-                res <- arraydb.to.arrayr(res[[1]], "character")
-
-            if (dim(res)[1] == 1)
-                res <- as.vector(res)
+        for (i in seq_len(length(names(x)))) {
+            if (array && x@.col.data_type[i] == "array") {
+                if (grepl("int", x@.col.udt_name[i]))
+                    res[[i]] <- arraydb.to.arrayr(res[[i]], "integer")
+                else if (grepl("float", x@.col.udt_name[i]))
+                    res[[i]] <- arraydb.to.arrayr(res[[i]], "double")
+                else if (x@.col.udt_name[i] == "_bool")
+                    res[[i]] <- arraydb.to.arrayr(res[[i]], "logical")
+                else
+                    res[[i]] <- arraydb.to.arrayr(res[[i]], "character")
+            }
         }
+        if (dim(res)[1] == 1)
+            res <- as.vector(res)
 
         ## if (add.crossprod) {
         ##     rst[[length(rst)+1]] <- res
         ##     return (rst)
         ## } else
+        
         return (res)
     })
 
