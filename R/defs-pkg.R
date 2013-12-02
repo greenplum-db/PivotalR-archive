@@ -133,6 +133,7 @@ setClass("db.Rcrossprod",
 setClass("db.Rview",
          contains = "db.Rquery")
 
+## Convert a db.Rquery object to db.Rview object
 as.db.Rview <- function (x) {
     if (!is(x, "db.Rquery"))
         stop(deparse(substitute(x)), " must be a db.Rquery object!")
