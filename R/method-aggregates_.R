@@ -417,6 +417,7 @@ colAgg <- function (x)
 ## array_agg all the columns on the same row
 db.array <- function (x, ...)
 {
+    if (length(names(x)) == 1 && x@.col.data_type == "array") return (x)
     n <- nargs()
     dat <- list()
     dat[[1]] <- .expand.array(x)
