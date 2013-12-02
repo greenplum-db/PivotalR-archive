@@ -55,10 +55,10 @@
     }
     res@.col.name <- col.name[1]
     for (i in seq_len(l-1)+1) {
-        if (x[[i]]@.col.data_type != "array")
+        if (x@.col.data_type[i] != "array") {
             res[[col.name[i]]] <- .sub.aggregate(x[[i]], func, vector, input.types, allow.bool,
                                                  data.type[i], udt.name[i], inside)
-        else {
+        } else {
             if (is.null(array.op))
                 res[[col.name[i]]] <- .apply.func.array(x[[i]], func, vector,
                                                         input.types, allow.bool,
@@ -71,6 +71,7 @@
             }
         }
     }
+
     res
 }
 
@@ -146,7 +147,7 @@
         .content = content,
         .expr = expr,
         .source = src,
-        .parent = parent,
+        .parent = x@.parent,
         .conn.id = conn.id(x),
         .col.name = col.name,
         .key = character(0),

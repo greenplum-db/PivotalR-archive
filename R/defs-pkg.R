@@ -139,7 +139,7 @@ as.db.Rview <- function (x) {
         stop(deparse(substitute(x)), " must be a db.Rquery object!")
     w <- as(x, "db.Rview")
     w@.parent <- x@.content
-    w@.expr <- w@.col.name
+    w@.expr <- "\"" %+% w@.col.name %+% "\""
     w@.content <- paste("select ",
                         paste(w@.expr, "as", w@.col.name, collapse = ", "),
                         " from (", w@.parent, ") s", sep = "")

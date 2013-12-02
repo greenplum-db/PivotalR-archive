@@ -261,21 +261,25 @@
     mid$lin <- intercept + rowSums(rcoef * x)
 
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
-    mid$w <- mid$p * (1 - mid$p)
-    mid$wx <- mid$w * db.array(x)
     mid$x <- db.array(x)
+   
     ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
 
     f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
 
-    w <- f$w
-    z <- f$lin + (f$y - f$p) / w
+    ## f <- as.db.Rview(mid)
 
-    compute <- Reduce(cbind2, c(crossprod(f$x, f$wx), crossprod(f$wx, z),
-                                mean(Reduce(cbind2,
-                                            c(f$wx, f$x, z, w*z, w)))))
+    ## w <- f$w
+    x <- f$x
+    w <- f$p * (1 - f$p)
+    wx <- w * f$x
+    z <- f$lin + (f$y - f$p) / w
+    wz <- w * f$lin + f$y - f$p
+    
+    compute <- Reduce(cbind2, c(crossprod(x, wx), crossprod(wx, z),
+                                mean(Reduce(cbind2, c(wx, x, z, wz, w)))))
 
     compute <- as.db.data.frame(compute, verbose = FALSE)
 
