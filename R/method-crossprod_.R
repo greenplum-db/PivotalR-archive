@@ -83,7 +83,7 @@ setMethod (
         madlib <- schema.madlib(conn.id)
         quick <- db.q("select count(*)  from pg_catalog.pg_proc p LEFT JOIN",
                       "pg_catalog.pg_namespace n ON n.oid = p.pronamespace",
-                      "where p.proname ~ '^(pivotalr_crossprod)$' and",
+                      "where p.proname ~ '^(crossprod)$' and",
                       "n.nspname ~ '^(madlib)$'", conn.id = conn.id, verbose = FALSE)
         if (quick == 0) {
             if (is.symmetric) { ## Using symmetric specific function is faster
@@ -101,9 +101,9 @@ setMethod (
             }
         } else {
             if (is.symmetric)
-                expr <- paste(madlib, ".pivotalr_crossprod_sym(", a, ")", sep = "")
+                expr <- paste(madlib, ".crossprod_sym(", a, ")", sep = "")
             else
-                expr <- paste(madlib, ".pivotalr_crossprod(", a, ", ",
+                expr <- paste(madlib, ".crossprod(", a, ", ",
                               b, ")", sep = "")
         }
 
