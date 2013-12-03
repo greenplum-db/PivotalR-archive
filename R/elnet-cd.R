@@ -15,12 +15,13 @@
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
-    x <- eval(parse(text = paste("with(data, c(",
+    vdata <- .expand.array(data)
+    x <- eval(parse(text = paste("with(vdata, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
     ## x <- Reduce(cbind2, x[-1], x[[1]])
     x <- .combine.list(x)
-    y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
+    y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(cbind2(x, y))
     centers <- attr(tmp, "scaled:center")
@@ -135,12 +136,13 @@
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
-    x <- eval(parse(text = paste("with(data, c(",
+    vdata <- .expand.array(data)
+    x <- eval(parse(text = paste("with(vdata, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
     ## x <- Reduce(cbind2, x[-1], x[[1]])
     x <- .combine.list(x)
-    y <- eval(parse(text = paste("with(data, ", gsub("\"", "`", y), ")",
+    y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")",
                     sep = "")))
     tmp <- scale(x)
     centers <- attr(tmp, "scaled:center")
