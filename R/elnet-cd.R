@@ -249,6 +249,13 @@
 
 ## ----------------------------------------------------------------------
 
+.convert.to.double.array <- function (x)
+{
+    as.numeric(strsplit(gsub("^\\{(.*)\\}$", "\\1", x), ",")[[1]])
+}
+
+## ----------------------------------------------------------------------
+
 .update.newton <- function (x, y, coef, alpha, lambda, N, control)
 {
     n <- length(coef) - 1 # exclude the intercept
@@ -267,9 +274,9 @@
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
 
-    f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
-
-    ## f <- as.db.Rview(mid)
+    ## f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE) 
+    ## f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE) 
+    f <- as.db.Rview(mid)
 
     ## w <- f$w
     x <- f$x
@@ -281,20 +288,29 @@
     compute <- Reduce(cbind2, c(crossprod(x, wx), crossprod(wx, z),
                                 mean(Reduce(cbind2, c(wx, x, z, wz, w)))))
 
-    compute <- as.db.data.frame(compute, verbose = FALSE)
+    ## compute <- as.db.data.frame(compute, verbose = FALSE)
+    ## xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
+    ## xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
+    ## xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
+    ## xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
 
-    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
-    xx@.is.symmetric <- FALSE; xx <- as.matrix(lk(xx))
+    compute <- lk(compute, array = FALSE)
+    xx <- .convert.to.double.array(compute[,1])
+    xx <- array(xx, dim = c(n,n))
+    xy <- .convert.to.double.array(compute[,2])
+
+    ## ms <- unlist(lk(compute[,-c(1,2)]))
+    ## mwx <- ms[1:n]
+    ## mx <- ms[1:n + n]
+    ## my <- ms[2*n+1]
+    ## mwz <- ms[2*n+2]
+    ## mw <- ms[2*n+3]
+    mwx <- .convert.to.double.array(compute[,3])
+    mx <- .convert.to.double.array(compute[,4])
+    my <- compute[,5]
+    mwz <- compute[,6]
+    mw <- compute[,7]
     
-    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
-    xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
-
-    ms <- unlist(lk(compute[,-c(1,2)]))
-    mwx <- ms[1:n]
-    mx <- ms[1:n + n]
-    my <- ms[2*n+1]
-    mwz <- ms[2*n+2]
-    mw <- ms[2*n+3]
     iter <- 0
     ## coef <- rep(0, n+1)
 
@@ -304,8 +320,8 @@
                  control$tolerance, as.integer(N), coef, iter,
                  PACKAGE = "PivotalR")
 
-    delete(f)
-    delete(compute)
+    ## delete(f)
+    ## delete(compute)
     list(coef = coef, iter = iter)
 }
 
