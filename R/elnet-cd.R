@@ -28,10 +28,12 @@
     if (identical(params$weight, character(0)))
         weight <- 1
     else {
-        weight <- eval(parse(text = paste("with(vdata, ",
-                             gsub("\"", "`", params$weight), ")",
+        weight <- eval(parse(text = paste("with(vdata, ", params$weight, ")",
                              sep = "")))
-        weight <- weight * N / lk(sum(weight))
+        if (is(weight, "db.obj"))
+            weight <- weight * N / lk(sum(weight))
+        else
+            weight <- 1
     }
 
     tmp <- scale(cbind2(x, y))
@@ -167,20 +169,22 @@
     vdata <- .expand.array(data)
     vdata <- data
     x <- eval(parse(text = paste("with(vdata, c(",
-                    paste(gsub("\"", "`", x), collapse = ", "), "))",
+                    paste(gsub("\"", "`", x),
+                          collapse = ", "), "))",
                     sep = "")))
     ## x <- Reduce(cbind2, x[-1], x[[1]])
     x <- .combine.list(x)
-    y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")",
-                    sep = "")))
+    y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")", sep = "")))
 
     if (identical(params$weight, character(0)))
         weight <- 1
     else {
         weight <- eval(parse(text = paste("with(vdata, ",
-                             gsub("\"", "`", params$weight), ")",
-                             sep = "")))
-        weight <- weight * N / lk(sum(weight))
+                             params$weight, ")", sep = "")))
+        if (is(weight, "db.obj"))
+            weight <- weight * N / lk(sum(weight))
+        else
+            weight <- 1
     }
 
     tmp <- scale(x)
@@ -190,9 +194,10 @@
         x <- tmp * sqrt(N/(N-1))
         mx <- centers
         sx <- sds * sqrt((N-1)/N)
-        mid <- as.db.data.frame(cbind2(db.array(x), y), verbose = FALSE)
+        mid <- as.db.data.frame(Reduce(cbind2, c(db.array(x), y, weight)), verbose = FALSE)
         x <- mid[,1]
         y <- mid[,2]
+        weight <- mid[,3]
     } else {
         mx <- centers
         sx <- 1
@@ -338,7 +343,7 @@
     wz <- w * f$lin + f$y - f$p
 
     compute <- Reduce(cbind2, c(crossprod(x, wx), crossprod(wx, z),
-                                mean(Reduce(cbind2, c(wx, x, z, wz, w)))))
+                                mean(Reduce(cbind2, c(wx, wz, w)))))
 
     ## compute <- as.db.data.frame(compute, verbose = FALSE)
     ## xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
@@ -366,7 +371,7 @@
     iter <- 0
     ## coef <- rep(0, n+1)
 
-    rst <- .Call("elcd_binom", xx, xy, mwx, mx, mwz, mw,
+    rst <- .Call("elcd_binom", xx, xy, mwx, mwz, mw,
                  alpha, lambda, control$use.active.set,
                  as.integer(control$max.iter),
                  control$tolerance, as.integer(N), coef, iter,

@@ -152,7 +152,7 @@ extern "C"
 
     // ----------------------------------------------------------------------
     
-    SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx,
+    SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx,
                     SEXP rmwz, SEXP rmw, SEXP ralpha, SEXP rlambda,
                     SEXP ractive_set,
                     SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter)
@@ -160,8 +160,6 @@ extern "C"
         Rmatrix<double> xx(rxx);
         Rvector<double> xy(rxy);
         Rvector<double> mwx(rmwx);
-        Rvector<double> mx(rmx);
-        // double my = *(REAL(rmy));
         double mwz = *(REAL(rmwz));
         double mw = *(REAL(rmw));
         Rvector<double> coef(rcoef);
