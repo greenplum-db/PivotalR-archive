@@ -4,6 +4,7 @@
 \alias{as.db.data.frame,data.frame-method}
 \alias{as.db.data.frame,db.Rquery-method}
 \alias{as.db.data.frame,db.data.frame-method}
+\alias{as.db.Rview}
 
 \title{
   Convert other objects into a \code{db.data.frame} object
@@ -32,7 +33,10 @@ NULL, nrow = NULL, field.types = NULL)
 
 \S4method{as.db.data.frame}{db.data.frame}(x, table.name = NULL, verbose
 = TRUE, is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow =
-NULL, field.types = NULL) }
+NULL, field.types = NULL)
+
+as.db.Rview(x)
+}
 
 \arguments{
   \item{x}{
@@ -48,6 +52,8 @@ NULL, field.types = NULL) }
   When it is of type \code{db.Rquery}, it represents a series of
   operations on a existing \code{db.data.frame} object. See
   \code{\linkS4class{db.Rquery}} for more.
+
+  For \code{as.db.Rview}, \code{x} must be a \code{db.Rquery} object.
   }
 
   \item{table.name}{

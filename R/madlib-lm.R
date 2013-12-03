@@ -136,7 +136,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
 
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
-            cond <- .combine.list(Map(function(x) {
+            cond <- .row.action(Map(function(x) {
                 if (is.na(rst[[i]][[x]]))
                     is.na(origin.data[,x])
                 else

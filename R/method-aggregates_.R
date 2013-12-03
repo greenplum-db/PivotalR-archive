@@ -18,7 +18,8 @@
 .aggregate <- function (x, func, vector = TRUE, input.types = .num.types,
                         allow.bool = FALSE,
                         data.type = "double precision",
-                        udt.name = "float8", inside = "")
+                        udt.name = "float8", inside = "",
+                        array.op = NULL) # some function can use special function to speed up
 {
     if (vector && length(names(x)) != 1)
         stop(func, " only works on a single column!")
@@ -43,19 +44,34 @@
     else {
         if (length(names(x)) == 1) z <- x
         else z <- x[[1]]
-        res <- .apply.func.array(z, func, vector, input.types, allow.bool,
-                                 data.type[1], udt.name[1], inside)
+        if (is.null(array.op))
+            res <- .apply.func.array(z, func, vector, input.types, allow.bool,
+                                     data.type[1], udt.name[1], inside)
+        else {
+            res <- z
+            res@.expr <- paste(array.op, "(", res@.expr, ")", sep = "")
+            res@.content <- gsub("^select .* as", paste("select", res@.expr, "as"), res@.content)
+        }
     }
     res@.col.name <- col.name[1]
     for (i in seq_len(l-1)+1) {
-        if (x[[i]]@.col.data_type != "array")
+        if (x@.col.data_type[i] != "array") {
             res[[col.name[i]]] <- .sub.aggregate(x[[i]], func, vector, input.types, allow.bool,
                                                  data.type[i], udt.name[i], inside)
-        else
-            res[[col.name[i]]] <- .apply.func.array(x[[i]], func, vector,
-                                                    input.types, allow.bool,
-                                                    data.type[i], udt.name[i], inside)
+        } else {
+            if (is.null(array.op))
+                res[[col.name[i]]] <- .apply.func.array(x[[i]], func, vector,
+                                                        input.types, allow.bool,
+                                                        data.type[i], udt.name[i], inside)
+            else {
+                z <- x[[i]]
+                z@.expr <- paste(array.op, "(", z@.expr, ")", sep = "")
+                z@.content <- gsub("^select .* as", paste("select", z@.expr, "as"), z@.content)
+                res[[col.name[i]]] <- z
+            }
+        }
     }
+
     res
 }
 
@@ -131,7 +147,7 @@
         .content = content,
         .expr = expr,
         .source = src,
-        .parent = parent,
+        .parent = x@.parent,
         .conn.id = conn.id(x),
         .col.name = col.name,
         .key = character(0),
@@ -152,8 +168,10 @@ setMethod (
     "mean",
     signature(x = "db.obj"),
     function (x, ...) {
+        madlib <- schema.madlib(conn.id(x))
         res <- .aggregate(x, "avg", FALSE, .num.types, TRUE,
-                          "double precision", "float8")
+                          "double precision", "float8",
+                          array.op = paste(madlib, ".avg", sep = ""))
         res@.is.agg <- TRUE
         res
     },
@@ -400,6 +418,7 @@ colAgg <- function (x)
 ## array_agg all the columns on the same row
 db.array <- function (x, ...)
 {
+    if (length(names(x)) == 1 && x@.col.data_type == "array") return (x)
     n <- nargs()
     dat <- list()
     dat[[1]] <- .expand.array(x)

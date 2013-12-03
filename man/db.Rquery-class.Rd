@@ -2,8 +2,9 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{db.Rquery-class}
+\alias{db.Rview-class}
 
-\title{Class \code{"db.Rquery"}}
+\title{Class \code{"db.Rquery"} and its sub-class \code{db.Rview-class}}
 \description{
   An object of this class represents a series of operations applied onto
   an existing \code{\linkS4class{db.data.frame}} object. These
@@ -12,13 +13,15 @@
   \code{\link{as.db.data.frame}}. \code{\link{preview}} can fetch a part
   of the result of executing the SQL query. Thus one does not need to
   create a table for every step of the operations, and the data
-  transfered between R and the database is minimized.
+  transfered between R and the database is minimized. 
 }
 
 \section{Objects from the Class}{
 Objects can be created by almost all functions/methods that can be
 applied onto \code{\linkS4class{db.data.frame}} except
 \code{\link{content}}, \code{\link{preview}} and \code{\link{delete}}.
+
+\code{db.Rview-class} is a sub-class of \code{db.Rquery-class}, and it behaves just like "view" in the databases except that it exists only in R. Usually there is no difference to use \code{db.Rview} or \code{db.Rquery}. \code{\link{as.db.Rview}} casts a \code{db.Rquery} object into a \code{db.Rview} object.
 
 Usually it is
 NOT recommended to directly manipulate the internal slots of these objects.
@@ -155,6 +158,8 @@ this class.
   \code{\link{as.db.data.frame}} converts \code{db.Rquery} object,
   \code{data.frame}, or a data file into a \code{db.data.frame} object
   and at the same time creates a new table in the database.
+
+  \code{\link{as.db.Rview}} converts a \code{db.Rquery} object to a \code{db.Rview} object.
 
   \code{\linkS4class{db.obj}} is the superclass.
 

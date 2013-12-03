@@ -127,6 +127,27 @@ setClass("db.Rcrossprod",
          ## prototype = list(.inverse = FALSE),
          contains = "db.Rquery")
 
+## ----------------------------------------------------------------------
+
+## A db.Rquery, but is treated as a view
+setClass("db.Rview",
+         contains = "db.Rquery")
+
+## Convert a db.Rquery object to db.Rview object
+as.db.Rview <- function (x) {
+    if (!is(x, "db.Rquery"))
+        stop(deparse(substitute(x)), " must be a db.Rquery object!")
+    w <- as(x, "db.Rview")
+    w@.parent <- x@.content
+    w@.expr <- "\"" %+% w@.col.name %+% "\""
+    w@.content <- paste("select ",
+                        paste(w@.expr, "as", w@.col.name, collapse = ", "),
+                        " from (", w@.parent, ") s", sep = "")
+    w@.where <- ""
+    w@.sort <- list(by = "", order = "", str = "")
+    w
+}
+
 ## -----------------------------------------------------------------------
 
 ## Abstract interface, which is the parent of both classes
