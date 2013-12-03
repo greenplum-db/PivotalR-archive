@@ -24,6 +24,16 @@
     x <- .combine.list(x)
     y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")",
                     sep = "")))
+
+    if (identical(params$weight, character(0)))
+        weight <- 1
+    else {
+        weight <- eval(parse(text = paste("with(vdata, ",
+                             gsub("\"", "`", params$weight), ")",
+                             sep = "")))
+        weight <- weight * N / lk(sum(weight))
+    }
+
     tmp <- scale(cbind2(x, y))
     centers <- attr(tmp, "scaled:center")
     sds <- attr(tmp, "scaled:scale")
@@ -68,13 +78,23 @@
             y.scl <- 1
         }
     }
-    compute <- cbind2(crossprod(x), crossprod(x, y))
-    compute <- as.db.data.frame(compute, verbose = FALSE)
-    xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
-    xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
-    xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
-    xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
-    delete(compute)
+    wx <- weight*db.array(x)
+    compute <- Reduce(cbind2, c(crossprod(x, wx),
+                                crossprod(wx, y),
+                                mean(wx), mean(weight*y), sd(weight*y)))
+    ## compute <- as.db.data.frame(compute, verbose = FALSE)
+    ## xx <- compute[,1]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(n,n)
+    ## xx@.is.symmetric <- TRUE; xx <- as.matrix(lk(xx))
+    ## xy <- compute[,2]; class(xy) <- "db.Rcrossprod"; xy@.dim <- c(1,n)
+    ## xy@.is.symmetric <- FALSE; xy <- as.vector(lk(xy))
+    ## delete(compute)
+    compute <- lk(compute, array = FALSE)
+    xx <- .convert.to.double.array(compute[,1])
+    xx <- array(xx, dim = c(n,n))
+    xy <- .convert.to.double.array(compute[,2])
+    mx <- .convert.to.double.array(compute[,3])
+    my <- compute[,4]
+    sy <- compute[,5] * sqrt((N-1)/N)
     coef <- rep(0, n+1) # including the intercept
     ## coef <- rnorm(n+1, 0, 1e-6)
     iter <- 0
@@ -153,6 +173,16 @@
     x <- .combine.list(x)
     y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")",
                     sep = "")))
+
+    if (identical(params$weight, character(0)))
+        weight <- 1
+    else {
+        weight <- eval(parse(text = paste("with(vdata, ",
+                             gsub("\"", "`", params$weight), ")",
+                             sep = "")))
+        weight <- weight * N / lk(sum(weight))
+    }
+
     tmp <- scale(x)
     centers <- attr(tmp, "scaled:center")
     sds <- attr(tmp, "scaled:scale")
@@ -202,7 +232,8 @@
         prev <- coef; prev[1] <- 0; prev[1] <- coef[1]
         ## prev <- rep(0, length(coef))
         ## for (i in seq_len(length(prev))) prev[i] <- coef[i]
-        newton <- .update.newton(x, y, coef, alpha, lambdas[lc], N, control)
+        newton <- .update.newton(x, y, coef, alpha, lambdas[lc], N, control,
+                                 weight)
         out.iter <- out.iter + 1
         inner.iter <- inner.iter + newton$iter
         diff <- abs(prev - newton$coef)
@@ -234,7 +265,8 @@
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- c(out.iter, inner.iter)
 
-    rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda)
+    rst$loglik <- .elnet.binom.loglik(coef, intercept, x, y, alpha, lambda,
+                                      weight)
 
     if (standardize) {
         rst$coef <- rst$coef / sx
@@ -274,7 +306,7 @@
 
 ## ----------------------------------------------------------------------
 
-.update.newton <- function (x, y, coef, alpha, lambda, N, control)
+.update.newton <- function (x, y, coef, alpha, lambda, N, control, weight)
 {
     n <- length(coef) - 1 # exclude the intercept
     intercept <- coef[n+1]
@@ -288,6 +320,8 @@
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     mid$x <- db.array(x)
 
+    mid$weight <- weight
+
     ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
@@ -298,7 +332,7 @@
 
     ## w <- f$w
     x <- f$x
-    w <- f$p * (1 - f$p)
+    w <- f$p * (1 - f$p) * f$weight
     wx <- w * f$x
     z <- f$lin + (f$y - f$p) / w
     wz <- w * f$lin + f$y - f$p
@@ -345,7 +379,7 @@
 
 ## ----------------------------------------------------------------------
 
-.elnet.binom.loglik <- function(coef, intercept, x, y, alpha, lambda)
+.elnet.binom.loglik <- function(coef, intercept, x, y, alpha, lambda, weight)
 {
     conn.id <- conn.id(x)
     coef.str <- "array[" %+% ("," %.% coef) %+% "]"
@@ -360,7 +394,9 @@
     else where.str <- ""
     sort <- y@.sort
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    sql <- paste("select avg(", madlib,
+    if (is(weight, "db.obj")) wstr <- paste(weight@.expr, "*")
+    else wstr <- ""
+    sql <- paste("select avg(", wstr, madlib,
                  ".__elastic_net_binomial_loglikelihood(", coef.str, ", ",
                  intercept, ", (", y.str, ")::boolean, ", x.str,
                  ")) as loss from ",

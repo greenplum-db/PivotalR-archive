@@ -350,6 +350,13 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         intercept.str <- "1,"
 
     labels <- .is.array(labels, data)
+
+    ## extract weight
+    has.weight <- grepl("^weight\\(.*\\)$", labels)
+    if (sum(has.weight) > 1)
+        stop("Only one weight is allowed on the right side of formula!")
+    weight <- gsub("^weight\\((.*)\\)", "\\1", labels[has.weight])
+    labels <- labels[!has.weight]
     orig.labels <- labels
 
     a <- eval(parse(text = paste("with(vdata, c(",
@@ -408,7 +415,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
          has.intercept = as.logical(f.intercept),
          data = data,
          factor.full = factor.full,
-         terms = f.terms)
+         terms = f.terms, weight = weight)
 }
 
 ## -----------------------------------------------------------------------
