@@ -59,14 +59,14 @@ madlib.elnet <- function (formula, data,
 
     if (family == "gaussian" && method == "cd") {
         .restore.warnings(warnings)
-        return (.elnet.gaus.cd(data, params$origin.ind, params$origin.dep,
+        return (.elnet.gaus.cd(data, params$ind.vars, params$origin.dep,
                                alpha, lambda, standardize, control, glmnet,
                                params, call))
     }
 
     if (family == "binomial" && method == "cd") {
         .restore.warnings(warnings)
-        return (.elnet.binom.cd(data, params$origin.ind, params$origin.dep,
+        return (.elnet.binom.cd(data, params$ind.vars, params$origin.dep,
                                 alpha, lambda, standardize, control, params,
                                 call))
     }
@@ -248,7 +248,9 @@ print.elnet.madlib <- function (x,
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
     cat("\nCoefficients:\n")
-    print(format(x$coef, digits = digits), quote = FALSE)
+    coef <- format(x$coef, digits = digits)
+    coef[x$coef == 0] <- "."
+    print(coef, quote = FALSE)
     cat("\n")
     print(format(x$intercept, digits = digits), quote = FALSE)
     if (x$standardize) std.str <- ""

@@ -193,12 +193,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                               is.factor = NA, cols = NA, suffix = NA)
 {    
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
-    f.str <- .replace.array(f.str, data)
+    ## f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
     f1 <- formula(fstr) # formula
     f2 <- f.str[2] # grouping columns, might be NA
 
-    fdata <- .expand.array(fdata)
+    ## fdata <- .expand.array(fdata)
     
     if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
@@ -281,11 +281,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
     right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
-
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
-
+    
     f.intercept <- attr(f.terms, "intercept")
     labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
     labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
@@ -294,7 +293,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     ## vdata <- .expand.array(data)
     vdata <- data
-    
+
     ## dependent variable
     ## factor does not play a role in dependent variable
     dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
@@ -318,12 +317,13 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     a <- eval(parse(text = paste("with(vdata, c(",
                     paste(labels, collapse = ", "), "))",
                     sep = "")))
-    a.labels <- unlist(sapply(a, function(x) x@.expr))
+    a.labels <- unlist(sapply(a, function(x) x[,]@.expr))
+
     b <- eval(parse(text = paste("with(vdata, c(",
                     paste(setdiff(rownames(f.factors),
                                   colnames(f.factors)),
                           collapse = ", "), "))", sep = "")))
-    b.labels <- unlist(sapply(b, function(x) x@.expr))
+    b.labels <- unlist(sapply(b, function(x) x[,]@.expr))
 
     labels <- .strip(setdiff(a.labels, b.labels), "`")
     

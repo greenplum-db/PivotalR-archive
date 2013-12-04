@@ -62,6 +62,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
     
     tmp <- eval(parse(text = paste("with(data, ",
                       params$origin.dep, ")", sep = "")))
+
     if (tmp@.col.data_type %in% c("boolean", "text", "varchar"))
         stop("The dependent variable type is not supported ",
              "in linear regression!")
@@ -136,12 +137,12 @@ madlib.lm <- function (formula, data, na.action = NULL,
 
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
-            cond <- .row.action(Map(function(x) {
+            cond <- .row.action(.combine.list(Map(function(x) {
                 if (is.na(rst[[i]][[x]]))
                     is.na(origin.data[,x])
                 else
                     origin.data[,x] == rst[[i]][[x]]
-            }, r.grp.cols), "&")
+            }, r.grp.cols)), "&")
             rst[[i]]$data <- origin.data[cond,]
         } else
             rst[[i]]$data <- origin.data

@@ -16,6 +16,7 @@
     N <- nrow(data)
     ind.vars <- x
     vdata <- .expand.array(data)
+    vdata <- data
     x <- eval(parse(text = paste("with(vdata, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
@@ -137,6 +138,7 @@
     N <- nrow(data)
     ind.vars <- x
     vdata <- .expand.array(data)
+    vdata <- data
     x <- eval(parse(text = paste("with(vdata, c(",
                     paste(gsub("\"", "`", x), collapse = ", "), "))",
                     sep = "")))
