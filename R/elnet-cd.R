@@ -176,9 +176,9 @@
     x <- .combine.list(x)
     y <- eval(parse(text = paste("with(vdata, ", gsub("\"", "`", y), ")", sep = "")))
 
-    if (identical(params$weight, character(0)))
+    if (identical(params$weight, character(0))) {
         weight <- 1
-    else {
+    } else {
         weight <- eval(parse(text = paste("with(vdata, ",
                              params$weight, ")", sep = "")))
         if (is(weight, "db.obj"))
@@ -194,7 +194,8 @@
         x <- tmp * sqrt(N/(N-1))
         mx <- centers
         sx <- sds * sqrt((N-1)/N)
-        mid <- as.db.data.frame(Reduce(cbind2, c(db.array(x), y, weight)), verbose = FALSE)
+        tmp <- cbind2(db.array(x), y); tmp$weight <- weight
+        mid <- as.db.data.frame(tmp, verbose = FALSE)
         x <- mid[,1]
         y <- mid[,2]
         weight <- mid[,3]
