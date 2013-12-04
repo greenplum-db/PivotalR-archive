@@ -31,6 +31,10 @@
 \alias{!=,db.obj,db.obj-method}
 \alias{!=,db.obj,numeric-method}
 \alias{!=,numeric,db.obj-method}
+\alias{==,db.obj,logical-method}
+\alias{==,logical,db.obj-method}
+\alias{!=,db.obj,logical-method}
+\alias{!=,logical,db.obj-method}
 \alias{grepl}
 \alias{grepl,character,db.obj-method}
 
@@ -72,6 +76,10 @@
 \S4method{<=}{db.obj,numeric}(e1, e2)
 \S4method{==}{db.obj,numeric}(e1, e2)
 \S4method{!=}{db.obj,numeric}(e1, e2)
+\S4method{==}{db.obj,logical}(e1, e2)
+\S4method{==}{logical,db.obj}(e1, e2)
+\S4method{!=}{db.obj,logical}(e1, e2)
+\S4method{!=}{logical,db.obj}(e1, e2)
 \S4method{grepl}{character,db.obj}(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 }
 

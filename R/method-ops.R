@@ -192,7 +192,9 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " > ", .num.types)
+        res <- .compare(e1, e2, " > ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -212,7 +214,9 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " < ", .num.types)
+        res <- .compare(e1, e2, " < ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -232,7 +236,9 @@ setMethod(
     ">=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " >= ", .num.types)
+        res <- .compare(e1, e2, " >= ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -252,7 +258,9 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " <= ", .num.types)
+        res <- .compare(e1, e2, " <= ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -272,7 +280,9 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " = ", .num.types)
+        res <- .compare(e1, e2, " = ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -292,7 +302,9 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " = ", "boolean", cast = "")
+        res <- .compare(e1, e2, " = ", "boolean", cast = "")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -310,9 +322,33 @@ setMethod (
 
 setMethod (
     "!=",
+    signature(e1 = "db.obj", e2 = "logical"),
+    function (e1, e2) {
+        res <- .compare(e1, e2, " <> ", "boolean", cast = "")
+        res@.is.agg <- e1@.is.agg
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "!=",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 != e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "!=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " <> ", .num.types)
+        res <- .compare(e1, e2, " <> ", .num.types)
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -357,7 +393,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " > ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " > ")
+        res <- .replace.timestamp(e1, res, e2, " > ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -379,7 +417,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " < ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " < ")
+        res <- .replace.timestamp(e1, res, e2, " < ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -401,7 +441,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " >= ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " >= ")
+        res <- .replace.timestamp(e1, res, e2, " >= ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -423,7 +465,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " <= ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " <= ")
+        res <- .replace.timestamp(e1, res, e2, " <= ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -445,7 +489,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " = ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " = ")
+        res <- .replace.timestamp(e1, res, e2, " = ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -467,7 +513,9 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
         res <- .compare(e1, e2, " <> ", .txt.types, cast = "")
-        .replace.timestamp(e1, res, e2, " <> ")
+        res <- .replace.timestamp(e1, res, e2, " <> ")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -487,7 +535,10 @@ setMethod (
     "&",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " and ", c("boolean"), res.type = "boolean", cast = "")
+        res <- .compare(e1, e2, " and ", c("boolean"), res.type = "boolean",
+                        cast = "")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -497,7 +548,10 @@ setMethod (
     "|",
     signature(e1 = "db.obj", e2 = "logical"),
     function (e1, e2) {
-        .compare(e1, e2, " or ", c("boolean"), res.type = "boolean", cast = "")
+        res <- .compare(e1, e2, " or ", c("boolean"), res.type = "boolean",
+                        cast = "")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -526,8 +580,11 @@ setMethod (
     "+",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " + ", .num.types, res.type = "double precision",
-                 res.udt = "float8")
+        res <- .compare(e1, e2, " + ", .num.types,
+                        res.type = "double precision",
+                        res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -547,8 +604,11 @@ setMethod (
     "-",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " - ", .num.types, res.type = "double precision",
-                 res.udt = "float8")
+        res <- .compare(e1, e2, " - ", .num.types,
+                        res.type = "double precision",
+                        res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -558,8 +618,10 @@ setMethod (
     "-",
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
-        .compare(e2, e1, " + ", .num.types, prefix = "-",
-                 res.type = "double precision", res.udt = "float8")
+        res <- .compare(e2, e1, " + ", .num.types, prefix = "-",
+                        res.type = "double precision", res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -582,10 +644,14 @@ setMethod (
             res@.content <- gsub("^select .* as",
                                  paste("select ", res@.expr, " as", sep = ""),
                                  e1@.content)
+            res@.is.agg <- e1@.is.agg
             return (res)
         } else {
-            .compare(e1, e2, " * ", .num.types, res.type = "double precision",
-                     res.udt = "float8")
+            res <- .compare(e1, e2, " * ", .num.types,
+                            res.type = "double precision",
+                            res.udt = "float8")
+            res@.is.agg <- e1@.is.agg
+            res
         }
     },
     valueClass = "db.Rquery")
@@ -606,8 +672,11 @@ setMethod (
     "/",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " / ", .num.types, res.type = "double precision",
-                 cast = "::double precision", res.udt = "float8")
+        res <- .compare(e1, e2, " / ", .num.types,
+                        res.type = "double precision",
+                        cast = "::double precision", res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -617,8 +686,10 @@ setMethod (
     "/",
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
-        .compare(e2, e1, " * ", .num.types, prefix = "1./",
-                 res.type = "double precision", res.udt = "float8")
+        res <- .compare(e2, e1, " * ", .num.types, prefix = "1./",
+                        res.type = "double precision", res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -628,8 +699,11 @@ setMethod (
     "^",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, "^", .num.types, res.type = "double precision",
-                 res.udt = "float8")
+        res <- .compare(e1, e2, "^", .num.types,
+                        res.type = "double precision",
+                        res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -639,9 +713,11 @@ setMethod (
     "^",
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
-        .compare(e2, "", "", .num.types,
-                 prefix = paste(e1, "^", sep = ""),
-                 res.type = "double precision", res.udt = "float8")
+        res <- .compare(e2, "", "", .num.types,
+                        prefix = paste(e1, "^", sep = ""),
+                        res.type = "double precision", res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -651,8 +727,11 @@ setMethod (
     "%%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, e2, " % ", .num.types, res.type = "double precision",
-                 cast = "::integer", res.udt = "float8")
+        res <- .compare(e1, e2, " % ", .num.types,
+                        res.type = "double precision",
+                        cast = "::integer", res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -662,10 +741,12 @@ setMethod (
     "%%",
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
-        .compare(e2, "", "", .num.types,
-                 prefix = paste(e1, "% "),
-                 res.type = "double precision", cast = "::integer",
-                 res.udt = "float8")
+        res <- .compare(e2, "", "", .num.types,
+                        prefix = paste(e1, "% "),
+                        res.type = "double precision", cast = "::integer",
+                        res.udt = "float8")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -675,9 +756,11 @@ setMethod (
     "%/%",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        .compare(e1, as.integer(e2), " / ", .int.types,
-                 res.type = "integer", cast = "::integer",
-                 res.udt = "int4")
+        res <- .compare(e1, as.integer(e2), " / ", .int.types,
+                        res.type = "integer", cast = "::integer",
+                        res.udt = "int4")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
@@ -687,10 +770,12 @@ setMethod (
     "%/%",
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
-        .compare(e2, "", "", .num.types,
-                 prefix = paste(e1, "%"),
-                 res.type = "integer", cast = "::integer",
-                 res.udt = "int4")
+        res <- .compare(e2, "", "", .num.types,
+                        prefix = paste(e1, "%"),
+                        res.type = "integer", cast = "::integer",
+                        res.udt = "int4")
+        res@.is.agg <- e1@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
