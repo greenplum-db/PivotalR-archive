@@ -104,8 +104,10 @@ madlib.lm <- function (formula, data, na.action = NULL,
     r.t_stats <- arraydb.to.arrayr(res$t_stats, "double", n)
     r.p_values <- arraydb.to.arrayr(res$p_values, "double", n)
     n.grps <- dim(r.coef)[1] # how many groups
+
     r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
                                                    "character", n))
+    r.grp.expr <- params$grp.expr
     r.has.intercept <- params$has.intercept # do we have an intercept
     r.ind.vars <- gsub("\"", "", params$ind.vars)
     r.ind.str <- params$ind.str
@@ -124,6 +126,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$t_stats <- r.t_stats[i,]
         rst[[i]]$p_values <- r.p_values[i,]
         rst[[i]]$grp.cols <- r.grp.cols
+        rst[[i]]$grp.expr <- r.grp.expr
         rst[[i]]$has.intercept <- r.has.intercept
         rst[[i]]$ind.vars <- r.ind.vars
         rst[[i]]$ind.str <- r.ind.str
@@ -134,15 +137,24 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
-
+        
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
             cond <- .row.action(.combine.list(Map(function(x) {
-                if (is.na(rst[[i]][[x]]))
-                    is.na(origin.data[,x])
+                if (is.na(rst[[i]][[r.grp.cols[x]]]))
+                    ## is.na(origin.data[,x])
+                    eval(parse(text = paste("with(origin.data, is.na(",
+                               r.grp.expr[x], "))", sep = "")))
                 else
-                    origin.data[,x] == rst[[i]][[x]]
-            }, r.grp.cols)), "&")
+                    ## origin.data[,x] == rst[[i]][[x]]
+                    if (is.character(rst[[i]][[r.grp.cols[x]]]))
+                        use <- "\"" %+% rst[[i]][[r.grp.cols[x]]] %+% "\""
+                    else
+                        use <- rst[[i]][[r.grp.cols[x]]]
+                    eval(parse(text = paste("with(origin.data, (",
+                               r.grp.expr[x], ") ==",
+                               rst[[i]][[r.grp.cols[x]]], ")", sep = "")))
+            }, seq_len(length(r.grp.expr)))), "&")
             rst[[i]]$data <- origin.data[cond,]
         } else
             rst[[i]]$data <- origin.data
@@ -218,8 +230,9 @@ print.lm.madlib.grps <- function (x,
         if (length(x[[i]]$grp.cols) != 0)
         {
             cat("Group", i, "when\n")
-            for (col in x[[i]]$grp.cols)
-                cat(col, ": ", x[[i]][[col]], "\n", sep = "")
+            for (col in seq_len(length(x[[i]]$grp.expr)))
+                cat(x[[i]]$grp.expr[col], ": ",
+                    x[[i]][[x[[i]]$grp.cols[col]]], "\n", sep = "")
             cat("\n")
         }
 

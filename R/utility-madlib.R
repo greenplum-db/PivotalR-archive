@@ -50,7 +50,9 @@
     
     params <- .analyze.formula(formula, data, params$data, refresh = TRUE,
                                is.factor = is.factor, cols = cols,
-                               suffix = data@.factor.suffix)
+                               suffix = data@.factor.suffix,
+                               grp.vars = params$grp.vars,
+                               grp.expr = params$grp.expr)
 
     list(data = data, params = params,
          is.tbl.source.temp = is.tbl.source.temp,

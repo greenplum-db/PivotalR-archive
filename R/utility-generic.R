@@ -190,42 +190,59 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 ## analyze formula
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
-                              is.factor = NA, cols = NA, suffix = NA)
+                              is.factor = NA, cols = NA, suffix = NA,
+                              grp.vars = NULL, grp.expr = NULL)
 {    
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     ## f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
-    f1 <- formula(fstr) # formula
+    
     f2 <- f.str[2] # grouping columns, might be NA
 
     ## fdata <- .expand.array(fdata)
-    
-    if (!is.na(f2)) {
+    if (!is.null(grp.vars) && !is.na(f2)) {
+        f2.labels <- grp.vars
+        grp.expr <- grp.expr
+        grp <- paste(f2.labels, collapse = ", ")
+    } else if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
         f2.labels <- attr(f2.terms, "term.labels")
-        inter <- intersect(f2.labels, names(fdata))
-        if (length(inter) != length(f2.labels))
-            stop("The grouping part of the formula is not quite right!")
-        ## grouping column do not use factor
+        ## inter <- intersect(f2.labels, names(fdata))
+        ## if (length(inter) != length(f2.labels))
+        ##     stop("The grouping part of the formula is not quite right!")
+        ## ## grouping column do not use factor
+        f2.labels <- gsub("as.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
-        ## f2.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f2.labels)
+        ## f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
+        ## ## f2.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f2.labels)
+        grp.expr <- f2.labels
+        for (i in seq_len(length(f2.labels))) {
+            if (! f2.labels[i] %in% names(data)) {
+                grp.col <- .unique.string()
+                data[[grp.col]] <- eval(parse(text = paste("with(data, ",
+                                              f2.labels[i], ")", sep = "")))
+                f2.labels[i] <- grp.col
+            }                
+        }
         grp <- paste(f2.labels, collapse = ", ")
     } else {
         f2.labels <- NULL
         grp <- NULL
     }
 
+    if (!is.null(f2.labels))
+        fstr <- paste(fstr, "-", paste("`", f2.labels, "`",
+                                       collapse = "-", sep = ""))
+
     ## create a fake data.frame only to extract
     ## terms when there is "." in formula
     fake.data <- structure(vector("list", ncol(fdata)), names=names(fdata), class="data.frame")
+    f1 <- formula(fstr) # formula
     f.terms <- terms(f1, data = fake.data) # formula terms
     ## the 1st row is the dependent variable
     f.factors <- attr(f.terms, "factors")
     f.labels <- attr(f.terms, "term.labels") # each terms on the right side
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)    
-    
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
         replace.cols <- cols[is.factor]
@@ -284,7 +301,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
-    
+
     f.intercept <- attr(f.terms, "intercept")
     labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
     labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
@@ -301,9 +318,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
     origin.dep <- dep.var
+
     tmp <- eval(parse(text = paste("with(vdata, ", dep.var, ")", sep = "")))
     dep.var <- tmp@.expr
-    
+
     ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
 
     ## with or without intercept
@@ -314,6 +332,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     labels <- .is.array(labels, data)
     orig.labels <- labels
+
     a <- eval(parse(text = paste("with(vdata, c(",
                     paste(labels, collapse = ", "), "))",
                     sep = "")))
@@ -353,7 +372,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     
     list(dep.str = dep.var, origin.dep = origin.dep,
          origin.ind = orig.labels,
-         ind.str = ind.var, grp.str = grp, grp.vars = f2.labels,
+         ind.str = ind.var,
+         grp.str = grp, grp.vars = f2.labels, grp.expr = grp.expr,
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data,

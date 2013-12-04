@@ -87,12 +87,13 @@ predict.logregr.madlib.grps <- function (object, newdata,
         for (i in seq_len(n)) {
             tmp <- ""
             for (j in seq_len(l)) {
-                tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
-                             object[[i]][[object[[i]]$grp.cols[j]]],
-                             "'::",
-                             newdata@.col.data_type[which(
-                                 names(newdata) == object[[i]]$grp.cols[j])],
-                             sep = "")
+                ## tmp <- paste(tmp, object[[i]]$grp.expr[j], " = '",
+                ##              object[[i]][[object[[i]]$grp.cols[j]]],
+                ##              "'::",
+                ##              newdata@.col.data_type[which(
+                ##                  names(newdata) == object[[i]]$grp.cols[j])],
+                ##              sep = "")
+                tmp <- object[[i]]$data@.where
                 if (j != l) tmp <- paste(tmp, " and ", sep = "")
             }
             if (!is(newdata, "db.data.frame"))
@@ -219,12 +220,13 @@ predict.logregr.madlib.grps <- function (object, newdata,
         for (i in seq_len(n)) {
             tmp <- ""
             for (j in seq_len(l)) {
-                tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
-                             object[[i]][[object[[i]]$grp.cols[j]]],
-                             "'::",
-                             newdata@.col.data_type[which(
-                                 names(newdata) == object[[i]]$grp.cols[j])],
-                             sep = "")
+                ## tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
+                ##              object[[i]][[object[[i]]$grp.cols[j]]],
+                ##              "'::",
+                ##              newdata@.col.data_type[which(
+                ##                  names(newdata) == object[[i]]$grp.cols[j])],
+                ##              sep = "")
+                tmp <- object[[i]]$data@.where
                 if (j != l) tmp <- paste(tmp, " and ", sep = "")
             }
             if (!is(newdata, "db.data.frame"))

@@ -289,6 +289,26 @@ setMethod (
 ## --
 
 setMethod (
+    "==",
+    signature(e1 = "db.obj", e2 = "logical"),
+    function (e1, e2) {
+        .compare(e1, e2, " = ", "boolean", cast = "")
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "==",
+    signature(e1 = "logical", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 == e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
