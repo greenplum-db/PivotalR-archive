@@ -620,7 +620,7 @@ setMethod (
     function (e1, e2) {
         res <- .compare(e2, e1, " + ", .num.types, prefix = "-",
                         res.type = "double precision", res.udt = "float8")
-        res@.is.agg <- e1@.is.agg
+        res@.is.agg <- e2@.is.agg
         res
     },
     valueClass = "db.Rquery")
@@ -688,7 +688,7 @@ setMethod (
     function (e1, e2) {
         res <- .compare(e2, e1, " * ", .num.types, prefix = "1./",
                         res.type = "double precision", res.udt = "float8")
-        res@.is.agg <- e1@.is.agg
+        res@.is.agg <- e2@.is.agg
         res
     },
     valueClass = "db.Rquery")
@@ -716,7 +716,7 @@ setMethod (
         res <- .compare(e2, "", "", .num.types,
                         prefix = paste(e1, "^", sep = ""),
                         res.type = "double precision", res.udt = "float8")
-        res@.is.agg <- e1@.is.agg
+        res@.is.agg <- e2@.is.agg
         res
     },
     valueClass = "db.Rquery")
@@ -745,7 +745,7 @@ setMethod (
                         prefix = paste(e1, "% "),
                         res.type = "double precision", cast = "::integer",
                         res.udt = "float8")
-        res@.is.agg <- e1@.is.agg
+        res@.is.agg <- e2@.is.agg
         res
     },
     valueClass = "db.Rquery")
@@ -774,7 +774,7 @@ setMethod (
                         prefix = paste(e1, "%"),
                         res.type = "integer", cast = "::integer",
                         res.udt = "int4")
-        res@.is.agg <- e1@.is.agg
+        res@.is.agg <- e2@.is.agg
         res
     },
     valueClass = "db.Rquery")

@@ -223,7 +223,7 @@ setMethod (
     "delete",
     signature (x = "elnet.madlib"),
     def = function (x) {
-        if (!is.na(x$model)) {
+        if (is(x$model, "db.obj")) {
             conn.id <- conn.id(x$model)
             d1 <- delete(x$model)
         } else {

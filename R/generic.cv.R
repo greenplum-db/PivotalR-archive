@@ -125,6 +125,7 @@ generic.cv <- function (train, predict, metric, data,
         }
         res <- list(metric = rst, params = args, best = best.fit, best.params = arg.list)
         class(res) <- "cv.generic"
+        res
     }
 }
 
