@@ -287,10 +287,13 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
 
     f.intercept <- attr(f.terms, "intercept")
-    labels <- gsub(":", "*", f.labels, perl = T) # replace interaction : with *
+    labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
+    labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
+    labels <- gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", labels)
     labels <- gsub("I\\((.*)\\)", "\\1", labels, perl = T) # remove I()
 
-    vdata <- .expand.array(data)
+    ## vdata <- .expand.array(data)
+    vdata <- data
     
     ## dependent variable
     ## factor does not play a role in dependent variable
