@@ -107,7 +107,7 @@ madlib.elnet <- function (formula, data,
     rst$coef <- as.vector(arraydb.to.arrayr(res$coef_all, "double"))
 
     rows <- gsub("\"", "", params$ind.vars)
-    rst$ind.vars <- rows
+    rst$ind.vars <- params$ind.vars
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
     for (i in seq_len(length(col.name)))

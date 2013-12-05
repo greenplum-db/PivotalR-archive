@@ -8,7 +8,7 @@
                             glmnet, params, call)
 {
     warnings <- .suppress.warnings(conn.id(data))
-    if (is.null(params$verbose) || params$verbose)
+    if (is.null(control$control$verbose) || control$control$verbose)
         message("Warning: The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
                 "is larger than a couple of thousands!")
@@ -130,7 +130,7 @@
                              params, call)
 {
     warnings <- .suppress.warnings(conn.id(data))
-    if (is.null(params$verbose) || params$verbose)
+    if (is.null(control$control$verbose) || control$control$verbose)
         message("Warning: The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
                 "is larger than a couple of thousands!")

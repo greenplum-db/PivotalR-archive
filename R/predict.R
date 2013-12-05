@@ -69,7 +69,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
         ind.vars <- object[[1]]$ind.vars
     ind.str <- paste("array[", paste(ind.vars, collapse = ","), "]", sep = "")
 
-    if (length(object[[1]]) == 1) {
+    if (length(object) == 1) {
         if (object[[1]]$has.intercept) {
             coef <- object[[1]]$coef[-1]
             intercept <- object[[1]]$coef[1]

@@ -138,7 +138,8 @@ madlib.glm <- function (formula, data,
                                                      "character", n))
     r.grp.expr <- params$grp.expr
     r.has.intercept <- params$has.intercept # do we have an intercept
-    r.ind.vars <- gsub("\"", "", params$ind.vars)
+    ## r.ind.vars <- gsub("\"", "", params$ind.vars)
+    r.ind.vars <- params$ind.vars
     r.col.name <- gsub("\"", "", data@.col.name)
     r.appear <- data@.appear.name
     r.call <- call # the current function call itself
@@ -226,6 +227,7 @@ print.logregr.madlib.grps <- function (x,
         rows <- c("(Intercept)", x[[1]]$ind.vars)
     else
         rows <- x[[1]]$ind.vars
+    rows <- gsub("\"", "", rows)
     for (i in seq_len(length(x[[1]]$col.name)))
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
@@ -312,6 +314,7 @@ print.logregr.madlib <- function (x,
         rows <- c("(Intercept)", x$ind.vars)
     else
         rows <- x$ind.vars
+    rows <- gsub("\"", "", rows)
     for (i in seq_len(length(x$col.name)))
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
