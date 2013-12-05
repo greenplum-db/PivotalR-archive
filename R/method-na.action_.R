@@ -25,7 +25,7 @@ setMethod(
                                                                 gsub("\"", "`", v),
                                                                 "))",
                                                                 sep = ""))),
-                                                     vars))), "|")
+                                                     vars))), " or ")
         
         options(warn = warn.r)
         x[!(cond),]

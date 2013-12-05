@@ -211,6 +211,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ## if (length(inter) != length(f2.labels))
         ##     stop("The grouping part of the formula is not quite right!")
         ## ## grouping column do not use factor
+        f2.labels <- gsub("I\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("as.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         ## f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)

@@ -183,8 +183,8 @@ madlib.glm <- function (formula, data,
                         use <- rst[[i]][[r.grp.cols[x]]]
                 eval(parse(text = paste("with(origin.data, (",
                            r.grp.expr[x], ") ==",
-                           rst[[i]][[r.grp.cols[x]]], ")", sep = "")))
-            }, seq_len(length(r.grp.expr)))), "&")
+                           use, ")", sep = "")))
+            }, seq_len(length(r.grp.expr)))), " and ")
             rst[[i]]$data <- origin.data[cond,]
         } else
             rst[[i]]$data <- origin.data

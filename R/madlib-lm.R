@@ -138,7 +138,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
-        
+
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
             cond <- .row.action(.combine.list(Map(function(x) {
@@ -146,7 +146,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
                     ## is.na(origin.data[,x])
                     eval(parse(text = paste("with(origin.data, is.na(",
                                r.grp.expr[x], "))", sep = "")))
-                else
+                else {
                     ## origin.data[,x] == rst[[i]][[x]]
                     if (is.character(rst[[i]][[r.grp.cols[x]]]))
                         use <- "\"" %+% rst[[i]][[r.grp.cols[x]]] %+% "\""
@@ -154,8 +154,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
                         use <- rst[[i]][[r.grp.cols[x]]]
                     eval(parse(text = paste("with(origin.data, (",
                                r.grp.expr[x], ") ==",
-                               rst[[i]][[r.grp.cols[x]]], ")", sep = "")))
-            }, seq_len(length(r.grp.expr)))), "&")
+                               use, ")", sep = "")))
+                }
+            }, seq_len(length(r.grp.expr)))), " and ")
             rst[[i]]$data <- origin.data[cond,]
         } else
             rst[[i]]$data <- origin.data
