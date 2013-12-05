@@ -44,7 +44,7 @@ setMethod (
         if (is(x, "db.data.frame")) {
             content <- paste("select * from ", content(x),
                              sort$str, sep = "")
-            expr <- names(x)
+            expr <- paste("\"", names(x), "\"", sep = "")
             src <- content(x)
             parent <- src
             where <- ""
