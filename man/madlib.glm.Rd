@@ -293,6 +293,12 @@ array.data <- db.data.frame("tbl_has_array_column")
 fit <- madlib.glm(y < 10 ~ x, data = array.data, family = "binomial")
 
 fit <- madlib.glm(y < 10 ~ x - x[1:2], data = array.data, family = "binomial")
+
+## 4th example
+## Step-wise feature selection
+dat <- as.db.data.frame(abalone, "abalone")
+start <- madlib.glm(rings < 10 ~ . - id - sex, data = dat, family = "binomial")
+step(start)
 }
 }
 
@@ -300,4 +306,3 @@ fit <- madlib.glm(y < 10 ~ x - x[1:2], data = array.data, family = "binomial")
 % R documentation directory.
 \keyword{madlib}
 \keyword{stats}
-

@@ -247,7 +247,7 @@ fit # display the result
 ## Another example
 x <- as.db.data.frame(abalone, "abalone")
 
-fit <- madlib.lm(rings ~ . - id | sex + length + height, data = x)
+fit <- madlib.lm(rings ~ . - id | sex + (id < 2000), data = x)
 
 ## 3rd example
 ## The table has two columns: x is an array, y is double precision
@@ -262,6 +262,12 @@ fit <- madlib.lm(y ~ x - x[1], data = array.data)
 fit <- madlib.lm(y ~ . - x[1:2], data = array.data)
 
 fit <- madlib.lm(as.integer(y < 10) ~ . - x[1:2], data = array.data)
+
+## 4th example
+## Step-wise feature selection
+dat <- as.db.data.frame(abalone, "abalone")
+start <- madlib.lm(rings ~ . - id - sex, data = dat)
+step(start)
 }
 }
 
