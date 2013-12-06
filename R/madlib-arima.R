@@ -26,7 +26,7 @@ setMethod (
     optim.control = list(), ...)
 {
     method <- match.arg(method)
-    optim.method <- match.arg(method)
+    optim.method <- match.arg(optim.method)
     if (length(names(x)) != 1 || length(names(ts)) != 1)
         stop("ARIMA can only have one time stamp column and ",
              "one time series value column !")

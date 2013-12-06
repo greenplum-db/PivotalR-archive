@@ -256,7 +256,7 @@ delete(s)
 s # s does not exist any more
 
 ## do not use formula
-s <- madlib.arima(x$tval, x$id, order = c(2,0,1))
+s <- madlib.arima(x$val, x$id, order = c(2,0,1))
 
 s
 
@@ -272,7 +272,7 @@ pred <- predict(s, n.ahead = 10)
 lookat(sort(pred, F, pred$step_ahead), "all")
 
 ## Use expressions
-s <- madlib.arima(tval+2 ~ I(tid + 1), x, order = c(2,0,1))
+s <- madlib.arima(val+2 ~ I(id + 1), x, order = c(2,0,1))
 }
 }
 
