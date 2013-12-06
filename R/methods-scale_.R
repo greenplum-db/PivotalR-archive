@@ -20,7 +20,8 @@ setMethod (
 
         warnings <- .suppress.warnings(conn.id)
 
-        all.names <- names(.expand.array(x))
+        ## all.names <- names(.expand.array(x))
+        all.names <- names(x)
         lg <- length(all.names)
         if (length(names(x)) == 1 && x@.col.data_type == "array")
             y <- x[[names(x)]]

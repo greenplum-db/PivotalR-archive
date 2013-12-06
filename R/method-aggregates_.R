@@ -522,7 +522,7 @@ db.array <- function (x, ...)
         .is.factor = FALSE,
         .factor.suffix = "",
         .sort = sort,
-        .dist.by = x@.dist.by)
+        .dist.by = base@.dist.by)
 }
 
 ## -----------------------------------------------------------------------
