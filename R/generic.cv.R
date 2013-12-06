@@ -156,7 +156,9 @@ generic.cv <- function (train, predict, metric, data,
 
 ## cut the data in an approximate way, but faster
 .approx.cut.data <- function (x, k)
-{    
+{
+    size <- 100
+    n <- k * size
     conn.id <- conn.id(x)
     tmp <- .unique.string()
     id.col <- .unique.string()
@@ -184,14 +186,15 @@ generic.cv <- function (train, predict, metric, data,
     random.col@.is.factor <- FALSE
     random.col@.factor.suffix <- ""
     random.col@.content <- gsub("select\\s+.*\\s+from",
-                                paste("select random() as", id.col, "from"),
+                                paste("select trunc(random()*", n, "+1) as", id.col, "from"),
                                 random.col@.content)
 
     x[[id.col]] <- random.col
     y <- as.db.data.frame(x, is.temp = TRUE, verbose = FALSE, pivot = FALSE)
     id <- ncol(y)
-    size <- 1 / k
-    tick <- c(0, seq(size, length.out = k-1, by = size), 1)
+    ## size <- 1 / k
+    ## tick <- c(0, seq(size, length.out = k-1, by = size), 1)
+    tick <- c(0, seq(size, length.out = k-1, by = size), n)
     valid <- list()
     train <- list()
     for (i in 1:k) {
