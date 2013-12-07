@@ -68,7 +68,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 
         \code{method}: A string, default is \code{"irls"} (iteratively
         reweighted least squares [3]), other choices
-        are \code{"cgd"} (conjugate gradient descent algorithm [4]) and \code{"igd"}
+        are \code{"cg"} (conjugate gradient descent algorithm [4]) and \code{"igd"}
         (stochastic gradient descent algorithm [5]). The algorithm names for
         logistic regression.
 
