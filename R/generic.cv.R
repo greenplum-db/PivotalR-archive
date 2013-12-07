@@ -179,7 +179,7 @@ generic.cv <- function (train, predict, metric, data,
     }
 
     random.col <- x[,1]
-    random.col@.expr <- "random()"
+    random.col@.expr <- paste("trunc(random()*", n, "+1)")
     random.col@.col.name <- id.col
     random.col@.col.data_type <- "double precision"
     random.col@.col.udt_name <- "float8"
