@@ -17,7 +17,7 @@ namespace adp
 	    SEXP tmp = VECTOR_ELT(rList, i);
 
 	    size_[i] = LENGTH(tmp);
-	
+
 	    itemType_[i] = TYPEOF(tmp);
 
 	    if (itemType_[i] == INTSXP)
@@ -30,8 +30,8 @@ namespace adp
 		intList_[i] = 0;
 		doubleList_[i] = REAL(tmp);
 	    }
-	    else
-		throw std::invalid_argument("The item type of the list must be either int or double!");
+	    // else
+	    //	throw std::invalid_argument("The item type of the list must be either int or double!");
 
 	    tmp = 0;
 	}
