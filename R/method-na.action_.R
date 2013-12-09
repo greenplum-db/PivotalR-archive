@@ -3,7 +3,7 @@
 ## inplement in R space
 ## ----------------------------------------------------------------------
 
-setGeneric("na.omit")
+setGeneric("na.omit", function(object, ...) standardGeneric("na.omit"))
 
 setMethod(
     "na.omit",
