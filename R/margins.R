@@ -1,6 +1,30 @@
 ## Implement marginal effects
 
-.margins <- function(coef, data, P, var = NULL, at.mean = FALSE)
+margins <- function (model, vars = ~., at.mean = FALSE,
+                     factor.continuous = FALSE, ...)
+    UseMethod("margins", model)
+
+## ----------------------------------------------------------------------
+
+margins.lm.madlib <- function(model, vars = ~., at.mean = FALSE,
+                              factor.continuous = FALSE, na.action = NULL,
+                              ...)
+{
+    coef <- model$coef
+    data <- model$data
+    ## formula <- model$call$formula
+    fake.data <- structure(vector("list", length(model$ind.vars)),
+                           names = gsub("\"", "`", model$ind.vars),
+                           class = "data.frame")
+    f.terms <- terms(vars, fake.data)
+    f.vars <- gsub("`", "\"", attr(f.terms, "term.labels"))
+    if (any(! (f.vars %in% c(model$inde.vars, names(data))))
+}
+
+## ----------------------------------------------------------------------
+
+.margins <- function(coef, data, P, var = NULL, at.mean = FALSE,
+                     factor.continuous = FALSE)
 {
     coefs <- coef
     n <- length(coefs)
