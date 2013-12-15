@@ -91,7 +91,7 @@
     }
 
     rst <- list(coef = coef, intercept = intercept)
-    rows <- gsub("\"", "", ind.vars)
+    rows <- gsub("\"", "", params$origin.ind)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
@@ -212,7 +212,7 @@
     intercept <- coef[n+1]
     coef <- coef[1:n]
     rst <- list(coef = coef, intercept = intercept)
-    rows <- gsub("\"", "", ind.vars)
+    rows <- gsub("\"", "", params$origin.ind)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
