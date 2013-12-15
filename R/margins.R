@@ -12,14 +12,15 @@ margins <- function (model, vars = ~., at.mean = FALSE,
     coef <- model$coef
     data <- model$data
     ## formula <- model$call$formula
-    model.vars <- gsub("\"", "`", model$ind.vars)
-    fake.data <- structure(vector("list", length(model$ind.vars)),
+    model.vars <- model$origin.ind
+    fake.data <- structure(vector("list", length(model.vars)),
                            names = gsub("`", "", model.vars),
                            class = "data.frame")
     f.terms <- terms(vars, data = fake.data)
     ## f.vars <- gsub("`", "\"", attr(f.terms, "term.labels"))
     f.vars <- attr(f.terms, "term.labels")
-    if (any(! (f.vars %in% c(model.vars, names(data)))))
+    if (any(! (gsub("`", "", f.vars) %in% c(gsub("`", "", model.vars),
+                                            names(data)))))
         stop("All the variables must be in the independent variables ",
              " or the table column names!")
     model.vars <- lapply(model.vars, function(x)
@@ -71,14 +72,15 @@ margins.lm.madlib.grp <- function(model, vars = ~., at.mean = FALSE,
                                      derv(P, i, model.vars, coefs) %+% ")"))
                       })
         se <- array(0, dim = c(n,n))
-        for (i in seq_len(n))
+        for (i in seq_len(n)) {
+            s <- derv(P, vars[i], model.vars, coefs)
             se[i,] <- sapply(seq_len(n),
                              function(j) {
                                  eval(parse(text = "with(avgs," %+%
-                                            derv1(P, vars[i], j, model.vars,
-                                                  coefs)
+                                            derv1(s, j, coefs)
                                             %+% ")"))
                              })
+        }
     } else {
         mar <- sapply(vars,
                       function(i) {
@@ -88,20 +90,19 @@ margins.lm.madlib.grp <- function(model, vars = ~., at.mean = FALSE,
         if (is(mar[[1]], "db.obj"))
             mar <- unlist(lk(.combine.list(mar), -1))
         for (i in seq_len(m)) {
+            s <- derv(P, vars[i], model.vars, coefs)
             if (i == 1)
                 se <- sapply(seq_len(n),
                              function(j) {
                                  eval(parse(text = "mean(with(data," %+%
-                                            derv1(P, vars[i], j, model.vars,
-                                                  coefs)
+                                            derv1(s, j, coefs)
                                             %+% "))"))
                              })
             else
                 se <- c(se, sapply(seq_len(n),
                                    function(j) {
                                        eval(parse(text = "mean(with(data," %+%
-                                                  derv1(P, vars[i], j,
-                                                        model.vars, coefs)
+                                                  derv1(s, j, coefs)
                                                   %+% "))"))
                                    }))
         }
@@ -118,8 +119,10 @@ margins.lm.madlib.grp <- function(model, vars = ~., at.mean = FALSE,
 ## derivative over a variable
 derv <- function(P, x, model.vars, coefs)
 {
-    if (x %in% sapply(model.vars, deparse)) {
-        i <- which(model.vars == x)
+    mv <- gsub("`", "", sapply(model.vars, deparse))
+    xv <- gsub("`", "", x)
+    if (xv %in% mv) {
+        i <- which(mv == xv)
         s <- .parse.deriv(P, "var" %+% i)
         s <- deparse(eval(parse(text = paste("substitute(", s,
                                 ", model.vars)"))))
@@ -138,9 +141,9 @@ derv <- function(P, x, model.vars, coefs)
 ## ----------------------------------------------------------------------
 
 ## derivative over a variable and a coefficient
-derv1 <- function(P, x, j, model.vars, coefs)
+derv1 <- function(s, j, coefs)
 {
-    s <- derv(P, x, model.vars, coefs)
+    ## s <- derv(P, x, model.vars, coefs)
     s1 <- .parse.deriv(s, "b" %+% "j")
     w <- eval(parse(text = paste("substitute(", s1, ", coefs)", sep = "")))
     as.character(enquote(w))[2]

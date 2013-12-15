@@ -140,6 +140,7 @@ madlib.glm <- function (formula, data,
     r.has.intercept <- params$has.intercept # do we have an intercept
     ## r.ind.vars <- gsub("\"", "", params$ind.vars)
     r.ind.vars <- params$ind.vars
+    r.origin.ind <- params$origin.ind
     r.col.name <- gsub("\"", "", data@.col.name)
     r.appear <- data@.appear.name
     r.call <- call # the current function call itself
@@ -159,6 +160,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$grp.expr <- r.grp.expr
         rst[[i]]$has.intercept <- r.has.intercept
         rst[[i]]$ind.vars <- r.ind.vars
+        rst[[i]]$origin.ind <- r.origin.ind
         rst[[i]]$ind.str <- r.ind.str
         rst[[i]]$col.name <- r.col.name
         rst[[i]]$appear <- r.appear
@@ -224,7 +226,7 @@ print.logregr.madlib.grps <- function (x,
     n.grps <- length(x)
 
     if (x[[1]]$has.intercept)
-        rows <- c("(Intercept)", x[[1]]$ind.vars)
+        rows <- c("(Intercept)", x[[1]]$origin.ind)
     else
         rows <- x[[1]]$ind.vars
     rows <- gsub("\"", "", rows)
@@ -311,7 +313,7 @@ print.logregr.madlib <- function (x,
                                   ...)
 {
     if (x$has.intercept)
-        rows <- c("(Intercept)", x$ind.vars)
+        rows <- c("(Intercept)", x$origin.ind)
     else
         rows <- x$ind.vars
     rows <- gsub("\"", "", rows)
