@@ -223,6 +223,7 @@ print.lm.madlib.grps <- function (x,
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Linear Regression Result\n")
@@ -313,6 +314,7 @@ print.lm.madlib <- function (x,
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Linear Regression Result\n")

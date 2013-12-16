@@ -19,6 +19,7 @@
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
     model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     res <- .combine.list(eval(parse(text = "with(x, c(" %+% (","
                                     %.% model.vars) %+% "))")))
     if (object$has.intercept) {
@@ -48,10 +49,11 @@ vcov.lm.madlib <- function(object, ...)
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
     model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     if (object$has.intercept)
         rows <- c("(Intercept)", model.vars)
     else
-        rows <- object$ind.vars
+        rows <- model.vars
     for (i in seq_len(length(object$col.name))) 
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
@@ -78,10 +80,11 @@ vcov.logregr.madlib <- function(object, ...)
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
     model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     if (object$has.intercept)
         rows <- c("(Intercept)", model.vars)
     else
-        rows <- object$ind.vars
+        rows <- model.vars
     for (i in seq_len(length(object$col.name))) 
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)

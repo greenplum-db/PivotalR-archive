@@ -400,6 +400,16 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     res
 }
 
+## ----------------------------------------------------------------------
+
+## reverse of the above function
+.reverse.consistent.func <- function (strs)
+{
+    res <- gsub("log\\s*\\(", "log10(", strs)
+    res <- gsub("ln\\s*\\(", "log(", res)
+    res
+}
+
 ## -----------------------------------------------------------------------
 
 .replace.with.quotes <- function (vars, cols)

@@ -7,15 +7,23 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 
 ## ----------------------------------------------------------------------
 
+.prepare.ind.vars <- function(ind.vars)
+{
+    vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
+    vars <- gsub("\"", "`", vars)
+    vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
+    .reverse.consistent.func(vars)
+}
+
+## ----------------------------------------------------------------------
+
 .parse.margins.vars <- function(model, vars)
 {
     coef <- model$coef
     data <- model$data
     ## formula <- model$call$formula
     ## model.vars <- model$origin.ind
-    model.vars <- gsub("::[\\w\\s]+", "", model$ind.vars, perl = T)
-    model.vars <- gsub("\"", "`", model.vars)
-    model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", model.vars)
+    model.vars <- .prepare.ind.vars(model$ind.vars)
     fake.data <- structure(vector("list", length(model.vars)),
                            names = gsub("`", "", model.vars),
                            class = "data.frame")
@@ -66,12 +74,12 @@ margins.logregr.madlib <- function(model, vars = ~., at.mean = FALSE,
     f <- .parse.margins.vars(model, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- ("1/(1 + exp(-(b1 + " %+% paste("b", 2:n, "*var", (2:n)-1,
-                                             collapse="+", sep = "")
+        P <- ("1/(1 + exp(-1*(b1 + " %+% paste("b", 2:n, "*var", (2:n)-1,
+                                               collapse="+", sep = "")
               %+% ")))")
     else
-        P <- ("1/(1 + exp(-(b1 + " %+% paste("b", 1:n, "*var", 1:n,
-                                             collapse="+", sep = "")
+        P <- ("1/(1 + exp(-1*(b1 + " %+% paste("b", 1:n, "*var", 1:n,
+                                               collapse="+", sep = "")
               %+% ")))")
     res <- .margins(model, model$coef, model$data, P, f$vars, f$model.vars,
                     at.mean, factor.continuous)
@@ -155,18 +163,22 @@ margins.logregr.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
 .derv.var <- function(P, x, model.vars)
 {
     mv <- gsub("`", "", sapply(model.vars, function(s)
-                               paste(deparse(s), collapse="")))
+                               paste(.strip(deparse(s), "\\n"),
+                                     collapse="")))
     xv <- gsub("`", "", x)
     if (xv %in% mv) {
         i <- which(mv == xv)
         s <- .parse.deriv(P, "var" %+% i)
         s <- paste(deparse(eval(parse(text = paste("substitute(", s,
                                       ", model.vars)")))), collapse = "")
+        s <- gsub("\\n", "", s)
     } else {
         P <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                       ", model.vars)")))), collapse = "")
+        P <- gsub("\\n", "", P)
         x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
                    collapse = "")
+        x <- gsub("\\n", "", x)
         s <- .parse.deriv(P, x)
     }
     s
@@ -179,7 +191,9 @@ derv <- function(P, x, model.vars, coefs)
 {
     s <- .derv.var(P, x, model.vars)
     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
-    gsub("`", "", as.character(enquote(w))[2])
+    w <- gsub("`", "", as.character(enquote(w))[2])
+    w <- gsub("-\\s*\\(", "-1*(", w)
+    w
 }
 
 ## ----------------------------------------------------------------------
@@ -190,6 +204,8 @@ derv1 <- function(s, j, coefs)
     ## s <- derv(P, x, model.vars, coefs)
     s1 <- .parse.deriv(s, "b" %+% j)
     w <- eval(parse(text = paste("substitute(", s1, ", coefs)", sep = "")))
-    gsub("`", "", as.character(enquote(w))[2])
+    w <- gsub("`", "", as.character(enquote(w))[2])
+    w <- gsub("-\\s*\\(", "-1*(", w)
+    w
 }
 
