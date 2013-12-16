@@ -214,10 +214,11 @@ print.lm.madlib.grps <- function (x,
     n.grps <- length(x)
     
     if (x[[1]]$has.intercept)
-        rows <- c("(Intercept)", x[[1]]$origin.ind)
+        rows <- c("(Intercept)", x[[1]]$ind.vars)
     else
         rows <- x[[1]]$ind.vars
     rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     for (i in seq_len(length(x[[1]]$col.name))) 
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
@@ -303,10 +304,11 @@ print.lm.madlib <- function (x,
                              ...)
 {
     if (x$has.intercept)
-        rows <- c("(Intercept)", x$origin.ind)
+        rows <- c("(Intercept)", x$ind.vars)
     else
         rows <- x$ind.vars
     rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     for (i in seq_len(length(x$col.name))) 
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)

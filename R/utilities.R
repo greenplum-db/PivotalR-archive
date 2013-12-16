@@ -269,22 +269,48 @@ setMethod("rowMeans",
 .combine.list <- function (lst)
 {
     n <- length(lst)
-    for (i in seq_len(n))
+    if (n == 1) return (lst[[1]])
+    res <- NULL
+    for (i in seq_len(n)) {
         if (is(lst[[i]], "db.data.frame")) {
             if (ncol(lst[[i]]) == 1 && lst[[i]]@.col.data_type == "array")
                 lst[[i]] <- db.array(lst[[i]])
             else
                 lst[[i]] <- lst[[i]][,]
         }
+        if (is(lst[[i]], "db.obj") && is.null(res)) res <- lst[[i]]
+    }
 
-    res <- lst[[1]]
-    res@.expr <- sapply(lst, function(x) x@.expr)
-    res@.col.name <- sapply(lst, function(x) x@.col.name)
-    res@.col.data_type <- sapply(lst, function(x) x@.col.data_type)
-    res@.col.udt_name <- sapply(lst, function(x) x@.col.udt_name)
-    res@.is.factor <- sapply(lst, function(x) x@.is.factor)
-    res@.factor.suffix <- sapply(lst, function(x) x@.factor.suffix)
-    res@.is.agg <- sapply(lst, function(x) x@.is.agg)
+    ## res <- lst[[1]]
+    res@.expr <- sapply(lst, function(x) {if (is(x, "db.obj"))
+                                              x@.expr else x})
+    res@.col.name <- sapply(lst, function(x) {if (is(x, "db.obj"))
+                                                  x@.col.name else
+                                              .unique.string()})
+    res@.col.data_type <- sapply(lst, function(x) {
+        if (is(x, "db.obj"))
+            x@.col.data_type
+        else {
+            if (typeof(x) == "character") "text"
+            else if (typeof(x) == "boolean")
+                "boolean"
+            else "double precision"
+        }})
+    res@.col.udt_name <- sapply(lst, function(x) {
+        if (is(x, "db.obj"))
+            x@.col.udt_name
+        else {
+            if (typeof(x) == "character") "text"
+            else if (typeof(x) == "boolean")
+                "bool"
+            else "float8"
+        }})
+    res@.is.factor <- sapply(lst, function(x) {if (is(x, "db.obj"))
+                             x@.is.factor else FALSE})
+    res@.factor.suffix <- sapply(lst, function(x) {if (is(x, "db.obj"))
+                                 x@.factor.suffix else ""})
+    res@.is.agg <- sapply(lst, function(x) {if (is(x, "db.obj"))
+                                                x@.is.agg else FALSE})
 
     if (res@.source == res@.parent)
         tbl <- res@.parent
@@ -295,7 +321,7 @@ setMethod("rowMeans",
     else where.str <- ""
     sort <- res@.sort
     res@.content <- paste("select ",
-                          paste(res@.expr, "as", res@.col.name,
+                          paste(res@.expr, "as \"", res@.col.name, "\"",
                                 collapse = ","),
                           " from ", tbl, where.str, sort$str, sep = "")
     res

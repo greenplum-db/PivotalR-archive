@@ -145,4 +145,5 @@ export("vcov.lm.madlib", "vcov.lm.madlib.grps",
 exportMethods("ifelse", "rowSums", "rowMeans")
 
 exportMethods("relevel")
-export("margins", "margins.lm.madlib")
+export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
+       "margins.logregr.madlib", "margins.logregr.madlib.grps")

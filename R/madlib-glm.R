@@ -313,10 +313,11 @@ print.logregr.madlib <- function (x,
                                   ...)
 {
     if (x$has.intercept)
-        rows <- c("(Intercept)", x$origin.ind)
+        rows <- c("(Intercept)", x$ind.vars)
     else
         rows <- x$ind.vars
     rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     for (i in seq_len(length(x$col.name)))
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
