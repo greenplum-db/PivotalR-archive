@@ -45,7 +45,7 @@ margins.lm.madlib <- function(model, vars = ~., at.mean = FALSE,
                                sep = "")
     else
         P <- paste("b", 1:n, "*var", 1:n, collapse="+", sep = "")
-    res <- .margins(model$coef, model$data, P, f$vars, f$model.vars,
+    res <- .margins(model, model$coef, model$data, P, f$vars, f$model.vars,
                     at.mean, factor.continuous)
     res
 }
@@ -73,7 +73,7 @@ margins.logregr.madlib <- function(model, vars = ~., at.mean = FALSE,
         P <- ("1/(1 + exp(-(b1 + " %+% paste("b", 1:n, "*var", 1:n,
                                              collapse="+", sep = "")
               %+% ")))")
-    res <- .margins(model$coef, model$data, P, f$vars, f$model.vars,
+    res <- .margins(model, model$coef, model$data, P, f$vars, f$model.vars,
                     at.mean, factor.continuous)
     res
 }
@@ -88,7 +88,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
 
 ## ----------------------------------------------------------------------
 
-.margins <- function(coef, data, P, vars, model.vars,
+.margins <- function(model, coef, data, P, vars, model.vars,
                      at.mean = FALSE, factor.continuous = FALSE)
 {
     coefs <- as.list(coef)
@@ -119,8 +119,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
                           eval(parse(text = "mean(with(data," %+%
                                      derv(P, i, model.vars, coefs) %+% "))"))
                       })
-        if (any(sapply(mar, function(s) is(s, "db.obj"))))
-            mar <- unlist(lk(.combine.list(mar), -1))
+        ## if (any(sapply(mar, function(s) is(s, "db.obj"))))
+        ##     mar <- unlist(lk(.combine.list(mar), -1))
         for (i in seq_len(m)) {
             s <- .derv.var(P, vars[i], model.vars)
             if (i == 1)
@@ -138,11 +138,15 @@ margins.logregr.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
                                                   %+% "))"))
                                    }))
         }
-        if (any(sapply(se, function(s) is(s, "db.obj"))))
-            se <- t(array(unlist(lk(.combine.list(se), -1)), dim = c(n,m)))
-        else
-            se <- t(array(se, dim = c(n,m)))
+        mar.se <- c(mar, se)
+        if (any(sapply(mar.se, function(s) is(s, "db.obj"))))
+            mar.se <- unlist(lk(.combine.list(mar.se), -1))
+        mar <- mar.se[seq_len(m)]
+        names(mar) <- vars
+        se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
     }
+    v <- vcov(model)
+    se <- se %*% v %*% t(se)
     return(list(mar=mar, se=se))
 }
 
