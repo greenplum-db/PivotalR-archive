@@ -134,8 +134,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                           eval(parse(text = "with(avgs," %+%
                                      derv(P, i, model.vars, coefs) %+% ")"))
                       })
-        se <- array(0, dim = c(n,n))
-        for (i in seq_len(n)) {
+        se <- array(0, dim = c(m,n))
+        for (i in seq_len(m)) {
             s <- .derv.var(P, vars[i], model.vars)
             se[i,] <- sapply(seq_len(n),
                              function(j) {
