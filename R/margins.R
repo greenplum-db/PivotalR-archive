@@ -173,9 +173,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
         if (any(sapply(mar.se, function(s) is(s, "db.obj"))))
             mar.se <- unlist(lk(.combine.list(mar.se), -1))
         mar <- mar.se[seq_len(m)]
-        names(mar) <- vars
         se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
     }
+    names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
     se <- se %*% v %*% t(se)
     return(list(mar=mar, se=se))
