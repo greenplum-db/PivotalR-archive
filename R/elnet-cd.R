@@ -101,6 +101,7 @@
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- iter
@@ -224,6 +225,7 @@
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- c(out.iter, inner.iter)

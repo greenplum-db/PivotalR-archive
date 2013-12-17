@@ -171,10 +171,20 @@ clean.madlib.temp <- function(conn.id = 1)
     lst0 <- deparse(x)
     lst0 <- lst0[2:(length(lst0)-1)]
     lst <- character(0)
+    ignore <- FALSE
     for (i in 1:length(lst0)) {
         if (grepl("value", lst0[i]) ||
             grepl("array", lst0[i]) ||
-            grepl("attr", lst0[i])) next
+            grepl("attr", lst0[i])) {
+            ignore <- TRUE
+            next
+        }
+        if (ignore) {
+            if (!grepl("<-", lst0[i]))
+                next
+            else
+                ignore <- FALSE
+        }
         if (grepl("<-", lst0[i])) {
             lst <- c(lst, lst0[i])
         } else {
@@ -186,6 +196,7 @@ clean.madlib.temp <- function(conn.id = 1)
     env <- lapply(lst, function(x) eval(parse(
         text = paste("quote(", strsplit(x, "\\s*<-\\s*")[[1]][2],
         ")", sep = ""))))
+
     names(env) <- sapply(lst, function(x)
                          gsub("^\\s*", "",
                               strsplit(x, "\\s*<-\\s*")[[1]][1]))

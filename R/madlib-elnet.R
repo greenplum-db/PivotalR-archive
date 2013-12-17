@@ -116,6 +116,7 @@ madlib.elnet <- function (formula, data,
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
 
     rst$intercept <- res$intercept

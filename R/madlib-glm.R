@@ -235,6 +235,7 @@ print.logregr.madlib.grps <- function (x,
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
@@ -324,6 +325,7 @@ print.logregr.madlib <- function (x,
             rows <- gsub(x$col.name[i], x$appear[i], rows)
     rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")

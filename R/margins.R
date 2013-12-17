@@ -12,6 +12,7 @@ margins <- function (model, vars = ~., at.mean = FALSE,
     vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
     vars <- gsub("\"", "`", vars)
     vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
+    vars <- gsub("\\s", "", vars)
     .reverse.consistent.func(vars)
 }
 
@@ -29,7 +30,7 @@ margins <- function (model, vars = ~., at.mean = FALSE,
                            class = "data.frame")
     f.terms <- terms(vars, data = fake.data)
     ## f.vars <- gsub("`", "\"", attr(f.terms, "term.labels"))
-    f.vars <- attr(f.terms, "term.labels")
+    f.vars <- gsub("\\s", "", attr(f.terms, "term.labels"))
     if (any(! (gsub("`", "", f.vars) %in% c(gsub("`", "", model.vars),
                                             names(.expand.array(data))))))
         stop("All the variables must be in the independent variables ",
@@ -185,9 +186,10 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 
 .derv.var <- function(P, x, model.vars)
 {
-    mv <- gsub("`", "", sapply(model.vars, function(s)
-                               paste(.strip(deparse(s), "\\n"),
-                                     collapse="")))
+    mv <- gsub("\\s", "",
+               gsub("`", "", sapply(model.vars, function(s)
+                                    paste(.strip(deparse(s), "\\n"),
+                                          collapse=""))))
     xv <- gsub("`", "", x)
     if (xv %in% mv) {
         i <- which(mv == xv)
