@@ -42,9 +42,9 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib <- function(model, vars = ~., at.mean = FALSE,
-                              factor.continuous = FALSE, na.action = NULL,
-                              ...)
+margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
+                              at.mean = FALSE, factor.continuous = FALSE,
+                              na.action = NULL, ...)
 {
     f <- .parse.margins.vars(model, vars)
     n <- length(model$coef)
@@ -53,22 +53,34 @@ margins.lm.madlib <- function(model, vars = ~., at.mean = FALSE,
                                sep = "")
     else
         P <- paste("b", 1:n, "*var", 1:n, collapse="+", sep = "")
-    res <- .margins(model, model$coef, model$data, P, f$vars, f$model.vars,
+    res <- .margins(model, model$coef, newdata, P, f$vars, f$model.vars,
                     at.mean, factor.continuous)
     res
 }
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
-                                   factor.continuous = FALSE,
+margins.lm.madlib.grps <- function(model, vars = ~.,
+                                   newdata = lapply(model, function(x) x$data),
+                                   at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
-    lapply(model, margins, vars, at.mean, factor.continuous, na.action, ...)
+{
+    if (length(newdata) == 1) 
+        lapply(seq_len(length(model)), function (i)
+               margins(model[[i]], vars, newdata, at.mean,
+                       factor.continuous, na.action, ...))
+    else if (length(newdata) == length(model))
+        lapply(seq_len(length(model)), function (i)
+               margins(model[[i]], vars, newdata[[i]], at.mean,
+                       factor.continuous, na.action, ...))
+    else
+        stop("The number db.obj objects in newdata must be 1 or equal to length of model!")
+}
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib <- function(model, vars = ~., at.mean = FALSE,
-                                   factor.continuous = FALSE,
+margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
+                                   at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
 {
     f <- .parse.margins.vars(model, vars)
@@ -81,18 +93,29 @@ margins.logregr.madlib <- function(model, vars = ~., at.mean = FALSE,
         P <- ("1/(1 + exp(-1*(b1 + " %+% paste("b", 1:n, "*var", 1:n,
                                                collapse="+", sep = "")
               %+% ")))")
-    res <- .margins(model, model$coef, model$data, P, f$vars, f$model.vars,
+    res <- .margins(model, model$coef, newdata, P, f$vars, f$model.vars,
                     at.mean, factor.continuous)
     res
 }
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib.grps <- function(model, vars = ~., at.mean = FALSE,
-                                        factor.continuous = FALSE,
+margins.logregr.madlib.grps <- function(model, vars = ~.,
+                                        newdata = lapply(model, function(x) x$data),
+                                        at.mean = FALSE, factor.continuous = FALSE,
                                         na.action = NULL, ...)
-    lapply(model, margins, vars, at.mean, factor.continuous, na.action, ...)
-
+{
+    if (length(newdata) == 1) 
+        lapply(seq_len(length(model)), function (i)
+               margins(model[[i]], vars, newdata, at.mean,
+                       factor.continuous, na.action, ...))
+    else if (length(newdata) == length(model))
+        lapply(seq_len(length(model)), function (i)
+               margins(model[[i]], vars, newdata[[i]], at.mean,
+                       factor.continuous, na.action, ...))
+    else
+        stop("The number db.obj objects in newdata must be 1 or equal to length of model!")
+}
 
 ## ----------------------------------------------------------------------
 
