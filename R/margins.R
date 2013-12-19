@@ -54,8 +54,8 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
                                sep = "")
     else
         P <- paste("b", 1:n, "*var", 1:n, collapse="+", sep = "")
-    res <- .margins(model, model$coef, newdata, P, f$vars, f$model.vars,
-                    at.mean, factor.continuous)
+    res <- .margins(model, model$coef, newdata, P, f$vars, "1", .deriv.eunit,
+                    .unique.string(), f$model.vars, at.mean, factor.continuous)
     res
 }
 
@@ -87,16 +87,37 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     f <- .parse.margins.vars(model, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- ("1/(1 + exp(-1*(b1 + " %+% paste("b", 2:n, "*var", (2:n)-1,
-                                               collapse="+", sep = "")
-              %+% ")))")
+        unit <- ("exp(-1*(b1 + " %+% paste("b", 2:n, "*var", (2:n)-1,
+                                           collapse="+", sep = "")
+                 %+% "))")
     else
-        P <- ("1/(1 + exp(-1*(b1 + " %+% paste("b", 1:n, "*var", 1:n,
-                                               collapse="+", sep = "")
-              %+% ")))")
-    res <- .margins(model, model$coef, newdata, P, f$vars, f$model.vars,
-                    at.mean, factor.continuous)
+        unit <- ("exp(-1*(" %+% paste("b", 1:n, "*var", 1:n,
+                                      collapse="+", sep = "")
+                 %+% "))")
+    unit.name <- .unique.string()
+    P <- "1/(1 + " %+% unit.name %+% ")"
+    
+    coefs <- as.list(model$coef)
+    n <- length(coefs)
+    m <- length(vars)
+    names(coefs) <- paste("b", seq_len(n), sep = "")
+    
+    newdata[[unit.name]] <- with(newdata, eval(parse(text = paste("substitute(", unit,
+                                                     ", c(f$model.vars, coefs))"))))
+    newdata <- as.db.Rview(newdata)
+    res <- .margins(model, model$coef, newdata, P, f$vars, unit, unit.name,
+                    .deriv.eunit, f$model.vars, at.mean, factor.continuous)
     res
+}
+
+## ----------------------------------------------------------------------
+
+## derivative of exp function
+.deriv.eunit <- function(unit, unit.name)
+{
+    if (unit == "1") return ("0")
+    inner <- gsub("^exp\\((.*)\\)$", "\\1", unit)
+    paste("(", inner, ")*", unit.name, sep = "")
 }
 
 ## ----------------------------------------------------------------------
@@ -120,8 +141,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 
 ## ----------------------------------------------------------------------
 
-.margins <- function(model, coef, data, P, vars, model.vars,
-                     at.mean = FALSE, factor.continuous = FALSE)
+.margins <- function(model, coef, data, P, vars, unit, unit.name,
+                     deriv.unit, model.vars, at.mean = FALSE,
+                     factor.continuous = FALSE)
 {
     coefs <- as.list(coef)
     n <- length(coefs)
@@ -133,15 +155,17 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
         mar <- sapply(vars,
                       function(i) {
                           eval(parse(text = "with(avgs," %+%
-                                     derv(P, i, model.vars, coefs) %+% ")"))
+                                     derv(P, i, unit, unit.name, deriv.unit,
+                                          model.vars, coefs) %+% ")"))
                       })
         se <- array(0, dim = c(m,n))
         for (i in seq_len(m)) {
-            s <- .derv.var(P, vars[i], model.vars)
+            s <- .derv.var(P, vars[i], unit, unit.name, deriv.unit, model.vars)
             se[i,] <- sapply(seq_len(n),
                              function(j) {
                                  eval(parse(text = "with(avgs," %+%
-                                            derv1(s, j, coefs)
+                                            derv1(s, j, unit, unit.name, deriv.unit,
+                                                  coefs)
                                             %+% ")"))
                              })
         }
@@ -149,24 +173,27 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
         mar <- sapply(vars,
                       function(i) {
                           eval(parse(text = "mean(with(data," %+%
-                                     derv(P, i, model.vars, coefs) %+% "))"))
+                                     derv(P, i, unit, unit.name, deriv.unit,
+                                          model.vars, coefs) %+% "))"))
                       })
         ## if (any(sapply(mar, function(s) is(s, "db.obj"))))
         ##     mar <- unlist(lk(.combine.list(mar), -1))
         for (i in seq_len(m)) {
-            s <- .derv.var(P, vars[i], model.vars)
+            s <- .derv.var(P, vars[i], unit, unit.name, deriv.unit, model.vars)
             if (i == 1)
                 se <- sapply(seq_len(n),
                              function(j) {
                                  eval(parse(text = "mean(with(data," %+%
-                                            derv1(s, j, coefs)
+                                            derv1(s, j, unit, unit.name, deriv.unit,
+                                                  coefs)
                                             %+% "))"))
                              })
             else
                 se <- c(se, sapply(seq_len(n),
                                    function(j) {
                                        eval(parse(text = "mean(with(data," %+%
-                                                  derv1(s, j, coefs)
+                                                  derv1(s, j, unit, unit.name, deriv.unit,
+                                                        coefs)
                                                   %+% "))"))
                                    }))
         }
@@ -184,7 +211,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 
 ## ----------------------------------------------------------------------
 
-.derv.var <- function(P, x, model.vars)
+.derv.var <- function(P, x, unit, unit.name, deriv.unit, model.vars)
 {
     mv <- gsub("\\s", "",
                gsub("`", "", sapply(model.vars, function(s)
@@ -193,12 +220,17 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
     xv <- gsub("`", "", x)
     if (xv %in% mv) {
         i <- which(mv == xv)
-        s <- .parse.deriv(P, "var" %+% i)
+        s <- paste(.parse.deriv(P, "var" %+% i), "+(",
+                   .parse.deriv(P, unit.name), ")*(",
+                   .parse.deriv(deriv.unit(unit, unit.name),
+                                "var" %+% i), ")", sep = "")
         s <- paste(deparse(eval(parse(text = paste("substitute(", s,
                                       ", model.vars)")))), collapse = "")
         s <- gsub("\\n", "", s)
     } else {
-        P <- paste(deparse(eval(parse(text = paste("substitute(", P,
+        P <- paste(deparse(eval(parse(text = paste("substitute(",
+                                      paste(P, "+(", .parse.deriv(P, unit.name), ")*(",
+                                            deriv.unit(unit, unit.name), sep = ""),   
                                       ", model.vars)")))), collapse = "")
         P <- gsub("\\n", "", P)
         x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
@@ -212,9 +244,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 ## ----------------------------------------------------------------------
 
 ## derivative over a variable
-derv <- function(P, x, model.vars, coefs)
+derv <- function(P, x, unit, unit.name, deriv.unit, model.vars, coefs)
 {
-    s <- .derv.var(P, x, model.vars)
+    s <- .derv.var(P, x, unit, unit.name, deriv.unit, model.vars)
     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
     w <- gsub("`", "", as.character(enquote(w))[2])
     w <- gsub("-\\s*\\(", "-1*(", w)
@@ -224,10 +256,12 @@ derv <- function(P, x, model.vars, coefs)
 ## ----------------------------------------------------------------------
 
 ## derivative over a variable and a coefficient
-derv1 <- function(s, j, coefs)
+derv1 <- function(s, j, unit, unit.name, deriv.unit, coefs)
 {
     ## s <- derv(P, x, model.vars, coefs)
-    s1 <- .parse.deriv(s, "b" %+% j)
+    s1 <- paste(.parse.deriv(s, "b" %+% j), "+(", .parse.deriv(s, unit.name),
+                ")*(", .parse.deriv(deriv.unit(unit, unit.name), "b" %+% j), ")",
+                sep = "")
     w <- eval(parse(text = paste("substitute(", s1, ", coefs)", sep = "")))
     w <- gsub("`", "", as.character(enquote(w))[2])
     w <- gsub("-\\s*\\(", "-1*(", w)
