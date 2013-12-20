@@ -13,7 +13,8 @@ margins <- function (model, vars = ~., at.mean = FALSE,
     vars <- gsub("\"", "`", vars)
     vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
-    .reverse.consistent.func(vars)
+    vars <- .reverse.consistent.func(vars)
+    vars
 }
 
 ## ----------------------------------------------------------------------
@@ -104,7 +105,8 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     names(coefs) <- paste("b", seq_len(n), sep = "")
     cmd <- paste("substitute(", unit, ", c(f$model.vars, coefs))", sep = "")
     expr <- gsub("\\s", "", paste(deparse(eval(parse(text = cmd))), collapse = ""))
-    newdata[[unit.name]] <- eval(parse(text = paste("with(newdata, ", expr, ")", sep = "")))
+    ## newdata[[unit.name]] <- eval(parse(text = paste("with(newdata, ", expr, ")", sep = "")))
+    newdata[[unit.name]] <- .with.data(newdata, expr)
     newdata <- as.db.Rview(newdata)
     res <- .margins(model, model$coef, newdata, P, f$vars, unit, unit.name,
                     .deriv.eunit, f$model.vars, at.mean, factor.continuous)
@@ -172,11 +174,13 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                              })
         }
     } else {
+        ## model.vars <- lapply(model.vars, .consistent.func)
         mar <- sapply(vars,
                       function(i) {
-                          eval(parse(text = "mean(with(data," %+%
-                                     derv(P, i, unit, unit.name, deriv.unit,
-                                          model.vars, coefs) %+% "))"))
+                          ## eval(parse(text = "mean(with(data," %+%
+                          ##            derv(P, i, unit, unit.name, deriv.unit,
+                          ##                 model.vars, coefs) %+% "))"))
+                          .with.data(data, paste("avg(",derv(P, i, unit, unit.name, deriv.unit, model.vars, coefs), ")", sep = ""))
                       })
         ## if (any(sapply(mar, function(s) is(s, "db.obj"))))
         ##     mar <- unlist(lk(.combine.list(mar), -1))
@@ -186,18 +190,22 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
             if (i == 1)
                 se <- sapply(seq_len(n),
                              function(j) {
-                                 eval(parse(text = "mean(with(data," %+%
-                                            derv1(s, j, unit, unit.name,
-                                                  deriv.unit, model.vars, coefs)
-                                            %+% "))"))
+                                 ## eval(parse(text = "mean(with(data," %+%
+                                 ##            derv1(s, j, unit, unit.name,
+                                 ##                  deriv.unit, model.vars, coefs)
+                                 ##            %+% "))"))
+                                 .with.data(data, paste("avg(", derv1(s, j, unit, unit.name, deriv.unit,
+                                                                      model.vars, coefs), ")", sep = ""), is.agg = TRUE)
                              })
             else
                 se <- c(se, sapply(seq_len(n),
                                    function(j) {
-                                       eval(parse(text = "mean(with(data," %+%
-                                                  derv1(s, j, unit, unit.name, deriv.unit,
-                                                        model.vars, coefs)
-                                                  %+% "))"))
+                                       ## eval(parse(text = "mean(with(data," %+%
+                                       ##            derv1(s, j, unit, unit.name, deriv.unit,
+                                       ##                  model.vars, coefs)
+                                       ##            %+% "))"))
+                                       .with.data(data, paste("avg(", derv1(s, j, unit, unit.name, deriv.unit,
+                                                                            model.vars, coefs), ")", sep = ""), is.agg = TRUE)
                                    }))
         }
         mar.se <- c(mar, se)
@@ -271,3 +279,20 @@ derv1 <- function(s, j, unit, unit.name, deriv.unit, model.vars, coefs)
     w
 }
 
+## ----------------------------------------------------------------------
+
+.with.data <- function(data, expr.str, type = "double precision",
+                       is.agg = FALSE)
+{
+    nm <- names(data)[1]
+    x <- data[[nm]]
+    x@.expr <- .consistent.func(expr.str)
+    x@.col.name <- "with_data"
+    x@.col.data_type <- type
+    x@.is.agg <- is.agg
+    x@.content <- gsub("^select (.*) from",
+                       paste("select ", x@.expr, " as ", x@.col.name, " from",
+                             sep = ""),
+                       x@.content)
+    x
+}
