@@ -11,7 +11,7 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 {
     vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
     vars <- gsub("\"", "`", vars)
-    vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
+    vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
     vars <- .reverse.consistent.func(vars)
     vars

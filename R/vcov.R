@@ -18,7 +18,7 @@
     ##                                 ("," %.% object$ind.vars) %+% "))")))
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
-    model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
     model.vars <- .reverse.consistent.func(model.vars)
     res <- .combine.list(eval(parse(text = "with(x, c(" %+% (","
                                     %.% model.vars) %+% "))")))
