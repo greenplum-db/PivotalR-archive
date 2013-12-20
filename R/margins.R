@@ -32,14 +32,28 @@ margins <- function (model, vars = ~., at.mean = FALSE,
     f.terms <- terms(vars, data = fake.data)
     ## f.vars <- gsub("`", "\"", attr(f.terms, "term.labels"))
     f.vars <- gsub("\\s", "", attr(f.terms, "term.labels"))
-    if (any(! (gsub("`", "", f.vars) %in% c(gsub("`", "", model.vars),
+    expand.vars <- character(0)
+    for (i in seq_len(length(f.vars))) {
+        if (grepl("^[^\\[\\]]*\\[[^\\[\\]]*\\]$", f.vars[i], perl = T)) {
+            var <- gsub("`", "", f.vars[i])
+            x.str <- gsub("([^\\[\\]]*)\\[[^\\[\\]]*\\]", "\\1", var,
+                          perl = TRUE)
+            idx <- gsub("[^\\[\\]]*\\[([^\\[\\]]*)\\]", "\\1", var,
+                        perl = TRUE)
+            idx <- eval(parse(text = idx))
+            expand.vars <- c(expand.vars, paste("`", x.str, "[", idx, "]`", sep = ""))
+        } else {
+            expand.vars <- c(expand.vars, f.vars[i])
+        }
+    }
+    if (any(! (gsub("`", "", expand.vars) %in% c(gsub("`", "", model.vars),
                                             names(.expand.array(data))))))
         stop("All the variables must be in the independent variables ",
              " or the table column names!")
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
     names(model.vars) <- paste("var", seq_len(length(model.vars)), sep = "")
-    return (list(vars = f.vars, model.vars = model.vars))
+    return (list(vars = expand.vars, model.vars = model.vars))
 }
 
 ## ----------------------------------------------------------------------
