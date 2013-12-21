@@ -123,13 +123,25 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     n <- length(coefs)
     m <- length(vars)
     names(coefs) <- paste("b", seq_len(n), sep = "")
+    avgs <- NULL
     cmd <- paste("substitute(", unit, ", c(f$model.vars, coefs))", sep = "")
     expr <- gsub("\\s", "", paste(deparse(eval(parse(text = cmd))), collapse = ""))
-    ## newdata[[unit.name]] <- eval(parse(text = paste("with(newdata, ", expr, ")", sep = "")))
-    newdata[[unit.name]] <- .with.data(newdata, expr)
-    newdata <- as.db.Rview(newdata)
+    if (at.mean) {
+        avgs <- lk(mean(newdata))
+        names(avgs) <- gsub("_avg$", "", names(avgs))
+        expr <- gsub("\\s", "", paste(deparse(eval(parse(text = paste("substitute(",
+                                                         expr, ", avgs)", sep = "")))),
+                                      collapse = ""))
+        avgs[[unit.name]] <- eval(parse(text = expr))
+        ## newdata[[unit.name]] <- eval(parse(text = expr))
+    } else {
+        ## newdata[[unit.name]] <- eval(parse(text = paste("with(newdata, ", expr, ")", sep = "")))
+        newdata[[unit.name]] <- .with.data(newdata, expr)
+        newdata <- as.db.Rview(newdata)
+    }
     res <- .margins(model, model$coef, newdata, P, f$vars, unit, unit.name,
-                    .deriv.eunit, f$model.vars, at.mean, factor.continuous)
+                    .deriv.eunit, f$model.vars, at.mean, factor.continuous,
+                    avgs = avgs)
     mar <- res$mar
     se <- sqrt(diag(res$se))
     z <- mar / se
@@ -172,15 +184,15 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 
 .margins <- function(model, coef, data, P, vars, unit, unit.name,
                      deriv.unit, model.vars, at.mean = FALSE,
-                     factor.continuous = FALSE)
+                     factor.continuous = FALSE, avgs = NULL)
 {
     coefs <- as.list(coef)
     n <- length(coefs)
     m <- length(vars)
     names(coefs) <- paste("b", seq_len(n), sep = "")
     if (at.mean) {
-        avgs <- lk(mean(data))
-        names(avgs) <- gsub("_avg$", "", names(avgs))
+        ## avgs <- lk(mean(data))
+        ## names(avgs) <- gsub("_avg$", "", names(avgs))
         mar <- sapply(vars,
                       function(i) {
                           eval(parse(text = "with(avgs," %+%
