@@ -72,7 +72,13 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
     res <- .margins(model, model$coef, newdata, P, f$vars, "1",
                     .unique.string(), .deriv.eunit, f$model.vars,
                     at.mean, factor.continuous)
-    res
+    mar <- res$mar
+    se <- sqrt(diag(res$se))
+    t <- mar / se
+    p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
+    data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
+                     `Pr(>|t|)` = p), row.names = gsub("`", "", f$vars),
+               check.names = FALSE)
 }
 
 ## ----------------------------------------------------------------------
@@ -124,7 +130,13 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     newdata <- as.db.Rview(newdata)
     res <- .margins(model, model$coef, newdata, P, f$vars, unit, unit.name,
                     .deriv.eunit, f$model.vars, at.mean, factor.continuous)
-    res
+    mar <- res$mar
+    se <- sqrt(diag(res$se))
+    z <- mar / se
+    p <- 2 * (1 - pnorm(abs(z)))
+    data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
+                     `Pr(>|z|)` = p), row.names = gsub("`", "", f$vars),
+               check.names = FALSE)
 }
 
 ## ----------------------------------------------------------------------

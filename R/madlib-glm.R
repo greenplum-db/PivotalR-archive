@@ -284,7 +284,7 @@ print.logregr.madlib.grps <- function (x,
         output <- data.frame(cbind(Estimate = coef,
                                    `Std. Error` = std.err,
                                    `z value` = z.stats,
-                                   `Pr(>|t|)` = p.values,
+                                   `Pr(>|z|)` = p.values,
                                    `Odds ratio` = odds.ratios),
                              row.names = rows, check.names = FALSE)
         print(format(output, justify = "left"))
