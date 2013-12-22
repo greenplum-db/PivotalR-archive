@@ -69,9 +69,15 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
                                sep = "")
     else
         P <- paste("b", 1:n, "*var", 1:n, collapse="+", sep = "")
+    if (at.mean) {
+        avgs <- lk(mean(newdata))
+        avgs <- .expand.avgs(avgs)
+        names(avgs) <- gsub("_avg$", "", names(avgs))
+    } else
+        avgs <- NULL
     res <- .margins(model, model$coef, newdata, P, f$vars, "1",
                     .unique.string(), .deriv.eunit, f$model.vars,
-                    at.mean, factor.continuous)
+                    at.mean, factor.continuous, avgs = avgs)
     mar <- res$mar
     se <- sqrt(diag(res$se))
     t <- mar / se
@@ -128,6 +134,7 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     expr <- gsub("\\s", "", paste(deparse(eval(parse(text = cmd))), collapse = ""))
     if (at.mean) {
         avgs <- lk(mean(newdata))
+        avgs <- .expand.avgs(avgs)
         names(avgs) <- gsub("_avg$", "", names(avgs))
         expr <- gsub("\\s", "", paste(deparse(eval(parse(text = paste("substitute(",
                                                          expr, ", avgs)", sep = "")))),
@@ -354,4 +361,22 @@ derv1 <- function(s, j, unit, unit.name, deriv.unit, model.vars, coefs)
                              sep = ""),
                        x@.content)
     x
+}
+
+## ----------------------------------------------------------------------
+
+## expand x into x[1], x[2], ...
+.expand.avgs <- function(avgs)
+{
+    n <- ncol(avgs)
+    res <- avgs
+    for (i in seq_len(n)) {
+        if (is.array(avgs[,i])) {
+            a <- as.list(avgs[,i])
+            names(a) <- paste(names(avgs)[i], "[", seq_len(length(avgs[,i])),
+                              "]", sep = "")
+            res <- c(res, a)
+        }
+    }
+    res
 }
