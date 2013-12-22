@@ -269,18 +269,32 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
     xv <- gsub("`", "", x)
     if (xv %in% mv) {
         i <- which(mv == xv)
-        s <- paste(.parse.deriv(P, "var" %+% i), "+(",
-                   .parse.deriv(P, unit.name), ")*(",
-                   .parse.deriv(deriv.unit(unit, unit.name),
-                                "var" %+% i), ")", sep = "")
+        ## s <- paste(.parse.deriv(P, "var" %+% i), "+(",
+        ##            .parse.deriv(P, unit.name), ")*(",
+        ##            .parse.deriv(deriv.unit(unit, unit.name),
+        ##                         "var" %+% i), ")", sep = "")
+        s <- paste(c(.parse.deriv(P, "var" %+% i),
+                     sapply(seq_len(length(unit)),
+                            function(j) {
+                                paste("(", .parse.deriv(P, unit.name[j]),
+                                      ")*(", .parse.deriv(deriv.unit(unit[j], unit.name[j]),
+                                                          "var" %+% i), ")", sep = "")
+                            })), collapse = "+")
         s <- paste(deparse(eval(parse(text = paste("substitute(", s,
                                       ", model.vars)")))), collapse = "")
         s <- gsub("\\n", "", s)
     } else {
-        P <- paste(deparse(eval(parse(text = paste("substitute(",
-                                      paste(P, "+(", .parse.deriv(P, unit.name), ")*(",
-                                            deriv.unit(unit, unit.name), ")", sep = ""),   
-                                      ", model.vars)")))), collapse = "")
+        ## P <- paste(deparse(eval(parse(text = paste("substitute(",
+        ##                               paste(P, "+(", .parse.deriv(P, unit.name), ")*(",
+        ##                                     deriv.unit(unit, unit.name), ")", sep = ""),   
+        ##                               ", model.vars)")))), collapse = "")
+        cmd <- paste(c(P, sapply(seq_len(length(unit)),
+                                 function(j) {
+                                     paste("(", .parse.deriv(P, unit.name[j]), ")*(",
+                                           deriv.unit(unit[j], unit.name[j]), ")", sep = "")
+                                 })), collapse = "+")
+        P <- paste(deparse(eval(parse(text = paste("substitute(", cmd, ", model.vars)",
+                                      sep = "")))), collapse = "")
         P <- gsub("\\n", "", P)
         x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
                    collapse = "")
@@ -308,9 +322,16 @@ derv <- function(P, x, unit, unit.name, deriv.unit, model.vars, coefs)
 derv1 <- function(s, j, unit, unit.name, deriv.unit, model.vars, coefs)
 {
     ## s <- derv(P, x, model.vars, coefs)
-    s1 <- paste(.parse.deriv(s, "b" %+% j), "+(", .parse.deriv(s, unit.name),
-                ")*(", .parse.deriv(deriv.unit(unit, unit.name), "b" %+% j), ")",
-                sep = "")
+    ## s1 <- paste(.parse.deriv(s, "b" %+% j), "+(", .parse.deriv(s, unit.name),
+    ##             ")*(", .parse.deriv(deriv.unit(unit, unit.name), "b" %+% j), ")",
+    ##             sep = "")
+    s1 <- paste(c(.parse.deriv(s, "b" %+% j),
+                  sapply(seq_len(length(unit)),
+                         function(i) {
+                             paste("(", .parse.deriv(s, unit.name[i]),
+                                   ")*(", .parse.deriv(deriv.unit(unit[i], unit.name[i]),
+                                                       "b" %+% j), ")", sep = "")
+                         })), collapse = "+")
     w <- eval(parse(text = paste("substitute(", s1, ", c(model.vars, coefs))", sep = "")))
     w <- gsub("`", "", as.character(enquote(w))[2])
     ## w <- gsub("-\\s*\\(", "-1*(", w)
