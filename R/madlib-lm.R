@@ -245,38 +245,12 @@ print.lm.madlib.grps <- function (x,
         }
 
         cat("Coefficients:\n")
-        coef <- format(x[[i]]$coef, digits = digits)
-        std.err <- format(x[[i]]$std_err, digits = digits)
-        t.stats <- format(x[[i]]$t_stats, digits = digits)
-
-        stars <- rep("", length(x[[i]]$p_values))
-        for (j in seq(length(x[[i]]$p_values))) {
-            if (is.na(x[[i]]$p_values[j]) || is.nan(x[[i]]$p_values[j])) {
-                stars[j] <- " "
-                next
-            }
-            if (x[[i]]$p_values[j] < 0.001)
-                stars[j] <- "***"
-            else if (x[[i]]$p_values[j] < 0.01)
-                stars[j] <- "**"
-            else if (x[[i]]$p_values[j] < 0.05)
-                stars[j] <- "*"
-            else if (x[[i]]$p_values[j] < 0.1)
-                stars[j] <- "."
-            else
-                stars[j] <- " "
-        }
-        p.values <- paste(format(x[[i]]$p_values, digits = digits),
-                          stars)
-        output <- data.frame(cbind(Estimate = coef,
-                                   `Std. Error` = std.err,
-                                   `t value` = t.stats,
-                                   `Pr(>|t|)` = p.values),
-                             row.names = rows, check.names = FALSE)
-        print(format(output, justify = "left"))
-
-        cat("---\n")
-        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coef,
+                                      `Std. Error` = x[[i]]$std_err,
+                                      `t value` = x[[i]]$t_stats,
+                                      `Pr(>|t|)` = x[[i]]$p_values),
+                                row.names = rows, check.names = FALSE),
+                 digits = digits, signif.stars = TRUE)
         cat("R-squared:", x[[i]]$r2, "\n")
         cat("Condition Number:", x[[i]]$condition_no, "\n")
 
@@ -332,38 +306,13 @@ print.lm.madlib <- function (x,
     }
     
     cat("Coefficients:\n")
-    coef <- format(x$coef, digits = digits)
-    std.err <- format(x$std_err, digits = digits)
-    t.stats <- format(x$t_stats, digits = digits)
+    printCoefmat(data.frame(cbind(Estimate = x$coef,
+                                  `Std. Error` = x$std_err,
+                                  `t value` = x$t_stats,
+                                  `Pr(>|t|)` = x$p_values),
+                            row.names = rows, check.names = FALSE),
+                 digits = digits, signif.stars = TRUE)
     
-    stars <- rep("", length(x$p_values))
-    for (j in seq(length(x$p_values))) {
-        if (is.na(x$p_values[j]) || is.nan(x$p_values[j])) {
-            stars[j] <- " "
-            next
-        }
-        if (x$p_values[j] < 0.001)
-            stars[j] <- "***"
-        else if (x$p_values[j] < 0.01)
-            stars[j] <- "**"
-        else if (x$p_values[j] < 0.05)
-            stars[j] <- "*"
-        else if (x$p_values[j] < 0.1)
-            stars[j] <- "."
-        else
-            stars[j] <- " "
-    }
-    p.values <- paste(format(x$p_values, digits = digits),
-                      stars)
-    output <- data.frame(cbind(Estimate = coef,
-                               `Std. Error` = std.err,
-                               `t value` = t.stats,
-                               `Pr(>|t|)` = p.values),
-                         row.names = rows, check.names = FALSE)
-    print(format(output, justify = "left"))
-    
-    cat("---\n")
-    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
     cat("R-squared:", x$r2, "\n")
     cat("Condition Number:", x$condition_no, "\n")
     

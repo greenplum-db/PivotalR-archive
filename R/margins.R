@@ -82,9 +82,11 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
     se <- sqrt(diag(res$se))
     t <- mar / se
     p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
-    data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
-                     `Pr(>|t|)` = p), row.names = gsub("`", "", f$vars),
-               check.names = FALSE)
+    res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
+                            `Pr(>|t|)` = p), row.names = gsub("`", "", f$vars),
+                      check.names = FALSE)
+    class(res) <- c("margins", "data.frame")
+    res
 }
 
 ## ----------------------------------------------------------------------
@@ -153,9 +155,20 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
     se <- sqrt(diag(res$se))
     z <- mar / se
     p <- 2 * (1 - pnorm(abs(z)))
-    data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
-                     `Pr(>|z|)` = p), row.names = gsub("`", "", f$vars),
-               check.names = FALSE)
+    res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
+                            `Pr(>|z|)` = p), row.names = gsub("`", "", f$vars),
+                      check.names = FALSE)
+    class(res) <- c("margins", "data.frame")
+    res
+}
+
+## ----------------------------------------------------------------------
+
+print.margins <- function(x,
+                          digits = max(3L, getOption("digits") - 3L),
+                          ...)
+{
+    printCoefmat(x, digits = digits, signif.stars = TRUE)
 }
 
 ## ----------------------------------------------------------------------
