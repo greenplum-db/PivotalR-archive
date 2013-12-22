@@ -460,13 +460,29 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     old.level
 }
 
+## ----------------------------------------------------------------------
+
+.db.data.frame2db.Rquery <- function(x)
+{
+    if (is(x, "db.data.frame")) {
+        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+            if (array)
+                x <- db.array(x)
+            else
+                x <- x[[names(x)]]
+        } else
+            x <- x[,]
+    }
+    x
+}
+
 ## -----------------------------------------------------------------------
 
 ## If an independent variable is an array, it needs special treatment
 .is.array <- function (labels, data)
 {
     nlabels <- character(0)
-    data <- data[,]
+    data <- .db.data.frame2db.Rquery(data)
     if (data@.parent == data@.source)
         tbl <- data@.parent
     else

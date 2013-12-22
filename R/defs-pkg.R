@@ -133,6 +133,8 @@ setClass("db.Rcrossprod",
 
 ## A db.Rquery, but is treated as a view
 setClass("db.Rview",
+         representation(
+             .sub = "character"),
          contains = "db.Rquery")
 
 ## Convert a db.Rquery object to db.Rview object
@@ -142,9 +144,11 @@ as.db.Rview <- function (x) {
     w <- as(x, "db.Rview")
     w@.parent <- x@.content
     w@.expr <- "\"" %+% w@.col.name %+% "\""
+    w@.sub <- gsub("__", "", .unique.string())
     w@.content <- paste("select ",
-                        paste(w@.expr, "as", w@.col.name, collapse = ", "),
-                        " from (", w@.parent, ") s", sep = "")
+                        paste(w@.expr, "as \"", w@.col.name, "\"",
+                              collapse = ", "),
+                        " from (", w@.parent, ") ", w@.sub, sep = "")
     w@.where <- ""
     w@.sort <- list(by = "", order = "", str = "")
     w

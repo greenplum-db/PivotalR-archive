@@ -62,6 +62,7 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
                               at.mean = FALSE, factor.continuous = FALSE,
                               na.action = NULL, ...)
 {
+    newdata <- .handle.dummy(newdata, model)
     f <- .parse.margins.vars(model, vars)
     n <- length(model$coef)
     if (model$has.intercept)
@@ -114,6 +115,7 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
                                    at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
 {
+    newdata <- .handle.dummy(newdata, model)
     f <- .parse.margins.vars(model, vars)
     n <- length(model$coef)
     if (model$has.intercept)
@@ -392,4 +394,38 @@ derv1 <- function(s, j, unit, unit.name, deriv.unit, model.vars, coefs)
         }
     }
     res
+}
+
+## ----------------------------------------------------------------------
+
+## create a db.Rview object which contains the dummy variable
+.handle.dummy <- function(data, model)
+{
+    l <- length(model$dummy)
+    if (l != 0) {
+        data <- .db.data.frame2db.Rquery(data)
+        data@.col.name <- c(data@.col.name, model$dummy)
+        data@.expr <- c(data@.expr, model$dummy.expr)
+        data@.col.data_type <- c(data@.col.data_type,
+                                 rep("double precision", l))
+        data@.col.udt_name <- c(data@.col.udt_name, rep("float8", l))
+        if (data@.source == data@.parent)
+            tbl <- data@.parent
+        else
+            tbl <- "(" %+% data@.parent %+% ") s"
+        where <- data@.where
+        if (where != "") where.str <- paste(" where", where)
+        else where.str <- ""
+        sort <- data@.sort
+        data@.content <- paste("select ", paste(data@.expr, " as \"",
+                                                data@.col.name, "\"",
+                                                sep = ""),
+                               " from ", tbl, where.str, sort$str, sep = "")
+        as.db.Rview(data)
+    } else {
+        if (is(data, "db.data.frame"))
+            data
+        else
+            as.db.Rview(data)
+    }
 }
