@@ -321,8 +321,8 @@ setMethod("rowMeans",
     else where.str <- ""
     sort <- res@.sort
     res@.content <- paste("select ",
-                          paste(res@.expr, "as \"", res@.col.name, "\"",
-                                collapse = ","),
+                          paste(res@.expr, " as \"", res@.col.name, "\"",
+                                collapse = ",", sep = ""),
                           " from ", tbl, where.str, sort$str, sep = "")
     res
 }
