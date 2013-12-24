@@ -36,9 +36,9 @@ is.db.data.frame <- function (x)
 ## ----------------------------------------------------------------------
 
 ## suppress all warnings
-.suppress.warnings <- function (conn.id)
+.suppress.warnings <- function (conn.id, level = "panic")
 {
-    msg.level <- .set.msg.level("panic", conn.id = conn.id)
+    msg.level <- .set.msg.level(level, conn.id = conn.id)
     warn.r <- getOption("warn")
     options(warn = -1)
     list(msg.level = msg.level, warn.r = warn.r, conn.id = conn.id)
