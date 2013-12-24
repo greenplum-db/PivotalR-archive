@@ -73,8 +73,8 @@ margins.lm.madlib <- function(model, vars = ~., newdata = model$data,
         names(avgs) <- gsub("_avg$", "", names(avgs))
     } else
         avgs <- NULL
-    res <- .margins(P, model$coef, newdata, f$vars, f$model.vars,
-                    at.mean, factor.continuous, avgs = avgs)
+    res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$model.vars,
+                        at.mean, factor.continuous, avgs = avgs)
     mar <- res$mar
     se <- sqrt(diag(res$se))
     t <- mar / se
@@ -119,7 +119,7 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
                                   collapse="+", sep = "")
     else
         P <- paste("b", 1:n, "*var", 1:n, collapse="+", sep = "")
-    sigma <- paste("1/(1+exp(-(", inner, ")))")
+    sigma <- paste("1/(1+exp(-(", P, ")))")
     sigma.name <- gsub("__", "", .unique.string())
 
     coefs <- as.list(model$coef)
@@ -134,17 +134,18 @@ margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
         names(avgs) <- gsub("_avg$", "", names(avgs))
-        expr <- gsub("\\s", "", paste(deparse(eval(parse(text = paste("substitute(",
-                                                         expr, ", avgs)", sep = "")))),
-                                      collapse = ""))
+        expr <- gsub("\\s", "",
+                     paste(deparse(eval(parse(text = paste("substitute(",
+                                              expr, ", avgs)", sep = "")))),
+                           collapse = ""))
         avgs[[sigma.name]] <- eval(parse(text = expr))
     } else {
         newdata[[sigma.name]] <- .with.data(newdata, expr)
         newdata <- as.db.Rview(newdata)
     }
 
-    res <- .margins(P, model$coef, newdata, f$vars, f$model.vars, sigma.name,
-                    at.mean, factor.continuous, avgs = avgs)
+    res <- .margins.log(P, model, model$coef, newdata, f$vars, f$model.vars,
+                        sigma.name, at.mean, factor.continuous, avgs = avgs)
 
     mar <- res$mar
     se <- sqrt(diag(res$se))
@@ -168,24 +169,6 @@ print.margins <- function(x,
 
 ## ----------------------------------------------------------------------
 
-## derivative of exp function
-## .deriv.eunit <- function(unit, unit.name)
-## {
-##     if (unit == "1") return ("0")
-##     inner <- gsub("exp\\((.*)\\)$", "\\1", unit)
-##     paste("(", inner, ")*", unit.name, sep = "")
-## }
-
-## .deriv.const <- function(unit, unit.name, inner) "0"
-
-## .deriv.sigma <- function(unit, unit.name, inner)
-## {
-##     ## inner <- gsub("^exp\\(-(.*)\\)$", "\\1", unit)
-##     paste("(", inner, ")*", unit.name, "*(1-", unit.name, ")", sep = "")
-## }
-
-## ----------------------------------------------------------------------
-
 margins.logregr.madlib.grps <- function(model, vars = ~.,
                                         newdata = lapply(model, function(x) x$data),
                                         at.mean = FALSE, factor.continuous = FALSE,
@@ -202,138 +185,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
     else
         stop("The number db.obj objects in newdata must be 1 or equal to length of model!")
 }
-
-## ----------------------------------------------------------------------
-
-## .margins <- function(model, coef, data, P, vars, unit, unit.name, inner,
-##                      deriv.unit, model.vars, at.mean = FALSE,
-##                      factor.continuous = FALSE, avgs = NULL)
-## {
-##     coefs <- as.list(coef)
-##     n <- length(coefs)
-##     m <- length(vars)
-##     names(coefs) <- paste("b", seq_len(n), sep = "")
-##     if (at.mean) {
-##         mar <- sapply(vars,
-##                       function(i) {
-##                           eval(parse(text = "with(avgs," %+%
-##                                      derv(P, i, unit, unit.name, inner, deriv.unit,
-##                                           model.vars, coefs) %+% ")"))
-##                       })
-##         se <- array(0, dim = c(m,n))
-##         for (i in seq_len(m)) {
-##             s <- .derv.var(P, vars[i], unit, unit.name, inner, deriv.unit,
-##                            model.vars)
-##             se[i,] <- sapply(seq_len(n),
-##                              function(j) {
-##                                  eval(parse(text = "with(avgs," %+%
-##                                             derv1(s, j, unit, unit.name, inner,
-##                                                   deriv.unit, model.vars, coefs)
-##                                             %+% ")"))
-##                              })
-##         }
-##     } else {
-##         mar <- sapply(vars,
-##                       function(i) {
-##                           .with.data(data, paste("avg(",derv(P, i, unit, unit.name, inner,
-##                                                              deriv.unit, model.vars, coefs), ")", sep = ""))
-##                       })
-##         for (i in seq_len(m)) {
-##             s <- .derv.var(P, vars[i], unit, unit.name, inner, deriv.unit,
-##                            model.vars)
-##             if (i == 1)
-##                 se <- sapply(seq_len(n),
-##                              function(j) {
-##                                  .with.data(data, paste("avg(", derv1(s, j, unit, unit.name, inner, deriv.unit,
-##                                                                       model.vars, coefs), ")", sep = ""), is.agg = TRUE)
-##                              })
-##             else
-##                 se <- c(se, sapply(seq_len(n),
-##                                    function(j) {
-##                                        .with.data(data, paste("avg(", derv1(s, j, unit, unit.name, inner, deriv.unit,
-##                                                                             model.vars, coefs), ")", sep = ""), is.agg = TRUE)
-##                                    }))
-##         }
-##         mar.se <- c(mar, se)
-##         if (any(sapply(mar.se, function(s) is(s, "db.obj")))) {
-##             mar.se <- .combine.list(mar.se)
-##             mar.se <- unlist(lk(mar.se, -1))
-##         }
-##         mar <- mar.se[seq_len(m)]
-##         se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
-##     }
-##     names(mar) <- gsub("`", "", vars)
-##     v <- vcov(model)
-##     se <- se %*% v %*% t(se)
-##     return(list(mar=mar, se=se))
-## }
-
-## ## ----------------------------------------------------------------------
-
-## .derv.var <- function(P, x, unit, unit.name, inner, deriv.unit, model.vars)
-## {
-##     mv <- gsub("\\s", "",
-##                gsub("`", "", sapply(model.vars, function(s)
-##                                     paste(.strip(deparse(s), "\\n"),
-##                                           collapse=""))))
-##     xv <- gsub("`", "", x)
-##     if (xv %in% mv) {
-##         i <- which(mv == xv)
-##         s <- paste(c(.parse.deriv(P, "var" %+% i),
-##                      sapply(seq_len(length(unit)),
-##                             function(j) {
-##                                 paste("(", .parse.deriv(P, unit.name[j]),
-##                                       ")*(", .parse.deriv(deriv.unit(unit[j], unit.name[j], inner[j]),
-##                                                           "var" %+% i), ")", sep = "")
-##                             })), collapse = "+")
-##         s <- paste(deparse(eval(parse(text = paste("substitute(", s,
-##                                       ", model.vars)")))), collapse = "")
-##         s <- gsub("\\n", "", s)
-##     } else {
-##         cmd <- paste(c(P, sapply(seq_len(length(unit)),
-##                                  function(j) {
-##                                      paste("(", .parse.deriv(P, unit.name[j]), ")*(",
-##                                            deriv.unit(unit[j], unit.name[j], inner[j]), ")", sep = "")
-##                                  })), collapse = "+")
-##         P <- paste(deparse(eval(parse(text = paste("substitute(", cmd, ", model.vars)",
-##                                       sep = "")))), collapse = "")
-##         P <- gsub("\\n", "", P)
-##         x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
-##                    collapse = "")
-##         x <- gsub("\\n", "", x)
-##         s <- .parse.deriv(P, x)
-##     }
-##     s
-## }
-
-## ## ----------------------------------------------------------------------
-
-## ## derivative over a variable
-## derv <- function(P, x, unit, unit.name, inner, deriv.unit, model.vars, coefs)
-## {
-##     s <- .derv.var(P, x, unit, unit.name, inner, deriv.unit, model.vars)
-##     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
-##     w <- gsub("`", "", as.character(enquote(w))[2])
-##     w
-## }
-
-## ## ----------------------------------------------------------------------
-
-## ## derivative over a variable and a coefficient
-## derv1 <- function(s, j, unit, unit.name, inner, deriv.unit, model.vars, coefs)
-## {
-##     s1 <- paste(c(.parse.deriv(s, "b" %+% j),
-##                   sapply(seq_len(length(unit)),
-##                          function(i) {
-##                              paste("(", .parse.deriv(s, unit.name[i]),
-##                                    ")*(", .parse.deriv(deriv.unit(unit[i], unit.name[i], inner[i]),
-##                                                        "b" %+% j), ")", sep = "")
-##                          })), collapse = "+")
-##     w <- eval(parse(text = paste("substitute(", s1, ", c(model.vars, coefs))", sep = "")))
-##     w <- gsub("`", "", as.character(enquote(w))[2])
-##     w
-## }
-
 ## ----------------------------------------------------------------------
 
 .with.data <- function(data, expr.str, type = "double precision",
@@ -407,8 +258,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 ## ----------------------------------------------------------------------
 
 ## special margins for linear
-.margins.lin <- function(P, coef, data, vars, model.vars, at.mean = FALSE,
-                         factor.continuous = FALSE, avgs = NULL)
+.margins.lin <- function(P, model, coef, data, vars, model.vars,
+                         at.mean = FALSE, factor.continuous = FALSE,
+                         avgs = NULL)
 {
     coefs <- as.list(coef)
     n <- length(coefs)
@@ -429,17 +281,18 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                 function(j) {
                     eval(parse(
                         text = paste("with(avgs,",
-                        .sub.coefs(.parse.deriv(s, "b"%+%j)), ")", sep = "")))
+                        .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
+                        ")", sep = "")))
                 })
         }
     } else {
         mar <- sapply(
             vars,
             function(i) {
-                .with.data(data, paste("avg(", .sub.coefs(.dx(P, i,
-                                                              model.vars),
-                                                          coefs), ")",
-                                       sep = ""))
+                .with.data(
+                    data,
+                    paste("avg(", .sub.coefs(.dx(P, i, model.vars), coefs),
+                          ")", sep = ""))
             })
         for (i in seq_len(m)) {
             s <- .dx(P, vars[i], model.vars)
@@ -447,7 +300,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                 seq_len(n),
                 function(j) {
                     .with.data(data, paste(
-                        "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j)),
+                        "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
                         ")", sep = ""), is.agg = TRUE)
                 })
             if (i == 1)
@@ -471,7 +324,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
 
 ## ----------------------------------------------------------------------
 
-.margins.log <- function(P, coef, data, vars, model.vars, sigma,
+.margins.log <- function(P, model, coef, data, vars, model.vars, sigma,
                          at.mean = FALSE, factor.continuous = FALSE,
                          avgs = NULL)
 {
@@ -497,62 +350,43 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                 function(j) {
                     (eval(parse(
                         text = paste("with(avgs,",
-                        .sub.coefs(.parse.deriv(s, "b"%+%j)), ")", sep = "")))
+                        .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
+                        ")", sep = "")))
                      * avgs[[sigma]] * (1 - avgs[[sigma]]) +
                      eval(parse(
                          text = paste("with(avgs,",
                          .sub.coefs(paste("(", s, ")*(",
                                           .dj(P, j, model.vars), ")",
-                                          sep = ""), coefs), ")", sep = ""))))
-                    * avgs[[sigma]] * (1 - avgs[[sigma]]) * (1 - 2*avgs[[sigma]])
+                                          sep = ""), coefs), ")", sep = "")))
+                    * avgs[[sigma]] * (1 - avgs[[sigma]]) * (1 - 2*avgs[[sigma]]))
                 })
         }
     } else {
-        madlib <- madlib.schema(conn.id(data))
+        madlib <- schema.madlib(conn.id(data))
         mar <- paste("array[", paste(sapply(
             vars,
             function(i) {
                 .sub.coefs(.dx(P, i, model.vars), coefs)
-            }), collapse = ", "), "]", sep = "")
+            }), collapse = ", "), "]::double precision[]", sep = "")
         mar <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(", mar,
                      ",", sigma, "*(1 - ", sigma, ")::double precision))",
                      sep = "")
-        
-        ## for (i in seq_len(m)) {
-        ##     s <- .dx(P, vars[i], model.vars)
-        ##     e <- sapply(
-        ##         seq_len(n),
-        ##         function(j) {
-        ##             .with.data(data, paste(
-        ##                 "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j)),
-        ##                 ")", sep = ""), is.agg = TRUE)
-        ##         })
-        ##     if (i == 1)
-        ##         se <- e
-        ##     else
-        ##         se <- c(se, e)
-        ## }
-        ## mar.se <- c(mar, se)
-        ## if (any(sapply(mar.se, function(s) is(s, "db.obj")))) {
-        ##     mar.se <- .combine.list(mar.se)
-        ##     mar.se <- unlist(lk(mar.se, -1))
-        ## }
 
         se1 <- paste(sapply(
             vars,
             function(i) {
-                s <- .dx(P, i, mode.vars)
+                s <- .dx(P, i, model.vars)
                 paste(sapply(
                     seq_len(n),
                     function(j) {
-                        .sub.coefs(.parse.deriv(s, "b"%+%j))
+                        .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
                     }), collapse = ", ")
             }), collapse = ", ")
 
         se2 <- paste(sapply(
             vars,
             function(i) {
-                s <- .dx(P, i, mode.vars)
+                s <- .dx(P, i, model.vars)
                 paste(sapply(
                     seq_len(n),
                     function(j) {
@@ -561,19 +395,19 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
                     }), collapse = ", ")
             }), collapse = ", ")
 
-        se1 <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(", se1,
-                     ",", sigma, "*(1 - ", sigma, ")::double precision))")
-        se2 <- paste(madlib, ".avg(", madlib, ".array_scalr_mult(", se2,
-                     ",", sigma, "*(1-", sigma, ")*(1-2*", sigma,
-                     ")::double precision))")
+        se1 <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(array[",
+                     se1, "]::double precision[],", sigma,
+                     "*(1 - ", sigma, ")::double precision))", sep = "")
+        se2 <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(array[",
+                     se2, "]::double precision[],", sigma,
+                     "*(1-", sigma, ")*(1-2*", sigma,
+                     ")::double precision))", sep = "")
 
         mar.se <- paste("select ", mar, " as mar, ", se1, " as se1, ",
                         se2, " as se2 from (", data@.parent, ") s",
                         sep = "")
-        mar.se <- db.q(mar.se, conn.id=conn.id)
-        
-        ## mar <- mar.se[seq_len(m)]
-        ## se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
+
+        mar.se <- db.q(mar.se, conn.id=conn.id, verbose = FALSE)
         mar <- as.vector(arraydb.to.arrayr(mar.se$mar))
         se <- t(array(as.vector(arraydb.to.arrayr(mar.se$se1) +
                                 arraydb.to.arrayr(mar.se$se2)), dim = c(n,m)))
@@ -622,14 +456,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~.,
     P <- gsub("\\n", "", P)
     .parse.deriv(P, "b"%+%j)
 }
-
-## ## ----------------------------------------------------------------------
-
-## .dxj <- function(P, x, j, model.vars)
-## {
-##     dx <- .dx(P, x, model.vars, coefs)
-##     .parse.deriv(dx, "b"%+%j)
-## }
 
 ## ----------------------------------------------------------------------
 
