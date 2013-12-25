@@ -170,7 +170,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 .unique.string <- function ()
 {
-    hex_digits <- c(as.character(0:9), letters[1:6])    
+    hex_digits <- c(as.character(0:9), letters[1:6])
     y_digits <- hex_digits[9:12]
     
     s <- paste(

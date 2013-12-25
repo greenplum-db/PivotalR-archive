@@ -20,10 +20,21 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 ## ----------------------------------------------------------------------
 
 ## list the independent variables indices
-Vars <- function(x = NULL)
+Terms <- function(x = NULL)
 {
     if (is.null(x)) x
     else as.integer(x)
+}
+
+## ----------------------------------------------------------------------
+
+Vars <- function(model)
+{
+    if (is.null(model$ind.vars))
+        model.vars <- .prepare.ind.vars(model[[1]]$ind.vars)
+    else
+        model.vars <- .prepare.ind.vars(model$ind.vars)
+    unique(all.vars(parse(text = model.vars)))
 }
 
 ## ----------------------------------------------------------------------
@@ -45,7 +56,7 @@ Vars <- function(x = NULL)
         paste(deparse(vars), collapse=""))), data = fake.data)
     f.vars <- gsub("\\s", "", attr(f.terms, "term.labels"))
     
-    is.terms <- grepl("^Vars\\(.*\\)$", f.vars)
+    is.terms <- grepl("^Terms\\(.*\\)$", f.vars)
     vars.terms <- f.vars[is.terms]
     select.ind <- integer(0)
     for (i in vars.terms) {
@@ -56,6 +67,18 @@ Vars <- function(x = NULL)
     select.ind <- unique(select.ind)
 
     f.vars <- f.vars[!is.terms]
+
+    is.vars <- grepl("^Vars\\(.*\\)$", f.vars)
+    vars.terms <- f.vars[is.vars]
+    select.vars <- character(0)
+    for (i in vars.terms) {
+        idx <- eval(parse(text = i))
+        select.vars <- c(select.vars, idx)
+    }
+    select.vars <- unique(select.vars)
+
+    f.vars <- unique(c(select.vars, f.vars[!is.vars]))    
+    
     is.ind <- rep(FALSE, length(f.vars))
     if (length(select.ind) != 0) {
         f.vars <- c(f.vars, paste("var.", select.ind, sep = ""))
@@ -102,7 +125,8 @@ Vars <- function(x = NULL)
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib <- function(model, vars = ~ Vars(), newdata = model$data,
+margins.lm.madlib <- function(model, vars = ~ Vars(model),
+                              newdata = model$data,
                               at.mean = FALSE, factor.continuous = FALSE,
                               na.action = NULL, ...)
 {
@@ -139,7 +163,7 @@ margins.lm.madlib <- function(model, vars = ~ Vars(), newdata = model$data,
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib.grps <- function(model, vars = ~.,
+margins.lm.madlib.grps <- function(model, vars = ~ Vars(model),
                                    newdata = lapply(model, function(x) x$data),
                                    at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
@@ -158,7 +182,8 @@ margins.lm.madlib.grps <- function(model, vars = ~.,
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib <- function(model, vars = ~., newdata = model$data,
+margins.logregr.madlib <- function(model, vars = ~ Vars(model),
+                                   newdata = model$data,
                                    at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
 {
@@ -225,7 +250,7 @@ print.margins <- function(x,
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib.grps <- function(model, vars = ~.,
+margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                                         newdata = lapply(model, function(x) x$data),
                                         at.mean = FALSE, factor.continuous = FALSE,
                                         na.action = NULL, ...)
