@@ -65,7 +65,14 @@ Vars <- function(x = NULL)
     expand.vars <- character(0)
     expand.is.ind <- logical(0)
     for (i in seq_len(length(f.vars))) {
-        if (grepl("^[^\\[\\]]*\\[[^\\[\\]]*\\]$", f.vars[i], perl = T)) {
+        if (f.vars[i] %in% names(newdata) &&
+            newdata[[f.vars[i]]]@.col.data_type == "array") {
+            l <- array.len(newdata[[f.vars[i]]])
+            expand.vars <- c(expand.vars, paste("`", f.vars[i], "[",
+                                                seq_len(l), "]`", sep = ""))
+            expand.is.ind <- c(expand.is.ind, rep(is.ind[i], l))
+        } else if (grepl("^[^\\[\\]]*\\[[^\\[\\]]*\\]$",
+                         f.vars[i], perl = T)) {
             var <- gsub("`", "", f.vars[i])
             x.str <- gsub("([^\\[\\]]*)\\[[^\\[\\]]*\\]", "\\1", var,
                           perl = TRUE)
