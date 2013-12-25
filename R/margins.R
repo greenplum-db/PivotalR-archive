@@ -40,7 +40,9 @@ Vars <- function(x = NULL)
     fake.data <- structure(vector("list", length(names(newdata))),
                                   names = names(newdata),
                                   class = "data.frame")
-    f.terms <- terms(vars, data = fake.data)
+    f.terms <- terms(formula(paste(
+        rownames(attr(model$terms, "factors"))[1],
+        paste(deparse(vars), collapse=""))), data = fake.data)
     f.vars <- gsub("\\s", "", attr(f.terms, "term.labels"))
     
     is.terms <- grepl("^Vars\\(.*\\)$", f.vars)
