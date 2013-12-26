@@ -33,6 +33,7 @@
         x.names <- x@.expr
     }
     is.factor <- x@.is.factor
+    factor.ref <- x@.factor.ref
     factor.suffix <- x@.factor.suffix
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
@@ -49,6 +50,7 @@
             x.col.data_type <- c(x.col.data_type, value@.col.data_type[i])
             x.col.udt_name <- c(x.col.udt_name, value@.col.udt_name[i])
             is.factor <- c(is.factor, value@.is.factor[i])
+            factor.ref <- c(factor.ref, value@.factor.ref[i])
             factor.suffix <- c(factor.suffix, value@.factor.suffix[i])
         } else {
             if (is.null(case))
@@ -67,6 +69,7 @@
             x.col.data_type[idx] <- value@.col.data_type[i]
             x.col.udt_name[idx] <- value@.col.udt_name[i]
             is.factor[idx] <- value@.is.factor[i]
+            factor.ref[idx] <- value@.factor.ref[i]
             factor.suffix[idx] <- value@.factor.suffix[i]
         }
     }
@@ -102,6 +105,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
+        .factor.ref = factor.ref,
         .factor.suffix = factor.suffix,
         .sort = sort,
         .dist.by = x@.dist.by)
@@ -115,6 +119,7 @@
     if (is(x, "db.data.frame")) x <- x[,]
     x.names <- x@.expr
     is.factor <- x@.is.factor
+    factor.ref <- x@.factor.ref
     factor.suffix <- x@.factor.suffix
     x.col.data_type <- x@.col.data_type
     x.col.udt_name <- x@.col.udt_name
@@ -132,6 +137,7 @@
             x.col.data_type <- c(x.col.data_type, type)
             x.col.udt_name <- c(x.col.udt_name, udt)
             is.factor <- c(is.factor, FALSE)
+            factor.ref <- c(factor.ref, as.character(NA))
             factor.suffix <- c(factor.suffix, "")
         } else {
             if (is.null(case))
@@ -152,6 +158,7 @@
             x.col.data_type[idx] <- type
             x.col.udt_name[idx] <- udt
             is.factor[idx] <- FALSE
+            factor.ref[idx] <- as.character(NA)
             factor.suffix[idx] <- ""
         }
     }
@@ -196,6 +203,7 @@
         .col.data_type = x.col.data_type,
         .col.udt_name = x.col.udt_name,
         .is.factor = is.factor,
+        .factor.ref = factor.ref,
         .factor.suffix = factor.suffix,
         .sort = sort,
         .dist.by = x@.dist.by)

@@ -57,6 +57,7 @@
     data.type <- character(0)
     udt.name <- character(0)
     is.factor <- logical(0)
+    factor.ref <- character(0)
     factor.suffix <- character(0)
     no.array <- TRUE
     for (i in seq_len(length(names(x)))) {
@@ -67,6 +68,7 @@
             data.type <- c(data.type, x@.col.data_type[i])
             udt.name <- c(udt.name, x@.col.udt_name[i])
             is.factor <- c(is.factor, x@.is.factor[i])
+            factor.ref <- c(factor.ref, x@.factor.ref[i])
             factor.suffix <- c(factor.suffix, x@.factor.suffix[i])
             next
         }
@@ -85,6 +87,7 @@
                                     length(arr)))
 
         is.factor <- c(is.factor, rep(FALSE, length(arr)))
+        factor.ref <- c(factor.ref, rep(as.character(NA), length(arr)))
         factor.suffix <- c(factor.suffix, rep("", length(arr)))
     }
 
@@ -106,6 +109,7 @@
         .col.data_type = data.type,
         .col.udt_name = udt.name,
         .is.factor = is.factor,
+        .factor.ref = factor.ref,
         .factor.suffix = factor.suffix,
         .sort = sort,
         .dist.by = x@.dist.by)

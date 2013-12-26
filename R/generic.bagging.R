@@ -114,6 +114,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
             .col.udt_name = res.udt.name,
             .where = where,
             .is.factor = FALSE,
+            .factor.ref = as.character(NA),
             .factor.suffix = "",
             .sort = sort,
             .dist.by = newdata@.dist.by)

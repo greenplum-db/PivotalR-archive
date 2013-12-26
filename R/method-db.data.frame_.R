@@ -92,6 +92,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     res@.table.type <- tbl.type$table_type
 
     res@.is.factor <- rep(FALSE, length(res@.col.name))
+    res@.factor.ref <- rep(as.character(NA), length(res@.col.name))
     res@.appear.name <- res@.col.name
     res@.factor.suffix <- rep("", length(res@.col.name))
 

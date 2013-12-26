@@ -40,6 +40,7 @@ setMethod (
             col.data_type <- NULL
             col.udt_name <- NULL
             is.factor <- NULL
+            factor.ref <- NULL
             factor.suffix <- NULL
         } else {
             on.str <- paste("on", paste(paste("s.\"", by.x, "\"", sep = ""),
@@ -61,6 +62,12 @@ setMethod (
             
             col.idx.y <- .gwhich(names(y), by.y)
             is.factor <- x@.is.factor[col.idx] & y@.is.factor[col.idx.y]
+            for (i in seq_len(length(idx))) {
+                if (is.factor[i])
+                    factor.ref <- c(factor.ref, x@.factor.ref[i])
+                else
+                    factor.ref <- c(factor.ref, as.character(NA))
+            }
             factor.suffix <- rep("", length(is.factor))
             for (i in seq_len(length(factor.suffix))) # create new suffix
                 if (is.factor[i]) factor.suffix[i] <- .unique.string()
@@ -79,6 +86,7 @@ setMethod (
             col.data_type <- c(col.data_type, x@.col.data_type[idx])
             col.udt_name <- c(col.udt_name, x@.col.udt_name[idx])
             is.factor <- c(is.factor, x@.is.factor[idx])
+            factor.ref <- c(factor.ref, x@.factor.ref[idx])
             factor.suffix <- c(factor.suffix, x@.factor.suffix[idx])
             if (col %in% xy) {
                 others <- c(others, paste("s.\"", col, "\"", sep = ""))
@@ -93,6 +101,7 @@ setMethod (
             col.data_type <- c(col.data_type, y@.col.data_type[idx])
             col.udt_name <- c(col.udt_name, y@.col.udt_name[idx])
             is.factor <- c(is.factor, y@.is.factor[idx])
+            factor.ref <- c(factor.ref, y@.factor.ref[idx])
             factor.suffix <- c(factor.suffix, y@.factor.suffix[idx])
             if (col %in% xy) {
                 others <- c(others, paste("t.\"", col, "\"", sep = ""))
@@ -124,6 +133,7 @@ setMethod (
             .col.udt_name = col.udt_name,
             .where = "",
             .is.factor = is.factor,
+            .factor.ref = factor.ref,
             .factor.suffix = factor.suffix,
             .sort = list(by = "", order = "", str = ""),
             .dist.by = x@.dist.by)

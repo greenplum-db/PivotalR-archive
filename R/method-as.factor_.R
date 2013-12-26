@@ -42,6 +42,7 @@ setMethod (
                 .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE,
+                .factor.ref = as.character(NA),
                 .factor.suffix = .unique.string(),
                 .sort = x@.sort,
                 .dist.by = x@.dist.by)
@@ -61,4 +62,21 @@ setMethod (
             TRUE
         else
             FALSE
+    })
+
+## ----------------------------------------------------------------------
+
+setGeneric ("relevel")
+
+setMethod(
+    "relevel",
+    signature(x = "db.obj"),
+    function(x, ref, ...) {
+        if (length(x@.col.name) != 1)
+            stop("Cannot relevel multiple columns!")
+        if (!x@.is.factor)
+            stop("Cannot relevel a non-factor column!")
+        x@.factor.ref <- (if (is.null(ref) || is.na(ref))
+                          'NULL' else as.character(ref))
+        x
     })

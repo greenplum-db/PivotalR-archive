@@ -68,6 +68,7 @@ setMethod (
             .col.udt_name = x@.col.udt_name,
             .where = where,
             .is.factor = x@.is.factor,
+            .factor.ref = x@.factor.ref,
             .factor.suffix = x@.factor.suffix,
             .sort = sort,
             .dist.by = x@.dist.by)

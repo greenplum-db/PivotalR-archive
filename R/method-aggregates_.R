@@ -155,6 +155,7 @@
         .col.udt_name = udt.name,
         .where = where,
         .is.factor = rep(FALSE, length(names(x))),
+        .factor.ref = rep(as.character(NA), length(names(x))),
         .factor.suffix = rep("", length(names(x))),
         .sort = list(by = "", order = "", str = ""),
         .dist.by = x@.dist.by)
@@ -520,6 +521,7 @@ db.array <- function (x, ...)
         .col.data_type = "array",
         .col.udt_name = udt.name,
         .is.factor = FALSE,
+        .factor.ref = as.character(NA),
         .factor.suffix = "",
         .sort = sort,
         .dist.by = base@.dist.by)

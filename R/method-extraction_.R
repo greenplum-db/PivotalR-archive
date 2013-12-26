@@ -289,6 +289,7 @@ setMethod (
     col.data_type <- x@.col.data_type[cols.i]
     col.udt_name <- x@.col.udt_name[cols.i]
     is.factor <- x@.is.factor[cols.i]
+    factor.ref <- x@.factor.ref[cols.i]
     factor.suffix <- x@.factor.suffix[cols.i]
     if (length(names(x)) == 1 && x@.col.data_type == "array"
         && !is.col.i.char && gsub("array_agg\\(.*\\)", "", expr) == expr) {
@@ -296,6 +297,7 @@ setMethod (
         col.data_type <- rep(.array.dat[idx], length(cols.i))
         col.udt_name <- rep(gsub("_", "", .array.udt[idx]), length(cols.i))
         is.factor <- rep(x@.is.factor, length(cols.i))
+        factor.ref <- rep(x@.factor.ref, length(cols.i))
         factor.suffix <- rep(x@.factor.suffix, length(cols.i))
     }
 
@@ -312,6 +314,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = where,
         .is.factor = is.factor,
+        .factor.ref = factor.ref,
         .factor.suffix = factor.suffix,
         .sort = sort,
         .dist.by = x@.dist.by)
