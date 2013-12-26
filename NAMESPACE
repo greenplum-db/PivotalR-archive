@@ -144,4 +144,4 @@ export("vcov.lm.madlib", "vcov.lm.madlib.grps",
 
 exportMethods("ifelse", "rowSums", "rowMeans")
 
-
+exportMethods("relevel")

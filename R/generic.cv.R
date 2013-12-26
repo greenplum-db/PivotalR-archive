@@ -182,6 +182,7 @@ generic.cv <- function (train, predict, metric, data,
     random.col@.col.data_type <- "double precision"
     random.col@.col.udt_name <- "float8"
     random.col@.is.factor <- FALSE
+    random.col@.factor.ref <- as.character(NA)
     random.col@.factor.suffix <- ""
     random.col@.content <- gsub("select\\s+.*\\s+from",
                                 paste("select random() as", id.col, "from"),

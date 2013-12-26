@@ -87,6 +87,7 @@ setMethod (
             .col.udt_name = x@.col.udt_name[select],
             .where = where,
             .is.factor = x@.is.factor[select],
+            .factor.ref = x@.factor.ref[select],
             .factor.suffix = x@.factor.suffix[select],
             .sort = sort,
             .dist.by = x@.dist.by)

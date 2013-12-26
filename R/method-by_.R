@@ -127,6 +127,7 @@ setMethod (
                 .col.udt_name = col.udt_name,
                 .where = where,
                 .is.factor = rep(FALSE, length(names(data))),
+                .factor.ref = rep(as.character(NA), length(names(data))),
                 .factor.suffix = rep("", length(names(data))),
                 .sort = list(by = "", order = "", str = ""),
                 .dist.by = data@.dist.by)

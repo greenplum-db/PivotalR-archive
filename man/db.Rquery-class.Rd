@@ -115,6 +115,10 @@ NOT recommended to directly manipulate the internal slots of these objects.
       variables. 
     }
 
+    \item{\code{.factor.ref}:}{
+      The value of the factor reference level for the regressions. If it       is \code{NA}, then the regressions automatically select a reference level.
+    }
+
     \item{\code{.sort}:}{
       Object of class \code{"list"}. The list contains the information
       used for "order by" in the SQL query.

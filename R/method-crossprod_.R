@@ -120,6 +120,7 @@ setMethod (
             .col.data_type = "crossprod",
             .col.udt_name = "_float",
             .is.factor = FALSE,
+            .factor.ref = as.character(NA),
             .factor.suffix = "",
             .sort = sort,
             .is.crossprod = TRUE,

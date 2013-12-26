@@ -226,7 +226,8 @@ setMethod (
         suffix <- x@.factor.suffix
         appear <- x@.col.name
         is.factor <- x@.is.factor
-
+        factor.ref <- x@.factor.ref
+        
         dummy <- character(0)
         dummy.expr <- character(0)
         if (pivot && !all(x@.is.factor == FALSE)) {
@@ -249,10 +250,16 @@ setMethod (
                     distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
                     ## Produce a fixed order for distinct values
                     distinct <- distinct[order(distinct, decreasing = TRUE)]
-                    for (j in seq_len(length(distinct) - 1)) {
+                    if (is.na(x@.factor.ref[i]))
+                        avoid <- distinct[length(distinct)]
+                    else
+                        avoid <- x@.factor.ref[i]
+                    for (j in seq_len(length(distinct))) {
+                        if (distinct[j] == avoid) next
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
                         is.factor <- c(is.factor, FALSE)
+                        factor.ref <- c(factor.ref, as.character(NA))
                         if (extra != "") extra <- paste(extra, ", ")
                         dex <- paste("(case when ", x@.expr[i], "::text = '",
                                      distinct[j], "'",
@@ -294,6 +301,7 @@ setMethod (
         res <- db.data.frame(x = tbnn, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)
         res@.is.factor <- is.factor
+        res@.factor.ref <- factor.ref
         res@.factor.suffix <- suffix
         res@.appear.name <- appear
         res@.dummy <- dummy

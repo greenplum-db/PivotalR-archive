@@ -165,6 +165,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = rep(FALSE, length(col.name)),
+        .factor.ref = rep(as.character(NA), length(col.name)),
         .factor.suffix = rep("", length(col.name)),
         .sort = sort,
         .dist.by = e1@.dist.by)
@@ -895,6 +896,7 @@ setMethod (
         .col.udt_name = col.udt_name,
         .where = e1@.where,
         .is.factor = rep(FALSE, l),
+        .factor.ref = rep(as.character(NA), l),
         .factor.suffix = rep("", l),
         .sort = sort,
         .dist.by = e1@.dist.by)

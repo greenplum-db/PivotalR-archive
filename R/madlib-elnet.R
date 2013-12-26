@@ -370,6 +370,7 @@ predict.elnet.madlib <- function (object, newdata,
         .col.udt_name = udt.name,
         .where = where,
         .is.factor = FALSE,
+        .factor.ref = as.character(NA),
         .factor.suffix = "",
         .sort = sort)
 }
