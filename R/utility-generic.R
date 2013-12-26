@@ -170,14 +170,13 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 .unique.string <- function ()
 {
-    hex_digits <- c(as.character(0:9), letters[1:6])
-    
+    hex_digits <- c(as.character(0:9), letters[1:6])    
     y_digits <- hex_digits[9:12]
     
     s <- paste(
         paste0(sample(hex_digits, 8), collapse=''),
         paste0(sample(hex_digits, 4), collapse=''),
-        paste0('4', sample(hex_digits, 3), collapse=''),
+        ## paste0('4', sample(hex_digits, 3), collapse=''),
         paste0(sample(y_digits,1), sample(hex_digits, 3), collapse=''),
         paste0(sample(hex_digits, 12), collapse=''), sep='_')
     s <- paste("__madlib_temp_", s, "__", sep = "")
