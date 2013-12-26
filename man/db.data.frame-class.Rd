@@ -80,6 +80,10 @@ NOT recommended to directly manipulate the internal slots of these objects.
       variables. 
     }
 
+    \item{\code{.factor.ref}:}{
+      The value of the factor reference level for the regressions. If it is \code{NA}, then the regressions automatically select a reference level.
+    }
+
     \item{\code{.appear.name}:}{Object of class \code{"character"}. This
   is also related the factor columns. \code{\link{print.lm.madlib}} and
   \code{\link{print.logregr.madlib}} use this value for printing the

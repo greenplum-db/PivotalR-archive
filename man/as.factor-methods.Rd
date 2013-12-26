@@ -1,4 +1,5 @@
 \name{as.factor-methods}
+\alias{relevel,db.obj-method}
 \alias{as.factor,db.obj-method}
 
 \title{ Convert one column of a \code{\linkS4class{db.obj}} object into a categorial variable }
@@ -7,21 +8,31 @@
   Convert one column of a \code{db.obj} object into a categorial
   variable. When \code{\link{madlib.lm}} or \code{\link{madlib.glm}} are
   applied onto a \code{db.obj} with categorial columns, dummy columns
-  will be created and fitted.
+  will be created and fitted. The reference level for regressions can be selected using \code{relevel}.
 }
 
 \usage{
 \S4method{as.factor}{db.obj}(x)
+
+\S4method{relevel}{db.obj}(x, ref, ...)
 }
 
 \arguments{
   \item{x}{
     A \code{db.obj} object. It must have only one column.
   }
+
+  \item{ref}{
+    A single value, which is the reference level that is used in the regressions.
+  }
+
+  \item{\dots}{
+    Other arguments passed into the result. Not implemented yet.
+  }
 }
 
 \value{
-  A \code{db.Rquery} object. It has only one column which is categorial.
+  A \code{db.Rquery} object. It has only one column which is categorial. By default, a reference level is automatically selected in regressions, which is usually the minimum of all levels, but one can easily change the reference level using \code{relevel}.
 }
 
 \author{
@@ -63,6 +74,10 @@ fit3 <- madlib.lm(rings ~ as.factor(sex) + length + diameter, data = z)
 
 fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
 = z, family = "binomial")
+
+## using relevel to change the reference level
+x$sex <- relevel(x$sex, ref = "M")
+madlib.lm(rings ~ . - id, data = x) # use "M" as the reference level
 }
 }
 
