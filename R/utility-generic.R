@@ -183,6 +183,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     s
 }
 
+.unique.pattern <- function()
+    "__madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}__"
+
 ## -----------------------------------------------------------------------
 
 ## strip the leading and trailing white spaces

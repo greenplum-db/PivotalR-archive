@@ -546,7 +546,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 ## extract factor column name and its value
 .extract.factor.info <- function(var)
 {
-    unique.string <- "__madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{6}_[a-f\\d]{12}__"
+    unique.string <- .unique.pattern()
     if (grepl(unique.string, var, perl = TRUE)) {
         res1 <- gsub(paste("^(.*)", unique.string, ".*$", sep = ""), "\\1",
                      var)

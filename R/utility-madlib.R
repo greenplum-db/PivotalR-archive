@@ -154,7 +154,7 @@ groups.logregr.madlib.grps <- function (x)
 clean.madlib.temp <- function(conn.id = 1)
 {
     for (tbl in db.objects(
-        "__madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}__",
+        .unique.pattern(),
         conn.id=conn.id))
         delete(tbl, conn.id=conn.id)
 }
