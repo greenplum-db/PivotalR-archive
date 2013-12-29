@@ -74,8 +74,7 @@ setMethod(
     function(x, ref, ...) {
         if (length(x@.col.name) != 1)
             stop("Cannot relevel multiple columns!")
-        if (!x@.is.factor)
-            stop("Cannot relevel a non-factor column!")
+        if (!x@.is.factor) x <- as.factor(x)
         x@.factor.ref <- (if (is.null(ref) || is.na(ref))
                           'NULL' else as.character(ref))
         x
