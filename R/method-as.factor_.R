@@ -11,6 +11,8 @@ setMethod (
     function (x) {
         if (length(x@.col.name) != 1)
             stop("Cannot coerce multiple columns into factor!")
+        if (x@.col.data_type == "array")
+            stop("Cannot set an array to be a factor!")
         if (x@.is.factor) return (x)
         if (is(x, "db.data.frame")) {
             new("db.Rquery",

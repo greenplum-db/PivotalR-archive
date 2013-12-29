@@ -39,7 +39,8 @@ export("predict.lm.madlib", "predict.logregr.madlib",
 
 exportMethods("$", "[[", "[", "subset")
 
-exportMethods("$<-", "[[<-", "[<-")
+exportMethods("$<-", "[[<-")
+export("[<-.db.obj")
 
 exportMethods("as.factor")
 
