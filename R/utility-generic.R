@@ -379,6 +379,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
     ##
+
+    if (!refresh) {
+        model.vars <- .prepare.ind.vars(labels)
+        vars <- unique(all.vars(parse(text = model.vars)))
+        for (var in vars) {
+            tmp <- eval(parse(text = paste("with(data, ", var, ")", sep = "")))
+            if (tmp@.col.data_type %in% c("boolean", .txt.types) &&
+                !tmp@.is.factor)
+                data[[var]] <- as.factor(data[[var]])
+        }
+    }
     
     list(dep.str = dep.var, origin.dep = origin.dep,
          origin.ind = orig.labels,
