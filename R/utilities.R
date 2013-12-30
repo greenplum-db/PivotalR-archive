@@ -282,35 +282,41 @@ setMethod("rowMeans",
     }
 
     ## res <- lst[[1]]
-    res@.expr <- sapply(lst, function(x) {if (is(x, "db.obj"))
-                                              x@.expr else x})
-    res@.col.name <- sapply(lst, function(x) {if (is(x, "db.obj"))
-                                                  x@.col.name else
-                                              .unique.string()})
-    res@.col.data_type <- sapply(lst, function(x) {
+    res@.expr <- unlist(lapply(lst, function(x) {if (is(x, "db.obj"))
+                                                     x@.expr else x}))
+    res@.col.name <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.col.name else
+            sapply(seq_len(length(x)), function(i) .unique.string())}))
+    res@.col.data_type <- unlist(lapply(lst, function(x) {
         if (is(x, "db.obj"))
             x@.col.data_type
         else {
-            if (typeof(x) == "character") "text"
+            if (typeof(x) == "character") rep("text", length(x))
             else if (typeof(x) == "boolean")
-                "boolean"
-            else "double precision"
-        }})
-    res@.col.udt_name <- sapply(lst, function(x) {
+                rep("boolean", length(x))
+            else rep("double precision", length(x))
+        }}))
+    res@.col.udt_name <- unlist(lapply(lst, function(x) {
         if (is(x, "db.obj"))
             x@.col.udt_name
         else {
-            if (typeof(x) == "character") "text"
+            if (typeof(x) == "character") rep("text", length(x))
             else if (typeof(x) == "boolean")
-                "bool"
-            else "float8"
-        }})
-    res@.is.factor <- sapply(lst, function(x) {if (is(x, "db.obj"))
-                             x@.is.factor else FALSE})
-    res@.factor.suffix <- sapply(lst, function(x) {if (is(x, "db.obj"))
-                                 x@.factor.suffix else ""})
-    res@.is.agg <- sapply(lst, function(x) {if (is(x, "db.obj"))
-                                                x@.is.agg else FALSE})
+                rep("bool", length(x))
+            else rep("float8", length(x))
+        }}))
+    res@.is.factor <- unlist(lapply(lst, function(x) {if (is(x, "db.obj"))
+                             x@.is.factor else rep(FALSE, length(x))}))
+    res@.factor.suffix <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.factor.suffix else rep("", length(x))}))
+    res@.is.agg <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.is.agg else rep(FALSE, length(x))}))
 
     if (res@.source == res@.parent)
         tbl <- res@.parent

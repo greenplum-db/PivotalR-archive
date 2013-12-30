@@ -658,6 +658,23 @@ setMethod (
                                  e1@.content)
             if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
             return (res)
+        } else if (length(names(e1)) == 1 && e1@.col.data_type != "array" &&
+                   length(e2) > 1) {
+            res <- e1
+            madlib <- schema.madlib(conn.id(e1))
+            res@.expr <- paste(madlib, ".array_scalar_mult(array[",
+                               paste(e2, collapse=","),
+                               "]::double precision[], ", e1@.expr,
+                               "::double precision)", sep = "")
+            res@.col.name <- paste(e1@.col.name, "_opr", sep = "")
+            ## res@.content <- gsub("^select [^((?! as ).)]+\\S+ as",
+            res@.content <- gsub("^select .* as",
+                                 paste("select ", res@.expr, " as", sep = ""),
+                                 e1@.content)
+            if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+            res@.col.data_type <- "array"
+            res@.col.udt_name <- "_float8"
+            return (res)
         } else {
             res <- .compare(e1, e2, " * ", .num.types,
                             res.type = "double precision",

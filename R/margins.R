@@ -45,9 +45,7 @@ Vars <- function(model)
     data <- model$data
     model.vars <- .prepare.ind.vars(model$ind.vars)
     n <- length(model.vars)
-    ## fake.data <- structure(vector("list", length(model.vars)),
-    ##                        names = gsub("`", "", model.vars),
-    ##                        class = "data.frame")
+
     fake.data <- structure(vector("list", length(names(newdata))),
                                   names = names(newdata),
                                   class = "data.frame")
@@ -110,16 +108,67 @@ Vars <- function(model)
         }
     }
 
+    ## ------- Deal with factors -------
+    
+    ## analyze the factor names
+    factors <- character(0)
+    used.vars <- model$dummy
+    used.is.factor <- rep(FALSE, length(used.vars))
+    for (i in seq_len(length(used.vars))) {
+        parse.var <- .extract.factor.info(used.vars[i])
+        if (length(parse.var) == 2) {
+            factors <- rbind(factors, c(parse.var, used.vars[i]))
+            used.is.factor[i] <- TRUE
+        }
+    }
+
+    l <- length(expand.vars)
+    is.factor <- rep(FALSE, l)
+    if (sum(used.is.factor) != 0) {
+        remove <- rep(FALSE, l)
+        append <- character(0)
+        existing.factors <- apply(factors, 1,
+                                  function(x) paste(x[1:2], collapse = "."))
+        for (i in seq_len(l)) {
+            j <- which(used.vars == expand.vars[i])
+            if (identical(j, integer(0))) {
+                if (expand.vars[i] %in% c(factors[,1], existing.factors)) {
+                    if (expand.vars[i] %in% factors[,1]) {
+                        k <- which(factors[,1] == expand.vars[i])
+                        remove[i] <- TRUE
+                        append <- c(append, factors[k,3])
+                    } else { 
+                        is.factor[i] <- TRUE
+                        expand.vars[i] <- factors[existing.factors ==
+                                                  expand.vars[i],3]
+                    }
+                }
+            } else {
+                if (used.is.factor[j]) is.factor[i] <- TRUE
+            }
+        }
+
+        if (!identical(append, character(0))) {
+            expand.vars <- expand.vars[!remove]
+            is.factor <- is.factor[!remove]
+            expand.vars <- c(expand.vars, append)
+            is.factor <- c(is.factor, rep(TRUE, length(append)))
+        }
+    }
+
+    ## ------- End -------
+
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
     names(model.vars) <- paste("var.", seq_len(n), sep = "")
     
     if (any(! (gsub("`", "", expand.vars) %in% c(names(model.vars),
-               names(.expand.array(data))))))
+               names(.expand.array(data)), model$dummy))))
         stop("All the variables must be in the independent variables ",
-             " or the table column names!")
+             "or the table column names!")
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
+                 is.factor = is.factor, factors = factors,
                  model.vars = model.vars))
 }
 
@@ -146,14 +195,21 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
         names(avgs) <- gsub("_avg$", "", names(avgs))
     } else
         avgs <- NULL
+    
     res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
-                        f$model.vars, at.mean, factor.continuous, avgs = avgs)
+                        f$is.factor, f$model.vars, at.mean, factor.continuous,
+                        avgs = avgs)
     mar <- res$mar
     se <- sqrt(diag(res$se))
     t <- mar / se
     p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
     rows <- gsub("`", "", f$vars)
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
+    for (i in seq_len(length(rows[f$is.factor]))) {
+        rows[f$is.factor][i] <- paste(f$factors[f$factors[,3] ==
+                                              rows[f$is.factor][i], 1:2],
+                                    collapse = ".")
+    }
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
                       check.names = FALSE)
@@ -223,8 +279,8 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     }
 
     res <- .margins.log(P, model, model$coef, newdata, f$vars, f$is.ind,
-                        f$model.vars, sigma.name, at.mean, factor.continuous,
-                        avgs = avgs)
+                        f$is.factor, f$model.vars, sigma.name, at.mean,
+                        factor.continuous, avgs = avgs)
 
     mar <- res$mar
     se <- sqrt(diag(res$se))
@@ -232,6 +288,11 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     p <- 2 * (1 - pnorm(abs(z)))
     rows <- gsub("`", "", f$vars)
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
+    for (i in seq_len(length(rows[f$is.factor]))) {
+        rows[f$is.factor][i] <- paste(f$factors[f$factors[,3] ==
+                                              rows[f$is.factor][i], 1:2],
+                                    collapse = ".")
+    }
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
                       row.names = rows, check.names = FALSE)
@@ -325,7 +386,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         sort <- data@.sort
         data@.content <- paste("select ", paste(data@.expr, " as \"",
                                                 data@.col.name, "\"",
-                                                sep = ""),
+                                                collapse = ", ", sep = ""),
                                " from ", tbl, where.str, sort$str, sep = "")
         as.db.Rview(data)
     } else {
@@ -339,9 +400,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 ## ----------------------------------------------------------------------
 
 ## special margins for linear
-.margins.lin <- function(P, model, coef, data, vars, is.ind, model.vars,
-                         at.mean = FALSE, factor.continuous = FALSE,
-                         avgs = NULL)
+.margins.lin <- function(P, model, coef, data, vars, is.ind, is.factor,
+                         model.vars, at.mean = FALSE,
+                         factor.continuous = FALSE, avgs = NULL)
 {
     coefs <- as.list(coef)
     n <- length(coefs)
@@ -370,16 +431,24 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         mar <- sapply(
             seq_len(m),
             function(i) {
+                ## eval(parse(
+                ##     text = "mean(with(data," %+%
+                ##     .sub.coefs(.dx(P, vars[i], is.ind[i],
+                ##                    model.vars), coefs) %+% "))"))
                 .with.data(
                     data,
                     paste("avg(", .sub.coefs(.dx(P, vars[i], is.ind[i], model.vars), coefs),
                           ")", sep = ""))
+
             })
         for (i in seq_len(m)) {
             s <- .dx(P, vars[i], is.ind[i], model.vars)
             e <- sapply(
                 seq_len(n),
                 function(j) {
+                    ## eval(parse(
+                    ##     text = "mean(with(data," %+%
+                    ##     .sub.coefs(.parse.deriv(s, "b"%+%j), coefs) %+% "))"))
                     .with.data(data, paste(
                         "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
                         ")", sep = ""), is.agg = TRUE)
@@ -390,7 +459,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                 se <- c(se, e)
         }
         mar.se <- c(mar, se)
-        if (any(sapply(mar.se, function(s) is(s, "db.obj")))) {
+        if (is.list(mar.se)) {
             mar.se <- .combine.list(mar.se)
             mar.se <- unlist(lk(mar.se, -1))
         }
@@ -405,9 +474,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 
 ## ----------------------------------------------------------------------
 
-.margins.log <- function(P, model, coef, data, vars, is.ind, model.vars, sigma,
-                         at.mean = FALSE, factor.continuous = FALSE,
-                         avgs = NULL)
+.margins.log <- function(P, model, coef, data, vars, is.ind, is.factor,
+                         model.vars, sigma, at.mean = FALSE,
+                         factor.continuous = FALSE, avgs = NULL)
 {
     conn.id <- conn.id(data)
     coefs <- as.list(coef)
@@ -453,6 +522,57 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                      ",", sigma, "*(1 - ", sigma, ")::double precision))",
                      sep = "")
 
+        ## mar <- sapply(
+            ## seq_len(m),
+            ## function(i) {
+                ## eval(parse(
+                    ## text = paste("with(data, ",
+                    ## .sub.coefs(.dx(P, vars[i], is.ind[i], model.vars), coefs),
+                    ## ")", sep = "")))
+            ## })
+
+        ## if (is.list(mar)) mar <- db.array(.combine.list(mar))
+
+        ## mar <- mean(data[[sigma]] * (1 - data[[sigma]]) * mar)
+
+        ## se1 <- unlist(lapply(
+            ## seq_len(m),
+            ## function(i) {
+                ## s <- .dx(P, vars[i], is.ind[i], model.vars)
+                ## res <- sapply(
+                    ## seq_len(n),
+                    ## function(j) {
+                        ## eval(parse(
+                            ## text = paste("with(data, ",
+                            ## .sub.coefs(.parse.deriv(s, "b"%+%j), coefs), ")",
+                            ## sep = "")))
+                    ## })
+                ## if (is.list(res)) res <- .combine.list(res)
+                ## res
+            ## }))
+
+        ## if (is.list(se1)) se1 <- db.array(.combine.list(se1))
+
+        ## se2 <- unlist(lapply(
+        ##     seq_len(m),
+        ##     function(i) {
+        ##         s <- .dx(P, vars[i], is.ind[i], model.vars)
+        ##         res <- sapply(
+        ##             seq_len(n),
+        ##             function(j) {
+        ##                 eval(parse(
+        ##                     text = paste("with(data, ",
+        ##                     .sub.coefs(paste("(", s, ")*(",
+        ##                                      .dj(P, j, model.vars),
+        ##                                      ")", sep = ""), coefs), ")",
+        ##                     sep = "")))
+        ##             })
+        ##         if (is.list(res)) res <- .combine.list(res)
+        ##         res
+        ##     }))
+
+        ## if (is.list(se2)) se2 <- db.array(.combine.list(se2))
+
         se1 <- paste(sapply(
             seq_len(m),
             function(i) {
@@ -483,15 +603,24 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                      se2, "]::double precision[],", sigma,
                      "*(1-", sigma, ")*(1-2*", sigma,
                      ")::double precision))", sep = "")
+        ## se1 <- mean(data[[sigma]] * (1 - data[[sigma]]) * se1)
+        ## se2 <- mean(data[[sigma]] * (1 - data[[sigma]]) *
+                    ## (1 - 2 * data[[sigma]]) * se2)
 
         mar.se <- paste("select ", mar, " as mar, ", se1, " as se1, ",
                         se2, " as se2 from (", data@.parent, ") s",
                         sep = "")
 
+        ## mar.se <- .combine.list(c(mar, se1, se2))
+
         mar.se <- db.q(mar.se, conn.id=conn.id, verbose = FALSE)
         mar <- as.vector(arraydb.to.arrayr(mar.se$mar))
         se <- t(array(as.vector(arraydb.to.arrayr(mar.se$se1) +
                                 arraydb.to.arrayr(mar.se$se2)), dim = c(n,m)))
+
+        ## mar.se <- lk(mar.se, -1)
+        ## mar <- mar.se[[1]]
+        ## se <- t(array(mar.se[[2]] + mar.se[[3]], dim = c(n,m)))
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
@@ -538,6 +667,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 {
     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
     w <- gsub("`", "", as.character(enquote(w))[2])
+    w <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1`[\\2]",
+              as.character(enquote(w))[2])
     w
 }
 
@@ -549,10 +680,12 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
     unique.string <- .unique.pattern()
     if (grepl(unique.string, var, perl = TRUE)) {
         res1 <- gsub(paste("^(.*)", unique.string, ".*$", sep = ""), "\\1",
-                     var)
+                     var, perl = TRUE)
         res2 <- gsub(paste("^.*", unique.string, "(.*)$", sep = ""), "\\1",
-                     var)
+                     var, perl = TRUE)
         c(res1, res2)
     } else
         var
 }
+
+

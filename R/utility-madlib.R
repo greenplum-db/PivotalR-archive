@@ -201,8 +201,8 @@ clean.madlib.temp <- function(conn.id = 1)
                          gsub("^\\s*", "",
                               strsplit(x, "\\s*<-\\s*")[[1]][1]))
     res <- ""
-    k <- which(names(env) == paste(".grad[, \"", var, "\"]",
-                    sep = ""))
+    k <- which(names(env) == paste(".grad[, \"", gsub("\"", "\\\\\\\"", var),
+                    "\"]", sep = ""))
     
     while (env[[k]] != res) {
         res <- env[[k]]
