@@ -270,10 +270,10 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 +" %+% paste("b", 2:n, "*var.", (2:n)-1,
+        P <- "b1 +" %+% paste("b", 2:n, "*`\"var.", (2:n)-1, "\"`",
                                   collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*var.", 1:n, collapse="+", sep = "")
+        P <- paste("b", 1:n, "*`\"var.", 1:n, "\"`", collapse="+", sep = "")
     sigma <- paste("1/(1+exp(-(", P, ")))")
     sigma.name <- gsub("__", "", .unique.string())
 
@@ -310,10 +310,11 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     rows <- gsub("`", "", f$vars)
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
-        rows[f$is.factor][i] <- paste(f$factors[f$factors[,3] ==
+        rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
+    rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
                       row.names = rows, check.names = FALSE)
@@ -458,8 +459,11 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                 ##                    model.vars), coefs) %+% "))"))
                 .with.data(
                     data,
-                    paste("avg(", .sub.coefs(.dx(P, vars[i], is.ind[i], model.vars), coefs),
-                          ")", sep = ""))
+                    gsub("`", "",
+                         paste("avg(",
+                               .sub.coefs(.dx(P, vars[i], is.ind[i],
+                                              model.vars), coefs),
+                               ")", sep = "")))
 
             })
         for (i in seq_len(m)) {
@@ -470,9 +474,9 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                     ## eval(parse(
                     ##     text = "mean(with(data," %+%
                     ##     .sub.coefs(.parse.deriv(s, "b"%+%j), coefs) %+% "))"))
-                    .with.data(data, paste(
+                    .with.data(data, gsub("`", "", paste(
                         "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
-                        ")", sep = ""), is.agg = TRUE)
+                        ")", sep = "")), is.agg = TRUE)
                 })
             if (i == 1)
                 se <- e
@@ -631,6 +635,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         mar.se <- paste("select ", mar, " as mar, ", se1, " as se1, ",
                         se2, " as se2 from (", data@.parent, ") s",
                         sep = "")
+        mar.se <- gsub("`", "", mar.se)
 
         ## mar.se <- .combine.list(c(mar, se1, se2))
 
