@@ -46,6 +46,7 @@ Vars <- function(model)
            function(v) {
                for (var in model.vars)
                    v <- gsub(var, paste("`\"", var, "\"`", sep = ""), v)
+               v <- gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)", "`\"\\2\"[\\3]`", v)
                v
            }))
 }
@@ -179,13 +180,14 @@ Vars <- function(model)
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
     names(model.vars) <- paste("\"var.", seq_len(n), "\"", sep = "")
-    
-    if (any(! (gsub("`", "", expand.vars) %in% c(names(model.vars),
+
+    if (any(! (gsub("\"", "", gsub("`", "", expand.vars)) %in% c(names(model.vars),
                names(.expand.array(data)), model$dummy))))
         stop("All the variables must be in the independent variables ",
              "or the table column names!")
 
     expand.vars <- paste("\"", expand.vars, "\"", sep = "")
+    expand.vars <- gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
@@ -230,6 +232,7 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
+    rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
@@ -314,6 +317,7 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
+    rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
@@ -453,10 +457,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         mar <- sapply(
             seq_len(m),
             function(i) {
-                ## eval(parse(
-                ##     text = "mean(with(data," %+%
-                ##     .sub.coefs(.dx(P, vars[i], is.ind[i],
-                ##                    model.vars), coefs) %+% "))"))
                 .with.data(
                     data,
                     gsub("`", "",
@@ -471,9 +471,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
             e <- sapply(
                 seq_len(n),
                 function(j) {
-                    ## eval(parse(
-                    ##     text = "mean(with(data," %+%
-                    ##     .sub.coefs(.parse.deriv(s, "b"%+%j), coefs) %+% "))"))
                     .with.data(data, gsub("`", "", paste(
                         "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
                         ")", sep = "")), is.agg = TRUE)
@@ -547,57 +544,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                      ",", sigma, "*(1 - ", sigma, ")::double precision))",
                      sep = "")
 
-        ## mar <- sapply(
-            ## seq_len(m),
-            ## function(i) {
-                ## eval(parse(
-                    ## text = paste("with(data, ",
-                    ## .sub.coefs(.dx(P, vars[i], is.ind[i], model.vars), coefs),
-                    ## ")", sep = "")))
-            ## })
-
-        ## if (is.list(mar)) mar <- db.array(.combine.list(mar))
-
-        ## mar <- mean(data[[sigma]] * (1 - data[[sigma]]) * mar)
-
-        ## se1 <- unlist(lapply(
-            ## seq_len(m),
-            ## function(i) {
-                ## s <- .dx(P, vars[i], is.ind[i], model.vars)
-                ## res <- sapply(
-                    ## seq_len(n),
-                    ## function(j) {
-                        ## eval(parse(
-                            ## text = paste("with(data, ",
-                            ## .sub.coefs(.parse.deriv(s, "b"%+%j), coefs), ")",
-                            ## sep = "")))
-                    ## })
-                ## if (is.list(res)) res <- .combine.list(res)
-                ## res
-            ## }))
-
-        ## if (is.list(se1)) se1 <- db.array(.combine.list(se1))
-
-        ## se2 <- unlist(lapply(
-        ##     seq_len(m),
-        ##     function(i) {
-        ##         s <- .dx(P, vars[i], is.ind[i], model.vars)
-        ##         res <- sapply(
-        ##             seq_len(n),
-        ##             function(j) {
-        ##                 eval(parse(
-        ##                     text = paste("with(data, ",
-        ##                     .sub.coefs(paste("(", s, ")*(",
-        ##                                      .dj(P, j, model.vars),
-        ##                                      ")", sep = ""), coefs), ")",
-        ##                     sep = "")))
-        ##             })
-        ##         if (is.list(res)) res <- .combine.list(res)
-        ##         res
-        ##     }))
-
-        ## if (is.list(se2)) se2 <- db.array(.combine.list(se2))
-
         se1 <- paste(sapply(
             seq_len(m),
             function(i) {
@@ -628,25 +574,16 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                      se2, "]::double precision[],", sigma,
                      "*(1-", sigma, ")*(1-2*", sigma,
                      ")::double precision))", sep = "")
-        ## se1 <- mean(data[[sigma]] * (1 - data[[sigma]]) * se1)
-        ## se2 <- mean(data[[sigma]] * (1 - data[[sigma]]) *
-                    ## (1 - 2 * data[[sigma]]) * se2)
 
         mar.se <- paste("select ", mar, " as mar, ", se1, " as se1, ",
                         se2, " as se2 from (", data@.parent, ") s",
                         sep = "")
         mar.se <- gsub("`", "", mar.se)
 
-        ## mar.se <- .combine.list(c(mar, se1, se2))
-
         mar.se <- db.q(mar.se, conn.id=conn.id, verbose = FALSE)
         mar <- as.vector(arraydb.to.arrayr(mar.se$mar))
         se <- t(array(as.vector(arraydb.to.arrayr(mar.se$se1) +
                                 arraydb.to.arrayr(mar.se$se2)), dim = c(n,m)))
-
-        ## mar.se <- lk(mar.se, -1)
-        ## mar <- mar.se[[1]]
-        ## se <- t(array(mar.se[[2]] + mar.se[[3]], dim = c(n,m)))
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)

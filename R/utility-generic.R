@@ -216,15 +216,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     } else if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
         f2.labels <- attr(f2.terms, "term.labels")
-        ## inter <- intersect(f2.labels, names(fdata))
-        ## if (length(inter) != length(f2.labels))
-        ##     stop("The grouping part of the formula is not quite right!")
+
         ## ## grouping column do not use factor
         f2.labels <- gsub("I\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("as.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        ## f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
-        ## ## f2.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f2.labels)
+   
         grp.expr <- f2.labels
         for (i in seq_len(length(f2.labels))) {
             if (! f2.labels[i] %in% names(data)) {
@@ -275,17 +272,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                                right.hand, perl = TRUE)
         }
     } else { # first pass
-        ## # make all text columns to be factor
-        ## for (i in seq_len(length(names(data)))) {
-        ##     if (data@.col.data_type[i] %in% .txt.types) {
-        ##         col <- data@.col.name[i]
-        ##         right.hand <- gsub(col,
-        ##                            paste0("as\\.factor\\(",
-        ##                                   col, "\\)"),
-        ##                            right.hand)
-        ##     }
-        ## }
-        
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
                            "factor(\\1)", right.hand, perl = T)
@@ -370,11 +356,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ind.var <- .consistent.func(ind.var)
     labels <- .consistent.func(labels)
 
-    ##
-    ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
-    ## ind.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", ind.var)
-    ## grp <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", grp)
-    ## labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", labels)
     dep.var <- gsub("`", "", dep.var)
     ind.var <- gsub("`", "", ind.var)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
@@ -383,6 +364,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     if (!refresh) {
         model.vars <- .prepare.ind.vars(labels)
+        model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
         vars <- unique(all.vars(parse(text = model.vars)))
         for (var in vars) {
             tmp <- eval(parse(text = paste("with(data, ", var, ")", sep = "")))
@@ -391,7 +373,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                 data[[var]] <- as.factor(data[[var]])
         }
     }
-    
+
     list(dep.str = dep.var, origin.dep = origin.dep,
          origin.ind = orig.labels,
          ind.str = ind.var,
