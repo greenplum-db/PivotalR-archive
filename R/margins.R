@@ -11,7 +11,7 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 {
     vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
     vars <- gsub("\"", "`", vars)
-    vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1[\\2]`", vars)
+    vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\"\\1\"[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
     vars <- .reverse.consistent.func(vars)
     vars
@@ -35,6 +35,19 @@ Vars <- function(model)
     else
         model.vars <- .prepare.ind.vars(model$ind.vars)
     unique(all.vars(parse(text = model.vars)))
+}
+
+## ----------------------------------------------------------------------
+
+## Add `\"\"` quotes to vars using model.vars
+.add.quotes <- function(vars, model.vars)
+{
+    as.vector(sapply(vars,
+           function(v) {
+               for (var in model.vars)
+                   v <- gsub(var, paste("`\"", var, "\"`", sep = ""), v)
+               v
+           }))
 }
 
 ## ----------------------------------------------------------------------
@@ -117,7 +130,9 @@ Vars <- function(model)
     for (i in seq_len(length(used.vars))) {
         parse.var <- .extract.factor.info(used.vars[i])
         if (length(parse.var) == 2) {
-            factors <- rbind(factors, c(parse.var, used.vars[i]))
+            factors <- rbind(factors,
+                             c(parse.var,
+                               paste("`\"", used.vars[i], "\"`", sep = "")))
             used.is.factor[i] <- TRUE
         }
     }
@@ -157,15 +172,20 @@ Vars <- function(model)
     }
 
     ## ------- End -------
-
+    
+    ## ------- Add quotes -------
+    mvars <- Vars(model)
+    model.vars <- .add.quotes(gsub("`", "", model.vars), mvars)
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
-    names(model.vars) <- paste("var.", seq_len(n), sep = "")
+    names(model.vars) <- paste("\"var.", seq_len(n), "\"", sep = "")
     
     if (any(! (gsub("`", "", expand.vars) %in% c(names(model.vars),
                names(.expand.array(data)), model$dummy))))
         stop("All the variables must be in the independent variables ",
              "or the table column names!")
+
+    expand.vars <- paste("\"", expand.vars, "\"", sep = "")
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
@@ -185,10 +205,10 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 + " %+% paste("b", 2:n, "*var.", (2:n)-1, collapse="+",
-                               sep = "")
+        P <- "b1 + " %+% paste("b", 2:n, "*`\"var.", (2:n)-1, "\"`",
+                               collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*var.", 1:n, collapse="+", sep = "")
+        P <- paste("b", 1:n, "*`\"var.", 1:n, "\"`", collapse="+", sep = "")
     if (at.mean) {
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
@@ -206,10 +226,11 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
     rows <- gsub("`", "", f$vars)
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
-        rows[f$is.factor][i] <- paste(f$factors[f$factors[,3] ==
+        rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
+    rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
                       check.names = FALSE)
