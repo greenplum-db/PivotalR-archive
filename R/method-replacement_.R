@@ -382,6 +382,11 @@ setMethod (
 {
     has.i <- !missing(i)
     has.j <- !missing(j)
+
+    if (length(x@.col.name) == 1 && x@.col.data_type == "array" &&
+        value@.is.factor)
+        stop("Cannot set an array to be a factor!")
+
     if (is(value, "db.Rquery")) func <- "dbRquery"
     else if (is(value, "character")) func <- "character"
     else if (is(value, "integer")) func <- "integer"

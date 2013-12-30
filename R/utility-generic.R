@@ -295,8 +295,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
                            perl = T))
         if (!all(col %in% names(data)))
-            stop("You can only make a existing column of",
-                 " the data into factor!")
+            stop("At least one of the variables cannot be set to be a factor ",
+                 "because either it does not exist in the data table ",
+                 "or it is an element of an array!")
 
         ## make sure the returned object is always db.Rquery
         for (i in seq_len(length(data@.col.name)))
