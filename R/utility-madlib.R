@@ -173,9 +173,9 @@ clean.madlib.temp <- function(conn.id = 1)
     lst <- character(0)
     ignore <- FALSE
     for (i in 1:length(lst0)) {
-        if (grepl("value", lst0[i]) ||
-            grepl("array", lst0[i]) ||
-            grepl("attr", lst0[i])) {
+        if (grepl("\\.value <- ", lst0[i]) ||
+            grepl("\\.grad <- ", lst0[i]) ||
+            grepl("attr\\(\\.value,", lst0[i])) {
             ignore <- TRUE
             next
         }
@@ -200,17 +200,18 @@ clean.madlib.temp <- function(conn.id = 1)
     names(env) <- sapply(lst, function(x)
                          gsub("^\\s*", "",
                               strsplit(x, "\\s*<-\\s*")[[1]][1]))
-    res <- ""
     k <- which(names(env) == paste(".grad[, \"", gsub("\"", "\\\\\\\"", var),
                     "\"]", sep = ""))
-    
-    while (env[[k]] != res) {
-        res <- env[[k]]
+    pre.res <- ""
+    res <- env[[k]]
+    while (!identical(pre.res, res)) {
         for (i in 1:length(env))
             env[[i]] <- eval(parse(text = paste("substitute(",
                                    paste(deparse(env[[i]]),
                                          collapse = " "),
                                    ", env)", sep = "")))
+        pre.res <- res
+        res <- env[[k]]
     }
     gsub("\\s+", " ", paste(deparse(res), collapse = " "))
 }
