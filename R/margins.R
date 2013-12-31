@@ -207,14 +207,16 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 + " %+% paste("b", 2:n, "*`\"var.", (2:n)-1, "\"`",
+        P <- "b1 + " %+% paste("b", 2:n, "*(`\"var.", (2:n)-1, "\"`)",
                                collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*`\"var.", 1:n, "\"`", collapse="+", sep = "")
+        P <- paste("b", 1:n, "*(`\"var.", 1:n, "\"`)", collapse="+", sep = "")
     if (at.mean) {
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
-        names(avgs) <- gsub("_avg$", "", names(avgs))
+        names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)\\[(\\d+)\\]\"([^`]|$)",
+                            "\"\\2\"[\\3]", names(avgs))
     } else
         avgs <- NULL
     
@@ -273,10 +275,10 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 +" %+% paste("b", 2:n, "*`\"var.", (2:n)-1, "\"`",
+        P <- "b1 +" %+% paste("b", 2:n, "*(`\"var.", (2:n)-1, "\"`)",
                                   collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*`\"var.", 1:n, "\"`", collapse="+", sep = "")
+        P <- paste("b", 1:n, "*(`\"var.", 1:n, "\"`)", collapse="+", sep = "")
     sigma <- paste("1/(1+exp(-(", P, ")))")
     sigma.name <- gsub("__", "", .unique.string())
 
@@ -292,6 +294,9 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
         names(avgs) <- gsub("_avg$", "", names(avgs))
+        names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)\\[(\\d+)\\]\"([^`]|$)",
+                            "\"\\2\"[\\3]", names(avgs))
         expr <- gsub("\\s", "",
                      paste(deparse(eval(parse(text = paste("substitute(",
                                               expr, ", avgs)", sep = "")))),
@@ -629,10 +634,10 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 .sub.coefs <- function(s, coefs)
 {
     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
-    w <- gsub("`", "", as.character(enquote(w))[2])
-    w <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1`[\\2]",
-              as.character(enquote(w))[2])
-    w
+    ## w <- gsub("`", "", as.character(enquote(w))[2])
+    ## w <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1`[\\2]",
+    ##           as.character(enquote(w))[2])
+    as.character(enquote(w))[2]
 }
 
 ## ----------------------------------------------------------------------
