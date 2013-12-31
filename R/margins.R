@@ -181,7 +181,8 @@ Vars <- function(model)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
     names(model.vars) <- paste("\"var.", seq_len(n), "\"", sep = "")
 
-    if (any(! (gsub("\"", "", gsub("`", "", expand.vars)) %in% c(names(model.vars),
+    if (any(! (gsub("\"", "", gsub("`", "", expand.vars)) %in%
+               c(gsub("\"", "", gsub("`", "", names(model.vars))),
                names(.expand.array(data)), model$dummy))))
         stop("All the variables must be in the independent variables ",
              "or the table column names!")
@@ -228,6 +229,7 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
     t <- mar / se
     p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
     rows <- gsub("`", "", f$vars)
+    rows <- .strip(rows, "\"")
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
         rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
@@ -235,7 +237,6 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
                                     collapse = ".")
     }
     rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
-    rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
                       check.names = FALSE)
@@ -316,6 +317,7 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     z <- mar / se
     p <- 2 * (1 - pnorm(abs(z)))
     rows <- gsub("`", "", f$vars)
+    rows <- .strip(rows, "\"")
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
         rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
@@ -323,7 +325,6 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
                                     collapse = ".")
     }
     rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
-    rows <- .strip(rows, "\"")
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
                       row.names = rows, check.names = FALSE)
