@@ -9,7 +9,7 @@
 arraydb.to.arrayr <- function (str, type = "double", n = 1)
 {
     if (is.null(str)) return (NULL)
-    
+
     if (type == "character")
         res <- character(0)
     else if (type == "integer")
@@ -18,7 +18,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         res <- logical(0)
     else
         res <- numeric(0)
-    
+
     for (i in seq(str))
     {
         if (is.na(str[i])) {
@@ -40,7 +40,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             else
                 elm <- as.numeric(elm)
         }
-        
+
         res <- rbind(res, elm)
     }
     row.names(res) <- NULL
@@ -81,7 +81,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         else {
             if (!.is.arg.string(distributed.by))
                 stop("distributed.by must be a string or NULL!")
-            if (distributed.by == "") # "" means no distributed by 
+            if (distributed.by == "") # "" means no distributed by
                 dist.str <- ""
             else
                 dist.str <- paste("DISTRIBUTED BY (", distributed.by, ")",
@@ -170,9 +170,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
 .unique.string <- function ()
 {
-    hex_digits <- c(as.character(0:9), letters[1:6])    
+    hex_digits <- c(as.character(0:9), letters[1:6])
     y_digits <- hex_digits[9:12]
-    
+
     s <- paste(
         paste0(sample(hex_digits, 8), collapse=''),
         paste0(sample(hex_digits, 4), collapse=''),
@@ -182,6 +182,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     s <- paste("__madlib_temp_", s, "__", sep = "")
     s
 }
+
+.unique.pattern <- function()
+    "__madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}__"
 
 ## -----------------------------------------------------------------------
 
@@ -198,11 +201,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
                               is.factor = NA, cols = NA, suffix = NA,
                               grp.vars = NULL, grp.expr = NULL)
-{    
+{
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     ## f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
-    
+
     f2 <- f.str[2] # grouping columns, might be NA
 
     ## fdata <- .expand.array(fdata)
@@ -229,7 +232,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                 data[[grp.col]] <- eval(parse(text = paste("with(data, ",
                                               f2.labels[i], ")", sep = "")))
                 f2.labels[i] <- grp.col
-            }                
+            }
         }
         grp <- paste(f2.labels, collapse = ", ")
     } else {
@@ -249,7 +252,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## the 1st row is the dependent variable
     f.factors <- attr(f.terms, "factors")
     f.labels <- attr(f.terms, "term.labels") # each terms on the right side
-    ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)    
+    ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
         replace.cols <- cols[is.factor]
@@ -261,7 +264,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             col <- replace.cols[i]
             new.col <- names(data)[grep(paste(col, suffix[i], sep=""),
                                         names(data))]
-            if (identical(new.col, character(0))) 
+            if (identical(new.col, character(0)))
                 new.col <- "1"
             else
                 new.col <- paste("(", paste("`", new.col, "`",
@@ -282,7 +285,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ##                            right.hand)
         ##     }
         ## }
-        
+
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
                            "factor(\\1)", right.hand, perl = T)
@@ -352,12 +355,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     b.labels <- unlist(sapply(b, function(x) x[,]@.expr))
 
     labels <- .strip(setdiff(a.labels, b.labels), "`")
-    
+
     ## labels <- .replace.with.quotes(labels, data@.col.name)
     ## remove grouping columns, when there is no intercept term
     if (!is.null(f2.labels) && f.intercept != 0)
         labels <- setdiff(labels, .strip(f2.labels, "`"))
-    
+
     ind.var <- paste("array[", intercept.str,
                      paste(labels, collapse = ","),
                      "]", sep = "") # independent variable
@@ -376,7 +379,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
     ##
-    
+
     list(dep.str = dep.var, origin.dep = origin.dep,
          origin.ind = orig.labels,
          ind.str = ind.var,
@@ -464,7 +467,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (data@.where != "") where.str <- paste(" where", data@.where)
     else where.str <- ""
     conn.id <- conn.id(data)
-    
+
     for (i in seq_len(length(labels))) {
         if (labels[i] %in% names(data) &&
             data@.col.data_type[i] == "array") {
@@ -499,7 +502,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (data@.where != "") where.str <- paste(" where", data@.where)
     else where.str <- ""
     conn.id <- conn.id(data)
-    
+
     for (i in seq_len(length(data@.col.name))) {
         if (data@.col.data_type[i] == "array") {
             n <- .db.getQuery(paste("select array_upper(\"",
@@ -536,7 +539,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                (s == where1 && t != where2)) {
         return (FALSE)
     }
-    
+
     s1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", s, perl = TRUE)
     if (s1 == s) return (s == t)
     s2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", s, perl = TRUE)
