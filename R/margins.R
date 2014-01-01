@@ -694,15 +694,17 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
             se.i <- paste(madlib, ".avg(array[", paste(sapply(
                 select.i,
                 function(i) {
-                    s <- .diff.log(P, vars[i], model.vars, sigma)
+                    ## s <- .diff.log(P, vars[i], model.vars, sigma)
                     paste(sapply(
                         seq_len(n),
                         function(j) {
-                            .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
+                            ## .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
+                            .sub.coefs(.diff.log.dj(P, vars[i], model.vars,
+                                                    sigma, j), coefs)
                         }), collapse = ", ")
                 }), collapse = ", "), "]::double precision[])", sep = "")
             cnts <- paste(madlib, ".avg(array[",
-                          paste(vars[select.i], collapse = ", "), "]",
+                          paste(vars[select.i], collapse = ", "), "])",
                           sep = "")
         }
 
@@ -807,12 +809,36 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
     x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
                collapse = "")
     x <- gsub("\\n", "", x)
-    env <- eval(parse(text = paste("list(", x, " = 0)")))
+    env <- list(0)
+    names(env) <- x
     P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
     paste(sigma, " - 1/(1 + exp(-(", P1, ")))", sep = "")
+}
+
+## ----------------------------------------------------------------------
+
+.diff.log.dj <- function(P, x, model.vars, sigma, j)
+{
+    dj <- .dj(P, j, model.vars)
+    P <- paste(deparse(eval(parse(text = paste("substitute(", P,
+                                  ", model.vars)", sep = "")))),
+               collapse = "")
+    P <- gsub("\\n", "", P)
+    x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
+               collapse = "")
+    x <- gsub("\\n", "", x)
+    env <- list(0)
+    names(env) <- x
+    P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
+                                   ", env)", sep = "")))),
+                collapse = "")
+    P1 <- gsub("\\n", "", P1)
+    dj0 <- .parse.deriv(P1, "b"%+%j)
+    paste("(", dj, ")*", sigma, "*(1 - ", sigma, ") - (", dj0,
+          ")", sep = "")
 }
 
 ## ----------------------------------------------------------------------
