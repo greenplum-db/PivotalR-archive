@@ -836,9 +836,10 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
-    dj0 <- .parse.deriv(paste("1/(1 + exp(-(", P1, ")))", sep = ""), "b"%+%j)
-    paste("(", dj, ")*", sigma, "*(1 - ", sigma, ") - (", dj0,
-          ")", sep = "")
+    sigma0 <- paste("1/(1 + exp(-(", P1, ")))", sep = "")
+    dj0 <- .parse.deriv(P1, "b"%+%j)
+    dj0 <- paste("(", dj0, ")*(", sigma0,")*(1 - ", sigma0, ")", sep = "")
+    paste("(", dj, ")*", sigma, "*(1 - ", sigma, ") - ", dj0, sep = "")
 }
 
 ## ----------------------------------------------------------------------
