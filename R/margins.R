@@ -224,19 +224,30 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
     res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, at.mean, factor.continuous,
                         avgs = avgs)
-    mar <- res$mar
-    se <- sqrt(diag(res$se))
+
+    ## re-arrange the order of results
+    ## in res, non-factor results are all in front of factor results
+    mar <- rep(0, length(res$mar))
+    mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
+    mar[f$is.factor] <- res$mar[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    se0 <- sqrt(diag(res$se))
+    se <- rep(0, length(res$mar))
+    se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
+    se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    
     t <- mar / se
     p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
     rows <- gsub("`", "", f$vars)
     rows <- .strip(rows, "\"")
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
-        rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
-                                              rows[f$is.factor][i], 1:2],
-                                    collapse = ".")
+        rows[f$is.factor][i] <- paste(
+            f$factors[.strip(.strip(f$factors[,3], "`"), "\"") ==
+                      rows[f$is.factor][i], 1:2],
+            collapse = ".")
     }
     rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
                       check.names = FALSE)
@@ -312,15 +323,24 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
                         f$is.factor, f$model.vars, sigma.name, at.mean,
                         factor.continuous, avgs = avgs)
 
-    mar <- res$mar
-    se <- sqrt(diag(res$se))
+    ## re-arrange the order of results
+    ## in res, non-factor results are all in front of factor results
+    mar <- rep(0, length(res$mar))
+    mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
+    mar[f$is.factor] <- res$mar[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    se0 <- sqrt(diag(res$se))
+    se <- rep(0, length(res$mar))
+    se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
+    se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    
     z <- mar / se
     p <- 2 * (1 - pnorm(abs(z)))
     rows <- gsub("`", "", f$vars)
     rows <- .strip(rows, "\"")
     rows <- ifelse(f$is.ind, "."%+%rows, rows)
     for (i in seq_len(length(rows[f$is.factor]))) {
-        rows[f$is.factor][i] <- paste(f$factors[.strip(f$factors[,3], "`") ==
+        rows[f$is.factor][i] <- paste(
+            f$factors[.strip(.strip(f$factors[,3], "`"), "\"") ==
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
@@ -510,11 +530,12 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                     data,
                     gsub("`", "",
                          paste("avg(",
-                               .sub.coefs(.diff(P, vars[i], model.vars), coefs),
+                               .sub.coefs(.diff.lin(P, vars[i], model.vars),
+                                          coefs),
                                ")", sep = "")))
             })
         for (i in select.i) {
-            s <- .diff(P, vars[i], model.vars)
+            s <- .diff.lin(P, vars[i], model.vars)
             e <- sapply(
                 seq_len(n),
                 function(j) {
@@ -644,13 +665,13 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
             mar.i <- paste(madlib, ".avg(array[", paste(sapply(
                 select.i,
                 function(i) {
-                    .sub.coefs(.diff(P, vars[i], model.vars, sigma), coefs)
+                    .sub.coefs(.diff.log(P, vars[i], model.vars, sigma), coefs)
                 }), collapse = ", "), "]::double precision[])", sep = "")
 
             se.i <- paste(madlib, ".avg(array[", paste(sapply(
                 select.i,
                 function(i) {
-                    s <- .diff(P, vars[i], model.vars, sigma)
+                    s <- .diff.log(P, vars[i], model.vars, sigma)
                     paste(sapply(
                         seq_len(n),
                         function(j) {
@@ -674,19 +695,23 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         mar.se <- gsub("`", "", mar.se)
 
         mar.se <- db.q(mar.se, conn.id=conn.id, verbose = FALSE)
-        mar <- as.vector(arraydb.to.arrayr(mar.se$mar))
-        if (length(select.c) > 0 && && length(select.i) > 0)
+        if (length(select.c) > 0 && length(select.i) > 0) {
+            mar <- c(as.vector(arraydb.to.arrayr(mar.se$mar)),
+                     as.vector(arraydb.to.arrayr(mar.se$mar_i)))
             se <- t(array(c(as.vector(arraydb.to.arrayr(mar.se$se1) +
                                 arraydb.to.arrayr(mar.se$se2)),
                             as.vector(arraydb.to.arrayr(mar.se$se_i))),
                           dim = c(n,m)))
-        else if (length(select.c) > 0)
+        } else if (length(select.c) > 0) {
+            mar <- as.vector(arraydb.to.arrayr(mar.se$mar))
             se <- t(array(as.vector(arraydb.to.arrayr(mar.se$se1) +
                                       arraydb.to.arrayr(mar.se$se2)),
                             dim = c(n,m)))
-        else
+        } else {
+            mar <- as.vector(arraydb.to.arrayr(mar.se$mar_i))
             se <- t(array(as.vector(arraydb.to.arrayr(mar.se$se_i)),
                           dim = c(n,m)))
+        }
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
