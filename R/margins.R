@@ -227,13 +227,19 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
-    mar <- rep(0, length(res$mar))
-    mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
-    mar[f$is.factor] <- res$mar[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
-    se0 <- sqrt(diag(res$se))
-    se <- rep(0, length(res$mar))
-    se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
-    se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    if (factor.continuous) {
+        mar <- res$mar
+        se <- sqrt(res$se)
+    } else {
+        mar <- rep(0, length(res$mar))
+        mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
+        mar[f$is.factor] <- res$mar[sum(!f$is.factor) +
+                                    seq_len(sum(f$is.factor))]
+        se0 <- sqrt(res$se)
+        se <- rep(0, length(res$mar))
+        se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
+        se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    }
     
     t <- mar / se
     p <- 2 * (1 - pt(abs(t), nrow(newdata) - n))
@@ -325,13 +331,19 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
-    mar <- rep(0, length(res$mar))
-    mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
-    mar[f$is.factor] <- res$mar[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
-    se0 <- sqrt(diag(res$se))
-    se <- rep(0, length(res$mar))
-    se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
-    se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    if (factor.continuous) {
+        mar <- res$mar
+        se <- sqrt(res$se)
+    } else {
+        mar <- rep(0, length(res$mar))
+        mar[!f$is.factor] <- res$mar[seq_len(sum(!f$is.factor))]
+        mar[f$is.factor] <- res$mar[sum(!f$is.factor) +
+                                    seq_len(sum(f$is.factor))]
+        se0 <- sqrt(res$se)
+        se <- rep(0, length(res$mar))
+        se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
+        se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
+    }
     
     z <- mar / se
     p <- 2 * (1 - pnorm(abs(z)))
@@ -523,13 +535,14 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         ## factors treated as uncontinuous variables
         mar.i <- NULL
         se.i <- NULL
+        cnts <- NULL
         mar.i <- sapply(
             select.i,
             function(i){
                 .with.data(
                     data,
                     gsub("`", "",
-                         paste("avg(",
+                         paste("sum(",
                                .sub.coefs(.diff.lin(P, vars[i], model.vars),
                                           coefs),
                                ")", sep = "")))
@@ -540,28 +553,38 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                 seq_len(n),
                 function(j) {
                     .with.data(data, gsub("`", "", paste(
-                        "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
+                        "sum(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
                         ")", sep = "")), is.agg = TRUE)
                 })
-            if (i == 1)
+            if (i == 1) {
                 se.i <- e
-            else
+                cnts <- sum(data[[.strip(vars[1], "\"")]] == 1)
+            } else {
                 se.i <- c(se.i, e)
+                cnts <- c(cnts, sum(data[[.strip(vars[i], "\"")]] == 1))
+            }
         }
 
-        mar.se <- c(mar, mar.i, se, se.i)
+        mar.se <- c(mar, mar.i, se, se.i, cnts)
         
         if (is.list(mar.se)) {
             mar.se <- .combine.list(mar.se)
             mar.se <- unlist(lk(mar.se, -1))
         }
-        
+
+        cnts <- mar.se[-seq_len(m+n*m)]
+        mar.se <- mar.se[seq_len(m+n*m)]
         mar <- mar.se[seq_len(m)]
         se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
-    se <- se %*% v %*% t(se)
+    se <- diag(se %*% v %*% t(se))
+    if (length(select.i) > 0) {
+        idx <- m - length(select.i) + seq_len(length(select.i))
+        mar[idx] <- mar[idx] / cnts
+        se[idx] <- se[idx] / cnts^2
+    }
     return(list(mar=mar, se=se))
 }
 
@@ -678,18 +701,22 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                             .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
                         }), collapse = ", ")
                 }), collapse = ", "), "]::double precision[])", sep = "")
+            cnts <- paste(madlib, ".avg(array[",
+                          paste(vars[select.i], collapse = ", "), "]",
+                          sep = "")
         }
 
         ## combine all strings
         if (length(select.c) > 0 && length(select.i) > 0)
             mar.se <- paste(mar, " as mar, ", mar.i, " as mar_i, ",
                             se1, " as se1, ", se2, " as se2, ",
-                            se.i, " as se_i ", sep = "")
+                            se.i, " as se_i, ", cnts, " as cnts ", sep = "")
         else if (length(select.c) > 0)
             mar.se <- paste(mar, " as mar, ", se1, " as se1, ",
                             se2, " as se2 ", sep = "")
         else
-            mar.se <- paste(mar.i, " as mar_i, ", se.i, " as se_i ", sep = "")
+            mar.se <- paste(mar.i, " as mar_i, ", se.i, " as se_i, ",
+                            cnts, " as cnts ", sep = "")
         mar.se <- paste("select ", mar.se, "from (", data@.parent, ") s",
                         sep = "")
         mar.se <- gsub("`", "", mar.se)
@@ -715,7 +742,13 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
-    se <- se %*% v %*% t(se)
+    se <- diag(se %*% v %*% t(se))
+    if (length(select.i) > 0) {
+        cnts <- as.vector(arraydb.to.arrayr(mar.se$cnts))
+        idx <- m - length(select.i) + seq_len(length(select.i))
+        mar[idx] <- mar[idx] / cnts
+        se[idx] <- se[idx] / cnts^2
+    }
     return(list(mar=mar, se=se))
 }
 
@@ -753,7 +786,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
     x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
                collapse = "")
     x <- gsub("\\n", "", x)
-    env <- eval(parse(text = paste("list(", x, " = 0)")))
+    env <- list(0)
+    names(env) <- x
     P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
@@ -797,9 +831,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 .sub.coefs <- function(s, coefs)
 {
     w <- eval(parse(text = paste("substitute(", s, ", coefs)", sep = "")))
-    ## w <- gsub("`", "", as.character(enquote(w))[2])
-    ## w <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\\1`[\\2]",
-    ##           as.character(enquote(w))[2])
     as.character(enquote(w))[2]
 }
 
