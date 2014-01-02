@@ -222,8 +222,8 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
         avgs <- NULL
     
     res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
-                        f$is.factor, f$model.vars, at.mean, factor.continuous,
-                        avgs = avgs)
+                        f$is.factor, f$model.vars, f$factors,
+                        at.mean, factor.continuous, avgs = avgs)
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
@@ -326,8 +326,8 @@ margins.logregr.madlib <- function(model, vars = ~ Vars(model),
     }
 
     res <- .margins.log(P, model, model$coef, newdata, f$vars, f$is.ind,
-                        f$is.factor, f$model.vars, sigma.name, at.mean,
-                        factor.continuous, avgs = avgs)
+                        f$is.factor, f$model.vars, sigma.name, f$factors,
+                        at.mean, factor.continuous, avgs = avgs)
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
@@ -465,7 +465,7 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 
 ## special margins for linear
 .margins.lin <- function(P, model, coef, data, vars, is.ind, is.factor,
-                         model.vars, at.mean = FALSE,
+                         model.vars, factors, at.mean = FALSE,
                          factor.continuous = FALSE, avgs = NULL)
 {
     coefs <- as.list(coef)
@@ -535,63 +535,53 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
         ## factors treated as uncontinuous variables
         mar.i <- NULL
         se.i <- NULL
-        cnts <- NULL
         mar.i <- sapply(
             select.i,
             function(i){
                 .with.data(
                     data,
                     gsub("`", "",
-                         paste("sum(",
-                               .sub.coefs(.diff.lin(P, vars[i], model.vars),
-                                          coefs),
+                         paste("avg(",
+                               .sub.coefs(.diff.lin(P, vars[i], model.vars,
+                                                    factors), coefs),
                                ")", sep = "")))
             })
         for (i in select.i) {
-            s <- .diff.lin(P, vars[i], model.vars)
+            s <- .diff.lin(P, vars[i], model.vars, factors)
             e <- sapply(
                 seq_len(n),
                 function(j) {
                     .with.data(data, gsub("`", "", paste(
-                        "sum(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
+                        "avg(", .sub.coefs(.parse.deriv(s, "b"%+%j), coefs),
                         ")", sep = "")), is.agg = TRUE)
                 })
             if (i == 1) {
                 se.i <- e
-                cnts <- sum(data[[.strip(vars[1], "\"")]] == 1)
             } else {
                 se.i <- c(se.i, e)
-                cnts <- c(cnts, sum(data[[.strip(vars[i], "\"")]] == 1))
             }
         }
 
-        mar.se <- c(mar, mar.i, se, se.i, cnts)
+        mar.se <- c(mar, mar.i, se, se.i)
         
         if (is.list(mar.se)) {
             mar.se <- .combine.list(mar.se)
             mar.se <- unlist(lk(mar.se, -1))
         }
 
-        cnts <- mar.se[-seq_len(m+n*m)]
-        mar.se <- mar.se[seq_len(m+n*m)]
         mar <- mar.se[seq_len(m)]
         se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
     }
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
     se <- diag(se %*% v %*% t(se))
-    if (length(select.i) > 0) {
-        idx <- m - length(select.i) + seq_len(length(select.i))
-        mar[idx] <- mar[idx] / cnts
-        se[idx] <- se[idx] / cnts^2
-    }
     return(list(mar=mar, se=se))
 }
 
 ## ----------------------------------------------------------------------
 
 .margins.log <- function(P, model, coef, data, vars, is.ind, is.factor,
-                         model.vars, sigma, at.mean = FALSE,
+                         model.vars, sigma, factors, at.mean = FALSE,
                          factor.continuous = FALSE, avgs = NULL)
 {
     conn.id <- conn.id(data)
@@ -688,7 +678,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
             mar.i <- paste(madlib, ".avg(array[", paste(sapply(
                 select.i,
                 function(i) {
-                    .sub.coefs(.diff.log(P, vars[i], model.vars, sigma), coefs)
+                    .sub.coefs(.diff.log(P, vars[i], model.vars, sigma,
+                                         factors), coefs)
                 }), collapse = ", "), "]::double precision[])", sep = "")
 
             se.i <- paste(madlib, ".avg(array[", paste(sapply(
@@ -700,25 +691,21 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                         function(j) {
                             ## .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
                             .sub.coefs(.diff.log.dj(P, vars[i], model.vars,
-                                                    sigma, j), coefs)
+                                                    sigma, j, factors), coefs)
                         }), collapse = ", ")
                 }), collapse = ", "), "]::double precision[])", sep = "")
-            cnts <- paste(madlib, ".avg(array[",
-                          paste(vars[select.i], collapse = ", "), "])",
-                          sep = "")
         }
 
         ## combine all strings
         if (length(select.c) > 0 && length(select.i) > 0)
             mar.se <- paste(mar, " as mar, ", mar.i, " as mar_i, ",
                             se1, " as se1, ", se2, " as se2, ",
-                            se.i, " as se_i, ", cnts, " as cnts ", sep = "")
+                            se.i, " as se_i ", sep = "")
         else if (length(select.c) > 0)
             mar.se <- paste(mar, " as mar, ", se1, " as se1, ",
                             se2, " as se2 ", sep = "")
         else
-            mar.se <- paste(mar.i, " as mar_i, ", se.i, " as se_i, ",
-                            cnts, " as cnts ", sep = "")
+            mar.se <- paste(mar.i, " as mar_i, ", se.i, " as se_i ", sep = "")
         mar.se <- paste("select ", mar.se, "from (", data@.parent, ") s",
                         sep = "")
         mar.se <- gsub("`", "", mar.se)
@@ -745,12 +732,6 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
     names(mar) <- gsub("`", "", vars)
     v <- vcov(model)
     se <- diag(se %*% v %*% t(se))
-    if (length(select.i) > 0) {
-        cnts <- as.vector(arraydb.to.arrayr(mar.se$cnts))
-        idx <- m - length(select.i) + seq_len(length(select.i))
-        mar[idx] <- mar[idx] / cnts
-        se[idx] <- se[idx] / cnts^2
-    }
     return(list(mar=mar, se=se))
 }
 
@@ -778,69 +759,92 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
 
 ## ----------------------------------------------------------------------
 
+.get.friend.dummy <- function(x, factors)
+{
+    col <- factors[.strip(factors[,3], "`") == x, 1]
+    .strip(factors[factors[,1] == col, 3], "`")
+}
+
+## ----------------------------------------------------------------------
+
 ## finite difference, only for factors, linear regression
-.diff.lin <- function(P, x, model.vars)
+.diff.lin <- function(P, x, model.vars, factors)
 {
     P <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                   ", model.vars)", sep = "")))),
                collapse = "")
     P <- gsub("\\n", "", P)
-    x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
-               collapse = "")
-    x <- gsub("\\n", "", x)
-    env <- list(0)
-    names(env) <- x
+    xs <- .get.friend.dummy(x, factors)
+    env <- as.list(rep(0, length(xs)))
+    names(env) <- xs
+    env[[x]] <- 1
     P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
-    paste("(", P, ") - (", P1, ")", sep = "")
+    env[[x]] <- 0
+    P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
+                                   ", env)", sep = "")))),
+                collapse = "")
+    P0 <- gsub("\\n", "", P0)
+    paste("(", P1, ") - (", P0, ")", sep = "")
 }
 
 ## ----------------------------------------------------------------------
 
 ## finite difference, only for factors, logistic regression
-.diff.log <- function(P, x, model.vars, sigma)
+.diff.log <- function(P, x, model.vars, sigma, factors)
 {
     P <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                   ", model.vars)", sep = "")))),
                collapse = "")
     P <- gsub("\\n", "", P)
-    x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
-               collapse = "")
-    x <- gsub("\\n", "", x)
-    env <- list(0)
-    names(env) <- x
+    xs <- .get.friend.dummy(x, factors)
+    env <- as.list(rep(0, length(xs)))
+    names(env) <- xs
+    env[[x]] <- 1
     P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
-    res <- paste(sigma, " - 1/(1 + exp(-(", P1, ")))", sep = "")
-    res
+    env[[x]] <- 0
+    P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
+                                   ", env)", sep = "")))),
+                collapse = "")
+    P0 <- gsub("\\n", "", P0)
+    paste("1/(1 + exp(-(", P1, "))) - 1/(1 + exp(-(", P0, ")))", sep = "")
 }
 
 ## ----------------------------------------------------------------------
 
-.diff.log.dj <- function(P, x, model.vars, sigma, j)
+.diff.log.dj <- function(P, x, model.vars, sigma, j, factors)
 {
     dj <- .dj(P, j, model.vars)
     P <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                   ", model.vars)", sep = "")))),
                collapse = "")
     P <- gsub("\\n", "", P)
-    x <- paste(deparse(eval(parse(text = paste("quote(", x, ")")))),
-               collapse = "")
-    x <- gsub("\\n", "", x)
-    env <- list(0)
-    names(env) <- x
+    xs <- .get.friend.dummy(x, factors)
+    env <- as.list(rep(0, length(xs)))
+    names(env) <- xs
+    env[[x]] <- 1
     P1 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
-    sigma0 <- paste("1/(1 + exp(-(", P1, ")))", sep = "")
-    dj0 <- .parse.deriv(P1, "b"%+%j)
+    sigma1 <- paste("1/(1 + exp(-(", P1, ")))", sep = "")
+    dj1 <- .parse.deriv(P1, "b"%+%j)
+    dj1 <- paste("(", dj1, ")*(", sigma1,")*(1 - ", sigma1, ")", sep = "")
+
+    env[[x]] <- 0
+    P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
+                                   ", env)", sep = "")))),
+                collapse = "")
+    P0 <- gsub("\\n", "", P0)
+    sigma0 <- paste("1/(1 + exp(-(", P0, ")))", sep = "")
+    dj0 <- .parse.deriv(P0, "b"%+%j)
     dj0 <- paste("(", dj0, ")*(", sigma0,")*(1 - ", sigma0, ")", sep = "")
-    paste("(", dj, ")*", sigma, "*(1 - ", sigma, ") - ", dj0, sep = "")
+    paste(dj1, " - ", dj0, sep = "")
 }
 
 ## ----------------------------------------------------------------------
