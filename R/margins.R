@@ -197,11 +197,12 @@ Vars <- function(model)
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib <- function(model, vars = ~ Vars(model),
+margins.lm.madlib <- function(model, dydx = ~ Vars(model),
                               newdata = model$data,
                               at.mean = FALSE, factor.continuous = FALSE,
                               na.action = NULL, ...)
 {
+    vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
     newdata <- .handle.dummy(newdata, model)
@@ -263,18 +264,18 @@ margins.lm.madlib <- function(model, vars = ~ Vars(model),
 
 ## ----------------------------------------------------------------------
 
-margins.lm.madlib.grps <- function(model, vars = ~ Vars(model),
+margins.lm.madlib.grps <- function(model, dydx = ~ Vars(model),
                                    newdata = lapply(model, function(x) x$data),
                                    at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
 {
     if (length(newdata) == 1) 
         lapply(seq_len(length(model)), function (i)
-               margins(model[[i]], vars, newdata, at.mean,
+               margins(model[[i]], dydx, newdata, at.mean,
                        factor.continuous, na.action, ...))
     else if (length(newdata) == length(model))
         lapply(seq_len(length(model)), function (i)
-               margins(model[[i]], vars, newdata[[i]], at.mean,
+               margins(model[[i]], dydx, newdata[[i]], at.mean,
                        factor.continuous, na.action, ...))
     else
         stop("The number db.obj objects in newdata must be 1 or equal to length of model!")
@@ -282,11 +283,12 @@ margins.lm.madlib.grps <- function(model, vars = ~ Vars(model),
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib <- function(model, vars = ~ Vars(model),
+margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                    newdata = model$data,
                                    at.mean = FALSE, factor.continuous = FALSE,
                                    na.action = NULL, ...)
 {
+    vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
     newdata <- .handle.dummy(newdata, model)
@@ -375,18 +377,18 @@ print.margins <- function(x,
 
 ## ----------------------------------------------------------------------
 
-margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
+margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                                         newdata = lapply(model, function(x) x$data),
                                         at.mean = FALSE, factor.continuous = FALSE,
                                         na.action = NULL, ...)
 {
     if (length(newdata) == 1) 
         lapply(seq_len(length(model)), function (i)
-               margins(model[[i]], vars, newdata, at.mean,
+               margins(model[[i]], dydx, newdata, at.mean,
                        factor.continuous, na.action, ...))
     else if (length(newdata) == length(model))
         lapply(seq_len(length(model)), function (i)
-               margins(model[[i]], vars, newdata[[i]], at.mean,
+               margins(model[[i]], dydx, newdata[[i]], at.mean,
                        factor.continuous, na.action, ...))
     else
         stop("The number db.obj objects in newdata must be 1 or equal to length of model!")
