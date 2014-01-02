@@ -524,7 +524,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                 eval(parse(
                     text = paste("with(avgs, ",
                     .sub.coefs(.diff.lin(P, vars[i], model.vars,
-                                         factors), coefs)
+                                         factors), coefs),
                     ")", sep = "")))
             })
         se.i <- array(0, dim = c(length(select.i),n))
@@ -673,10 +673,10 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                 eval(parse(
                     text = paste("with(avgs, ",
                     .sub.coefs(.diff.log(P, vars[i], model.vars, sigma,
-                                         factors), coefs)
+                                         factors), coefs),
                     ")", sep = "")))
             }))
-        se.i <- array(0, dim = c(length(select.i, n)))
+        se.i <- array(0, dim = c(length(select.i), n))
         for (i in select.i) {
             se[i,] <- sapply(
                 seq_len(n),
@@ -684,7 +684,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                     eval(parse(
                         text = paste("with(avgs, ",
                         .sub.coefs(.diff.log.dj(P, vars[i], model.vars,
-                                                sigma, j, factors), coefs)
+                                                sigma, j, factors), coefs),
                         ")", sep = "")))
                 })
         }
