@@ -815,7 +815,8 @@ margins.logregr.madlib.grps <- function(model, vars = ~ Vars(model),
                                    ", env)", sep = "")))),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
-    paste(sigma, " - 1/(1 + exp(-(", P1, ")))", sep = "")
+    res <- paste(sigma, " - 1/(1 + exp(-(", P1, ")))", sep = "")
+    res
 }
 
 ## ----------------------------------------------------------------------

@@ -360,17 +360,17 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ind.var <- gsub("`", "", ind.var)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
-    ##
 
     if (!refresh) {
-        model.vars <- .prepare.ind.vars(labels)
+        model.vars <- .prepare.ind.vars(orig.labels)
         model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
         vars <- unique(all.vars(parse(text = model.vars)))
         for (var in vars) {
             tmp <- eval(parse(text = paste("with(data, ", var, ")", sep = "")))
             if (tmp@.col.data_type %in% c("boolean", .txt.types) &&
-                !tmp@.is.factor)
+                !tmp@.is.factor) {
                 data[[var]] <- as.factor(data[[var]])
+            }
         }
     }
 
