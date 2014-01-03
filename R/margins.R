@@ -46,7 +46,8 @@ Vars <- function(model)
            function(v) {
                for (var in model.vars)
                    v <- gsub(var, paste("`\"", var, "\"`", sep = ""), v)
-               v <- gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)", "`\"\\2\"[\\3]`", v)
+               v <- gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)",
+                         "(`\"\\2\"[\\3]`)", v)
                v
            }))
 }
@@ -219,7 +220,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
         names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
-        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)\\[(\\d+)\\]\"([^`]|$)",
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)_avg\\[(\\d+)\\]\"([^`]|$)",
                             "\"\\2\"[\\3]", names(avgs))
     } else if (length(at) > 0) {
         at.mean <- TRUE
@@ -259,7 +260,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
                       rows[f$is.factor][i], 1:2],
             collapse = ".")
     }
-    rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
 
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
@@ -324,7 +325,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
         avgs <- .expand.avgs(avgs)
         names(avgs) <- gsub("_avg$", "", names(avgs))
         names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
-        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)\\[(\\d+)\\]\"([^`]|$)",
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)_avg\\[(\\d+)\\]\"([^`]|$)",
                             "\"\\2\"[\\3]", names(avgs))
         expr <- gsub("\\s", "",
                      paste(deparse(eval(parse(text = paste("substitute(",
@@ -371,7 +372,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
-    rows <- gsub("\"([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
                       row.names = rows, check.names = FALSE)
@@ -650,7 +651,8 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
             select.c,
             function(i) {
                 eval(parse(text = "with(avgs," %+%
-                           .sub.coefs(.dx(P, vars[i], is.ind[i], model.vars), coefs) %+% ")"))
+                           .sub.coefs(.dx(P, vars[i], is.ind[i],
+                                          model.vars), coefs) %+% ")"))
             }))
         mar <- mar * avgs[[sigma]] * (1 - avgs[[sigma]])
 
@@ -668,10 +670,11 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                      * avgs[[sigma]] * (1 - avgs[[sigma]]) +
                      eval(parse(
                          text = paste("with(avgs,",
-                         .sub.coefs(paste("(", s, ")*(",
-                                          .dj(P, j, model.vars), ")",
-                                          sep = ""), coefs), ")", sep = "")))
-                    * avgs[[sigma]] * (1 - avgs[[sigma]]) * (1 - 2*avgs[[sigma]]))
+                         .sub.coefs(
+                             paste("(", s, ")*(",
+                                   .dj(P, j, model.vars), ")",
+                                   sep = ""), coefs), ")", sep = "")))
+                     * avgs[[sigma]] * (1 - avgs[[sigma]]) * (1 - 2*avgs[[sigma]]))
                 })
             cnt <- cnt + 1
         }
