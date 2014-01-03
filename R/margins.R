@@ -201,10 +201,10 @@ Vars <- function(model)
 margins.lm.madlib <- function(model, dydx = ~ Vars(model),
                               newdata = model$data,
                               at.mean = FALSE, factor.continuous = FALSE,
-                              at = list(),
+                              ## at = list(),
                               na.action = NULL, ...)
 {
-    stopifnot(inherits(at, "list"))
+    ## stopifnot(inherits(at, "list"))
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
@@ -222,10 +222,14 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
         names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
         names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*)_avg\\[(\\d+)\\]\"([^`]|$)",
                             "\"\\2\"[\\3]", names(avgs))
-    } else if (length(at) > 0) {
-        at.mean <- TRUE
-        avgs <- at
-        names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
+    ## } else if (length(at) > 0) {
+    ##     at.mean <- TRUE
+    ##     avgs <- at
+    ##     for (i in seq_len(length(at))) {
+    ##         if (! names(at)[i] %in% names(newdata) &&
+    ##             ! names(at)[i] %in% f$factors[,3])
+    ##     }
+    ##     names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
     } else 
         avgs <- NULL
     
@@ -274,7 +278,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
 margins.lm.madlib.grps <- function(model, dydx = ~ Vars(model),
                                    newdata = lapply(model, function(x) x$data),
                                    at.mean = FALSE, factor.continuous = FALSE,
-                                   at = list(),
+                                   ## at = list(),
                                    na.action = NULL, ...)
 {
     if (length(newdata) == 1) 
@@ -294,10 +298,10 @@ margins.lm.madlib.grps <- function(model, dydx = ~ Vars(model),
 margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                    newdata = model$data,
                                    at.mean = FALSE, factor.continuous = FALSE,
-                                   at = list(),
+                                   ## at = list(),
                                    na.action = NULL, ...)
 {
-    stopifnot(inherits(at, "list"))
+    ## stopifnot(inherits(at, "list"))
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
@@ -332,10 +336,10 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                               expr, ", avgs)", sep = "")))),
                            collapse = ""))
         avgs[[sigma.name]] <- eval(parse(text = expr))
-    } else if (length(at) > 0) {
-        at.mean <- TRUE
-        avgs <- at
-        names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
+    ## } else if (length(at) > 0) {
+    ##     at.mean <- TRUE
+    ##     avgs <- at
+    ##     names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
     }else {
         newdata[[sigma.name]] <- .with.data(newdata, expr)
         newdata <- as.db.Rview(newdata)
@@ -394,7 +398,7 @@ print.margins <- function(x,
 margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                                         newdata = lapply(model, function(x) x$data),
                                         at.mean = FALSE, factor.continuous = FALSE,
-                                        at = list(),
+                                        ## at = list(),
                                         na.action = NULL, ...)
 {
     if (length(newdata) == 1) 
