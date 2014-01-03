@@ -205,6 +205,11 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
                               na.action = NULL, ...)
 {
     ## stopifnot(inherits(at, "list"))
+
+    if (!is.null(na.action)) {
+        newdata <- na.action(newdata, vars = Vars(model))
+    }
+    
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
@@ -302,6 +307,11 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                    na.action = NULL, ...)
 {
     ## stopifnot(inherits(at, "list"))
+
+    if (!is.null(na.action)) {
+        newdata <- na.action(newdata, vars = Vars(model))
+    }
+    
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
