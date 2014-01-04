@@ -180,7 +180,7 @@ Vars <- function(model)
     model.vars <- .add.quotes(gsub("`", "", model.vars), mvars)
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
-    names(model.vars) <- paste("\"var.", seq_len(n), "\"", sep = "")
+    names(model.vars) <- paste("\"term.", seq_len(n), "\"", sep = "")
 
     if (any(! (gsub("\"", "", gsub("`", "", expand.vars)) %in%
                c(gsub("\"", "", gsub("`", "", names(model.vars))),
@@ -217,10 +217,10 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 + " %+% paste("b", 2:n, "*(`\"var.", (2:n)-1, "\"`)",
+        P <- "b1 + " %+% paste("b", 2:n, "*(`\"term.", (2:n)-1, "\"`)",
                                collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*(`\"var.", 1:n, "\"`)", collapse="+", sep = "")
+        P <- paste("b", 1:n, "*(`\"term.", 1:n, "\"`)", collapse="+", sep = "")
     if (at.mean) {
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
@@ -319,10 +319,10 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     f <- .parse.margins.vars(model, newdata, vars)
     n <- length(model$coef)
     if (model$has.intercept)
-        P <- "b1 +" %+% paste("b", 2:n, "*(`\"var.", (2:n)-1, "\"`)",
+        P <- "b1 +" %+% paste("b", 2:n, "*(`\"term.", (2:n)-1, "\"`)",
                                   collapse="+", sep = "")
     else
-        P <- paste("b", 1:n, "*(`\"var.", 1:n, "\"`)", collapse="+", sep = "")
+        P <- paste("b", 1:n, "*(`\"term.", 1:n, "\"`)", collapse="+", sep = "")
     sigma <- paste("1/(1+exp(-(", P, ")))")
     sigma.name <- gsub("__", "", .unique.string())
 

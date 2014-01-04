@@ -10,7 +10,7 @@
   according to the values of the grouping columns. The requested regression
   method is applied onto each group,  which has fixed values of the grouping
   columns. Multinomial logistic regression is not implemented
-  yet. Categorial variables are supported. The
+  yet. Categorical variables are supported. The
   computation is parallelized by MADlib if the connected database is
   Greenplum database. The regression computation can also be done on a
   column that is an array in the data table.
@@ -191,7 +191,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
     we are dealing with the factor variables, where the dummy variable
     names can be very long due to the inserting of a random string to
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
-    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorial variables, but do not contain any important information.
+    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorical variables, but do not contain any important information.
   }
 
   \item{model}{
@@ -257,7 +257,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
   \code{\link{madlib.summary}}, \code{\link{madlib.arima}} are MADlib
   wrapper functions.
 
-  \code{\link{as.factor}} creates categorial variables for fitiing.
+  \code{\link{as.factor}} creates categorical variables for fitiing.
 
   \code{\link{delete}} safely deletes the result of this function.
 }

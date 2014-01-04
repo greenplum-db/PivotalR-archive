@@ -150,4 +150,4 @@ export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
        "margins.logregr.madlib", "margins.logregr.madlib.grps",
        "print.margins")
 
-export("Vars", "Terms")
+export("Vars")

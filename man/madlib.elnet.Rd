@@ -210,7 +210,7 @@ All parameters have been explained above. The only one left is \code{verbose}.
     we are dealing with the factor variables, where the dummy variable
     names can be very long due to the inserting of a random string to
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
-    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorial variables, but do not contain any important information.
+    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorical variables, but do not contain any important information.
   }
 }
 

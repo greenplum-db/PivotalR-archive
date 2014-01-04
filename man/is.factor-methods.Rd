@@ -3,11 +3,11 @@
 \alias{is.factor,db.obj-method}
 
 \title{ Detect whether a \code{\linkS4class{db.obj}} object is a
-  categorial object }
+  categorical object }
 
 \description{
   This function detects whether a \code{\linkS4class{db.obj}} object is a
-  categorial object. 
+  categorical object. 
 }
 
 \usage{
@@ -22,7 +22,7 @@
 
 \value{
   A logical value. When all columns of \code{\linkS4class{db.obj}} are
-  categorial variables, this function returns \code{TRUE}.
+  categorical variables, this function returns \code{TRUE}.
 }
 
 \author{
@@ -33,7 +33,7 @@
 
 \seealso{
   \code{\link{as.factor,db.obj-method}} converts a column
-  \code{\linkS4class{db.obj}} of into categorial variables.
+  \code{\linkS4class{db.obj}} of into categorical variables.
 }
 
 \examples{
@@ -43,7 +43,7 @@
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone") # use default connection 1
 
-## set sex to be a categorial variable
+## set sex to be a categorical variable
 x$sex <- as.factor(x$sex)
 
 is.factor(x$sex)

@@ -6,14 +6,13 @@
 \alias{margins.logregr.madlib.grps}
 \alias{print.margins}
 \alias{Vars}
-\alias{Terms}
 
 \title{
 Compute the marginal effects of regression models
 }
 
 \description{
-  
+  \code{margins} calculates the marginal effects of the variables given the result of regressions (\code{\link{madlib.lm}}, \code{\link{madlib.glm}} etc). \code{Vars} lists all the variables used in the regression model. \code{Vars} is only used in \code{margins}.
 }
 
 \usage{
@@ -28,48 +27,50 @@ Compute the marginal effects of regression models
 \method{print}{margins}(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 Vars(model)
-
-Terms(term = NULL)
 }
 
 \arguments{
   \item{model}{
-
+    The result of \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, which represents a regression model for the training data.
 }
   \item{dydx}{
-
+    A formula, and the default is \code{~ Vars(model)}, which tells the function to compute the marginal effects for all the variables that appear in the model. \code{~ .} will compute the marginal effects of all variables in \code{newdata}.
 }
   \item{newdata}{
-
+    A \code{\linkS4class{db.obj}} object, which represents the data in the database. The default is the data used to train the regression model, but the user can freely use other data sets.
 }
   \item{at.mean}{
-
+    A logical, the default is \code{FALSE}. Whether to compute the marginal effects at the mean values of the variables.
 }
   \item{factor.continuous}{
-
+    A logical, the default is \code{FALSE}. Whether to compute the marginal effects of factors by treating them as continuous variables. See "details" for more explanation.
 }
   \item{na.action}{
-
+        A string which indicates what should happen when the data
+        contain \code{NA}s. Possible
+        values include \code{\link{na.omit}}, \code{"na.exclude"},              \code{"na.fail"}
+  and \code{NULL}. Right now, \code{\link{na.omit,db.obj-method}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed, and see \code{\link{na.omit,db.obj-method}} for the preferred function interface.
 }
   \item{\dots}{
-
+    Other arguments, not implemented.
   }
 
   \item{x}{
-
+    The result of \code{margins} function, which is of the class "margins".
   }
 
   \item{digits}{
-
-  }
-
-  \item{term}{
-
+            A non-null value for `digits' specifies the minimum number of
+          significant digits to be printed in values.  The default,
+          `NULL', uses `getOption("digits")'.  (For the interpretation
+          for complex numbers see \code{signif}.)  Non-integer values will
+          be rounded down, and only values greater than or equal to 1
+          and no greater than 22 are accepted.
   }
 }
 
 \details{
-
+  For a continuous variable, its marginal effects is just the first derivative of the response function with respect to the variable. For a categorical variable, it is usually more meaningful to compute the finite difference of the response function for the variable being 1 and 0. The finite difference marginal effect represents the 
 }
 
 \value{
