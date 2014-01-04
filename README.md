@@ -29,7 +29,8 @@ To install PivotalR:
   ```r
   install.packages("gopivotal-PivotalR-xxxx.tar.gz", repos = NULL, type = "source")
   ```
-
+  where "gopivotal-PivotalR-xxxx.tar.gz" is the name of the package.
+  
 To get started:
 
 * [Read the wiki](https://github.com/gopivotal/PivotalR/wiki)
