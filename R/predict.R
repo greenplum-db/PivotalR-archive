@@ -41,6 +41,8 @@ predict.logregr.madlib.grps <- function (object, newdata,
     }
 }
 
+## ----------------------------------------------------------------------
+
 ## predict probability only for binomial models
 .predict.prob <- function(object, newdata)
 {
@@ -62,9 +64,10 @@ predict.logregr.madlib.grps <- function (object, newdata,
     func.str <- paste(madlib, ".", "elastic_net_binomial_prob", sep = "")
 
     if (!is(newdata, "db.data.frame"))
-        ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
-                                           names(newdata),
-                                           newdata@.expr)
+        ## ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
+        ##                                    names(newdata),
+        ##                                    newdata@.expr)
+        ind.vars <- .replace.col.with.expr1(object[[1]]$ind.vars, newdata)
     else
         ind.vars <- object[[1]]$ind.vars
     ind.str <- paste("array[", paste(ind.vars, collapse = ","), "]", sep = "")
@@ -85,20 +88,23 @@ predict.logregr.madlib.grps <- function (object, newdata,
         expr <- "case when "
         n <- length(object)
         for (i in seq_len(n)) {
-            tmp <- ""
-            for (j in seq_len(l)) {
-                ## tmp <- paste(tmp, object[[i]]$grp.expr[j], " = '",
-                ##              object[[i]][[object[[i]]$grp.cols[j]]],
-                ##              "'::",
-                ##              newdata@.col.data_type[which(
-                ##                  names(newdata) == object[[i]]$grp.cols[j])],
-                ##              sep = "")
-                tmp <- object[[i]]$data@.where
-                if (j != l) tmp <- paste(tmp, " and ", sep = "")
-            }
+            ## tmp <- ""
+            ## for (j in seq_len(l)) {
+            ##     ## tmp <- paste(tmp, object[[i]]$grp.expr[j], " = '",
+            ##     ##              object[[i]][[object[[i]]$grp.cols[j]]],
+            ##     ##              "'::",
+            ##     ##              newdata@.col.data_type[which(
+            ##     ##                  names(newdata) == object[[i]]$grp.cols[j])],
+            ##     ##              sep = "")
+            ##     tmp <- object[[i]]$data@.where
+            ##     if (j != l) tmp <- paste(tmp, " and ", sep = "")
+            ## }
+            tmp <- object[[i]]$data@.where
             if (!is(newdata, "db.data.frame"))
-                tmp <- .replace.col.with.expr(tmp, names(newdata),
-                                              newdata@.expr)
+                ## tmp <- .replace.col.with.expr(tmp, names(newdata),
+                ##                               newdata@.expr)
+                tmp <- .replace.col.with.expr1(gsub(" = ", " == ", tmp),
+                                               newdata)
             expr <- paste(expr, tmp, " then ", sep = "")
 
             if (object[[i]]$has.intercept) {
@@ -174,9 +180,10 @@ predict.logregr.madlib.grps <- function (object, newdata,
     parent <- strs$parent
 
     if (!is(newdata, "db.data.frame"))
-        ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
-                                           names(newdata),
-                                           newdata@.expr)
+        ## ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
+        ##                                    names(newdata),
+        ##                                    newdata@.expr)
+        ind.vars <- .replace.col.with.expr1(object[[1]]$ind.vars, newdata)
     else
         ind.vars <- object[[1]]$ind.vars
     if (db.str != "HAWQ") {
@@ -220,19 +227,22 @@ predict.logregr.madlib.grps <- function (object, newdata,
         n <- length(object)
         for (i in seq_len(n)) {
             tmp <- ""
-            for (j in seq_len(l)) {
-                ## tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
-                ##              object[[i]][[object[[i]]$grp.cols[j]]],
-                ##              "'::",
-                ##              newdata@.col.data_type[which(
-                ##                  names(newdata) == object[[i]]$grp.cols[j])],
-                ##              sep = "")
-                tmp <- object[[i]]$data@.where
-                if (j != l) tmp <- paste(tmp, " and ", sep = "")
-            }
+            ## for (j in seq_len(l)) {
+            ##     ## tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
+            ##     ##              object[[i]][[object[[i]]$grp.cols[j]]],
+            ##     ##              "'::",
+            ##     ##              newdata@.col.data_type[which(
+            ##     ##                  names(newdata) == object[[i]]$grp.cols[j])],
+            ##     ##              sep = "")
+            ##     tmp <- object[[i]]$data@.where
+            ##     if (j != l) tmp <- paste(tmp, " and ", sep = "")
+            ## }
+            tmp <- object[[i]]$data@.where
             if (!is(newdata, "db.data.frame"))
-                tmp <- .replace.col.with.expr(tmp, names(newdata),
-                                              newdata@.expr)
+                ## tmp <- .replace.col.with.expr(tmp, names(newdata),
+                ##                               newdata@.expr)
+                tmp <- .replace.col.with.expr1(gsub(" = ", " == ", tmp),
+                                               newdata)
             expr <- paste(expr, tmp, " then ", sep = "")
         
             if (db.str != "HAWQ") {
@@ -313,3 +323,19 @@ predict.logregr.madlib.grps <- function (object, newdata,
     str
 }
 
+## ----------------------------------------------------------------------
+
+.replace.col.with.expr1 <- function(str, data)
+{
+    vars <- gsub("::[\\w\\s]+", "", str, perl = T)
+    vars <- gsub("\"", "`", vars)
+    ## vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`(\\1)[\\2]`", vars)
+    vars <- gsub("\\s", "", vars)
+    vars <- .reverse.consistent.func(vars)
+    as.vector(sapply(
+        vars,
+        function(s) {
+            r <- eval(parse(text = paste("with(data, ", s, ")", sep = "")))
+            r@.expr
+        }))
+}
