@@ -1,8 +1,8 @@
 ## Implement marginal effects
 
-margins <- function (model, vars = ~., at.mean = FALSE,
-                     factor.continuous = FALSE, na.action = NULL,
-                     ...)
+margins <- function (model, dydx = ~ Vars(model), newdata = model$data,
+                     at.mean = FALSE, factor.continuous = FALSE,
+                     na.action = NULL, ...)
     UseMethod("margins", model)
 
 ## ----------------------------------------------------------------------
@@ -20,10 +20,10 @@ margins <- function (model, vars = ~., at.mean = FALSE,
 ## ----------------------------------------------------------------------
 
 ## list the independent variables indices
-Terms <- function(x = NULL)
+Terms <- function(term = NULL)
 {
-    if (is.null(x)) x
-    else as.integer(x)
+    if (is.null(term)) term
+    else as.integer(term)
 }
 
 ## ----------------------------------------------------------------------
