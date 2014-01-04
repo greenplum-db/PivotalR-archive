@@ -9,11 +9,12 @@
 \alias{$<-,db.obj,db.Rquery-method}
 \alias{$<-,db.obj,logical-method}
 \alias{[,db.obj,ANY,ANY,ANY-method}
-\alias{[<-,db.obj,ANY,ANY,character-method}
-\alias{[<-,db.obj,ANY,ANY,integer-method}
-\alias{[<-,db.obj,ANY,ANY,numeric-method}
-\alias{[<-,db.obj,ANY,ANY,db.Rquery-method}
-\alias{[<-,db.obj,ANY,ANY,logical-method}
+%% \alias{[<-,db.obj,ANY,ANY,character-method}
+%% \alias{[<-,db.obj,ANY,ANY,integer-method}
+%% \alias{[<-,db.obj,ANY,ANY,numeric-method}
+%% \alias{[<-,db.obj,ANY,ANY,db.Rquery-method}
+%% \alias{[<-,db.obj,ANY,ANY,logical-method}
+\alias{[<-.db.obj}
 \alias{[[,db.obj-method}
 \alias{[[<-,db.obj,ANY,ANY,character-method}
 \alias{[[<-,db.obj,ANY,ANY,integer-method}
@@ -42,12 +43,7 @@
 \S4method{[[}{db.obj,ANY,ANY,numeric}(x, i, j) <- value
 \S4method{[[}{db.obj,ANY,ANY,logical}(x, i, j) <- value
 \S4method{[[}{db.obj,ANY,ANY,db.Rquery}(x, i, j) <- value
-\S4method{[}{db.obj,ANY,ANY,character}(x, i, j) <- value
-\S4method{[}{db.obj,ANY,ANY,integer}(x, i, j) <- value
-\S4method{[}{db.obj,ANY,ANY,numeric}(x, i, j) <- value
-\S4method{[}{db.obj,ANY,ANY,logical}(x, i, j) <- value
-\S4method{[}{db.obj,ANY,ANY,db.Rquery}(x, i, j) <- value
-
+\method{[}{db.obj}(x, i, j) <- value
 %% x$name
 %% x[[i, j, ...]]
 %% x[i, j, ..., drop = TRUE]
