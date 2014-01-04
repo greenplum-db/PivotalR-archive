@@ -8,7 +8,7 @@
 \alias{Vars}
 
 \title{
-Compute the marginal effects of regression models
+  Compute the marginal effects of regression models
 }
 
 \description{
@@ -34,7 +34,7 @@ Vars(model)
     The result of \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, which represents a regression model for the training data.
 }
   \item{dydx}{
-    A formula, and the default is \code{~ Vars(model)}, which tells the function to compute the marginal effects for all the variables that appear in the model. \code{~ .} will compute the marginal effects of all variables in \code{newdata}.
+    A formula, and the default is \code{~ Vars(model)}, which tells the function to compute the marginal effects for all the variables that appear in the model. \code{~ .} will compute the marginal effects of all variables in \code{newdata}. Use the normal formula to specify which variables' marginal effects are to be computed.
 }
   \item{newdata}{
     A \code{\linkS4class{db.obj}} object, which represents the data in the database. The default is the data used to train the regression model, but the user can freely use other data sets.
@@ -70,37 +70,69 @@ Vars(model)
 }
 
 \details{
-  For a continuous variable, its marginal effects is just the first derivative of the response function with respect to the variable. For a categorical variable, it is usually more meaningful to compute the finite difference of the response function for the variable being 1 and 0. The finite difference marginal effect represents the 
+  For a continuous variable, its marginal effects is just the first derivative of the response function with respect to the variable. For a categorical variable, it is usually more meaningful to compute the finite difference of the response function for the variable being 1 and 0. The finite difference marginal effect measures how much more the response function would be compared with the reference category. The reference category for a categorical variable can be changed by \code{\link{relevel}}.
 }
 
 \value{
+  \code{margins} function returns a \code{margins} object, which is a   \code{data.frame}. It contains the following item:
+\item{Estimate}{
+  The marginal effect values for all variable that have been specified in \code{dydx}.
+}
 
+\item{Std. Error}{
+  The standard errors for the marginal effects.
+}
+
+\item{t value, z value}{
+  The t statistics (for linear regression) or z statistics (for logistic regression).
+}
+
+\item{Pr(>|t|), Pr(>|z|)}{
+  The corresponding p values.
+}
+
+\code{Vars} returns a vector of strings, which are the variable names that have been used in the regression model.
 }
 
 \references{
-
+[1] Stata 13 help for margins, \url{http://www.stata.com/help.cgi?margins}
 }
 
 \author{
+  Author: Predictive Analytics Team at Pivotal Inc.
 
-}
-
-\note{
-
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
+  \code{\link{relevel}} changes the reference category.
 
+  \code{\link{madlib.lm}}, \code{\link{madlib.glm}} compute linear and logistic regressions.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+## create a data table in database and the R wrapper
+dat <- as.db.data.frame(abalone, "abalone")
 
-## The function is currently defined as
-function (model, dydx = ~Vars(model), newdata = model$data, at.mean = FALSE, 
-    factor.continuous = FALSE, na.action = NULL, ...) 
-UseMethod("margins", model)
+fit <- madlib.lm(rings ~ length + diameter*sex, data = x)
+margins(fit)
+margins(fit, at.mean = TRUE)
+margins(fit, factor.continuous = TRUE)
+
+fit <- madlib.glm(rings < 10 ~ length + diameter*sex, data = x, family = "logistic")
+margins(fit, ~ length + sex)
+margins(fit, ~ length + sex.M, at.mean = TRUE)
+margins(fit, ~ length + sex.I, factor.continuous = TRUE)
+
+## create a data table that has two columns
+## one of them is an array column
+dat1 <- cbind(db.array(dat[,-c(1,2,10)]), dat[,10])
+names(dat1) <- c("x", "y")
+dat1 <- as.db.data.frame(dat1, "abalone_array")
+
+fit <- madlib.glm(y < 10 ~ x[-1], data = dat1, family = "logistic")
+margins(fit, ~ x[2:5])
+}
 }
 
 \keyword{stats}

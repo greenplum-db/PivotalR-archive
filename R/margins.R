@@ -94,7 +94,7 @@ Vars <- function(model)
     
     is.ind <- rep(FALSE, length(f.vars))
     if (length(select.ind) != 0) {
-        f.vars <- c(f.vars, paste("var.", select.ind, sep = ""))
+        f.vars <- c(f.vars, paste("term.", select.ind, sep = ""))
         is.ind <- c(is.ind, rep(TRUE, length(select.ind)))
     }
     
@@ -115,7 +115,8 @@ Vars <- function(model)
             idx <- gsub("[^\\[\\]]*\\[([^\\[\\]]*)\\]", "\\1", var,
                         perl = TRUE)
             idx <- eval(parse(text = idx))
-            expand.vars <- c(expand.vars, paste("`", x.str, "[", idx, "]`", sep = ""))
+            expand.vars <- c(expand.vars, paste("`\"", .strip(x.str, "\""),
+                                                "\"[", idx, "]`", sep = ""))
             expand.is.ind <- c(expand.is.ind, rep(is.ind[i], length(idx)))
         } else {
             expand.vars <- c(expand.vars, f.vars[i])
@@ -153,11 +154,14 @@ Vars <- function(model)
                     if (expand.vars[i] %in% factors[,1]) {
                         k <- which(factors[,1] == expand.vars[i])
                         remove[i] <- TRUE
-                        append <- c(append, factors[k,3])
+                        append <- c(append, gsub("\"", "",
+                                                 gsub("`", "", factors[k,3])))
                     } else { 
                         is.factor[i] <- TRUE
-                        expand.vars[i] <- factors[existing.factors ==
-                                                  expand.vars[i],3]
+                        expand.vars[i] <- gsub(
+                            "\"", "",
+                            gsub("`", "",factors[existing.factors ==
+                                                 expand.vars[i],3]))
                     }
                 }
             } else {
@@ -168,8 +172,10 @@ Vars <- function(model)
         if (!identical(append, character(0))) {
             expand.vars <- expand.vars[!remove]
             is.factor <- is.factor[!remove]
+            expand.is.ind <- expand.is.ind[!remove]
             expand.vars <- c(expand.vars, append)
             is.factor <- c(is.factor, rep(TRUE, length(append)))
+            expand.is.ind <- c(expand.is.ind, rep(FALSE, length(append)))
         }
     }
 
@@ -350,7 +356,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     ##     at.mean <- TRUE
     ##     avgs <- at
     ##     names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
-    }else {
+    } else {
         newdata[[sigma.name]] <- .with.data(newdata, expr)
         newdata <- as.db.Rview(newdata)
     }
