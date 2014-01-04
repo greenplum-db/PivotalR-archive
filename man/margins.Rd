@@ -16,15 +16,24 @@
 }
 
 \usage{
-\method{margins}{lm.madlib}(model, dydx = ~Vars(model), newdata = model$data, at.mean = FALSE, factor.continuous = FALSE, na.action = NULL, ...)
+\method{margins}{lm.madlib}(model, dydx = ~Vars(model), newdata =
+model$data, at.mean = FALSE, factor.continuous = FALSE, na.action =
+NULL, ...)
 
-\method{margins}{lm.madlib.grps}(model, dydx = ~Vars(model), newdata = model$data, at.mean = FALSE, factor.continuous = FALSE, na.action = NULL, ...)
+\method{margins}{lm.madlib.grps}(model, dydx = ~Vars(model), newdata =
+lapply(model, function(x) x$data), at.mean = FALSE, factor.continuous =
+FALSE, na.action = NULL, ...)
 
-\method{margins}{logregr.madlib}(model, dydx = ~Vars(model), newdata = model$data, at.mean = FALSE, factor.continuous = FALSE, na.action = NULL, ...)
+\method{margins}{logregr.madlib}(model, dydx = ~Vars(model), newdata =
+model$data, at.mean = FALSE, factor.continuous = FALSE, na.action =
+NULL, ...)
 
-\method{margins}{logregr.madlib.grps}(model, dydx = ~Vars(model), newdata = model$data, at.mean = FALSE, factor.continuous = FALSE, na.action = NULL, ...)
+\method{margins}{logregr.madlib.grps}(model, dydx = ~Vars(model),
+newdata = lapply(model, function(x) x$data), at.mean = FALSE,
+factor.continuous = FALSE, na.action = NULL, ...)
 
-\method{print}{margins}(x, digits = max(3L, getOption("digits") - 3L), ...)
+\method{print}{margins}(x, digits = max(3L, getOption("digits") - 3L),
+...)
 
 Vars(model)
 }
