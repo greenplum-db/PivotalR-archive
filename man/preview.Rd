@@ -21,17 +21,17 @@
 \usage{
 preview(x, ..., drop = TRUE)
 
-\S4method{preview}{db.table}(x, nrows = 100, array = TRUE)
+\S4method{preview}{db.table}(x, nrows = 100, array = TRUE, drop = TRUE)
 
 \S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE,
-array = TRUE)
+array = TRUE, drop = TRUE)
 
 \S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE,
-array = TRUE)
+array = TRUE, drop = TRUE)
 
-\S4method{preview}{db.Rcrossprod}(x, nrows = 100, interactive = FALSE)
+\S4method{preview}{db.Rcrossprod}(x, nrows = 100, interactive = FALSE, drop = TRUE)
 
-\S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE)
+\S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE, drop = TRUE)
 
 lookat(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
