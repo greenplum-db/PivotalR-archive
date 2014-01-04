@@ -68,8 +68,8 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   \code{w}. 
 
   Both the linear regression (this function) and the logistic regression
-  (\code{\link{madlib.glm}}) support categorial variables. Use
-  \code{\link{as.factor,db.obj-method}} to denote that a variable is categorial, and
+  (\code{\link{madlib.glm}}) support categorical variables. Use
+  \code{\link{as.factor,db.obj-method}} to denote that a variable is categorical, and
   the corresponding dummy variables are created and fitted. See
   \code{\link{as.factor,db.obj-method}} for more.
 }
@@ -171,7 +171,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
     we are dealing with the factor variables, where the dummy variable
     names can be very long due to the inserting of a random string to
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
-    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorial variables, but do not contain any important information.
+    for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorical variables, but do not contain any important information.
   }
 
   \item{model}{
@@ -223,7 +223,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   \code{\link{madlib.summary}}, \code{\link{madlib.arima}} are MADlib
   wrapper functions.
 
-  \code{\link{as.factor}} creates categorial variables for fitiing.
+  \code{\link{as.factor}} creates categorical variables for fitiing.
 
   \code{\link{delete}} safely deletes the result of this function.
 }

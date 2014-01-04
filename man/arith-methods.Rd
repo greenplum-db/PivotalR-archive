@@ -4,6 +4,7 @@
 \alias{+,db.obj,db.obj-method}
 \alias{+,db.obj,numeric-method}
 \alias{+,numeric,db.obj-method}
+\alias{-,db.obj,ANY-method}
 \alias{-,db.obj,db.obj-method}
 \alias{-,db.obj,numeric-method}
 \alias{-,numeric,db.obj-method}
@@ -33,6 +34,7 @@
 \usage{
 \S4method{+}{db.obj,db.obj}(e1, e2)
 \S4method{-}{db.obj,db.obj}(e1, e2)
+\S4method{-}{db.obj,ANY}(e1, e2)
 \S4method{*}{db.obj,db.obj}(e1, e2)
 \S4method{/}{db.obj,db.obj}(e1, e2)
 \S4method{\%\%}{db.obj,db.obj}(e1, e2)

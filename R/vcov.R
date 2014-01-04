@@ -16,8 +16,12 @@
     }
     ## res <- Reduce(cbind2, eval(parse(text = "with(x, c(" %+%
     ##                                 ("," %.% object$ind.vars) %+% "))")))
+    model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
+    model.vars <- gsub("\"", "`", model.vars)
+    model.vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     res <- .combine.list(eval(parse(text = "with(x, c(" %+% (","
-                                    %.% object$ind.vars) %+% "))")))
+                                    %.% model.vars) %+% "))")))
     if (object$has.intercept) {
         z <- res
         intercept <- .unique.string()
@@ -41,11 +45,15 @@ vcov.lm.madlib <- function(object, ...)
     xx@.is.symmetric <- TRUE; xx <- solve(lk(xx))
     delete(compute)
     res <- mn * xx    
-    
+
+    model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
+    model.vars <- gsub("\"", "`", model.vars)
+    model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     if (object$has.intercept)
-        rows <- c("(Intercept)", object$ind.vars)
+        rows <- c("(Intercept)", model.vars)
     else
-        rows <- object$ind.vars
+        rows <- model.vars
     for (i in seq_len(length(object$col.name))) 
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
@@ -69,10 +77,14 @@ vcov.logregr.madlib <- function(object, ...)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
     xx <- solve(lk(crossprod(x, a*x)))
 
+    model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
+    model.vars <- gsub("\"", "`", model.vars)
+    model.vars <- gsub("\\(`(.*)`\\)\\[(\\d+)\\]", "\\1[\\2]", model.vars)
+    model.vars <- .reverse.consistent.func(model.vars)
     if (object$has.intercept)
-        rows <- c("(Intercept)", object$ind.vars)
+        rows <- c("(Intercept)", model.vars)
     else
-        rows <- object$ind.vars
+        rows <- model.vars
     for (i in seq_len(length(object$col.name))) 
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)

@@ -129,8 +129,10 @@ setMethod (
 
         ## if (array) x <- .expand.array(x)
 
-        res <- .db.getQuery(paste(content(x), .limit.str(nrows),
-                                  sep = ""), conn.id(x))
+        ## res <- .db.getQuery(paste(content(x), .limit.str(nrows),
+        ##                           sep = ""), conn.id(x))
+        res <- db.q(content(x), .limit.str(nrows), conn.id = conn.id(x),
+                    verbose = FALSE, sep = "")
 
         .restore.warnings(warnings)
         for (i in seq_len(length(names(x)))) {
@@ -178,10 +180,15 @@ setMethod (
         ## more than 1500. So we have to use unnest to help to load a large array
         ## TODO: Create a separate array loading function to specifically deal
         ## with such situations and can be called by other functions.
-        res <- .db.getQuery(paste("select unnest(\"", names(x)[1],
-                                  "\") as v from (",
-                                  content(x),
-                                  .limit.str(nrows), ") s", sep = ""), conn.id(x))
+        ## res <- .db.getQuery(paste("select unnest(\"", names(x)[1],
+        ##                           "\") as v from (",
+        ##                           content(x),
+        ##                           .limit.str(nrows), ") s", sep = ""), conn.id(x))
+        res <- db.q("select unnest(\"", names(x)[1],
+                    "\") as v from (",
+                    content(x),
+                    .limit.str(nrows), ") s", sep = "",
+                    conn.id = conn.id(x), verbose = FALSE)
 
         n <- dim(x)[1]
         dims <- x@.dim

@@ -91,14 +91,17 @@
     }
 
     rst <- list(coef = coef, intercept = intercept)
-    rows <- gsub("\"", "", ind.vars)
+    rows <- gsub("\"", "", params$ind.vars)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
     for (i in seq_len(length(col.name))) 
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- iter
@@ -212,14 +215,17 @@
     intercept <- coef[n+1]
     coef <- coef[1:n]
     rst <- list(coef = coef, intercept = intercept)
-    rows <- gsub("\"", "", ind.vars)
+    rows <- gsub("\"", "", params$ind.vars)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
     for (i in seq_len(length(col.name))) 
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
     names(rst$intercept) <- "(Intercept)"
     rst$iter <- c(out.iter, inner.iter)

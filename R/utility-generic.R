@@ -216,15 +216,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     } else if (!is.na(f2)) {
         f2.terms <- terms(formula(paste("~", f2)))
         f2.labels <- attr(f2.terms, "term.labels")
-        ## inter <- intersect(f2.labels, names(fdata))
-        ## if (length(inter) != length(f2.labels))
-        ##     stop("The grouping part of the formula is not quite right!")
+
         ## ## grouping column do not use factor
         f2.labels <- gsub("I\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("as.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        ## f2.labels <- .replace.with.quotes(f2.labels, data@.col.name)
-        ## ## f2.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f2.labels)
+
         grp.expr <- f2.labels
         for (i in seq_len(length(f2.labels))) {
             if (! f2.labels[i] %in% names(data)) {
@@ -275,17 +272,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                                right.hand, perl = TRUE)
         }
     } else { # first pass
-        ## # make all text columns to be factor
-        ## for (i in seq_len(length(names(data)))) {
-        ##     if (data@.col.data_type[i] %in% .txt.types) {
-        ##         col <- data@.col.name[i]
-        ##         right.hand <- gsub(col,
-        ##                            paste0("as\\.factor\\(",
-        ##                                   col, "\\)"),
-        ##                            right.hand)
-        ##     }
-        ## }
-
         ## find all the factor columns
         right.hand <- gsub("as.factor\\s*\\((.*)\\)",
                            "factor(\\1)", right.hand, perl = T)
@@ -295,8 +281,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         col <- .strip(gsub("factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
                            perl = T))
         if (!all(col %in% names(data)))
-            stop("You can only make a existing column of",
-                 " the data into factor!")
+            stop("At least one of the variables cannot be set to be a factor ",
+                 "because either it does not exist in the data table ",
+                 "or it is an element of an array!")
 
         ## make sure the returned object is always db.Rquery
         for (i in seq_len(length(data@.col.name)))
@@ -369,16 +356,23 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ind.var <- .consistent.func(ind.var)
     labels <- .consistent.func(labels)
 
-    ##
-    ## dep.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", dep.var)
-    ## ind.var <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", ind.var)
-    ## grp <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", grp)
-    ## labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", labels)
     dep.var <- gsub("`", "", dep.var)
     ind.var <- gsub("`", "", ind.var)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
-    ##
+
+    if (!refresh) {
+        model.vars <- .prepare.ind.vars(orig.labels)
+        model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
+        vars <- unique(all.vars(parse(text = model.vars)))
+        for (var in vars) {
+            tmp <- eval(parse(text = paste("with(data, ", var, ")", sep = "")))
+            if (tmp@.col.data_type %in% c("boolean", .txt.types) &&
+                !tmp@.is.factor) {
+                data[[var]] <- as.factor(data[[var]])
+            }
+        }
+    }
 
     list(dep.str = dep.var, origin.dep = origin.dep,
          origin.ind = orig.labels,
@@ -400,6 +394,16 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     res <- gsub("log10\\s*\\(", "log(", res)
     ## res <- gsub("log2\\s*\\(", "log(2.,", res)
     ## res <- gsub("logb\\s*\\(()", "log(", res)
+    res
+}
+
+## ----------------------------------------------------------------------
+
+## reverse of the above function
+.reverse.consistent.func <- function (strs)
+{
+    res <- gsub("log\\s*\\(", "log10(", strs)
+    res <- gsub("ln\\s*\\(", "log(", res)
     res
 }
 
@@ -453,13 +457,29 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     old.level
 }
 
+## ----------------------------------------------------------------------
+
+.db.data.frame2db.Rquery <- function(x)
+{
+    if (is(x, "db.data.frame")) {
+        if (length(names(x)) == 1 && x@.col.data_type == "array") {
+            if (array)
+                x <- db.array(x)
+            else
+                x <- x[[names(x)]]
+        } else
+            x <- x[,]
+    }
+    x
+}
+
 ## -----------------------------------------------------------------------
 
 ## If an independent variable is an array, it needs special treatment
 .is.array <- function (labels, data)
 {
     nlabels <- character(0)
-    data <- data[,]
+    data <- .db.data.frame2db.Rquery(data)
     if (data@.parent == data@.source)
         tbl <- data@.parent
     else

@@ -2,12 +2,12 @@
 \alias{relevel,db.obj-method}
 \alias{as.factor,db.obj-method}
 
-\title{ Convert one column of a \code{\linkS4class{db.obj}} object into a categorial variable }
+\title{ Convert one column of a \code{\linkS4class{db.obj}} object into a categorical variable }
 
 \description{
-  Convert one column of a \code{db.obj} object into a categorial
+  Convert one column of a \code{db.obj} object into a categorical
   variable. When \code{\link{madlib.lm}} or \code{\link{madlib.glm}} are
-  applied onto a \code{db.obj} with categorial columns, dummy columns
+  applied onto a \code{db.obj} with categorical columns, dummy columns
   will be created and fitted. The reference level for regressions can be selected using \code{relevel}.
 }
 
@@ -32,7 +32,7 @@
 }
 
 \value{
-  A \code{db.Rquery} object. It has only one column which is categorial. By default, a reference level is automatically selected in regressions, which is usually the minimum of all levels, but one can easily change the reference level using \code{relevel}.
+  A \code{db.Rquery} object. It has only one column which is categorical. By default, a reference level is automatically selected in regressions, which is usually the minimum of all levels, but one can easily change the reference level using \code{relevel}.
 }
 
 \author{
@@ -43,10 +43,10 @@
 
 \seealso{
   \code{\link{madlib.lm}} and \code{\link{madlib.glm}} can fit
-  categorial variables
+  categorical variables
 
   When \code{\link{as.db.data.frame}} creates a table/view, it can create dummy variables for a
-  categorial variable.
+  categorical variable.
 }
 
 \examples{
@@ -59,7 +59,7 @@ help("as.factor,db.obj-method")
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone") # use default connection 1
 
-## set sex to be a categorial variable
+## set sex to be a categorical variable
 x$sex <- as.factor(x$sex)
 
 fit1 <- madlib.lm(rings ~ . - id, data = x) # linear regression

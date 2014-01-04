@@ -171,10 +171,20 @@ clean.madlib.temp <- function(conn.id = 1)
     lst0 <- deparse(x)
     lst0 <- lst0[2:(length(lst0)-1)]
     lst <- character(0)
+    ignore <- FALSE
     for (i in 1:length(lst0)) {
-        if (grepl("value", lst0[i]) ||
-            grepl("array", lst0[i]) ||
-            grepl("attr", lst0[i])) next
+        if (grepl("\\.value <- ", lst0[i]) ||
+            grepl("\\.grad <- ", lst0[i]) ||
+            grepl("attr\\(\\.value,", lst0[i])) {
+            ignore <- TRUE
+            next
+        }
+        if (ignore) {
+            if (!grepl("<-", lst0[i]))
+                next
+            else
+                ignore <- FALSE
+        }
         if (grepl("<-", lst0[i])) {
             lst <- c(lst, lst0[i])
         } else {
@@ -186,20 +196,23 @@ clean.madlib.temp <- function(conn.id = 1)
     env <- lapply(lst, function(x) eval(parse(
         text = paste("quote(", strsplit(x, "\\s*<-\\s*")[[1]][2],
         ")", sep = ""))))
+
     names(env) <- sapply(lst, function(x)
                          gsub("^\\s*", "",
                               strsplit(x, "\\s*<-\\s*")[[1]][1]))
-    res <- ""
-    k <- which(names(env) == paste(".grad[, \"", var, "\"]",
-                    sep = ""))
 
-    while (env[[k]] != res) {
-        res <- env[[k]]
+    k <- which(names(env) == paste(".grad[, \"", gsub("\"", "\\\\\\\"", var),
+                    "\"]", sep = ""))
+    pre.res <- ""
+    res <- env[[k]]
+    while (!identical(pre.res, res)) {
         for (i in 1:length(env))
             env[[i]] <- eval(parse(text = paste("substitute(",
                                    paste(deparse(env[[i]]),
                                          collapse = " "),
                                    ", env)", sep = "")))
+        pre.res <- res
+        res <- env[[k]]
     }
     gsub("\\s+", " ", paste(deparse(res), collapse = " "))
 }

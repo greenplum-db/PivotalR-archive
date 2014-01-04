@@ -96,7 +96,10 @@ madlib.elnet <- function (formula, data,
                  control$control.str, "', NULL, ", control$max.iter, ", ",
                  control$tolerance, ")", sep = "")
 
-    res <- .get.res(sql, tbl.output, conn.id)
+    ## res <- .get.res(sql, tbl.output, conn.id)
+    res <- db.q(sql, conn.id=conn.id, verbose = FALSE)
+    res <- db.q("select * from", tbl.output, conn.id=conn.id, verbose=FALSE,
+                sep = " ")
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
@@ -107,13 +110,16 @@ madlib.elnet <- function (formula, data,
     rst$coef <- as.vector(arraydb.to.arrayr(res$coef_all, "double"))
 
     rows <- gsub("\"", "", params$ind.vars)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     rst$ind.vars <- params$ind.vars
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
     for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
 
     rst$intercept <- res$intercept
@@ -302,9 +308,14 @@ predict.elnet.madlib <- function (object, newdata,
     }
 
     if (!is(newdata, "db.data.frame"))
-        ind.str <- .replace.col.with.expr(object$ind.str,
-                                          names(newdata),
-                                          newdata@.expr)
+        ## ind.str <- .replace.col.with.expr(object$ind.str,
+        ##                                   names(newdata),
+        ##                                   newdata@.expr)
+        ind.str <- paste(
+            "array[",
+            paste(.replace.col.with.expr1(object$ind.vars, newdata),
+                  collapse = ", "),
+            "]", sep = "")
     else
         ind.str <- object$ind.str
 
@@ -313,7 +324,7 @@ predict.elnet.madlib <- function (object, newdata,
             coef.str <- "array[" %+% ("," %.% object$coef) %+% "]"
         else
             coef.str <- paste("(select ", madlib,
-                              ".array_scalar_mult(coeff_all, ",
+                              ".array_scalar_mult(coef_all, ",
                               object$y.scl, "::double precision) from ",
                               content(object$model), ")", sep = "")
         expr <- paste(madlib, ".elastic_net_gaussian_predict(",

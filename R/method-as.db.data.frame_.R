@@ -266,7 +266,7 @@ setMethod (
                                      " then 1 else 0 end)", sep = "")
                         extra <- paste(extra, " ", dex, " as ",
                                        "\"", new.col, "\"", sep = "")
-                        appear <- c(appear, paste(x@.col.name[i],":",
+                        appear <- c(appear, paste(x@.col.name[i],".",
                                                   distinct[j], sep = ""))
                         dummy <- c(dummy, new.col)
                         dummy.expr <- c(dummy.expr, dex)

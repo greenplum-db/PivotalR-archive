@@ -140,6 +140,7 @@ madlib.glm <- function (formula, data,
     r.has.intercept <- params$has.intercept # do we have an intercept
     ## r.ind.vars <- gsub("\"", "", params$ind.vars)
     r.ind.vars <- params$ind.vars
+    r.origin.ind <- params$origin.ind
     r.col.name <- gsub("\"", "", data@.col.name)
     r.appear <- data@.appear.name
     r.call <- call # the current function call itself
@@ -159,6 +160,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$grp.expr <- r.grp.expr
         rst[[i]]$has.intercept <- r.has.intercept
         rst[[i]]$ind.vars <- r.ind.vars
+        rst[[i]]$origin.ind <- r.origin.ind
         rst[[i]]$ind.str <- r.ind.str
         rst[[i]]$col.name <- r.col.name
         rst[[i]]$appear <- r.appear
@@ -224,14 +226,16 @@ print.logregr.madlib.grps <- function (x,
     n.grps <- length(x)
 
     if (x[[1]]$has.intercept)
-        rows <- c("(Intercept)", x[[1]]$ind.vars)
+        rows <- c("(Intercept)", x[[1]]$origin.ind)
     else
         rows <- x[[1]]$ind.vars
     rows <- gsub("\"", "", rows)
     for (i in seq_len(length(x[[1]]$col.name)))
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
-    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
@@ -252,41 +256,13 @@ print.logregr.madlib.grps <- function (x,
         }
 
         cat("Coefficients:\n")
-        coef <- format(x[[i]]$coef, digits = digits)
-        std.err <- format(x[[i]]$std_err, digits = digits)
-        z.stats <- format(x[[i]]$z_stats, digits = digits)
-        odds.ratios <- format(x[[i]]$odds_ratios, digits = digits)
-
-        stars <- rep("", length(x[[i]]$p_values))
-        for (j in seq(length(x[[i]]$p_values))) {
-            if (is.na(x[[i]]$p_values[j]) || is.nan(x[[i]]$p_values[j])) {
-                stars[j] <- " "
-                next
-            }
-            if (x[[i]]$p_values[j] < 0.001)
-                stars[j] <- "***"
-            else if (x[[i]]$p_values[j] < 0.01)
-                stars[j] <- "**"
-            else if (x[[i]]$p_values[j] < 0.05)
-                stars[j] <- "*"
-            else if (x[[i]]$p_values[j] < 0.1)
-                stars[j] <- "."
-            else
-                stars[j] <- " "
-        }
-
-        p.values <- paste(format(x[[i]]$p_values, digits = digits),
-                          stars)
-        output <- data.frame(cbind(Estimate = coef,
-                                   `Std. Error` = std.err,
-                                   `z value` = z.stats,
-                                   `Pr(>|t|)` = p.values,
-                                   `Odds ratio` = odds.ratios),
-                             row.names = rows, check.names = FALSE)
-        print(format(output, justify = "left"))
-
-        cat("---\n")
-        cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coef,
+                                      `Std. Error` = x[[i]]$std_err,
+                                      `z value` = x[[i]]$z_stats,
+                                      `Pr(>|z|)` = x[[i]]$p_values),
+                                row.names = rows, check.names = FALSE),
+                     digits = digits, signif.stars = TRUE)
+        
         cat("Log likelihood:", x[[i]]$log_likelihood, "\n")
         cat("Condition Number:", x[[i]]$condition_no, "\n")
         cat("Number of iterations:", x[[i]]$num_iterations, "\n")
@@ -315,10 +291,13 @@ print.logregr.madlib <- function (x,
     else
         rows <- x$ind.vars
     rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     for (i in seq_len(length(x$col.name)))
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
-    rows <- gsub("\\((.*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
@@ -334,41 +313,13 @@ print.logregr.madlib <- function (x,
     }
 
     cat("Coefficients:\n")
-    coef <- format(x$coef, digits = digits)
-    std.err <- format(x$std_err, digits = digits)
-    z.stats <- format(x$z_stats, digits = digits)
-    odds.ratios <- format(x$odds_ratios, digits = digits)
-
-    stars <- rep("", length(x$p_values))
-    for (j in seq(length(x$p_values))) {
-        if (is.na(x$p_values[j]) || is.nan(x$p_values[j])) {
-            stars[j] <- " "
-            next
-        }
-        if (x$p_values[j] < 0.001)
-            stars[j] <- "***"
-        else if (x$p_values[j] < 0.01)
-            stars[j] <- "**"
-        else if (x$p_values[j] < 0.05)
-            stars[j] <- "*"
-        else if (x$p_values[j] < 0.1)
-            stars[j] <- "."
-        else
-            stars[j] <- " "
-    }
-
-    p.values <- paste(format(x$p_values, digits = digits),
-                      stars)
-    output <- data.frame(cbind(Estimate = coef,
-                               `Std. Error` = std.err,
-                               `z value` = z.stats,
-                               `Pr(>|t|)` = p.values,
-                               `Odds ratio` = odds.ratios),
-                         row.names = rows, check.names = FALSE)
-    print(format(output, justify = "left"))
-
-    cat("---\n")
-    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+    printCoefmat(data.frame(cbind(Estimate = x$coef,
+                                  `Std. Error` = x$std_err,
+                                  `z value` = x$z_stats,
+                                  `Pr(>|z|)` = x$p_values),
+                            row.names = rows, check.names = FALSE),
+                 digits = digits, signif.stars = TRUE)
+    
     cat("Log likelihood:", x$log_likelihood, "\n")
     cat("Condition Number:", x$condition_no, "\n")
     cat("Number of iterations:", x$num_iterations, "\n")

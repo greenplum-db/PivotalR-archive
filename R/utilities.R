@@ -36,9 +36,9 @@ is.db.data.frame <- function (x)
 ## ----------------------------------------------------------------------
 
 ## suppress all warnings
-.suppress.warnings <- function (conn.id)
+.suppress.warnings <- function (conn.id, level = "panic")
 {
-    msg.level <- .set.msg.level("panic", conn.id = conn.id)
+    msg.level <- .set.msg.level(level, conn.id = conn.id)
     warn.r <- getOption("warn")
     options(warn = -1)
     list(msg.level = msg.level, warn.r = warn.r, conn.id = conn.id)
@@ -269,22 +269,54 @@ setMethod("rowMeans",
 .combine.list <- function (lst)
 {
     n <- length(lst)
-    for (i in seq_len(n))
+    if (n == 1) return (lst[[1]])
+    res <- NULL
+    for (i in seq_len(n)) {
         if (is(lst[[i]], "db.data.frame")) {
             if (ncol(lst[[i]]) == 1 && lst[[i]]@.col.data_type == "array")
                 lst[[i]] <- db.array(lst[[i]])
             else
                 lst[[i]] <- lst[[i]][,]
         }
+        if (is(lst[[i]], "db.obj") && is.null(res)) res <- lst[[i]]
+    }
 
-    res <- lst[[1]]
-    res@.expr <- sapply(lst, function(x) x@.expr)
-    res@.col.name <- sapply(lst, function(x) x@.col.name)
-    res@.col.data_type <- sapply(lst, function(x) x@.col.data_type)
-    res@.col.udt_name <- sapply(lst, function(x) x@.col.udt_name)
-    res@.is.factor <- sapply(lst, function(x) x@.is.factor)
-    res@.factor.suffix <- sapply(lst, function(x) x@.factor.suffix)
-    res@.is.agg <- sapply(lst, function(x) x@.is.agg)
+    ## res <- lst[[1]]
+    res@.expr <- unlist(lapply(lst, function(x) {if (is(x, "db.obj"))
+                                                     x@.expr else x}))
+    res@.col.name <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.col.name else
+            sapply(seq_len(length(x)), function(i) .unique.string())}))
+    res@.col.data_type <- unlist(lapply(lst, function(x) {
+        if (is(x, "db.obj"))
+            x@.col.data_type
+        else {
+            if (typeof(x) == "character") rep("text", length(x))
+            else if (typeof(x) == "boolean")
+                rep("boolean", length(x))
+            else rep("double precision", length(x))
+        }}))
+    res@.col.udt_name <- unlist(lapply(lst, function(x) {
+        if (is(x, "db.obj"))
+            x@.col.udt_name
+        else {
+            if (typeof(x) == "character") rep("text", length(x))
+            else if (typeof(x) == "boolean")
+                rep("bool", length(x))
+            else rep("float8", length(x))
+        }}))
+    res@.is.factor <- unlist(lapply(lst, function(x) {if (is(x, "db.obj"))
+                             x@.is.factor else rep(FALSE, length(x))}))
+    res@.factor.suffix <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.factor.suffix else rep("", length(x))}))
+    res@.is.agg <- unlist(
+        lapply(lst, function(x) {
+            if (is(x, "db.obj"))
+                x@.is.agg else rep(FALSE, length(x))}))
 
     if (res@.source == res@.parent)
         tbl <- res@.parent
@@ -295,8 +327,8 @@ setMethod("rowMeans",
     else where.str <- ""
     sort <- res@.sort
     res@.content <- paste("select ",
-                          paste(res@.expr, "as", res@.col.name,
-                                collapse = ","),
+                          paste(res@.expr, " as \"", res@.col.name, "\"",
+                                collapse = ",", sep = ""),
                           " from ", tbl, where.str, sort$str, sep = "")
     res
 }
