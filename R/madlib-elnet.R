@@ -139,6 +139,7 @@ madlib.elnet <- function (formula, data,
     rst$ind.str <- params$ind.str
     rst$dummy <- data@.dummy
     rst$dummy.expr <- data@.dummy.expr
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$appear <- appear
     rst$terms <- params$terms
     rst$model <- model
@@ -149,6 +150,7 @@ madlib.elnet <- function (formula, data,
     rst$family <- family
     rst$max.iter <- control$max.iter
     rst$tolerance <- control$tolerance
+    rst$factor.ref <- data$factor.ref
     class(rst) <- "elnet.madlib"
     rst
 }

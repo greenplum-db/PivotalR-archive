@@ -140,6 +140,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
+        rst[[i]]$factor.ref <- data@.factor.ref
 
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,

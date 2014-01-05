@@ -57,7 +57,8 @@
 
     list(data = data, params = params,
          is.tbl.source.temp = is.tbl.source.temp,
-         tbl.source = tbl.source, is.factor = is.factor[seq(n)])
+         tbl.source = tbl.source, is.factor = is.factor[seq(n)],
+         factor.ref = data@.factor.ref)
 }
 
 ## -----------------------------------------------------------------------
