@@ -25,7 +25,7 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
     if (is(dat, .err.class)) {
         .db.clearResult(res)
         .restore.warnings(warns)
-        stop(dat[1])
+        ## stop(dat[1])
     } else {
         .db.clearResult(res)
         .restore.warnings(warns)
