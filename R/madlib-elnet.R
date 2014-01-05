@@ -147,6 +147,8 @@ madlib.elnet <- function (formula, data,
     rst$lambda <- lambda
     rst$method <- method
     rst$family <- family
+    rst$max.iter <- control$max.iter
+    rst$tolerance <- control$tolerance
     class(rst) <- "elnet.madlib"
     rst
 }
@@ -196,7 +198,7 @@ madlib.elnet <- function (formula, data,
         stop("Some of the control parameters are not supported!")
 
     ## max_iter and tolerance are not in SQL's optimizer_params
-    max.iter <- 10000
+    max.iter <- 100
     tolerance <- 1e-4
     if ("max.iter" %in% names(control)) {
         max.iter <- control$max.iter
@@ -264,6 +266,7 @@ print.elnet.madlib <- function (x,
     cat("\nThe independent variables are", std.str,
         " standardized.\n", sep = "")
     cat("The log-likelihood is", format(x$loglik, digits = digits))
+
     if (x$method != "cd")
         cat("\nThe computation is done with", x$iter, "iterations.\n\n")
     else if (x$family == "gaussian")
@@ -273,6 +276,12 @@ print.elnet.madlib <- function (x,
         cat("\nThe computation is done with", x$iter[1],
             "iterations in database and", x$iter[2],
             "iterations in memory.\n\n")
+
+    if (x$iter >= x$max.iter)
+        cat("The computation may not have converged with max.iter = ",
+            x$max.iter, " and tolerance = ", x$tolerance,
+            ". Use a larger max.iter or ",
+            "tolerance in the control parameters.\n\n", sep = "")
 }
 
 ## ----------------------------------------------------------------------
