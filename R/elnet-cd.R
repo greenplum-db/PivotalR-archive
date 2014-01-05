@@ -120,6 +120,8 @@
     rst$lambda <- lambda
     rst$method <- "cd"
     rst$family <- "gaussian"
+    rst$max.iter <- control$max.iter
+    rst$tolerance <- rst$tolerance
     class(rst) <- "elnet.madlib"
     ## if (standardize) delete(mid)
     .restore.warnings(warnings)
@@ -251,6 +253,8 @@
     rst$lambda <- lambda
     rst$method <- "cd"
     rst$family <- "binomial"
+    rst$max.iter <- control$max.iter
+    rst$tolerance <- control$tolerance
     class(rst) <- "elnet.madlib"
     if (standardize) delete(mid)
     .restore.warnings(warnings)
