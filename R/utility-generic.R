@@ -174,11 +174,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     y_digits <- hex_digits[9:12]
 
     s <- paste(
-        paste0(sample(hex_digits, 8), collapse=''),
-        paste0(sample(hex_digits, 4), collapse=''),
-        ## paste0('4', sample(hex_digits, 3), collapse=''),
-        paste0(sample(y_digits,1), sample(hex_digits, 3), collapse=''),
-        paste0(sample(hex_digits, 12), collapse=''), sep='_')
+        paste(sample(hex_digits, 8), collapse=''),
+        paste(sample(hex_digits, 4), collapse=''),
+        ## paste('4', sample(hex_digits, 3), collapse=''),
+        paste(sample(y_digits,1), sample(hex_digits, 3),
+              collapse='', sep = ''),
+        paste(sample(hex_digits, 12), collapse=''), sep='_')
     s <- paste("__madlib_temp_", s, "__", sep = "")
     s
 }
@@ -361,6 +362,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
 
+    factor.full <- rep(FALSE, length(names(data)))
     if (!refresh) {
         model.vars <- .prepare.ind.vars(orig.labels)
         model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
@@ -372,6 +374,33 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                 data[[var]] <- as.factor(data[[var]])
             }
         }
+
+        ## re-analyze the formula
+        if (sum(data@.is.factor) > 0) {
+            l <- length(names(data))
+            fake.data <- as.data.frame(array(1, dim = c(3, l)))
+            names(fake.data) <- names(data)
+            us <- rep('', l)
+            for (i in seq_len(l)) {
+                if (data@.is.factor[i]) {
+                    us[i] <- paste(
+                        sample(c(as.character(0:9), letters[1:6]), 8),
+                        collapse = '')
+                    fake.data[,i] <- paste(us[i], c('a', 'b', 'c'), sep = '')
+                }
+            }
+            f1 <- formula(fstr)
+            term <- .modeling.formula(f1, fake.data)
+            ## factor.full <- rep(FALSE, l)
+            for (i in seq_len(l)) {
+                if (data@.is.factor[i]) {
+                    if (any(grepl(us[i]%+%'a', term)) &&
+                        any(grepl(us[i]%+%'b', term)) &&
+                        any(grepl(us[i]%+%'c', term)))
+                        factor.full[i] <- TRUE
+                }
+            }
+        }
     }
 
     list(dep.str = dep.var, origin.dep = origin.dep,
@@ -381,10 +410,26 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
          ind.vars = labels,
          has.intercept = as.logical(f.intercept),
          data = data,
+         factor.full = factor.full,
          terms = f.terms)
 }
 
 ## -----------------------------------------------------------------------
+
+.modeling.formula <- function(formula, data)
+{
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- quote(stats::model.frame)
+    mf <- eval(mf, parent.frame())
+    mt <- attr(mf, "terms")
+    x <- model.matrix(mt, mf, contrasts)
+    colnames(x)
+}
+
+## ----------------------------------------------------------------------
 
 ## R's log is SQL's log(exp(1.), x)
 ## R's log10 is SQL's log

@@ -154,7 +154,8 @@ setMethod (
     def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
-    distributed.by = NULL, nrow = NULL, field.types = NULL) {
+    distributed.by = NULL, nrow = NULL, field.types = NULL,
+    factor.full = rep(FALSE, length(names(x)))) { # whether expand all levels
         warnings <- .suppress.warnings(conn.id(x))
         
         if (is.null(table.name)) {
@@ -255,7 +256,7 @@ setMethod (
                     else
                         avoid <- x@.factor.ref[i]
                     for (j in seq_len(length(distinct))) {
-                        if (distinct[j] == avoid) next
+                        if (distinct[j] == avoid && !factor.full[i]) next
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
                         is.factor <- c(is.factor, FALSE)
