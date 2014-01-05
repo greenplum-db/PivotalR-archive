@@ -95,7 +95,7 @@ SGD is a sequential algorithm in nature. When running in a distributed manner, e
 
 (3) The common control parameters for both "fista" and "sgd" optimizers:
 
-- \code{max.iter} An integer, default is 10000. The maximum number of iterations that are allowed.
+- \code{max.iter} An integer, default is 100. The maximum number of iterations that are allowed.
 
 - \code{tolerance} A numeric value, default is 1e-4. The criteria to end iterations. Basically 1e-4 will produce results with 4 significant digits. Both the "fista" and "sgd" optimizers compute the average difference between the coefficients of two consecutive iterations, and when the difference is smaller than tolerance or the iteration number is larger than max_iter, the computation stops.
 
@@ -211,6 +211,10 @@ All parameters have been explained above. The only one left is \code{verbose}.
     names can be very long due to the inserting of a random string to
     avoid naming conflicts, see \code{\link{as.factor,db.obj-method}}
     for details. The list also contains \code{dummy} and \code{dummy.expr}, which are also used for processing the categorical variables, but do not contain any important information.
+  }
+
+  \item{max.iter, tolerance}{
+    The \code{max.iter} and \code{tolerance} in the \code{control}.
   }
 }
 
