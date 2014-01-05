@@ -3,7 +3,7 @@
 ## ----------------------------------------------------------------------
 
 db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
-                 verbose = TRUE)
+                 verbose = TRUE, extra.err.msg = "")
 {
     if (!.is.conn.id.valid(conn.id))
         stop(conn.id, " is not a valid connection ID. ",
@@ -23,7 +23,7 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
     res <- try(.db.sendQuery(sql, conn.id), silent = TRUE)
     if (is(res, .err.class)) {
         .restore.warnings(warns)
-        stop(res[1])
+        stop(res[1], "\n", extra.err.msg)
     }
     dat <- try(.db.fetch(res, nrows), silent = TRUE)
     if (is(dat, .err.class)) {

@@ -72,7 +72,8 @@
         if (!is.null(warns)) .restore.warnings(warns)
         stop("Could not run SQL query !")
     }
-
+    ## res <- db.q(sql, conn.id = conn.id, verbose = FALSE)
+    
     ## retreive result
     if (!is.null(tbl.output)) {
         res <- try(.db.getQuery(paste("select * from", tbl.output),

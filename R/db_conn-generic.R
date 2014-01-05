@@ -80,13 +80,21 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                      "separated by commas. One can also use the ",
                      "function db.default.schemas or db.search.path ",
                      "to display or set the current default schemas.")
+            ## res <- db.q("set search_path =", default.schemas, conn.id = result,
+            ##             verbose = FALSE,
+            ##             extra.err.msg =
+            ##             paste("Could not set the default schemas ! ",
+            ##                   "default.schemas must be a set of schema names ",
+            ##                   "separated by commas. One can also use the ",
+            ##                   "function db.default.schemas or db.search.path ",
+            ##                   "to display or set the current default schemas.",
+            ##                   sep = ""))
         }
 
         res <- .get.res(paste("set application_name = '",
                               .this.pkg.name, "'", sep = ""),
                         conn.id = result)
-
-        return (result)
+       return (result)
     }
     else
     {
@@ -107,6 +115,7 @@ db.default.schemas <- function (conn.id = 1, set = NULL)
         res <- .db.getQuery("show search_path", conn.id = conn.id)
         if (is(res, .err.class))
             stop("Could not show the default schemas ! ")
+        ## res <- db.q("show search_path", conn.id = conn.id, verbose = FALSE)
         res
     } else {
         res <- .db.getQuery(paste("set search_path =",
@@ -115,6 +124,12 @@ db.default.schemas <- function (conn.id = 1, set = NULL)
             stop("Could not set the default schemas ! ",
                  "default.schemas must be a set of schema names ",
                  "separated by commas.")
+        ## res <- db.q("set search_path = ", set, conn.id = conn.id, sep = "",
+        ##             verbose = FALSE,
+        ##             extra.err.msg =
+        ##             paste("Could not set the default schemas ! ",
+        ##                   "default.schemas must be a set of schema names ",
+        ##                   "separated by commas.", sep = ""))
     }
 }
 
