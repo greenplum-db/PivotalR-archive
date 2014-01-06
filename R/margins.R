@@ -216,6 +216,7 @@ Vars <- function(model)
 
     expand.vars <- paste("\"", expand.vars, "\"", sep = "")
     expand.vars <- gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
+    expand.vars <- gsub("\"`([^\\[\\]]*)\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
