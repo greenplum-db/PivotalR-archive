@@ -149,9 +149,12 @@ Vars <- function(model)
             seq_len(nrow(factors)),
             function(i) {
                 sub <- factors[factors[,1] == factors[i,1],]
-                gsub("`", "", sub[sub[,2] == sub[,4],3])
+                paste("\"", factors[i,1],
+                      gsub(paste(".*(", .unique.pattern(), ").*", sep = ""),
+                           "\\1", factors[i,3], perl = TRUE),
+                      factors[i,4], "\"", sep = "")
             }))
-        
+
         remove <- rep(FALSE, l)
         append <- character(0)
         existing.factors <- apply(factors, 1,
@@ -179,7 +182,8 @@ Vars <- function(model)
                 }
             } else {
                 if (used.is.factor[j]) is.factor[i] <- TRUE
-                sub <- factors[gsub("\"", "", gsub("`", "", factors[,3]))
+                sub <- factors[gsub("\"", "",
+                                    gsub("`", "", factors[,3]))
                                == used.vars[j],]
                 if (gsub("`", "", sub[3]) == sub[5]) remove[i] <- TRUE
             }
@@ -926,7 +930,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
     env[[x]] <- 0
-    ref <- factors[factors[,3] == x, 5]
+    ref <- factors[gsub("`", "", factors[,3]) == x, 5]
     if (ref %in% names(env)) env[[ref]] <- 1
     P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
@@ -957,7 +961,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
     dj1 <- paste("(", dj1, ")*(", sigma1,")*(1 - ", sigma1, ")", sep = "")
 
     env[[x]] <- 0
-    ref <- factors[factors[,3] == x, 5]
+    ref <- factors[gsub("`", "", factors[,3]) == x, 5]
     if (ref %in% names(env)) env[[ref]] <- 1
     P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
