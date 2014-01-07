@@ -206,6 +206,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     ## f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
+    fstr <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "factor(\\1)",
+                 fstr, perl = T)
+    fstr <- gsub("factor\\((((?!as\\.factor).)*)\\)", "as.factor(\\1)",
+                 fstr, perl = T)
 
     f2 <- f.str[2] # grouping columns, might be NA
 
@@ -293,13 +297,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ## factors added by formula
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
     }
-
+    
     right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
     right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
     f.terms1 <- terms(formula(paste("~", right.hand)), data = fake.data)
     f.labels <- attr(f.terms1, "term.labels")
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
-
     f.intercept <- attr(f.terms, "intercept")
     labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
     labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
@@ -335,13 +338,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                     paste(labels, collapse = ", "), "))",
                     sep = "")))
     a.labels <- unlist(sapply(a, function(x) x[,]@.expr))
-
     b <- eval(parse(text = paste("with(vdata, c(",
                     paste(setdiff(rownames(f.factors),
                                   colnames(f.factors)),
                           collapse = ", "), "))", sep = "")))
     b.labels <- unlist(sapply(b, function(x) x[,]@.expr))
-
     labels <- .strip(setdiff(a.labels, b.labels), "`")
 
     ## labels <- .replace.with.quotes(labels, data@.col.name)

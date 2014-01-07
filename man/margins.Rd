@@ -123,12 +123,12 @@ Vars(model)
 ## create a data table in database and the R wrapper
 dat <- as.db.data.frame(abalone, "abalone")
 
-fit <- madlib.lm(rings ~ length + diameter*sex, data = x)
+fit <- madlib.lm(rings ~ length + diameter*sex, data = dat)
 margins(fit)
 margins(fit, at.mean = TRUE)
 margins(fit, factor.continuous = TRUE)
 
-fit <- madlib.glm(rings < 10 ~ length + diameter*sex, data = x, family = "logistic")
+fit <- madlib.glm(rings < 10 ~ length + diameter*sex, data = dat, family = "logistic")
 margins(fit, ~ length + sex)
 margins(fit, ~ length + sex.M, at.mean = TRUE)
 margins(fit, ~ length + sex.I, factor.continuous = TRUE)
