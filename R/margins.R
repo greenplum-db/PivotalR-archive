@@ -56,7 +56,7 @@ Vars <- function(model)
 
 .parse.margins.vars <- function(model, newdata, vars)
 {
-    coef <- model$coef
+    coef <- model$coefficients
     data <- model$data
     model.vars <- .prepare.ind.vars(model$ind.vars)
     n <- length(model.vars)
@@ -242,7 +242,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
         stop("newdata must be a db.obj object!")
     newdata <- .handle.dummy(newdata, model)
     f <- .parse.margins.vars(model, newdata, vars)
-    n <- length(model$coef)
+    n <- length(model$coefficients)
     if (model$has.intercept)
         P <- "b1 + " %+% paste("b", 2:n, "*(`\"term.", (2:n)-1, "\"`)",
                                collapse="+", sep = "")
@@ -265,7 +265,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     } else
         avgs <- NULL
 
-    res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
+    res <- .margins.lin(P, model, model$coefficients, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, f$factors,
                         at.mean, factor.continuous, avgs = avgs)
 
@@ -344,7 +344,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
         stop("newdata must be a db.obj object!")
     newdata <- .handle.dummy(newdata, model)
     f <- .parse.margins.vars(model, newdata, vars)
-    n <- length(model$coef)
+    n <- length(model$coefficients)
     if (model$has.intercept)
         P <- "b1 +" %+% paste("b", 2:n, "*(`\"term.", (2:n)-1, "\"`)",
                                   collapse="+", sep = "")
@@ -353,7 +353,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     sigma <- paste("1/(1+exp(-(", P, ")))")
     sigma.name <- gsub("__", "", .unique.string())
 
-    coefs <- as.list(model$coef)
+    coefs <- as.list(model$coefficients)
     n <- length(coefs)
     m <- length(vars)
     names(coefs) <- paste("b", seq_len(n), sep = "")
@@ -382,7 +382,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
         newdata <- as.db.Rview(newdata)
     }
 
-    res <- .margins.log(P, model, model$coef, newdata, f$vars, f$is.ind,
+    res <- .margins.log(P, model, model$coefficients, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, sigma.name, f$factors,
                         at.mean, factor.continuous, avgs = avgs)
 
@@ -1012,5 +1012,3 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
     } else
         var
 }
-
-
