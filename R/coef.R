@@ -8,10 +8,9 @@ coef.logregr.madlib <- coef.lm.madlib <- function(object, ...)
     for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             nams <- gsub(object$col.name[i], object$appear[i], nams)
-    setNames(object$coef, nams)
+    setNames(object$coefficients, nams)
 }
 
 
 coef.logregr.madlib.grps <- coef.lm.madlib.grps <- function(object, ...)
 lapply(object, coef)
-

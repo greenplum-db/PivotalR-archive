@@ -1,6 +1,6 @@
 extractAIC.logregr.madlib <- function(fit, scale=0, k=2, ...)
 {
-    edf <- length(fit$coef)
+    edf <- length(fit$coefficients)
     c(edf, -2 * fit$log_likelihood + k * edf)
 }
 
@@ -9,7 +9,7 @@ extractAIC.logregr.madlib <- function(fit, scale=0, k=2, ...)
 logLik.logregr.madlib <- function(object, ...)
 {
     ll <- object$log_likelihood
-    attr(ll, "df") <- length(object$coef)
+    attr(ll, "df") <- length(object$coefficients)
     class(ll) <- "logLik"
     ll
 }
@@ -28,4 +28,3 @@ logLik.logregr.madlib.grps <- function(object, ...)
 
 AIC.logregr.madlib.grps <- function(object, ..., k=2)
     sapply(object, AIC, k=k, ...)
-

@@ -127,7 +127,7 @@ madlib.glm <- function (formula, data,
     n <- length(params$ind.vars)
     res.names <- names(res)
     rst <- list()
-    r.coef <- arraydb.to.arrayr(res$coef, "double", n)
+    r.coef <- arraydb.to.arrayr(res$coefficients, "double", n)
     r.std_err <- arraydb.to.arrayr(res$std_err, "double", n)
     r.z_stats <- arraydb.to.arrayr(res$z_stats, "double", n)
     r.p_values <- arraydb.to.arrayr(res$p_values, "double", n)

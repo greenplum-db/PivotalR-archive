@@ -44,7 +44,7 @@ vcov.lm.madlib <- function(object, ...)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)
     xx@.is.symmetric <- TRUE; xx <- solve(lk(xx))
     delete(compute)
-    res <- mn * xx    
+    res <- mn * xx
 
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
@@ -54,7 +54,7 @@ vcov.lm.madlib <- function(object, ...)
         rows <- c("(Intercept)", model.vars)
     else
         rows <- model.vars
-    for (i in seq_len(length(object$col.name))) 
+    for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
     colnames(res) <- rows
@@ -73,7 +73,7 @@ vcov.logregr.madlib <- function(object, ...)
 {
     x <- .extract.regr.x(object)
     ## cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
-    cx <- rowSums(object$coef * x)
+    cx <- rowSums(object$coefficients * x)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
     xx <- solve(lk(crossprod(x, a*x)))
 
@@ -85,7 +85,7 @@ vcov.logregr.madlib <- function(object, ...)
         rows <- c("(Intercept)", model.vars)
     else
         rows <- model.vars
-    for (i in seq_len(length(object$col.name))) 
+    for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
     colnames(xx) <- rows

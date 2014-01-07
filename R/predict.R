@@ -81,10 +81,10 @@ predict.logregr.madlib.grps <- function (object, newdata,
 
     if (length(object) == 1) {
         if (object[[1]]$has.intercept) {
-            coef <- object[[1]]$coef[-1]
-            intercept <- object[[1]]$coef[1]
+            coef <- object[[1]]$coefficients[-1]
+            intercept <- object[[1]]$coefficients[1]
         } else {
-            coef <- object[[1]]$coef
+            coef <- object[[1]]$coefficients
             intercept <- 0
         }
         coef <- paste("array[", paste(coef, collapse = ", "), "]", sep = "")
@@ -115,10 +115,10 @@ predict.logregr.madlib.grps <- function (object, newdata,
             expr <- paste(expr, tmp, " then ", sep = "")
 
             if (object[[i]]$has.intercept) {
-                coef <- object[[i]]$coef[-1]
-                intercept <- object[[i]]$coef[1]
+                coef <- object[[i]]$coefficients[-1]
+                intercept <- object[[i]]$coefficients[1]
             } else {
-                coef <- object[[i]]$coef
+                coef <- object[[i]]$coefficients
                 intercept <- 0
             }
             coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
@@ -208,16 +208,14 @@ predict.logregr.madlib.grps <- function (object, newdata,
     }
 
     ## deal with groups
-    ## coef.i <- which(names(object[[1]]) == "coef")
-    ## grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
 
     if (length(object) == 1) {
         if (db.str != "HAWQ") {
             if (object[[1]]$has.intercept) {
-                coef <- object[[1]]$coef[-1]
-                intercept <- object[[1]]$coef[1]
+                coef <- object[[1]]$coefficients[-1]
+                intercept <- object[[1]]$coefficients[1]
             } else {
-                coef <- object[[1]]$coef
+                coef <- object[[1]]$coefficients
                 intercept <- 0
             }
             coef <- paste("array[", paste(coef, collapse = ", "), "]",
@@ -230,7 +228,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
             ## expr <- paste(madlib, ".", func.str, "(", coef, ", ",
             ##               ind.str, ")", sep = "")
         } else {
-            expr <- paste(object[[1]]$coef, ind.vars, sep = "*",
+            expr <- paste(object[[1]]$coefficients, ind.vars, sep = "*",
                           collapse = " + ")
             if (func.str == "logregr_predict")
                 expr <- paste(expr, " > 0", sep = "")
@@ -261,10 +259,10 @@ predict.logregr.madlib.grps <- function (object, newdata,
 
             if (db.str != "HAWQ") {
                 if (object[[i]]$has.intercept) {
-                    coef <- object[[i]]$coef[-1]
-                    intercept <- object[[i]]$coef[1]
+                    coef <- object[[i]]$coefficients[-1]
+                    intercept <- object[[i]]$coefficients[1]
                 } else {
-                    coef <- object[[i]]$coef
+                    coef <- object[[i]]$coefficients
                     intercept <- 0
                 }
                 coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
@@ -277,7 +275,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
                 ## expr <- paste(expr, madlib, ".", func.str, "(", coef.i,
                 ##               ", ", ind.str, ")", sep = "")
             } else {
-                expr <- paste(expr, paste(object[[1]]$coef, ind.vars,
+                expr <- paste(expr, paste(object[[1]]$coefficients, ind.vars,
                                           sep = "*", collapse = " + "), sep = "")
                 if (func.str == "logregr_predict")
                     expr <- paste(expr, " > 0", sep = "")
