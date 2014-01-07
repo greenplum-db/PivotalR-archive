@@ -170,7 +170,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
-        
+
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
             cond <- .row.action(.combine.list(Map(function(x) {
@@ -194,8 +194,9 @@ madlib.glm <- function (formula, data,
 
         rst[[i]]$origin.data <- origin.data
         rst[[i]]$nobs <- nrow(rst[[i]]$data)
-        
-        class(rst[[i]]) <- "logregr.madlib"
+
+        class(rst[[i]]) <- c("logregr.madlib", "glm")
+        names(rst[[i]]) <- gsub("^coef$", "coefficients", names(rst[[i]]))
     }
 
     class(rst) <- "logregr.madlib.grps" # use this to track summary
@@ -263,7 +264,7 @@ print.logregr.madlib.grps <- function (x,
                                       `Pr(>|z|)` = x[[i]]$p_values),
                                 row.names = rows, check.names = FALSE),
                      digits = digits, signif.stars = TRUE)
-        
+
         cat("Log likelihood:", x[[i]]$log_likelihood, "\n")
         cat("Condition Number:", x[[i]]$condition_no, "\n")
         cat("Number of iterations:", x[[i]]$num_iterations, "\n")
@@ -320,7 +321,7 @@ print.logregr.madlib <- function (x,
                                   `Pr(>|z|)` = x$p_values),
                             row.names = rows, check.names = FALSE),
                  digits = digits, signif.stars = TRUE)
-    
+
     cat("Log likelihood:", x$log_likelihood, "\n")
     cat("Condition Number:", x$condition_no, "\n")
     cat("Number of iterations:", x$num_iterations, "\n")

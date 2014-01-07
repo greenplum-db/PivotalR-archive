@@ -167,7 +167,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$origin.data <- origin.data
         rst[[i]]$nobs <- nrow(rst[[i]]$data)
 
-        class(rst[[i]]) <- "lm.madlib" # A single model class
+        class(rst[[i]]) <- c("lm.madlib", "lm") # A single model class
+
+        names(rst[[i]]) <- gsub("^coef$", "coefficients", names(rst[[i]]))
 
         ## get error SS manually using predicted values
         ## This takes too much time. Move it into isolated functions
