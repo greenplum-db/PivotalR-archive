@@ -29,7 +29,7 @@ distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose =
 TRUE, is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by =
-NULL, nrow = NULL, field.types = NULL)
+NULL, nrow = NULL, field.types = NULL, factor.full = rep(FALSE, length(names(x))))
 
 \S4method{as.db.data.frame}{db.data.frame}(x, table.name = NULL, verbose
 = TRUE, is.view = FALSE, is.temp = FALSE, distributed.by = NULL, nrow =
@@ -149,8 +149,12 @@ and it defaults to 0.
     A list of \code{key=value} pairs, where the value is a string of
     data type. Force the new table to use the data type for the column
     \code{key}. 
+  }
 
-  } }
+  \item{factor.full}{
+    A vector of logical values with the length of the column number. All \code{FALSE} by default. When the function creates dummy variables for a factor (categorical) variable, whether to create \code{n} dummies or \code{n-1} dummies, where \code{n} is the number of levels of the factor. For some regression problem, we need to create dummy variables for all the distinct values of the categorical variable.
+  }
+}
 
 \value{
   A \code{db.data.frame} object. It points to a table whose name is
