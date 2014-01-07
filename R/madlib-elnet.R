@@ -99,7 +99,7 @@ madlib.elnet <- function (formula, data,
     ## res <- .get.res(sql, tbl.output, conn.id)
     res <- db.q(sql, conn.id=conn.id, verbose = FALSE)
     res <- db.q("select * from", tbl.output, conn.id=conn.id, verbose=FALSE,
-                sep = " ")
+                sep = " ", nrows = -1)
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)

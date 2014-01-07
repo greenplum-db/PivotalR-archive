@@ -132,7 +132,7 @@ setMethod (
         ## res <- .db.getQuery(paste(content(x), .limit.str(nrows),
         ##                           sep = ""), conn.id(x))
         res <- db.q(content(x), .limit.str(nrows), conn.id = conn.id(x),
-                    verbose = FALSE, sep = "")
+                    verbose = FALSE, sep = "", nrows = -1)
 
         .restore.warnings(warnings)
         for (i in seq_len(length(names(x)))) {
@@ -188,7 +188,7 @@ setMethod (
                     "\") as v from (",
                     content(x),
                     .limit.str(nrows), ") s", sep = "",
-                    conn.id = conn.id(x), verbose = FALSE)
+                    conn.id = conn.id(x), verbose = FALSE, nrows = -1)
 
         n <- dim(x)[1]
         dims <- x@.dim
