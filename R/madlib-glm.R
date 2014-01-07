@@ -151,7 +151,7 @@ madlib.glm <- function (formula, data,
         rst[[i]] <- list()
         for (j in seq(res.names))
             rst[[i]][[res.names[j]]] <- res[[res.names[j]]][[i]]
-        rst[[i]]$coef <- r.coef[i,]
+        rst[[i]]$coefficients <- r.coef[i,]
         rst[[i]]$std_err <- r.std_err[i,]
         rst[[i]]$z_stats <- r.z_stats[i,]
         rst[[i]]$p_values <- r.p_values[i,]
@@ -196,7 +196,6 @@ madlib.glm <- function (formula, data,
         rst[[i]]$nobs <- nrow(rst[[i]]$data)
 
         class(rst[[i]]) <- c("logregr.madlib", "glm")
-        names(rst[[i]]) <- gsub("^coef$", "coefficients", names(rst[[i]]))
     }
 
     class(rst) <- "logregr.madlib.grps" # use this to track summary
@@ -258,7 +257,7 @@ print.logregr.madlib.grps <- function (x,
         }
 
         cat("Coefficients:\n")
-        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coef,
+        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coefficients,
                                       `Std. Error` = x[[i]]$std_err,
                                       `z value` = x[[i]]$z_stats,
                                       `Pr(>|z|)` = x[[i]]$p_values),
@@ -315,7 +314,7 @@ print.logregr.madlib <- function (x,
     }
 
     cat("Coefficients:\n")
-    printCoefmat(data.frame(cbind(Estimate = x$coef,
+    printCoefmat(data.frame(cbind(Estimate = x$coefficients,
                                   `Std. Error` = x$std_err,
                                   `z value` = x$z_stats,
                                   `Pr(>|z|)` = x$p_values),

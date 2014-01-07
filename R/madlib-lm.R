@@ -123,7 +123,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]] <- list()
         for (j in seq(res.names))
             rst[[i]][[res.names[j]]] <- res[[res.names[j]]][i]
-        rst[[i]]$coef <- r.coef[i,]
+        rst[[i]]$coefficients <- r.coef[i,]
         rst[[i]]$std_err <- r.std_err[i,]
         rst[[i]]$t_stats <- r.t_stats[i,]
         rst[[i]]$p_values <- r.p_values[i,]
@@ -168,8 +168,6 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$nobs <- nrow(rst[[i]]$data)
 
         class(rst[[i]]) <- c("lm.madlib", "lm") # A single model class
-
-        names(rst[[i]]) <- gsub("^coef$", "coefficients", names(rst[[i]]))
 
         ## get error SS manually using predicted values
         ## This takes too much time. Move it into isolated functions
@@ -248,7 +246,7 @@ print.lm.madlib.grps <- function (x,
         }
 
         cat("Coefficients:\n")
-        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coef,
+        printCoefmat(data.frame(cbind(Estimate = x[[i]]$coefficients,
                                       `Std. Error` = x[[i]]$std_err,
                                       `t value` = x[[i]]$t_stats,
                                       `Pr(>|t|)` = x[[i]]$p_values),
@@ -309,7 +307,7 @@ print.lm.madlib <- function (x,
     }
 
     cat("Coefficients:\n")
-    printCoefmat(data.frame(cbind(Estimate = x$coef,
+    printCoefmat(data.frame(cbind(Estimate = x$coefficients,
                                   `Std. Error` = x$std_err,
                                   `t value` = x$t_stats,
                                   `Pr(>|t|)` = x$p_values),
