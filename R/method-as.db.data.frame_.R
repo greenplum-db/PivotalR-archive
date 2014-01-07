@@ -154,7 +154,8 @@ setMethod (
     def = function (x, table.name = NULL, verbose = TRUE,
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
-    distributed.by = NULL, nrow = NULL, field.types = NULL) {
+    distributed.by = NULL, nrow = NULL, field.types = NULL,
+    factor.full = rep(FALSE, length(names(x)))) { # whether expand all levels
         warnings <- .suppress.warnings(conn.id(x))
         
         if (is.null(table.name)) {
@@ -230,6 +231,7 @@ setMethod (
         
         dummy <- character(0)
         dummy.expr <- character(0)
+        factor.ref <- rep(as.character(NA), length(x@.is.factor))
         if (pivot && !all(x@.is.factor == FALSE)) {
             cats <- x@.expr[x@.is.factor]
             sql <- "select "
@@ -254,8 +256,9 @@ setMethod (
                         avoid <- distinct[length(distinct)]
                     else
                         avoid <- x@.factor.ref[i]
+                    factor.ref[i] <- avoid
                     for (j in seq_len(length(distinct))) {
-                        if (distinct[j] == avoid) next
+                        if (distinct[j] == avoid && !factor.full[i]) next
                         new.col <- paste(x@.col.name[i], suffix[i],
                                         distinct[j], sep = "")
                         is.factor <- c(is.factor, FALSE)

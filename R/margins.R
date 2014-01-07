@@ -133,9 +133,11 @@ Vars <- function(model)
     for (i in seq_len(length(used.vars))) {
         parse.var <- .extract.factor.info(used.vars[i])
         if (length(parse.var) == 2) {
-            factors <- rbind(factors,
-                             c(parse.var,
-                               paste("`\"", used.vars[i], "\"`", sep = "")))
+            factors <- rbind(
+                factors,
+                c(parse.var,
+                  paste("`\"", used.vars[i], "\"`", sep = ""),
+                  model$factor.ref[model$col.name == parse.var[1]]))
             used.is.factor[i] <- TRUE
         }
     }
@@ -143,6 +145,16 @@ Vars <- function(model)
     l <- length(expand.vars)
     is.factor <- rep(FALSE, l)
     if (sum(used.is.factor) != 0) {
+        factors <- cbind(factors, sapply(
+            seq_len(nrow(factors)),
+            function(i) {
+                sub <- factors[factors[,1] == factors[i,1],]
+                paste("\"", factors[i,1],
+                      gsub(paste(".*(", .unique.pattern(), ").*", sep = ""),
+                           "\\1", factors[i,3], perl = TRUE),
+                      factors[i,4], "\"", sep = "")
+            }))
+
         remove <- rep(FALSE, l)
         append <- character(0)
         existing.factors <- apply(factors, 1,
@@ -152,27 +164,35 @@ Vars <- function(model)
             if (identical(j, integer(0))) {
                 if (expand.vars[i] %in% c(factors[,1], existing.factors)) {
                     if (expand.vars[i] %in% factors[,1]) {
-                        k <- which(factors[,1] == expand.vars[i])
+                        k <- which(factors[,1] == expand.vars[i]
+                                   & factors[,2] != factors[,4])
                         remove[i] <- TRUE
                         append <- c(append, gsub("\"", "",
                                                  gsub("`", "", factors[k,3])))
                     } else { 
                         is.factor[i] <- TRUE
+                        idx <- (existing.factors == expand.vars[i] &
+                                factors[,2] != factors[,4])
+                        if (all(idx == FALSE))
+                            stop("The marginal effect for teh reference ",
+                                 "category is not to be computed!")
                         expand.vars[i] <- gsub(
-                            "\"", "",
-                            gsub("`", "",factors[existing.factors ==
-                                                 expand.vars[i],3]))
+                            "\"", "", gsub("`", "",factors[idx,3]))
                     }
                 }
             } else {
                 if (used.is.factor[j]) is.factor[i] <- TRUE
+                sub <- factors[gsub("\"", "",
+                                    gsub("`", "", factors[,3]))
+                               == used.vars[j],]
+                if (gsub("`", "", sub[3]) == sub[5]) remove[i] <- TRUE
             }
         }
 
+        expand.vars <- expand.vars[!remove]
+        is.factor <- is.factor[!remove]
+        expand.is.ind <- expand.is.ind[!remove]
         if (!identical(append, character(0))) {
-            expand.vars <- expand.vars[!remove]
-            is.factor <- is.factor[!remove]
-            expand.is.ind <- expand.is.ind[!remove]
             expand.vars <- c(expand.vars, append)
             is.factor <- c(is.factor, rep(TRUE, length(append)))
             expand.is.ind <- c(expand.is.ind, rep(FALSE, length(append)))
@@ -196,6 +216,7 @@ Vars <- function(model)
 
     expand.vars <- paste("\"", expand.vars, "\"", sep = "")
     expand.vars <- gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
+    expand.vars <- gsub("\"`([^\\[\\]]*)\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
@@ -883,6 +904,8 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
     env[[x]] <- 0
+    ref <- factors[gsub("`", "", factors[,3]) == x, 5]
+    if (ref %in% names(env)) env[[ref]] <- 1
     P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
@@ -908,6 +931,8 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                 collapse = "")
     P1 <- gsub("\\n", "", P1)
     env[[x]] <- 0
+    ref <- factors[gsub("`", "", factors[,3]) == x, 5]
+    if (ref %in% names(env)) env[[ref]] <- 1
     P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")
@@ -937,6 +962,8 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
     dj1 <- paste("(", dj1, ")*(", sigma1,")*(1 - ", sigma1, ")", sep = "")
 
     env[[x]] <- 0
+    ref <- factors[gsub("`", "", factors[,3]) == x, 5]
+    if (ref %in% names(env)) env[[ref]] <- 1
     P0 <- paste(deparse(eval(parse(text = paste("substitute(", P,
                                    ", env)", sep = "")))),
                 collapse = "")

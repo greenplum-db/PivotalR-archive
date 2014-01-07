@@ -118,10 +118,12 @@
     rst$call <- call
     rst$alpha <- alpha
     rst$lambda <- lambda
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$method <- "cd"
     rst$family <- "gaussian"
     rst$max.iter <- control$max.iter
     rst$tolerance <- rst$tolerance
+    rst$factor.ref <- data@.factor.ref
     class(rst) <- "elnet.madlib"
     ## if (standardize) delete(mid)
     .restore.warnings(warnings)
@@ -251,10 +253,12 @@
     rst$call <- call
     rst$alpha <- alpha
     rst$lambda <- lambda
+    rst$col.name <- gsub("\"", "", data@.col.name)
     rst$method <- "cd"
     rst$family <- "binomial"
     rst$max.iter <- control$max.iter
     rst$tolerance <- control$tolerance
+    rst$factor.ref <- data@.factor.ref
     class(rst) <- "elnet.madlib"
     if (standardize) delete(mid)
     .restore.warnings(warnings)
