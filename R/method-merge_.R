@@ -13,7 +13,7 @@ setMethod (
               key = x@.key, suffixes = c("_x","_y"), ...) {
         if (!conn.eql(conn.id(x), conn.id(y)))
             stop("The two data sets are not on the same database!")
-            
+
         if (is(x, "db.data.frame"))
             x.content <- paste(content(x), " s", sep = "")
         else if (is(x, "db.Rquery") && x@.source == x@.parent &&
@@ -21,7 +21,7 @@ setMethod (
             x.content <- paste(x@.source, " s", sep = "")
         else
             x.content <- paste("(", content(x), ") s", sep = "")
-        
+
         if (is(y, "db.data.frame"))
             y.content <- paste(content(y), " t", sep = "")
         else if (is(y, "db.Rquery") && y@.source == y@.parent &&
@@ -33,20 +33,20 @@ setMethod (
         if (length(by.x) != length(by.y))
             stop("The columns used to merge should have the same number!")
 
+        on.str <- ""
+        by.str <- NULL
+        col.data_type <- NULL
+        col.udt_name <- NULL
+        is.factor <- NULL
+        factor.ref <- NULL
+        factor.suffix <- NULL
         if (length(by.x) == 0) {
             join.str <- "cross join"
-            on.str <- ""
-            by.str <- NULL
-            col.data_type <- NULL
-            col.udt_name <- NULL
-            is.factor <- NULL
-            factor.ref <- NULL
-            factor.suffix <- NULL
         } else {
             on.str <- paste("on", paste(paste("s.\"", by.x, "\"", sep = ""),
                                         paste("t.\"", by.y, "\"", sep = ""),
                                         sep = " = ", collapse = " and "))
-            if (all.x == FALSE && all.y == FALSE) 
+            if (all.x == FALSE && all.y == FALSE)
                 join.str <- "join"
             else if (all.x == TRUE && all.y == FALSE)
                 join.str <- "left join"
@@ -54,15 +54,15 @@ setMethod (
                 join.str <- "right join"
             else
                 join.str <- "full join"
-            
+
             by.str <- paste("s.\"", .strip(by.x, "\""), "\"", sep = "")
             col.idx <- .gwhich(names(x), by.x)
             col.data_type <- x@.col.data_type[col.idx]
             col.udt_name <- x@.col.udt_name[col.idx]
-            
+
             col.idx.y <- .gwhich(names(y), by.y)
             is.factor <- x@.is.factor[col.idx] & y@.is.factor[col.idx.y]
-            for (i in seq_len(length(idx))) {
+            for (i in seq_len(length(is.factor))) {
                 if (is.factor[i])
                     factor.ref <- c(factor.ref, x@.factor.ref[i])
                 else
@@ -75,7 +75,7 @@ setMethod (
 
         parent <- paste(x.content, join.str, y.content, on.str)
         src <- parent
-        
+
         col.name <- by.x
         x.diff <- setdiff(names(x), by.x)
         y.diff <- setdiff(names(y), by.y)
@@ -113,7 +113,7 @@ setMethod (
         }
 
         if (!identical(key, character(0)) && key %in% xy) key <- paste(key, suffixes[1], sep = "")
-        
+
         expr <- c(by.str, others)
 
         sql <- paste("select", paste(expr,
