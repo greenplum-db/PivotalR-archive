@@ -45,7 +45,8 @@ setMethod (
                     rst[[1]]$index <- vals[i,]
                     next
                 }
-                use <- get.piece(data, indx, w)
+
+                use <- get.piece(data, as.character(indx), w)
                 rst[[count+1]] <- list(index = vals[i,], result = FUN(use))
                 count <- count + 1
             }
