@@ -10,7 +10,6 @@ setMethod (
     signature(data = "db.obj"),
     function (data, INDICES, FUN, ..., simplify = TRUE) {
         if (is.list(INDICES))
-            ## indx <- Reduce(cbind2, INDICES[-1], INDICES[[1]])
             indx <- .combine.list(INDICES)
         else
             indx <- INDICES
@@ -20,16 +19,18 @@ setMethod (
                        if (is.character(x)) paste("\"", x, "\"", sep = "")
                        else x, str))
         v <- add.quotes(v)
+
         get.piece <- function (x, indx, v) {
-            s <- paste(gsub("\"", "`", indx@.expr), "==", v, sep = "",
-                       collapse = " && ")
-            for (i in which(is.na(v)))
-                s <- gsub(paste(gsub("\"", "`", indx@.expr[i]), "==", v[i],
-                                sep = ""),
-                          paste("is.na(", indx@.expr[i], ")", sep = ""), s)
-            eval(parse(text = paste("with(x, x[", s, ",])",
-                       sep = "")))
+            eval(parse(
+                text = paste("x[",
+                paste(ifelse(
+                    is.na(v),
+                    paste("is.na(indx[,", seq_len(length(v)), "])", sep = ""),
+                    paste("indx[,", seq_len(length(v)), "] == ", v, sep = "")),
+                      collapse = " & "),
+                ",]")))
         }
+
         use <- get.piece(data, indx, v)
         fit0 <- FUN(use)
         if (!is(fit0, "db.obj")) {
