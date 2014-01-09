@@ -61,7 +61,8 @@ setMethod (
             
             col.idx.y <- .gwhich(names(y), by.y)
             is.factor <- x@.is.factor[col.idx] & y@.is.factor[col.idx.y]
-            for (i in seq_len(length(factor.ref))) {
+            for (i in seq_len(length(is.factor))) {
+                factor.ref <- NULL
                 if (is.factor[i])
                     factor.ref <- c(factor.ref, x@.factor.ref[i])
                 else
