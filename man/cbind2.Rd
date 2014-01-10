@@ -47,7 +47,6 @@ x and y.
   \code{\link{array.len}} measures the length of the array in an array column.
 }
 \examples{
-\dontrun{
 
 ## Suppose that a valid connection with ID 1 exists
 
@@ -72,7 +71,7 @@ unlist(Map(function(x)
 
 ## sum of all columns (excluding the 2nd column)
 Reduce(function(left, right) left + right, as.list(x[-2]))
-}
+
 }
 
 \keyword{data operation}

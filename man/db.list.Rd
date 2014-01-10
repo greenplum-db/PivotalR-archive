@@ -21,7 +21,7 @@ db.list()
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -32,23 +32,23 @@ db.list()
 
 \seealso{
   \code{\link{db.connect}} connects to database.
-  
+
   \code{\link{db.disconnect}} disconnects a connection.
 
   \code{\link{connection info}} the functions that extract information
   about the connection.
-  
+
   \code{\link{conn.eql}} tests whether two connections are the same.
 }
 
 \examples{
-\dontrun{
+
 ## connect to multiple databases
 db.connect(dbname = "mydb", port = 5433, madlib = "madlib")
 db.connect(dbname = "otherdb", port = 5432, madlib = "madlib07")
 
 db.list() # list the two connections
-}
+
 }
 
 \keyword{utility}

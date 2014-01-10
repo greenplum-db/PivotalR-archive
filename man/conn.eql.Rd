@@ -30,7 +30,7 @@ conn.eql(conn.id1, conn.id2)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -46,7 +46,7 @@ conn.eql(conn.id1, conn.id2)
   information.
 }
 \examples{
-\dontrun{
+
 ## Create two connections
 db.connect(host = "localhost", user = "you", dbname = "your_db", port = 5432)
 db.connect(user = "you", dbname = "your_db") # use default values
@@ -54,10 +54,9 @@ db.connect(user = "you", dbname = "your_db") # use default values
 db.list() # list the above two connections
 
 conn.eql(1, 2) # returns TRUE
-}
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{database}
 \keyword{utility}
-

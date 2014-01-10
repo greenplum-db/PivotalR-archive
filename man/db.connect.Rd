@@ -91,11 +91,11 @@ default.schemas = NULL, verbose = TRUE)
   connected database.
 }
 \examples{
-\dontrun{
+
 ## connect to a database
 db.connect(host = "localhost", user = "me", dbname = "me", password =
 "", port = 5432, madlib = "madlib")
-}
+
 }
 
 \keyword{utility}

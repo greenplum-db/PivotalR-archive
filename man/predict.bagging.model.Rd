@@ -17,21 +17,21 @@
     A \code{bagging.model}, which is the result of
   \code{\link{generic.bagging}}.
   }
-  
+
   \item{newdata}{
     A \code{\linkS4class{db.obj}} object, which wraps the data in the
-    database. 
+    database.
   }
-  
+
   \item{combine}{
     A string, default is \code{"mean"}. The other choice is
-    \code{"vote"}. How to 
+    \code{"vote"}. How to
     summarize the predictions of the multiple models in the fitting result
     of \code{\link{generic.bagging}}. \code{"mean"} will produce the average of
     the predictions, while \code{"vote"} will select the prediction with the
     most votes.
   }
-  
+
   \item{\dots}{
     Extra parameters. Not implemented yet.
   }
@@ -44,7 +44,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -57,7 +57,7 @@
   and logistic models.
 }
 \examples{
-\dontrun{
+
 ## set up the database connection
 db.connect(port = 14526, dbname = "madlib")
 
@@ -70,7 +70,7 @@ fit <- generic.bagging(function(data) {
 pred <- predict(fit, newdata = y) # make prediction
 
 lookat(mean((y$rings - pred)^2)) # mean squared error
-}
+
 }
 
 \keyword{madlib}

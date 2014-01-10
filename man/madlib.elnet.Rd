@@ -42,8 +42,8 @@ TRUE, method = c("fista", "igd", "sgd", "cd"), control = list(), glmnet
   A numeric value in [0,1], elastic net mixing parameter. The
           penalty is defined as
 
-                     (1-alpha)/2||beta||_2^2+alpha||beta||_1.           
-          
+                     (1-alpha)/2||beta||_2^2+alpha||beta||_1.
+
           'alpha=1' is the lasso penalty, and 'alpha=0' the ridge
           penalty.
 
@@ -115,7 +115,7 @@ A numeric value, the value of tolerance used during warmup. The default is the s
 
 \code{max.iter}, \code{tolerance}, \code{use.active.set} and \code{verbose} for \code{family = "gaussian"}
 
-\code{max.iter}, \code{tolerance}, \code{use.active.set}, \code{verbose}, \code{warmup}, \code{warmup.lambda.no} for \code{family   = "binomial"}
+\code{max.iter}, \code{tolerance}, \code{use.active.set}, \code{verbose}, \code{warmup}, \code{warmup.lambda.no} for \code{family = "binomial"}
 
 All parameters have been explained above. The only one left is \code{verbose}.
 
@@ -130,18 +130,18 @@ All parameters have been explained above. The only one left is \code{verbose}.
 }
 
 \note{
-  The coordinate descent (\code{method = "cd"}) algorithm is currently only available in PivotalR. In the future, we will also implement it in MADlib. The idea is to do some part of the computation in memory. Due to the memory usage liimitation of the database, this method cannot handle the fitting where the number of features is too large (a couple of thousands). 
+  The coordinate descent (\code{method = "cd"}) algorithm is currently only available in PivotalR. In the future, we will also implement it in MADlib. The idea is to do some part of the computation in memory. Due to the memory usage liimitation of the database, this method cannot handle the fitting where the number of features is too large (a couple of thousands).
 }
 
 \details{
   the objective function for
      \code{"gaussian"} is
 
-                       1/2  RSS/nobs + lambda*penalty,                  
-     
+                       1/2  RSS/nobs + lambda*penalty,
+
      and for the other models it is
 
-                       -loglik/nobs + lambda*penalty.   
+                       -loglik/nobs + lambda*penalty.
 }
 
 \value{
@@ -244,7 +244,7 @@ All parameters have been explained above. The only one left is \code{verbose}.
   \code{\link{generic.cv}} does k-fold cross-validation. See the examples there about how to use elastic net together with cross-validation.
 }
 \examples{
-\dontrun{
+
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
@@ -260,7 +260,6 @@ fit
 
 lk(mean((z$y - predict(fit, z))^2)) # mean square error
 
-}
 }
 
 \keyword{madlib}

@@ -61,13 +61,13 @@
 
   The numeric
   centering and scalings used (if any) are returned as attributes
-  "scaled:center" and "scaled:scale". The number of rows in the table is also 
+  "scaled:center" and "scaled:scale". The number of rows in the table is also
   returned as the attribute "row.number".
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -77,7 +77,7 @@
 }
 
 \examples{
-\dontrun{
+
 help("scale,db.obj-method") # display this doc
 
 ## Suppose a valid database connection 1 has been created by db.connect
@@ -92,7 +92,7 @@ scales <- attr(s, "scaled:scale")
 
 ## create the scaled table
 y <- as.db.data.frame(s, "scaled_abalone")
-}
+
 }
 
 \keyword{methods}

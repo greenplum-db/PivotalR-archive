@@ -78,7 +78,7 @@ db.array(x, ...)
 
 \details{
     For aggregate functions: \code{mean}, \code{sum}, \code{count},
-    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
+    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature
     \code{x} must be a reference to a single column in a table.
 
     For aggregate functions: \code{colMeans}, \code{colSums}, and \code{colAgg} the signature
@@ -124,7 +124,7 @@ db.array(x, ...)
 }
 
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("mean,db.obj-method")
 
@@ -167,7 +167,7 @@ colAgg(x)
 
 ## put everything into an array plus a constant 1 as the first element
 db.array(1, x, x, x)
-}
+
 }
 
 \keyword{math}

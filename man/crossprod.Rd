@@ -9,7 +9,7 @@
 \description{
   The function computes the cross product of two matrices. The matrix is
   stored in the table either as multiple columns of data or a column of
-  arrays.  
+  arrays.
 }
 
 \usage{
@@ -41,7 +41,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -49,7 +49,7 @@
   \code{\link{db.array}} forms an array using columns
 }
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("crossprod,db.obj-method")
 
@@ -79,7 +79,7 @@ pca <- function (x, center = TRUE, scale = FALSE)
     d <- delete(z) # delete the intermediate table
     res <- eigen(m) # only this computation is in R
     n <- attr(y, "row.number") # save the computation to count rows
-     
+
     ## return the result
     list(val = sqrt(res$values/(n-1)), # eigenvalues
          vec = res$vectors, # columns of this matrix are eigenvectors
@@ -94,9 +94,8 @@ dat <- as.db.data.frame(abalone)
 p <- pca(dat[,-c(1,2)])
 
 p$val # eigenvalues
-}
+
 }
 
 \keyword{methods}
 \keyword{math}
-

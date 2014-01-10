@@ -42,7 +42,7 @@
 }
 
 \examples{
-\dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame
@@ -51,7 +51,7 @@ preview(x, 10)
 
 preview(x[1:3])
 preview(subset(x, 1:3))
-    }
+
 }
 
 \keyword{data operation}

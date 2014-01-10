@@ -4,7 +4,7 @@
 \title{Functions for filtering \code{NA} values in data}
 
 \description{
-  'na.omit' returns the object with incomplete cases removed. 
+  'na.omit' returns the object with incomplete cases removed.
 }
 
 \usage{
@@ -31,7 +31,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -40,10 +40,10 @@
 }
 
 \examples{
-\dontrun{
+
 dat <- as.db.data.frame(abalone, "abalone")
 madlib.lm(rings ~ . - sex - id, data = dat, na.action = na.omit)
-}
+
 }
 
 \keyword{utility}

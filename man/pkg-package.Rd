@@ -118,7 +118,7 @@ include
 }
 
 \examples{
-\dontrun{
+
 ## get the help for the package
 help("PivotalR-package")
 
@@ -265,7 +265,7 @@ fit
 
 ## Or we can replace all NULL values
 x[is.na(x)] <- 45
-}
+
 }
 
 \keyword{package}

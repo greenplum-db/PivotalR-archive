@@ -55,7 +55,7 @@
 \value{ For ungrouped regressions, \code{logLik} returns an object of
     class \code{logLik}, and \code{extractAIC} returns a length-2
     numeric vector giving the edf and AIC.
-    
+
     For grouped regressions, \code{logLik} and \code{extractAIC} return
   a list giving the output of these methods for each of the component
   models. Similarly, \code{AIC} for a grouped regression returns a
@@ -63,7 +63,7 @@
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -71,7 +71,7 @@
   \code{\link{AIC}}, \code{\link{extractAIC}}, \code{\link{logLik}}.
 }
 
-\examples{ \dontrun{
+\examples{
 
 ## create a table
 x <- as.db.data.frame(abalone, "abalone")
@@ -82,6 +82,4 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 AIC(fit)
 
 AIC(fit[[1]])
-} }
-
-
+}

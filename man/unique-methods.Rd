@@ -6,7 +6,7 @@
 \description{
     This function gives the unique values of a \code{db.obj}, which are
     the column
-    unique of a \code{db.table} or \code{db.view}. 
+    unique of a \code{db.table} or \code{db.view}.
 }
 
 \usage{
@@ -49,7 +49,7 @@
 }
 
 \examples{
-    \dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame "abalone"
@@ -59,7 +59,7 @@ preview(x, nrows = 10) # extract 10 rows of data
 
 ## get unique of all columns
 unique(x$sex)
-}
+
 }
 
 \keyword{methods}

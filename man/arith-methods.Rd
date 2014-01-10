@@ -69,23 +69,23 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \note{
   A meaningful expression is generated only when the
   \code{.col.data_type} is "numeric", otherwise a "NULL" value is
-  generated. 
+  generated.
 }
 
 \seealso{
 \code{\linkS4class{db.Rquery}} contains a SQL query that does the
-operations. 
+operations.
 }
 
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("+,db.obj,db.obj-method")
 
@@ -101,7 +101,7 @@ x$area <- x$length * x$height # add a new column
 preview(x$area, 10) # view the actual values computed in database
 
 fit <- madlib.lm(rings ~ area, data = x)
-}
+
 }
 
 \keyword{math}

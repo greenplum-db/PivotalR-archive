@@ -20,7 +20,7 @@ db.objects(search = NULL, conn.id = 1)
     A string, default is \code{NULL}. List all database objects whose
   names have the string in them. You can put regular expression here.
   }
-  
+
   \item{conn.id}{
     An integer, default is 1. The ID of the database connection.
   }
@@ -28,12 +28,12 @@ db.objects(search = NULL, conn.id = 1)
 
 \value{
   A character array. Each element has the format of
-  'schema_name.table_name'. 
+  'schema_name.table_name'.
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -43,7 +43,7 @@ db.objects(search = NULL, conn.id = 1)
   \code{\link{db.existsObject}} tests whether an object exists in the database
 }
 \examples{
-\dontrun{
+
 ## create connection to a database
 conid <- db.connect(port = 5433) # using default values
 
@@ -54,8 +54,8 @@ db.objects(conid) # list all tables/views
 
 ## list all tables/views start with "madlibtestdata.lin"
 ## where "madlibtestdata" is the schema name
-db.objects("^madlibtestdata.lin") 
-}
+db.objects("^madlibtestdata.lin")
+
 }
 
 \keyword{utility}

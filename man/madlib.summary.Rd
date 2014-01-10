@@ -115,7 +115,7 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
 }
 
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("madlib.summary")
 
@@ -139,9 +139,6 @@ summary_result  <- madlib.summary(x, target.cols=c('assets', 'sector'),
 print(summary_result)
 
 }
-}
 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{stats}
 \keyword{madlib}

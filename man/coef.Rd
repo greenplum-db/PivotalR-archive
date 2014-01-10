@@ -32,13 +32,13 @@
 }
 
 \value{ For ungrouped regressions, a named numeric vector giving the fitted coefficients.
-    
+
     For grouped regressions, a list giving the coefficients for each of the component
   models.
 }
 
 \author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -46,7 +46,7 @@
   \code{\link{coef}}.
 }
 
-\examples{ \dontrun{
+\examples{
 
 ## create a table
 x <- as.db.data.frame(abalone, "abalone")
@@ -57,6 +57,6 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 coef(fit)
 
 coef(fit[[1]])
-} }
+}
 
 \keyword{utility}

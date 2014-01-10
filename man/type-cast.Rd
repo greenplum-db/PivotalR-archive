@@ -72,13 +72,13 @@ col.types(x)
 }
 
 \value{
-    A \code{\linkS4class{db.Rquery}} object, which is a SQL query which     combine all columns into an array.
+    A \code{\linkS4class{db.Rquery}} object, which is a SQL query which combine all columns into an array.
 
 \code{col.types} returns a vector of characters, which are the column types of \code{x}.
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc.  
+  Author: Predictive Analytics Team at Pivotal Inc.
 
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
@@ -89,7 +89,7 @@ col.types(x)
 }
 
 \examples{
-\dontrun{
+
 ## Suppose that a valid connection to a database (with ID=1) is established
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone")
@@ -103,7 +103,7 @@ lookat(z, 10)
 col.types(x)
 
 col.types(z)
-}
+
 }
 
 \keyword{utility}

@@ -62,7 +62,7 @@ information associated with a \code{db.table} or \code{db.view} object.
   \code{\link{preview}} Displays the contents of an associated table.
 }
 \examples{
-  \dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame "abalone"
@@ -73,10 +73,8 @@ print(x) # Display the associated table, and database information for x
 show(x)
 ##Alternative way of doing the same thing
 x# Display the associated table, and database information for x
-  }
+
 }
+
 \keyword{IO}
 \keyword{utility}
-
-
-

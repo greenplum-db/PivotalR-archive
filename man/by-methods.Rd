@@ -23,7 +23,7 @@
     A list of \code{db.Rquery} objects. Each of
     the list element selects one or multiple columns of \code{data}. When the value is
     \code{NULL}, no grouping of data is done, and the aggregate function
-    \code{FUN} will be applied onto 
+    \code{FUN} will be applied onto
     all the data.
   }
 
@@ -41,7 +41,7 @@
 }
 
 \value{
-  The type of the returned value depends on the return type of   \code{FUN}.
+  The type of the returned value depends on the return type of \code{FUN}.
 
 If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then this function returns
   a \code{db.Rquery} object, which is actually the SQL query that does
@@ -53,7 +53,7 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -65,7 +65,7 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
 }
 
 \examples{
-\dontrun{
+
 help("by,db.obj-method") # display this doc
 
 ## Suppose a valid database connection 1 has been created by db.connect
@@ -86,7 +86,7 @@ dat <- as.db.data.frame(abalone)
 
 ## Fit linear model to each group of data
 by(dat, dat$sex, function(x) madlib.lm(rings ~ . - id - sex, data = x))
-}
+
 }
 
 \keyword{methods}

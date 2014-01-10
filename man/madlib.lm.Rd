@@ -65,7 +65,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   the fitting is done conditioned on the values of one or more
   variables. For example, \code{y ~ x + sin(z) | v + w} will do the
   fitting each distinct combination of the values of \code{v} and
-  \code{w}. 
+  \code{w}.
 
   Both the linear regression (this function) and the logistic regression
   (\code{\link{madlib.glm}}) support categorical variables. Use
@@ -78,7 +78,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   If there is no grouping (i.e. no \code{|} in the formula), the result
   is a \code{lm.madlib} object. Otherwise, it is a \code{lm.madlib.grps}
   object, which is just a list of \code{lm.madlib} objects.
-  
+
   A \code{lm.madlib} object is a list which contains the following items:
 
   \item{grouping column(s)}{
@@ -98,7 +98,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
     number of rows is equal to the number of distinct combinations of
     all the grouping column values. The number of columns is equal to
     the number features (including intercept if it presents in the
-    formula). 
+    formula).
   }
 
   \item{r2}{
@@ -107,7 +107,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   }
 
   \item{std_err}{
-    A numeric matrix, the standard error for each coefficients. 
+    A numeric matrix, the standard error for each coefficients.
   }
 
   \item{t_stats}{
@@ -181,18 +181,18 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
   \item{terms}{ A \code{\link{terms}} object, describing the terms in
     the model formula.  }
-  
+
   \item{nobs}{
     The number of observations used to fit the model.
   }
 
   \item{data}{A \code{db.obj} object, which wraps all the
-  data used in the database. If there are fittings for multiple groups,   then this is only the wrapper for the data in one group.}
+  data used in the database. If there are fittings for multiple groups, then this is only the wrapper for the data in one group.}
 
 \item{origin.data}{
   The original \code{db.obj} object. When there is no grouping, it is equal to \code{data} above, otherwise it is the "sum" of \code{data} from all groups.
 }
-  
+
   Note that if there is grouping done, and there are multiple
   \code{lm.madlib} objects in the final result, each one of them
   contains the same copy \code{model}.
@@ -228,7 +228,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   \code{\link{delete}} safely deletes the result of this function.
 }
 \examples{
-\dontrun{
+
 ## connect to a data base
 db.connect(dbname = "exampledb", user = "example", host = "localhost", port = 5433)
 x <- db.data.frame("madlibtestdata.lin_ornstein")
@@ -268,7 +268,7 @@ fit <- madlib.lm(as.integer(y < 10) ~ . - x[1:2], data = array.data)
 dat <- as.db.data.frame(abalone, "abalone")
 start <- madlib.lm(rings ~ . - id - sex, data = dat)
 step(start)
-}
+
 }
 
 \keyword{madlib}

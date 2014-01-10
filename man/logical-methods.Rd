@@ -29,11 +29,11 @@
 
 \arguments{
   \item{e1, e2}{
-    logical or \code{\linkS4class{db.obj}} object. 
+    logical or \code{\linkS4class{db.obj}} object.
   }
 
   \item{x}{
-    \code{\linkS4class{db.obj}} object. 
+    \code{\linkS4class{db.obj}} object.
   }
 }
 
@@ -44,23 +44,23 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \note{
   A meaningful expression is generated only when the
   \code{.col.data_type} is "boolean", otherwise a "NULL" value is
-  generated. 
+  generated.
 }
 
 \seealso{
 \code{\linkS4class{db.Rquery}} contains a SQL query that does the
-operations. 
+operations.
 }
 
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("|,db.obj,db.obj-method")
 
@@ -70,9 +70,8 @@ help("|,db.obj,db.obj-method")
 x <- as.db.data.frame(abalone, "abalone")
 
 preview(x$rings[x$length > 10 & x$height < 2,])
-}
+
 }
 
 \keyword{methods}
 \keyword{math}
-

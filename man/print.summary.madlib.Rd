@@ -46,7 +46,7 @@
 }
 
 \examples{
-\dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 ## create a table from the example data.frame
 
@@ -58,10 +58,9 @@ preview(x, 10)
 summary_result  <- madlib.summary(x)
 print(summary_result)
 show(summary_result)
-    }
+
 }
 
 \keyword{IO}
 \keyword{madlib}
 \keyword{utilities}
-

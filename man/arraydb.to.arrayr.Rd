@@ -26,16 +26,16 @@ arraydb.to.arrayr(str, type = "double", n = 1)
   \item{type}{
     The type of the return value of this function. Default is
   \code{"double"}. It can be \code{"character"}, \code{"double"},
-  \code{"logical"}, \code{"integer"}, 
+  \code{"logical"}, \code{"integer"},
   \code{"numeric"} etc. All types other than \code{"character"},
-  \code{"logical"} and 
+  \code{"logical"} and
   \code{"integer"} will be treated as \code{"numeric"}.
   }
   \item{n}{
     An integer, default is 1. If the input has \code{NA} instead of a string as
-   one element of a string array, how many \code{NA}'s should be returned so that 
-    a valid array can be returned. There should be as many \code{NA} as the number 
-  of elements in other output rows without \code{NA}.  
+   one element of a string array, how many \code{NA}'s should be returned so that
+    a valid array can be returned. There should be as many \code{NA} as the number
+  of elements in other output rows without \code{NA}.
   }
 }
 
@@ -62,7 +62,7 @@ arraydb.to.arrayr(str, type = "double", n = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -72,15 +72,14 @@ arraydb.to.arrayr(str, type = "double", n = 1)
 
   (2) Although this function is for the strings extracted from database,
   it can actually deal with strings like \code{"a, b, c"}, which do not start
-  or end with curly brackets. 
+  or end with curly brackets.
 }
 
 \seealso{
-  \code{\link{preview}} extracts the data of a table 
+  \code{\link{preview}} extracts the data of a table
 }
 
 \examples{
-\dontrun{
 
 ## Example 1 ----------
 
@@ -96,9 +95,8 @@ arraydb.to.arrayr(str, "character") # c("a", "b", "\"c, d\"")
 x <- db.data.frame("table_in_database", conn.id = 1)
 dat <- preview(x, nrows = 50) # extract the actual data
 arraydb.to.arrayr(dat$col.array, "double") # an array of 50 rows
+
 }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
 \keyword{ database }
 \keyword{ utility }

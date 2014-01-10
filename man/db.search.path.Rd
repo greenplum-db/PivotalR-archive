@@ -5,7 +5,7 @@
 \title{
   Display or set the search path (i.e. default schemas) for a connected
   session to a database. The use can easily switch to a schema that he
-  has the privilege to write. 
+  has the privilege to write.
 }
 
 \description{
@@ -40,18 +40,18 @@ db.default.schemas(conn.id = 1, set = NULL)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
   \code{\link{db.connect}} connects to database, and the parameter
   \code{default.schemas} can be used to set the search path when
-  connecting. 
+  connecting.
 }
 
 \examples{
-\dontrun{
+
 library(PivotalR)
 db.connect(port = 14526, dbname = "madlib", default.schemas =
 "public,madlib")
@@ -59,7 +59,7 @@ db.connect(port = 14526, dbname = "madlib", default.schemas =
 db.search.path()
 
 db.search.path(set = "public,madlibtestdata")
-}
+
 }
 
 \keyword{utility}

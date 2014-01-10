@@ -57,7 +57,7 @@ to \code{sort(x, FALSE, "random")}. When
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -66,7 +66,7 @@ to \code{sort(x, FALSE, "random")}. When
 }
 
 \examples{
-\dontrun{
+
 ## set up the database connection
 db.connect(port = 14526, dbname = "madlib")
 
@@ -87,8 +87,9 @@ dim(b)
 lookat(b)
 
 delete(b)
+
 }
-}
+
 \keyword{methods}
 \keyword{database}
 \keyword{stats}

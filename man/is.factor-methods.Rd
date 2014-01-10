@@ -7,7 +7,7 @@
 
 \description{
   This function detects whether a \code{\linkS4class{db.obj}} object is a
-  categorical object. 
+  categorical object.
 }
 
 \usage{
@@ -16,7 +16,7 @@
 
 \arguments{
   \item{x}{
-    A \code{\linkS4class{db.obj}} object. 
+    A \code{\linkS4class{db.obj}} object.
   }
 }
 
@@ -27,7 +27,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -37,7 +37,7 @@
 }
 
 \examples{
-\dontrun{
+
 ## Suppose that a valid connection with ID 1 is already created by db.connect
 
 ## create a table from the example data.frame "abalone"
@@ -49,7 +49,7 @@ x$sex <- as.factor(x$sex)
 is.factor(x$sex)
 
 is.factor(x)
-}
+
 }
 
 \keyword{methods}

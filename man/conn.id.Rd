@@ -32,7 +32,7 @@ conn.id(x) <- value
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -46,12 +46,12 @@ conn.id(x) <- value
 
  \code{\link{connection info}} has all functions that can extract
   information about the database connection.
-  
+
   \code{\link{conn.eql}} tests whether two connections are actually the
   same one.
 }
 \examples{
-\dontrun{
+
 ## create two connections
 db.connect(host = "localhost", user = "you", dbname = "your_db", port = 5432)
 db.connect(user = "you", dbname = "your_db") # use default values
@@ -70,9 +70,8 @@ preview(x) # gives an error since connection 1 is disconnected
 conn.id(x) <- 2 # 1 and 2 are the same
 
 preview(x) # gives what you want
+
 }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
 \keyword{database}
 \keyword{utility}

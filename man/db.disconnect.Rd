@@ -53,7 +53,7 @@ db.disconnect(conn.id = 1, verbose = TRUE, force = FALSE)
   \code{\link{conn.eql}} tests whether two connections are the same.
 }
 \examples{
-\dontrun{
+
 ## connect to a database
 conid <- db.connect(host = "localhost", user = "me", dbname = "me", password =
 "", port = 5432, madlib = "madlib")
@@ -61,8 +61,8 @@ conid <- db.connect(host = "localhost", user = "me", dbname = "me", password =
 ## disconnect the connection
 db.disconnect(conid)
 
-db.list() 
-}
+db.list()
+
 }
 
 \keyword{utility}

@@ -37,7 +37,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -50,7 +50,7 @@
 }
 
 \examples{
-\dontrun{
+
 ## get help for a method
 help("as.factor,db.obj-method")
 
@@ -78,7 +78,7 @@ fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
 ## using relevel to change the reference level
 x$sex <- relevel(x$sex, ref = "M")
 madlib.lm(rings ~ . - id, data = x) # use "M" as the reference level
-}
+
 }
 
 \keyword{methods}

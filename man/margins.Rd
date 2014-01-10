@@ -57,7 +57,7 @@ Vars(model)
   \item{na.action}{
         A string which indicates what should happen when the data
         contain \code{NA}s. Possible
-        values include \code{\link{na.omit}}, \code{"na.exclude"},              \code{"na.fail"}
+        values include \code{\link{na.omit}}, \code{"na.exclude"}, \code{"na.fail"}
   and \code{NULL}. Right now, \code{\link{na.omit,db.obj-method}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed, and see \code{\link{na.omit,db.obj-method}} for the preferred function interface.
 }
   \item{\dots}{
@@ -83,7 +83,7 @@ Vars(model)
 }
 
 \value{
-  \code{margins} function returns a \code{margins} object, which is a   \code{data.frame}. It contains the following item:
+  \code{margins} function returns a \code{margins} object, which is a \code{data.frame}. It contains the following item:
 \item{Estimate}{
   The marginal effect values for all variable that have been specified in \code{dydx}.
 }
@@ -119,7 +119,7 @@ Vars(model)
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}} compute linear and logistic regressions.
 }
 \examples{
-\dontrun{
+
 ## create a data table in database and the R wrapper
 dat <- as.db.data.frame(abalone, "abalone")
 
@@ -141,7 +141,7 @@ dat1 <- as.db.data.frame(dat1, "abalone_array")
 
 fit <- madlib.glm(y < 10 ~ x[-1], data = dat1, family = "logistic")
 margins(fit, ~ x[2:5])
-}
+
 }
 
 \keyword{stats}

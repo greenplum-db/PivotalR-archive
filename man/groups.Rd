@@ -50,18 +50,18 @@
 
 \seealso{
   \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
-  
+
   \code{\link{madlib.lm}} wrapper for MADlib linear regression
 
   \code{\link{predict.lm.madlib}}, \code{\link{predict.lm.madlib.grps}},
   \code{\link{predict.logregr.madlib}},
-  \code{\link{predict.logregr.madlib.grps}} make 
+  \code{\link{predict.logregr.madlib.grps}} make
   predictions for new data.
 }
 
 
 \examples{
-    \dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame
@@ -74,7 +74,7 @@ fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)
 groups(fit) # all grouping column values
 
 groups(fit[[1]]) # the first model's grouping column value
-       }
+
 }
 
 \keyword{madlib}

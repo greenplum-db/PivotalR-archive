@@ -25,7 +25,7 @@ distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose =
 TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
-distributed.by = NULL, is.temp = FALSE, ...) 
+distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose =
 TRUE, is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by =
@@ -148,7 +148,7 @@ and it defaults to 0.
 
     A list of \code{key=value} pairs, where the value is a string of
     data type. Force the new table to use the data type for the column
-    \code{key}. 
+    \code{key}.
   }
 
   \item{factor.full}{
@@ -158,19 +158,19 @@ and it defaults to 0.
 
 \value{
   A \code{db.data.frame} object. It points to a table whose name is
-  given by \code{table.name} in connection \code{conn.id}. 
+  given by \code{table.name} in connection \code{conn.id}.
 
 }
 
 \note{
 
-  All the \code{as.db.data.frame} accept the option \code{field.types}. 
-  
+  All the \code{as.db.data.frame} accept the option \code{field.types}.
+
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -188,7 +188,7 @@ and it defaults to 0.
   operations on an existing \code{\linkS4class{db.data.frame}} object.
 }
 \examples{
-\dontrun{
+
 ## get the help for a method
 help("as.db.data.frame")
 help("as.db.data.frame,db.Rquery-method")
@@ -216,7 +216,7 @@ z <- as.db.data.frame(x[,], "abalone1")
 
 z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"))
 
-} }
+}
 
 \keyword{utility}
 \keyword{ database }

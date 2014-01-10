@@ -3,7 +3,7 @@
 
 \title{
   Delete all the result tables created during calculations of
-  MADlib 
+  MADlib
 }
 \description{
   Some MADlib wrapper functions create result tables that cannot be
@@ -14,7 +14,7 @@
   3 tables when they are not useful anymore using
   \code{\link{delete,arima.css.madlib-method}}. One can also choose to
   all such tables created by many such functions together using this
-  function. 
+  function.
 }
 
 \usage{
@@ -36,7 +36,7 @@ clean.madlib.temp(conn.id = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -46,11 +46,11 @@ clean.madlib.temp(conn.id = 1)
 
   \code{\link{delete,arima.css.madlib-method}} deletes the result of
   \code{\link{madlib.arima}} together with the model, residual and statistics
-  tables. 
+  tables.
 }
 
 \examples{
-\dontrun{
+
 library(PivotalR)
 db.connect(port = 14526, dbname = "madlib")
 
@@ -77,8 +77,8 @@ s
 clean.madlib.temp(conn.id=1)
 
 ## s still exists but the 3 tables (model, residuals, etc.) are deleted
-s 
-}
+s
+
 }
 
 \keyword{utility}

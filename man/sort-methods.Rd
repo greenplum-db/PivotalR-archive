@@ -47,12 +47,12 @@
 
 \seealso{
   \code{\link{by}} has similar syntax to this function.
-  
+
   \code{\link{preview}} to view portion of the data table
 }
 
 \examples{
-\dontrun{
+
 # Suppose that a valid connection with ID 1 exists
 x  <- db.data.frame("madlibtestdata.lin_ornstein")
 preview(x, 10)
@@ -62,7 +62,7 @@ y  <- sort(x, decreasing = FALSE, list(x$nation, x$sector) )
 content(y)
 # get the sorted output
 preview(y)
-}
+
 }
 
 \keyword{database}

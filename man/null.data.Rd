@@ -35,7 +35,6 @@ loaded whenever it is used.}
 }
 
 \examples{
-\dontrun{
 
 ## The user does not need to run data(abalone) to load the data
 
@@ -44,8 +43,8 @@ loaded whenever it is used.}
 x <- as.db.data.frame(null.data, "null_data") # use default connection 1
 
 ## ERROR, because of NULL values
-fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + 
-                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + 
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto +
+                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a +
                  lnrenr3a, data = x)
 
 ## select columns
@@ -63,7 +62,8 @@ dim(y)
 fit <- madlib.lm(sf_mrtg_pct_assets ~ ., data = y)
 
 fit
+
 }
-}
+
 \keyword{database}
 \keyword{data operation}

@@ -18,7 +18,7 @@
     \item{test}{
       A \code{db.obj} object, which has only one column. The column can be casted into boolean values.
     }
- 
+
     \item{yes}{
       A normal value or a \code{db.obj} object. It is the returned value when \code{test} is \code{TRUE}.
     }
@@ -29,12 +29,12 @@
 }
 
 \value{
-  A \code{\linkS4class{db.obj}} which has the same length in-database as   \code{test}.
+  A \code{\linkS4class{db.obj}} which has the same length in-database as \code{test}.
 }
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -42,11 +42,11 @@
   \code{\linkS4class{db.obj}}
 }
 
-\examples{ \dontrun{
+\examples{
 ## create a table
 x <- as.db.data.frame(abalone, "abalone")
 
 ## create a new db.obj with one-column,
 ## and values "small" or "big"
 z <- ifelse(x$rings < 10, "small", "big")
-} }
+}

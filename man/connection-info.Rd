@@ -55,7 +55,7 @@ conn.pkg(conn.id = 1)
 
 \value{
   For \code{user}, a string, which is the user name.
-  
+
   For \code{host}, a string, which is the host address.
 
   For \code{dbname}, a string, which is the database name.
@@ -80,7 +80,7 @@ conn.pkg(conn.id = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -97,7 +97,7 @@ conn.pkg(conn.id = 1)
 }
 
 \examples{
-\dontrun{
+
 user(1)
 host(2)
 dbname() # use default connection 1
@@ -113,9 +113,8 @@ dbListTables(con) # directly use functions in package RPostgreSQL
 
 ## This package provides a better function to list all tables/views
 db.objects(1) # list all tables/views with their schema in connection 1
-}
+
 }
 
 \keyword{utility}
 \keyword{database}
-

@@ -39,17 +39,17 @@ db.q(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 
 \seealso{
-  \code{\link{db.connect}}, \code{\link{db.objects}},   \code{\link{db.list}}, 
+  \code{\link{db.connect}}, \code{\link{db.objects}}, \code{\link{db.list}},
 }
 
 \examples{
-\dontrun{
+
 ## Suppose a connection has been create with connection ID 1
 db.q("show search_path")
 db.q("drop table if exists tr;",
@@ -57,7 +57,7 @@ db.q("drop table if exists tr;",
                             val double precision);",
       "insert into tr values (1, 2.3), (2, 3.4)")
 db.q("select * from tr")
-}
+
 }
 
 \keyword{utility}

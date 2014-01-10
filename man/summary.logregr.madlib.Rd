@@ -34,13 +34,13 @@
 
 \seealso{
   \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
-  
+
   \code{\link{madlib.lm}} wrapper for MADlib linear regression
 }
 
 
 \examples{
-    \dontrun{
+
 ## Suppose that a valid connection with ID 1 exists
 
 ## create a table from the example data.frame
@@ -54,7 +54,7 @@ summary(fit)
 ## use I(.) for expressions
 fit <- madlib.logregr(y ~ x + I(x^2) - 1, data = source_data)
 summary(fit)
-       }
+
 }
 
 \keyword{madlib}

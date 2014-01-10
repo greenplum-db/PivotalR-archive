@@ -91,7 +91,7 @@
 \item{pattern}{
 character string containing a regular expression (or
           character string for 'fixed = TRUE') to be matched in the
-          given character vector. 
+          given character vector.
 }
 
 \item{x}{
@@ -124,24 +124,24 @@ logical. Not implemented yet.
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \note{
   A meaningful expression is generated only when the
   \code{.col.data_type} is "character" or "numeric", otherwise a "NULL"
-  value is 
-  generated. 
+  value is
+  generated.
 }
 
 \seealso{
 \code{\linkS4class{db.Rquery}} contains a SQL query that does the
-operations. 
+operations.
 }
 
 \examples{
-\dontrun{
+
 ## get the help for a method
 help(">,db.obj,db.obj-method")
 
@@ -151,7 +151,7 @@ help(">,db.obj,db.obj-method")
 x <- as.db.data.frame(abalone, "abalone")
 
 preview(x[x$length > 10,])
-}
+
 }
 
 \keyword{methods}

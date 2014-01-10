@@ -263,7 +263,7 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 }
 
 \examples{
-    \dontrun{
+
 ## connect to a data base
 db.connect(dbname = "exampledb", user = "example", host = "localhost", port = 5433)
 source_data <- db.data.frame("madlibtestdata.lin_ornstein")
@@ -299,7 +299,7 @@ fit <- madlib.glm(y < 10 ~ x - x[1:2], data = array.data, family = "binomial")
 dat <- as.db.data.frame(abalone, "abalone")
 start <- madlib.glm(rings < 10 ~ . - id - sex, data = dat, family = "binomial")
 step(start)
-}
+
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

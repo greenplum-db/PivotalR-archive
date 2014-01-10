@@ -42,17 +42,18 @@
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
-  \code{\link{sum,db.obj-method}}, \code{\link{colSums,db.obj-method}}   compute the sum of each column.
+  \code{\link{sum,db.obj-method}}, \code{\link{colSums,db.obj-method}} compute the sum of each column.
 
 \code{\link{mean,db.obj-method}}, \code{\link{colMeans,db.obj-method}} compute the mean values column-wise.
 }
 
-\examples{ \dontrun{
+\examples{
+
 ## create a table
 x <- as.db.data.frame(abalone, "abalone")
 
@@ -62,4 +63,4 @@ row.avg <- rowMeans(x[,-2])
 ## lokk at 10 results
 lk(row.sum, 10)
 lk(row.avg, 10)
-} }
+}
