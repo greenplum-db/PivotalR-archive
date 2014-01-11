@@ -21,9 +21,9 @@ setMethod (
 
 ## ----------------------------------------------------------------------
 
-setGeneric("cbind", function(x, ...) {
+setGeneric("cbind", function(x, ..., deparse.level = 1) {
     if (!is(x, "db.obj"))
-        base::cbind(x, ...)
+        base::cbind(x, ..., deparse.level = 1)
     else
         standardGeneric("cbind")
 })
@@ -31,7 +31,7 @@ setGeneric("cbind", function(x, ...) {
 setMethod(
     "cbind",
     representation(x = "db.obj"),
-    function(x, ...) {
+    function(x, ..., deparse.level = 1) {
         lst <- c(x, ...)
         PivotalR:::.combine.list(lst)
     })
