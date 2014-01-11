@@ -12,35 +12,26 @@ operate on the objects in the database. PivotalR also lets the user to run the f
 big-data machine
 learning package [MADlib](http://madlib.net/) directly from R.
 
-To install PivotalR:
+1. [An Introduction to PivotalR](https://github.com/gopivotal/PivotalR/raw/master/inst/doc/pivotalr_vignette.pdf)
 
-* Get the latest stable version from CRAN by running `install.packages("PivotalR")`
+2. To install PivotalR:
+    * Get the latest stable version from CRAN by running `install.packages("PivotalR")`
+    * Or try out the latest development version from github by running the following code:
 
-* Or try out the latest development version from github by running the following code:
-
-    ```r
-    # install.packages("devtools")
-    devtools::install_github("PivotalR", "gopivotal")
-    ```
-
-* Or download the source tarball directly from [**here**](https://github.com/gopivotal/PivotalR/tarball/master), and
-  then install the tarball
-
-  ```r
-  install.packages("gopivotal-PivotalR-xxxx.tar.gz", repos = NULL, type = "source")
-  ```
-  where "gopivotal-PivotalR-xxxx.tar.gz" is the name of the package.
-  
-To get started:
-
-* [Read the wiki](https://github.com/gopivotal/PivotalR/wiki)
-
-* [Look at some demo code](https://github.com/gopivotal/PivotalR/wiki/Example)
-
-* [Watch a training video](https://docs.google.com/file/d/0B9bfZ-YiuzxQc1RWTEJJZ2V1TWc/edit?usp=sharing)
-
-* [Read the quick-start guide](https://github.com/wjjung317/gp-r/blob/master/docs/PivotalR-quick-start%20v2.pdf)
-
-* [View the pivotal demo slides](https://docs.google.com/presentation/d/103dv1h4VBCBAixqpezJzWmffyrcRR2h9MCJBTfMOBIM/edit?usp=sharing)
-
-* [Check out the PivotalR webpage](http://gopivotal.github.io/PivotalR)
+        ```
+        ## install.packages("devtools")
+        devtools::install_github("PivotalR", "gopivotal")
+        ```
+    * Or download the source tarball directly from [**here**](https://github.com/gopivotal/PivotalR/tarball/master), and then install the tarball
+    
+        ```
+        install.packages("gopivotal-PivotalR-xxxx.tar.gz", repos = NULL, type = "source")
+        ```
+    where "gopivotal-PivotalR-xxxx.tar.gz" is the name of the package that you have downloaded.
+3. To get started:
+    * [Read the wiki](https://github.com/gopivotal/PivotalR/wiki)
+    * [Look at some demo code](https://github.com/gopivotal/PivotalR/wiki/Example)
+    * [Watch a training video](https://docs.google.com/file/d/0B9bfZ-YiuzxQc1RWTEJJZ2V1TWc/edit?usp=sharing)
+    * [Read the quick-start guide](https://github.com/wjjung317/gp-r/blob/master/docs/PivotalR-quick-start%20v2.pdf)
+    * [View the pivotal demo slides](https://docs.google.com/presentation/d/103dv1h4VBCBAixqpezJzWmffyrcRR2h9MCJBTfMOBIM/edit?usp=sharing)
+    * [Check out the PivotalR webpage](http://gopivotal.github.io/PivotalR)
