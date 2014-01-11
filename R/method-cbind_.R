@@ -18,3 +18,20 @@ setMethod (
         z
     },
     valueClass = "db.Rquery")
+
+## ----------------------------------------------------------------------
+
+setGeneric("cbind", function(x, ...) {
+    if (!is(x, "db.obj"))
+        base::cbind(x, ...)
+    else
+        standardGeneric("cbind")
+})
+
+setMethod(
+    "cbind",
+    representation(x = "db.obj"),
+    function(x, ...) {
+        lst <- c(x, ...)
+        PivotalR:::.combine.list(lst)
+    })

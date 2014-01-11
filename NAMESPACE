@@ -80,6 +80,8 @@ export("groups", "groups.lm.madlib", "groups.logregr.madlib",
 
 exportMethods("cbind2")
 
+export("cbind")
+
 export("madlib.arima")
 
 export("summary.arima.css.madlib", "print.arima.css.madlib",
