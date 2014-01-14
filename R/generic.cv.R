@@ -57,7 +57,7 @@ generic.cv <- function (train, predict, metric, data,
             fits <- train(data = cuts$train[[i]])
             pred <- predict(object = fits, newdata = cuts$valid[[i]])
             err <- c(err, as.numeric(metric(predicted = pred, actual = cuts$valid[[i]])))
-            delete(fits)
+            if (is(data, "db.obj")) delete(fits)
         }
 
         if (is(data, "db.obj")) {
@@ -93,7 +93,7 @@ generic.cv <- function (train, predict, metric, data,
                 pred <- predict(object = fits, newdata = cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(predicted = pred,
                                                     actual = cuts$valid[[i]])))
-                delete(fits)
+                if (is(data, "db.obj")) delete(fits)
             }
             err <- rbind(err, err.k)
         }
