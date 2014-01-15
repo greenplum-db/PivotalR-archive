@@ -369,14 +369,18 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     factor.full <- rep(FALSE, length(names(data)))
     if (!refresh) {
+        t0 <- proc.time()
         model.vars <- .prepare.ind.vars(orig.labels)
         model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
         vars <- unique(all.vars(parse(text = model.vars)))
-        for (var in vars) {
-            tmp <- eval(parse(text = paste("with(data, ", var, ")", sep = "")))
-            if (tmp@.col.data_type %in% c("boolean", .txt.types) &&
-                !tmp@.is.factor) {
-                data[[var]] <- as.factor(data[[var]])
+        idx <- match(vars, names(data))
+        for (i in seq_len(length(idx))) {
+            id <- idx[i]
+            if (!is.na(id)) {
+                if (data@.col.data_type[id] %in% c("boolean", .txt.types) &&
+                    !data@.is.factor[id]) {
+                    data[[var[i]]] <- as.factor(data[[var[i]]])
+                }
             }
         }
 
