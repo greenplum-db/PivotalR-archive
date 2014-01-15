@@ -78,7 +78,7 @@ db.array(x, ...)
 
 \details{
     For aggregate functions: \code{mean}, \code{sum}, \code{count},
-    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
+    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature
     \code{x} must be a reference to a single column in a table.
 
     For aggregate functions: \code{colMeans}, \code{colSums}, and \code{colAgg} the signature
@@ -129,41 +129,43 @@ db.array(x, ...)
 help("mean,db.obj-method")
 
 ## Suppose that a valid connection to a database (with ID=1) is established
-## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+db.connect(port = 5433, dbname = "madlib")
+
+## create a temp table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone)
 
 ## get the mean of a column
-mean(x$diameter)
+lk(mean(x$diameter))
 
 ## get the sum of a column
-sum(x$height)
+lk(sum(x$height))
 
 ## get the number of entries in a column
-count(x$id)
+lk(count(x$id))
 
 ## get the max value of a column
-max(x$diameter)
+lk(max(x$diameter))
 
 ## get the min value of a column
 min(x$diameter)
 
 ## get the standard deviation of the values in column
-sd(x$diameter)
+lk(sd(x$diameter))
 
 ## get the variance of the values in column
-var(x$diameter)
+lk(var(x$diameter))
 
 ## get the mean of all columns in the table
-colMeans(x)
+lk(colMeans(x))
 
 ## get the sum of all columns in the table
-colSums(x)
+lk(colSums(x))
 
 ## get the array aggregate of a specific column in the table
-colAgg(x$diameter)
+lk(colAgg(x$diameter))
 
 ## get the array aggregate of all columns in the table
-colAgg(x)
+lk(colAgg(x))
 
 ## put everything into an array plus a constant 1 as the first element
 db.array(1, x, x, x)
