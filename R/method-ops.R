@@ -639,6 +639,16 @@ setMethod (
 
 setMethod (
     "-",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 - e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "-",
     signature(e1 = "db.obj", e2 = "ANY"),
     function (e1, e2) {
         if (nargs() == 1) e1 * (-1)
