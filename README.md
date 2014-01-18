@@ -12,8 +12,10 @@ operate on the objects in the database. PivotalR also lets the user to run the f
 big-data machine
 learning package [MADlib](http://madlib.net/) directly from R.
 
-1. [An Introduction to PivotalR](https://github.com/gopivotal/PivotalR/raw/master/inst/doc/pivotalr_vignette.pdf)
-
+1. An Introduction to PivotalR
+        ```
+        vignette("pivotalr")
+        ```
 2. To install PivotalR:
     * Get the latest stable version from CRAN by running `install.packages("PivotalR")`
     * Or try out the latest development version from github by running the following code:
@@ -23,7 +25,7 @@ learning package [MADlib](http://madlib.net/) directly from R.
         devtools::install_github("PivotalR", "gopivotal")
         ```
     * Or download the source tarball directly from [**here**](https://github.com/gopivotal/PivotalR/tarball/master), and then install the tarball
-    
+
         ```
         install.packages("gopivotal-PivotalR-xxxx.tar.gz", repos = NULL, type = "source")
         ```
