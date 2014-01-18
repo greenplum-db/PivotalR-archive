@@ -13,9 +13,8 @@ big-data machine
 learning package [MADlib](http://madlib.net/) directly from R.
 
 1. An Introduction to PivotalR
-        ```
-        vignette("pivotalr")
-        ```
+
+        vignette("pivotalr") # execute in R console to view the PDF file
 2. To install PivotalR:
     * Get the latest stable version from CRAN by running `install.packages("PivotalR")`
     * Or try out the latest development version from github by running the following code:
