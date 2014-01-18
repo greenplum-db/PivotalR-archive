@@ -186,6 +186,11 @@ setMethod (
 .txt.types <- c("character varying", "varchar", "character",
                 "char", "text")
 
+## --
+
+.time.types <- c("timestamp", "time", "date", "interval",
+                 "timestamp with time zone")
+
 ## -----------------------------------------------------------------------
 
 setMethod (
@@ -365,20 +370,24 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## convert string to time types
-.replace.timestamp <- function (e1, res, s, op)
+.replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE)
 {
     types <- col.types(e1)
-    time.types <- c("timestamp", "time", "date", "interval")
+    idx <- match(types, .time.types)
     for (i in seq_len(length(types))) {
-        for (t in time.types) {
-            if (grepl(t, types[i])) {
-                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
-                res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
-                                           "\"", sep = ""),
-                                paste(res@.expr[i], " as \"",
-                                      res@.col.name[i], "\"", sep = ""),
-                                res@.content)
-                break
+        if (!is.na(idx[i])) {
+            t <- .time.types[idx[i]]
+            res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
+            res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
+                                       "\"", sep = ""),
+                                 paste(res@.expr[i], " as \"",
+                                       res@.col.name[i], "\"", sep = ""),
+                                 res@.content)
+            if (res.type.change) {
+                change <- c("interval", "time", "integer", "interval",
+                            "interval")
+                res@.col.data_type <- change[idx[i]]
+                res@.col.udt_name <- change[idx[i]]
             }
         }
     }
@@ -616,9 +625,23 @@ setMethod (
 
 setMethod (
     "-",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        res <- .compare(e1, e2, " - ", .time.types, cast = "")
+        res <- .replace.timestamp(e1, res, e2, " - ", TRUE)
+        if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "-",
     signature(e1 = "db.obj", e2 = "ANY"),
     function (e1, e2) {
-        if (nargs() == 1) -1 * e1
+        if (nargs() == 1) e1 * (-1)
         else e1 - e2
     },
     valueClass = "db.Rquery")
@@ -864,7 +887,8 @@ setMethod (
                 tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
                                         conn.id)
                 if (length(tmp2) != length(tmp1) && length(tmp2) != 1)
-                    stop("Two arrays have to have the same length or one of them has length of 1!")
+                    stop("Two arrays have to have the same length or one ",
+                         "of them has length of 1!")
                 expr[i] <- paste("array[", paste("(", tmp1, ")",
                                                  cast, op, "(",
                                                  tmp2, ")", sep = "",
