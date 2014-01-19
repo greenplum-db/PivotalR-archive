@@ -1,6 +1,4 @@
 \name{summary.lm.madlib}
-\alias{summary.lm.madlib}
-\alias{summary.lm.madlib.grps}
 
 \title{Summary information for Linear Regression output}
 \description{
@@ -9,9 +7,7 @@
 }
 
 \usage{
-\method{summary}{lm.madlib}(object, ...)
 
-\method{summary}{lm.madlib.grps}(object, ...)
 }
 
 
@@ -24,8 +20,7 @@
 }
 
 \value{
-    The function returns the \code{lm.madlib} or \code{lm.madlib.grps}
-    object passed to the function 
+
 }
 
 \author{

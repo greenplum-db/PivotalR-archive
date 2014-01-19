@@ -1,9 +1,14 @@
 \name{madlib.lm}
 
 \alias{madlib.lm}
+\alias{coef.lm.madlib}
+\alias{coef.lm.madlib.grps}
+\alias{summary.lm.madlib}
+\alias{summary.lm.madlib.grps}
+
 
 \title{
-  Linear regression with grouping support, heteroskedasticity
+  Linear regression with grouping support, heteroskedasticity. Other useful function to extract fitted coefficients.
 }
 
 \description{
@@ -20,6 +25,14 @@
 
 \usage{
 madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
+
+\method{coef}{lm.madlib}(object, ...)
+
+\method{coef}{lm.madlib.grps}(object, ...)
+
+\method{summary}{lm.madlib}(object, ...)
+
+\method{summary}{lm.madlib.grps}(object, ...)
 }
 
 \arguments{
@@ -29,6 +42,10 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
     fitted. The details of model specification are given under
     'Details'.
   }
+
+  \item{object}{
+    The regression model object, fit using \code{\link{madlib.lm}} or \code{\link{madlib.glm}}.
+    }
 
   \item{data}{
     An object of \code{db.obj} class. Currently, this parameter is
@@ -54,7 +71,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   }
 
   \item{\dots}{
-    More parameters can be passed into this function. Currently, it is
+    More parameters can be passed into the functions. Currently, it is
     just a place holder and any parameter here is not used.
   }
 }
@@ -65,7 +82,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   the fitting is done conditioned on the values of one or more
   variables. For example, \code{y ~ x + sin(z) | v + w} will do the
   fitting each distinct combination of the values of \code{v} and
-  \code{w}. 
+  \code{w}.
 
   Both the linear regression (this function) and the logistic regression
   (\code{\link{madlib.glm}}) support categorical variables. Use
@@ -75,10 +92,24 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 }
 
 \value{
+
+  \code{coef}:
+
+  For ungrouped regressions, a named numeric vector giving the fitted coefficients.
+
+    For grouped regressions, a list giving the coefficients for each of the component models.
+
+\code{summary}:
+
+    The function returns the \code{lm.madlib} or \code{lm.madlib.grps}
+    object passed to the function
+
+  \code{madlib.lm}:
+
   If there is no grouping (i.e. no \code{|} in the formula), the result
   is a \code{lm.madlib} object. Otherwise, it is a \code{lm.madlib.grps}
   object, which is just a list of \code{lm.madlib} objects.
-  
+
   A \code{lm.madlib} object is a list which contains the following items:
 
   \item{grouping column(s)}{
@@ -98,7 +129,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
     number of rows is equal to the number of distinct combinations of
     all the grouping column values. The number of columns is equal to
     the number features (including intercept if it presents in the
-    formula). 
+    formula).
   }
 
   \item{r2}{
@@ -107,7 +138,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   }
 
   \item{std_err}{
-    A numeric matrix, the standard error for each coefficients. 
+    A numeric matrix, the standard error for each coefficients.
   }
 
   \item{t_stats}{
@@ -181,18 +212,18 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
   \item{terms}{ A \code{\link{terms}} object, describing the terms in
     the model formula.  }
-  
+
   \item{nobs}{
     The number of observations used to fit the model.
   }
 
   \item{data}{A \code{db.obj} object, which wraps all the
-  data used in the database. If there are fittings for multiple groups,   then this is only the wrapper for the data in one group.}
+  data used in the database. If there are fittings for multiple groups, then this is only the wrapper for the data in one group.}
 
 \item{origin.data}{
   The original \code{db.obj} object. When there is no grouping, it is equal to \code{data} above, otherwise it is the "sum" of \code{data} from all groups.
 }
-  
+
   Note that if there is grouping done, and there are multiple
   \code{lm.madlib} objects in the final result, each one of them
   contains the same copy \code{model}.
@@ -238,6 +269,8 @@ preview(x, 10)
 ## i.e. grouping
 fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
 fit
+coef(fit)
+summary(fit[[1]])
 
 ## use I(.) for expressions
 fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
@@ -248,6 +281,7 @@ fit # display the result
 x <- as.db.data.frame(abalone, "abalone")
 
 fit <- madlib.lm(rings ~ . - id | sex + (id < 2000), data = x)
+coef(fit)
 
 ## 3rd example
 ## The table has two columns: x is an array, y is double precision
@@ -272,4 +306,5 @@ step(start)
 }
 
 \keyword{madlib}
+\keyword{math}
 \keyword{stats}
