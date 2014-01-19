@@ -191,6 +191,10 @@ setMethod (
 .time.types <- c("timestamp", "time", "date", "interval",
                  "timestamp with time zone")
 
+.udt.time.types <- c("timestamp", "time", "date", "interval", "timestamptz")
+
+.time.change <- c("interval", "time", "integer", "interval", "interval")
+
 ## -----------------------------------------------------------------------
 
 setMethod (
@@ -372,8 +376,9 @@ setMethod (
 ## convert string to time types
 .replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE)
 {
-    types <- col.types(e1)
-    idx <- match(types, .time.types)
+    types <- ifelse(e1@.col.data_type == "array",
+                    .strip(e1@.col.udt_name, "_"), e1@.col.udt_name)
+    idx <- match(types, .udt.time.types)
     for (i in seq_len(length(types))) {
         if (!is.na(idx[i])) {
             t <- .time.types[idx[i]]
@@ -384,10 +389,8 @@ setMethod (
                                        res@.col.name[i], "\"", sep = ""),
                                  res@.content)
             if (res.type.change) {
-                change <- c("interval", "time", "integer", "interval",
-                            "interval")
-                res@.col.data_type <- change[idx[i]]
-                res@.col.udt_name <- change[idx[i]]
+                res@.col.data_type <- .time.change[idx[i]]
+                res@.col.udt_name <- .time.change[idx[i]]
             }
         }
     }
@@ -1001,6 +1004,32 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 - e2)
         }
+
+        cbind(sapply(
+            seq_len(names(e1)),
+            function(i) {
+                s1 <- sapply(.udt.time.types,
+                             function(s) grepl(s, e1@.col.udt_name[i]))
+                s2 <- sapply(.udt.time.types,
+                             function(s) grepl(s, e2@.col.udt_name[i]))
+                if (any(s1) || any(s2)) {
+                    id <- union(seq_len(.time.types)[s1],
+                                seq_len(.time.types)[s2])[1]
+                    udt <- (if (.time.change[id] == "integer")
+                            "int4"
+                    else .time.change[id])
+                    .operate.two(
+                        e1[[i]], e2[[i]], " - ", list(.time.types),
+                        res.type = .time.change[id],
+                        res.udt = (if (e1@.col.data_type[i] == "array"))
+                        paste("_", udt, sep = "") else udt)
+                } else {
+                    .operate.two(e1[[i]], e2[[i]], " - ", list(.num.types),
+                                 res.type = "double precision",
+                                 res.udt = "float8")
+                }
+            }))
+
         .operate.two(e1, e2, " - ", list(.num.types),
                      res.type = "double precision",
                      res.udt = "float8")
