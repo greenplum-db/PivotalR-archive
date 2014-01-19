@@ -635,7 +635,7 @@ setMethod (
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
         e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
-        res <- .compare(e1, e2, " - ", .time.types, cast = "")
+        res <- .compare(e1, e2, " - ", .num.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " - ", TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
@@ -649,7 +649,7 @@ setMethod (
     signature(e1 = "character", e2 = "db.obj"),
     function (e1, e2) {
         e1 <- paste("'", .strip(e1, "'"), "'", sep = "")
-        res <- .compare(e1, e2, " - ", .time.types, cast = "")
+        res <- .compare(e2, e1, " - ", .num.types, cast = "")
         res <- .replace.timestamp(e2, res, e1, " - ", TRUE, TRUE)
         if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
         res
@@ -959,6 +959,7 @@ setMethod (
 
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
+
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
         where.str, sort$str, sep = ""),
@@ -1013,22 +1014,27 @@ setMethod (
             return (e1 - e2)
         }
 
-        cbind(sapply(
-            seq_len(names(e1)),
+        .combine.list(sapply(
+            seq_len(length(names(e1))),
             function(i) {
                 s1 <- sapply(.udt.time.types,
-                             function(s) grepl(s, e1@.col.udt_name[i]))
+                             function(s) grepl(paste(s, "$", sep = ""),
+                                               e1@.col.udt_name[i]))
                 s2 <- sapply(.udt.time.types,
-                             function(s) grepl(s, e2@.col.udt_name[i]))
+                             function(s) grepl(paste(s, "$", sep = ""),
+                                               e2@.col.udt_name[i]))
+
                 if (any(s1) || any(s2)) {
-                    id <- union(seq_len(.time.types)[s1],
-                                seq_len(.time.types)[s2])[1]
+                    id <- union(seq_len(length(.time.types))[s1],
+                                seq_len(length(.time.types))[s2])[1]
                     udt <- (if (.time.change[id] == "integer")
                             "int4"
                     else .time.change[id])
+
                     .operate.two(
                         e1[[i]], e2[[i]], " - ", list(.time.types),
                         res.type = .time.change[id],
+                        cast = '',
                         res.udt = (if (e1@.col.data_type[i] == "array")
                                    paste("_", udt, sep = "") else udt))
                 } else {
@@ -1037,10 +1043,6 @@ setMethod (
                                  res.udt = "float8")
                 }
             }))
-
-        .operate.two(e1, e2, " - ", list(.num.types),
-                     res.type = "double precision",
-                     res.udt = "float8")
     },
     valueClass = "db.Rquery")
 
