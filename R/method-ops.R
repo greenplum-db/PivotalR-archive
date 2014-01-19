@@ -374,7 +374,8 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## convert string to time types
-.replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE)
+.replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE,
+                                inverse = FALSE)
 {
     types <- ifelse(e1@.col.data_type == "array",
                     .strip(e1@.col.udt_name, "_"), e1@.col.udt_name)
@@ -382,7 +383,10 @@ setMethod (
     for (i in seq_len(length(types))) {
         if (!is.na(idx[i])) {
             t <- .time.types[idx[i]]
-            res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
+            if (inverse)
+                res@.expr[i] <- paste(s, "::", t, op, e1@.expr[i], sep = "")
+            else
+                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
             res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
                                        "\"", sep = ""),
                                  paste(res@.expr[i], " as \"",
@@ -644,7 +648,11 @@ setMethod (
     "-",
     signature(e1 = "character", e2 = "db.obj"),
     function (e1, e2) {
-        e2 - e1
+        e1 <- paste("'", .strip(e1, "'"), "'", sep = "")
+        res <- .compare(e1, e2, " - ", .time.types, cast = "")
+        res <- .replace.timestamp(e2, res, e1, " - ", TRUE, TRUE)
+        if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
+        res
     },
     valueClass = "db.Rquery")
 
