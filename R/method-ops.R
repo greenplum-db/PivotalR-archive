@@ -1021,8 +1021,8 @@ setMethod (
                     .operate.two(
                         e1[[i]], e2[[i]], " - ", list(.time.types),
                         res.type = .time.change[id],
-                        res.udt = (if (e1@.col.data_type[i] == "array"))
-                        paste("_", udt, sep = "") else udt)
+                        res.udt = (if (e1@.col.data_type[i] == "array")
+                                   paste("_", udt, sep = "") else udt))
                 } else {
                     .operate.two(e1[[i]], e2[[i]], " - ", list(.num.types),
                                  res.type = "double precision",
