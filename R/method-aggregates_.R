@@ -215,8 +215,8 @@ setMethod (
     "max",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        res <- .aggregate(x, "max", FALSE, .num.types, FALSE,
-                          x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "max", FALSE, c(.num.types, .time.types),
+                          FALSE, x@.col.data_type, x@.col.udt_name)
         res@.is.agg <- TRUE
         res
     },
@@ -230,8 +230,8 @@ setMethod (
     "min",
     signature(x = "db.obj"),
     function (x, ..., na.rm = FALSE) {
-        res <- .aggregate(x, "min", FALSE, .num.types, FALSE,
-                          x@.col.data_type, x@.col.udt_name)
+        res <- .aggregate(x, "min", FALSE, c(.num.types, .time.types),
+                          FALSE, x@.col.data_type, x@.col.udt_name)
         res@.is.agg <- TRUE
         res
     },
