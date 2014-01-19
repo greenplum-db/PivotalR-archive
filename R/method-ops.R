@@ -375,7 +375,7 @@ setMethod (
 
 ## convert string to time types
 .replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE,
-                                inverse = FALSE)
+                                inverse = FALSE, always.interval = FALSE)
 {
     types <- ifelse(e1@.col.data_type == "array",
                     .strip(e1@.col.udt_name, "_"), e1@.col.udt_name)
@@ -383,18 +383,25 @@ setMethod (
     for (i in seq_len(length(types))) {
         if (!is.na(idx[i])) {
             t <- .time.types[idx[i]]
-            if (inverse)
-                res@.expr[i] <- paste(s, "::", t, op, e1@.expr[i], sep = "")
+            if (always.interval)
+                t1 <- "interval"
             else
-                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
+                t1 <- t
+            if (inverse)
+                res@.expr[i] <- paste(s, "::", t1, op, e1@.expr[i], sep = "")
+            else
+                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t1, sep = "")
             res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
                                        "\"", sep = ""),
                                  paste(res@.expr[i], " as \"",
                                        res@.col.name[i], "\"", sep = ""),
                                  res@.content)
             if (res.type.change) {
-                res@.col.data_type <- .time.change[idx[i]]
-                res@.col.udt_name <- .time.change[idx[i]]
+                res@.col.data_type[i] <- .time.change[idx[i]]
+                res@.col.udt_name[i] <- .time.change[idx[i]]
+            } else {
+                res@.col.data_type[i] <- t
+                res@.col.udt_name[i] <- t
             }
         }
     }
@@ -597,9 +604,24 @@ setMethod (
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
         res <- .compare(e1, e2, " + ", .num.types,
+                        cast = "",
                         res.type = "double precision",
                         res.udt = "float8")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+
+        for (i in seq_len(length(names(res)))) {
+            if (grepl("date$", e1@.col.udt_name[i])) {
+                res@.expr[i] <- paste(e1@.expr, " + ", e2, "::integer",
+                                      sep = "")
+                res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
+                                           "\"", sep = ""),
+                                     paste(res@.expr[i], " as \"",
+                                           res@.col.name[i], "\"", sep = ""),
+                                     res@.content)
+                res@.col.data_type[i] <- "date"
+                res@.col.udt_name[i] <- "date"
+            }
+        }
         res
     },
     valueClass = "db.Rquery")
@@ -609,6 +631,31 @@ setMethod (
 setMethod (
     "+",
     signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 + e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+setMethod (
+    "+",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        res <- .compare(e1, e2, " + ", .num.types,
+                        cast = "",
+                        res.type = "double precision",
+                        res.udt = "float8")
+        if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+        res <- .replace.timestamp(e1, res, e2, " + ", always.interval = TRUE)
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "+",
+    signature(e1 = "character", e2 = "db.obj"),
     function (e1, e2) {
         e2 + e1
     },

@@ -4,10 +4,14 @@
 \alias{+,db.obj,db.obj-method}
 \alias{+,db.obj,numeric-method}
 \alias{+,numeric,db.obj-method}
+\alias{+,db.obj,character-method}
+\alias{+,character,db.obj-method}
 \alias{-,db.obj,ANY-method}
 \alias{-,db.obj,db.obj-method}
 \alias{-,db.obj,numeric-method}
 \alias{-,numeric,db.obj-method}
+\alias{-,db.obj,character-method}
+\alias{-,character,db.obj-method}
 \alias{*,db.obj,db.obj-method}
 \alias{*,db.obj,numeric-method}
 \alias{*,numeric,db.obj-method}
@@ -41,14 +45,18 @@
 \S4method{\%/\%}{db.obj,db.obj}(e1, e2)
 \S4method{^}{db.obj,db.obj}(e1, e2)
 \S4method{+}{numeric,db.obj}(e1, e2)
+\S4method{+}{character,db.obj}(e1, e2)
 \S4method{-}{numeric,db.obj}(e1, e2)
+\S4method{-}{character,db.obj}(e1, e2)
 \S4method{*}{numeric,db.obj}(e1, e2)
 \S4method{/}{numeric,db.obj}(e1, e2)
 \S4method{\%\%}{numeric,db.obj}(e1, e2)
 \S4method{\%/\%}{numeric,db.obj}(e1, e2)
 \S4method{^}{numeric,db.obj}(e1, e2)
 \S4method{+}{db.obj,numeric}(e1, e2)
+\S4method{+}{db.obj,character}(e1, e2)
 \S4method{-}{db.obj,numeric}(e1, e2)
+\S4method{-}{db.obj,character}(e1, e2)
 \S4method{*}{db.obj,numeric}(e1, e2)
 \S4method{/}{db.obj,numeric}(e1, e2)
 \S4method{\%\%}{db.obj,numeric}(e1, e2)
@@ -77,6 +85,8 @@
   A meaningful expression is generated only when the
   \code{.col.data_type} is "numeric", otherwise a "NULL" value is
   generated.
+
+  \code{"-"} and \code{"+"} support computing the arithmetic computations between dates, timestamps, times etc.
 }
 
 \seealso{
