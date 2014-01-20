@@ -11,6 +11,7 @@
 \alias{show.lm.madlib.grps}
 \alias{vcov.lm.madlib}
 \alias{vcov.lm.madlib.grps}
+\alias{groups}
 \alias{groups.lm.madlib}
 \alias{groups.lm.madlib.grps}
 \alias{residuals.lm.madlib}
@@ -90,7 +91,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
 \arguments{
   \item{x, object, fit}{
-    The regression model object, fit using \code{\link{madlib.lm}}.
+    The regression model object, fit using \code{madlib.lm}.
   }
 
       \item{scale}{
@@ -112,10 +113,6 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
         \item{newdata}{
           A \code{db.obj} object, which contains the information about the real data in the database.
-  }
-
-  \item{type}{
-    A string, default is \code{"response"}, which produces the \code{TRUE} or \code{FALSE} prediction. If it is \code{"prob"}, this function computes the probabilities for \code{TRUE} cases.
   }
 
     \item{formula}{

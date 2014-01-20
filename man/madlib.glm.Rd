@@ -82,14 +82,14 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 
 \method{AIC}{logregr.madlib.grps}(object, ..., k=2)
 
-\method{predict}{logregr.madlib}(object, newdata, ...)
+\method{predict}{logregr.madlib}(object, newdata, type = c("response", "prob"), ...)
 
-\method{predict}{logregr.madlib.grps}(object, newdata, ...)
+\method{predict}{logregr.madlib.grps}(object, newdata, type = c("response", "prob"), ...)
 }
 
 \arguments{
     \item{x, object, fit}{
-    The regression model object, fit using \code{\link{madlib.logregr}}.
+    The regression model object, fit using \code{madlib.glm}.
   }
 
       \item{scale}{
