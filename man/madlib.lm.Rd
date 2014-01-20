@@ -5,10 +5,27 @@
 \alias{coef.lm.madlib.grps}
 \alias{summary.lm.madlib}
 \alias{summary.lm.madlib.grps}
-
+\alias{print.lm.madlib}
+\alias{print.lm.madlib.grps}
+\alias{show.lm.madlib}
+\alias{show.lm.madlib.grps}
+\alias{vcov.lm.madlib}
+\alias{vcov.lm.madlib.grps}
+\alias{groups.lm.madlib}
+\alias{groups.lm.madlib.grps}
+\alias{residuals.lm.madlib}
+\alias{residuals.lm.madlib.grps}
+\alias{AIC.lm.madlib}
+\alias{extractAIC.lm.madlib}
+\alias{logLik.lm.madlib}
+\alias{AIC.lm.madlib.grps}
+\alias{extractAIC.lm.madlib.grps}
+\alias{logLik.lm.madlib.grps}
+\alias{predict.lm.madlib}
+\alias{predict.lm.madlib.grps}
 
 \title{
-  Linear regression with grouping support, heteroskedasticity. Other useful function to extract fitted coefficients.
+  Linear regression with grouping support, heteroskedasticity. Other useful function to extract fitted coefficients, measure the variance-covariance matrix, make predictions etc.
 }
 
 \description{
@@ -33,19 +50,80 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 \method{summary}{lm.madlib}(object, ...)
 
 \method{summary}{lm.madlib.grps}(object, ...)
+
+\method{print}{lm.madlib}(x, digits = max(3L, getOption("digits") - 3L),
+...)
+
+\method{print}{lm.madlib.grps}(x, digits = max(3L, getOption("digits") -
+3L), ...)
+
+\method{show}{lm.madlib}(object)
+
+\method{show}{lm.madlib.grps}(object)
+
+\method{vcov}{lm.madlib.grps}(object, ...)
+
+\method{vcov}{lm.madlib}(object, ...)
+
+\method{groups}{lm.madlib}(x)
+
+\method{groups}{lm.madlib.grps}(x)
+
+\method{residuals}{lm.madlib}(object, ...)
+
+\method{residuals}{lm.madlib.grps}(object, ...)
+
+\method{extractAIC}{lm.madlib}(fit, scale=0, k=2, ...)
+
+\method{extractAIC}{lm.madlib.grps}(fit, scale=0, k=2, ...)
+
+\method{logLik}{lm.madlib}(object, ...)
+
+\method{logLik}{lm.madlib.grps}(object, ...)
+
+\method{AIC}{lm.madlib.grps}(object, ..., k=2)
+
+\method{predict}{lm.madlib}(object, newdata, ...)
+
+\method{predict}{lm.madlib.grps}(object, newdata, ...)
 }
 
 \arguments{
-  \item{formula}{
+  \item{x, object, fit}{
+    The regression model object, fit using \code{\link{madlib.lm}}.
+  }
+
+      \item{scale}{
+        The scale parameter for the model. Currently unused.
+      }
+
+    \item{k}{
+        Numeric, specifying the equivalent degrees of freedom part in the AIC formula.
+    }
+
+    \item{digits}{
+        A non-null value for `digits' specifies the minimum number of
+          significant digits to be printed in values.  The default,
+          `NULL', uses `getOption("digits")'.  (For the interpretation
+          for complex numbers see \code{signif}.)  Non-integer values will
+          be rounded down, and only values greater than or equal to 1
+          and no greater than 22 are accepted.
+        }
+
+        \item{newdata}{
+          A \code{db.obj} object, which contains the information about the real data in the database.
+  }
+
+  \item{type}{
+    A string, default is \code{"response"}, which produces the \code{TRUE} or \code{FALSE} prediction. If it is \code{"prob"}, this function computes the probabilities for \code{TRUE} cases.
+  }
+
+    \item{formula}{
     an object of class "\code{\link{formula}}" (or one that can be coerced to
     that class): a symbolic description of the model to be
     fitted. The details of model specification are given under
     'Details'.
   }
-
-  \item{object}{
-    The regression model object, fit using \code{\link{madlib.lm}} or \code{\link{madlib.glm}}.
-    }
 
   \item{data}{
     An object of \code{db.obj} class. Currently, this parameter is
@@ -92,7 +170,6 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 }
 
 \value{
-
   \code{coef}:
 
   For ungrouped regressions, a named numeric vector giving the fitted coefficients.
@@ -103,6 +180,48 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
     The function returns the \code{lm.madlib} or \code{lm.madlib.grps}
     object passed to the function
+
+    \code{print} and \code{show}: No value is returned.
+
+    \code{vcov}:
+
+      For \code{lm.madlib} objects, this function  returns the variance-covariance matrix of the main parameters.
+
+For \code{lm.madlib.grps} objects, which are a list of models for multiple groups of data, returns a list, each of which is the variance-cocariance matrix for the model of each group of data.
+
+\code{groups}:
+
+    A list that contains the value of each grouping colum. The elements
+    of the list are the same as the grouping columns. If \code{x} is a
+    \code{lm.madlib} object with one group's information in it, the
+    elements of the resulting list contain one value for each grouping
+    column. If \code{x} is \code{lm.madlib.grps}, which contains
+    multiple groups' information, then each element of the resulting
+    list is a vector with the length equal to the number of different
+    groups.
+
+    If no grouping column is used, this funcion returns \code{NULL}.
+
+    \code{residuals}:
+
+     For ungrouped regressions, \code{residuals} returns an object of class \code{\linkS4class{db.Rquery}}
+
+    For grouped regressions, \code{residuals} returns a list of \code{\linkS4class{db.Rquery}} objects giving the output of these methods for each of the component models. Similarly, \code{AIC} for a grouped regression returns a vector of the AICs for each of the component models.
+
+\code{logLik}, \code{AIC}, \code{extractAIC}:
+
+For ungrouped regressions, \code{logLik} returns an object of
+    class \code{logLik}, and \code{extractAIC} returns a length-2
+    numeric vector giving the edf and AIC.
+
+    For grouped regressions, \code{logLik} and \code{extractAIC} return
+  a list giving the output of these methods for each of the component
+  models. Similarly, \code{AIC} for a grouped regression returns a
+  vector of the AICs for each of the component models.
+
+  \code{predict}:
+
+    A \code{\linkS4class{db.Rquery}} object, which contains the SQL query to compute the predictions.
 
   \code{madlib.lm}:
 
@@ -231,7 +350,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc.
+  Author: Predictive Analytics Team at Pivotal Inc. Hong Ooi at Pivotal Inc. contributed the code for \code{AIC}, \code{extractAIC}, \code{logLik}.
 
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
@@ -282,6 +401,8 @@ x <- as.db.data.frame(abalone, "abalone")
 
 fit <- madlib.lm(rings ~ . - id | sex + (id < 2000), data = x)
 coef(fit)
+vcov(fit)
+vcov(fit[[1]])
 
 ## 3rd example
 ## The table has two columns: x is an array, y is double precision
@@ -308,3 +429,5 @@ step(start)
 \keyword{madlib}
 \keyword{math}
 \keyword{stats}
+\keyword{IO}
+\keyword{utility}
