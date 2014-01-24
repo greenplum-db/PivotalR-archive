@@ -22,8 +22,8 @@ available at \url{http://zimmeee.github.io/gp-r/#pivotalr}.
 \tabular{ll}{
 Package: \tab PivotalR\cr
 Type: \tab Package\cr
-Version: \tab 0.1.10\cr
-Date: \tab 2014-01-09\cr
+Version: \tab 0.1.10.14\cr
+Date: \tab 2014-01-24\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab methods, DBI, RPostgreSQL\cr
 }

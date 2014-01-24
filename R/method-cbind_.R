@@ -22,9 +22,13 @@ setMethod (
 ## ----------------------------------------------------------------------
 
 setGeneric("cbind", function(x, ..., deparse.level = 1) {
-    if (!is(x, "db.obj"))
-        base::cbind(x, ..., deparse.level = 1)
-    else
+    if (missing(x) || !is(x, "db.obj")) {
+        if (missing(x))
+            args <- list(..., deparse.level = deparse.level)
+        else
+            args <- list(x=x, ..., deparse.level = deparse.level)
+        do.call(base::cbind, args)
+    } else
         standardGeneric("cbind")
 })
 

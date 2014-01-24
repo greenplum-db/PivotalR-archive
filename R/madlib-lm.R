@@ -9,7 +9,7 @@ setClass("lm.madlib.grps")
 ## na.action is a place holder
 ## will implement later in R (using temp table), or will implement
 ## in MADlib
-madlib.lm <- function (formula, data, na.action = NULL, 
+madlib.lm <- function (formula, data, na.action = NULL,
                        hetero = FALSE, ...) # param name too long
 {
     ## make sure fitting to db.obj
@@ -18,7 +18,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
              deparse(substitute(data)), " is not!")
 
     origin.data <- data
-    
+
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data)
 
@@ -47,7 +47,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
 
     ## Is data temporarily created?
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
-    
+
     ## grouping string
     if (is.null(params$grp.str))
         grp <- "NULL"
@@ -59,7 +59,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
             grp <- paste("'", params$grp.str, "'", sep = "")
         else
             grp <- paste("'{", params$grp.str, "}'::text[]")
-    
+
     tmp <- eval(parse(text = paste("with(data, ",
                       params$origin.dep, ")", sep = "")))
 
@@ -83,7 +83,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
                      params$dep.str, "', '", params$ind.str, "', ",
                      grp, ", ", hetero, ")", sep = "")
     }
-        
+
     ## execute and get the result, error handling is taken care of
     res <- .get.res(sql, tbl.output, conn.id)
 
@@ -118,7 +118,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
     r.call <- match.call() # the current function call itself
     r.dummy <- data@.dummy
     r.dummy.expr <- data@.dummy.expr
-    
+
     for (i in seq_len(n.grps)) {
         rst[[i]] <- list()
         for (j in seq(res.names))
@@ -213,14 +213,14 @@ print.lm.madlib.grps <- function (x,
                                   ...)
 {
     n.grps <- length(x)
-    
+
     if (x[[1]]$has.intercept)
         rows <- c("(Intercept)", x[[1]]$ind.vars)
     else
         rows <- x[[1]]$ind.vars
     rows <- gsub("\"", "", rows)
     rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
-    for (i in seq_len(length(x[[1]]$col.name))) 
+    for (i in seq_len(length(x[[1]]$col.name)))
         if (x[[1]]$col.name[i] != x[[1]]$appear[i])
             rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
     rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
@@ -259,7 +259,7 @@ print.lm.madlib.grps <- function (x,
         {
             cat("Breusch-Pagan test statistics:", x[[i]]$bp_stats, "\n")
             cat("Breusch-Pagan test p-value:", x[[i]]$bp_p_value, "\n")
-        }        
+        }
     }
 
     cat("\n")
@@ -286,7 +286,7 @@ print.lm.madlib <- function (x,
         rows <- x$ind.vars
     rows <- gsub("\"", "", rows)
     rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
-    for (i in seq_len(length(x$col.name))) 
+    for (i in seq_len(length(x$col.name)))
         if (x$col.name[i] != x$appear[i])
             rows <- gsub(x$col.name[i], x$appear[i], rows)
     rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
@@ -297,7 +297,7 @@ print.lm.madlib <- function (x,
     cat("\nMADlib Linear Regression Result\n")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
-    
+
     cat("\n---------------------------------------\n\n")
     if (length(x$grp.cols) != 0)
     {
@@ -305,7 +305,7 @@ print.lm.madlib <- function (x,
             cat(col, ": ", x[[col]], "\n", sep = "")
         cat("\n")
     }
-    
+
     cat("Coefficients:\n")
     printCoefmat(data.frame(cbind(Estimate = x$coef,
                                   `Std. Error` = x$std_err,
@@ -313,16 +313,16 @@ print.lm.madlib <- function (x,
                                   `Pr(>|t|)` = x$p_values),
                             row.names = rows, check.names = FALSE),
                  digits = digits, signif.stars = TRUE)
-    
+
     cat("R-squared:", x$r2, "\n")
     cat("Condition Number:", x$condition_no, "\n")
-    
+
     if (!is.null(x$bp_stats))
     {
         cat("Breusch-Pagan test statistics:", x$bp_stats, "\n")
         cat("Breusch-Pagan test p-value:", x$bp_p_value, "\n")
-    }        
-    
+    }
+
     cat("\n")
 }
 
