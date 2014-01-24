@@ -13,7 +13,7 @@ setMethod (
             indx <- .combine.list(INDICES)
         else
             indx <- INDICES
-        v <- lk(indx, 1, array = FALSE)
+        v <- lk(as.character(indx, array = FALSE), 1, array = FALSE)
         add.quotes <- function (str)
             unlist(Map(function (x)
                        if (is.character(x)) paste("\"", x, "\"", sep = "")
@@ -31,7 +31,7 @@ setMethod (
                 ",]")))
         }
 
-        use <- get.piece(data, indx, v)
+        use <- get.piece(data, as.character(indx), v)
         fit0 <- FUN(use)
         if (!is(fit0, "db.obj")) {
             vals <- lk(unique(db.array(as.character(indx, array = FALSE))))
