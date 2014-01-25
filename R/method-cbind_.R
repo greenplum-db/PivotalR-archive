@@ -35,7 +35,6 @@ setGeneric(
         if (no.first)
             args <- list(..., deparse.level = deparse.level)
         else {
-            call <- paste(deparse(sys.call()), collapse = "")
             args <- list(
                 `__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`, ...,
                 deparse.level = deparse.level)
@@ -51,3 +50,11 @@ setGeneric(
     }
 })
 
+## ----------------------------------------------------------------------
+
+.find.pos <- function(str)
+{
+    helper <- function(..) 1
+    str <- strsplit(str, ",")[[1]]
+
+}
