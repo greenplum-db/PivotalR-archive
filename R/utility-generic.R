@@ -223,7 +223,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         f2.labels <- attr(f2.terms, "term.labels")
 
         ## ## grouping column do not use factor
-        f2.labels <- gsub("I\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- gsub("I\\((.*)\\)", "(\\1)", f2.labels, perl = T)
         f2.labels <- gsub("as\\.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
         f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
 
@@ -311,14 +311,14 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
     labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
     labels <- gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", labels)
-    labels <- gsub("I\\((.*)\\)", "\\1", labels, perl = T) # remove I()
+    labels <- gsub("I\\((.*)\\)", "(\\1)", labels, perl = T) # remove I()
 
     ## vdata <- .expand.array(data)
     vdata <- data
 
     ## dependent variable
     ## factor does not play a role in dependent variable
-    dep.var <- gsub("I\\((.*)\\)", "\\1", rownames(f.factors)[1], perl = T)
+    dep.var <- gsub("I\\((.*)\\)", "(\\1)", rownames(f.factors)[1], perl = T)
     dep.var <- gsub("as\\.factor\\((.*)\\)", "\\1", dep.var, perl = T)
     dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
@@ -342,9 +342,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                     paste(labels, collapse = ", "), "))",
                     sep = "")))
     a.labels <- unlist(sapply(a, function(x) x[,]@.expr))
+
     b <- eval(parse(text = paste("with(vdata, c(",
-                    paste(setdiff(rownames(f.factors),
-                                  colnames(f.factors)),
+                    paste(gsub("I\\((.*)\\)", "(\\1)",
+                               setdiff(rownames(f.factors),
+                                       colnames(f.factors))),
                           collapse = ", "), "))", sep = "")))
     b.labels <- unlist(sapply(b, function(x) x[,]@.expr))
     labels <- .strip(setdiff(a.labels, b.labels), "`")
@@ -369,7 +371,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     factor.full <- rep(FALSE, length(names(data)))
     if (!refresh) {
-        t0 <- proc.time()
         model.vars <- .prepare.ind.vars(orig.labels)
         model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
         vars <- unique(all.vars(parse(text = model.vars)))
@@ -379,7 +380,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             if (!is.na(id)) {
                 if (data@.col.data_type[id] %in% c("boolean", .txt.types) &&
                     !data@.is.factor[id]) {
-                    data[[var[i]]] <- as.factor(data[[var[i]]])
+                    data[[vars[i]]] <- as.factor(data[[vars[i]]])
                 }
             }
         }
