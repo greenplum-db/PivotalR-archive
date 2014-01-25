@@ -21,21 +21,20 @@ setMethod (
 
 ## ----------------------------------------------------------------------
 
-setGeneric("cbind", function(x, ..., deparse.level = 1) {
-    if (missing(x) || !is(x, "db.obj")) {
-        if (missing(x))
+setGeneric("cbind", function(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`, ..., deparse.level = 1) {
+    if (missing(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`) && !is(..1, "db.obj")
+        || (!missing(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`) && !is(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`, "db.obj"))) {
+        if (missing(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`))
             args <- list(..., deparse.level = deparse.level)
         else
-            args <- list(x=x, ..., deparse.level = deparse.level)
+            args <- list(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`, ..., deparse.level = deparse.level)
         do.call(base::cbind, args)
-    } else
-        standardGeneric("cbind")
+    } else {
+        if (missing(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`))
+            lst <- c(...)
+        else
+            lst <- c(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`, ...)
+        .combine.list(lst)
+    }
 })
 
-setMethod(
-    "cbind",
-    representation(x = "db.obj"),
-    function(x, ..., deparse.level = 1) {
-        lst <- c(x, ...)
-        PivotalR:::.combine.list(lst)
-    })

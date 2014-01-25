@@ -1,7 +1,6 @@
 \name{cbind2-methods}
 \alias{as.list,db.obj-method}
 \alias{cbind}
-\alias{cbind,db.obj-method}
 \alias{cbind2}
 \alias{cbind2,db.obj,db.obj-method}
 \title{Combine two \code{db.obj} Objects by Columns}
@@ -10,8 +9,6 @@
 }
 
 \usage{
-\S4method{cbind}{db.obj}(x, ..., deparse.level = 1)
-
 \S4method{cbind2}{db.obj,db.obj}(x, y)
 
 \S4method{as.list}{db.obj}(x, array = FALSE, ...)
@@ -29,11 +26,6 @@
 \item{\dots}{
   In \code{cbind} they can be anything that can form new columns together with \code{x}. In \code{as.list}, it is not implemented yet.
 }
-
-\item{deparse.level}{
-    Not implemented.
-}
-
 }
 
 \value{
