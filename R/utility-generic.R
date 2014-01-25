@@ -258,26 +258,40 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
         right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
-        ## right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
 
-        replace.cols <- cols[is.factor]
-        suffix <- suffix[is.factor]
-        n.order <- order(nchar(replace.cols), decreasing = TRUE)
-        replace.cols <- replace.cols[n.order]
-        suffix <- suffix[n.order]
-        for (i in seq_len(length(replace.cols))) {
-            col <- replace.cols[i]
-            new.col <- names(data)[grep(paste(col, suffix[i], sep=""),
-                                        names(data))]
-            if (identical(new.col, character(0)))
-                new.col <- "1"
-            else
-                new.col <- paste("(", paste("`", new.col, "`",
-                                            collapse = " + ",
-                                            sep = ""), ")", sep = "")
-            right.hand <- gsub(paste(col, "([^_\\w]+|$)", sep = ""),
-                               paste(new.col, "\\1", sep = ""),
-                               right.hand, perl = TRUE)
+        if (sum(data@.is.factor) > 0) {
+            distinct <- list()
+            ref <- list()
+            replace.cols <- cols[is.factor]
+            suffix <- suffix[is.factor]
+            the.refs <- data@.factor.ref[is.factor]
+            max.level <- 0
+            for (i in seq_len(length(replace.cols))) {
+                col <- replace.cols[i]
+                new.col <- gsub(paste("^", col, sep = ""), "",
+                                names(data)[grep(paste(col, suffix[i],
+                                                       sep=""),
+                                                 names(data))])
+                distinct[[col]] <- new.col
+                ref[[col]] <- paste(suffix[i], the.refs[i], sep = "")
+                if (length(new.col) > max.level)
+                    max.level <- length(new.col)
+            }
+
+            l <- length(names(data))
+            fake <- as.data.frame(array(1, dim = c(max.level, l)))
+            names(fake) <- names(data)
+            for (i in seq_len(l)) {
+                if (data@.is.factor[i]) {
+                    fake[,i] <- distinct[[data@.col.name[i]]]
+                    fake[,i] <- as.factor(fake[,i])
+                    fake[,i] <- relevel(fake[,i],
+                                        ref = ref[[data@.col.name[i]]])
+                }
+            }
+            fterm <- .modeling.formula(formula(paste("~", right.hand)), fake)
+            if (fterm[1] == "(Intercept)") fterm <- fterm[-1]
+            right.hand <- paste(fterm, collapse = " + ")
         }
     } else { # first pass
         ## find all the factor columns
@@ -369,7 +383,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     if (!is.null(grp)) grp <- gsub("`", "", grp)
     labels <- gsub("`", "", labels)
 
-    factor.full <- rep(FALSE, length(names(data)))
+    factor.full <- rep(TRUE, length(names(data)))
     if (!refresh) {
         model.vars <- .prepare.ind.vars(orig.labels)
         model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
@@ -381,33 +395,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                 if (data@.col.data_type[id] %in% c("boolean", .txt.types) &&
                     !data@.is.factor[id]) {
                     data[[vars[i]]] <- as.factor(data[[vars[i]]])
-                }
-            }
-        }
-
-        ## re-analyze the formula
-        if (sum(data@.is.factor) > 0) {
-            l <- length(names(data))
-            fake.data <- as.data.frame(array(1, dim = c(3, l)))
-            names(fake.data) <- names(data)
-            us <- rep('', l)
-            for (i in seq_len(l)) {
-                if (data@.is.factor[i]) {
-                    us[i] <- paste(
-                        sample(c(as.character(0:9), letters[1:6]), 8),
-                        collapse = '')
-                    fake.data[,i] <- paste(us[i], c('a', 'b', 'c'), sep = '')
-                }
-            }
-            f1 <- formula(fstr)
-            term <- .modeling.formula(f1, fake.data)
-            ## factor.full <- rep(FALSE, l)
-            for (i in seq_len(l)) {
-                if (data@.is.factor[i]) {
-                    if (any(grepl(us[i]%+%'a', term)) &&
-                        any(grepl(us[i]%+%'b', term)) &&
-                        any(grepl(us[i]%+%'c', term)))
-                        factor.full[i] <- TRUE
                 }
             }
         }
