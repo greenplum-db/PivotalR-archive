@@ -68,7 +68,7 @@ Vars <- function(model)
         rownames(attr(model$terms, "factors"))[1],
         paste(deparse(vars), collapse=""))), data = fake.data)
     f.vars <- gsub("\\s", "", attr(f.terms, "term.labels"))
-    
+
     is.terms <- grepl("^Terms\\(.*\\)$", f.vars)
     vars.terms <- f.vars[is.terms]
     select.ind <- integer(0)
@@ -90,14 +90,14 @@ Vars <- function(model)
     }
     select.vars <- unique(select.vars)
 
-    f.vars <- unique(c(select.vars, f.vars[!is.vars]))    
-    
+    f.vars <- unique(c(select.vars, f.vars[!is.vars]))
+
     is.ind <- rep(FALSE, length(f.vars))
     if (length(select.ind) != 0) {
         f.vars <- c(f.vars, paste("term.", select.ind, sep = ""))
         is.ind <- c(is.ind, rep(TRUE, length(select.ind)))
     }
-    
+
     expand.vars <- character(0)
     expand.is.ind <- logical(0)
     for (i in seq_len(length(f.vars))) {
@@ -125,7 +125,7 @@ Vars <- function(model)
     }
 
     ## ------- Deal with factors -------
-    
+
     ## analyze the factor names
     factors <- character(0)
     used.vars <- model$dummy
@@ -169,7 +169,7 @@ Vars <- function(model)
                         remove[i] <- TRUE
                         append <- c(append, gsub("\"", "",
                                                  gsub("`", "", factors[k,3])))
-                    } else { 
+                    } else {
                         is.factor[i] <- TRUE
                         idx <- (existing.factors == expand.vars[i] &
                                 factors[,2] != factors[,4])
@@ -200,7 +200,7 @@ Vars <- function(model)
     }
 
     ## ------- End -------
-    
+
     ## ------- Add quotes -------
     mvars <- Vars(model)
     model.vars <- .add.quotes(gsub("`", "", model.vars), mvars)
@@ -236,7 +236,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(na.action)) {
         newdata <- na.action(newdata, vars = Vars(model))
     }
-    
+
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
@@ -262,9 +262,9 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     ##             ! names(at)[i] %in% f$factors[,3])
     ##     }
     ##     names(avgs) <- paste("\"", .strip(names(avgs), "\""), "\"", sep = "")
-    } else 
+    } else
         avgs <- NULL
-    
+
     res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, f$factors,
                         at.mean, factor.continuous, avgs = avgs)
@@ -313,7 +313,7 @@ margins.lm.madlib.grps <- function(model, dydx = ~ Vars(model),
                                    ## at = list(),
                                    na.action = NULL, ...)
 {
-    if (length(newdata) == 1) 
+    if (length(newdata) == 1)
         lapply(seq_len(length(model)), function (i)
                margins(model[[i]], dydx, newdata, at.mean,
                        factor.continuous, na.action, ...))
@@ -338,7 +338,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(na.action)) {
         newdata <- na.action(newdata, vars = Vars(model))
     }
-    
+
     vars <- dydx
     if (!is(newdata, "db.obj"))
         stop("newdata must be a db.obj object!")
@@ -401,7 +401,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
         se[!f$is.factor] <- se0[seq_len(sum(!f$is.factor))]
         se[f$is.factor] <- se0[sum(!f$is.factor) + seq_len(sum(f$is.factor))]
     }
-    
+
     z <- mar / se
     p <- 2 * (1 - pnorm(abs(z)))
     rows <- gsub("`", "", f$vars)
@@ -438,7 +438,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                                         ## at = list(),
                                         na.action = NULL, ...)
 {
-    if (length(newdata) == 1) 
+    if (length(newdata) == 1)
         lapply(seq_len(length(model)), function (i)
                margins(model[[i]], dydx, newdata, at.mean,
                        factor.continuous, na.action, ...))
@@ -538,7 +538,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
         select.c <- seq_len(m)
         select.i <- integer(0)
     }
-    
+
     if (at.mean) {
         mar <- unlist(sapply(
             select.c,
@@ -634,6 +634,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                                         factors), coefs)),
                           ")", sep = ""))
             }))
+
         for (i in select.i) {
             s <- .diff.lin(P, vars[i], model.vars, factors)
             e <- sapply(
@@ -652,7 +653,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
         }
 
         mar.se <- c(mar, mar.i, se, se.i)
-        
+
         if (is.list(mar.se)) {
             mar.se <- .combine.list(mar.se)
             mar.se <- unlist(lk(mar.se, -1))
@@ -686,7 +687,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
         select.c <- seq_len(m)
         select.i <- integer(0)
     }
-    
+
     if (at.mean) {
         mar <- unlist(sapply(
             select.c,
@@ -760,7 +761,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
             mar <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(", mar,
                          ",", sigma, "*(1 - ", sigma, ")::double precision))",
                          sep = "")
-            
+
             se1 <- paste(sapply(
                 select.c,
                 function(i) {
@@ -771,7 +772,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                             .sub.coefs(.parse.deriv(s, "b"%+%j), coefs)
                         }), collapse = ", ")
                 }), collapse = ", ")
-            
+
             se2 <- paste(sapply(
                 select.c,
                 function(i) {
@@ -784,7 +785,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
                                              ")", sep = ""), coefs)
                         }), collapse = ", ")
                 }), collapse = ", ")
-            
+
             se1 <- paste(madlib, ".avg(", madlib, ".array_scalar_mult(array[",
                          se1, "]::double precision[],", sigma,
                          "*(1 - ", sigma, ")::double precision))", sep = "")

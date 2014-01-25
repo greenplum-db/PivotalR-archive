@@ -318,16 +318,23 @@ predict.elnet.madlib <- function (object, newdata,
         sort <- newdata@.sort
     }
 
-    if (!is(newdata, "db.data.frame"))
+    if (!is(newdata, "db.data.frame")) {
         ## ind.str <- .replace.col.with.expr(object$ind.str,
         ##                                   names(newdata),
         ##                                   newdata@.expr)
+        if (length(object[[1]]$dummy) != 0) {
+            l <- length(names(newdata))
+            for (i in seq_len(length(object[[1]]$dummy))) {
+                newdata[[object[[1]]$dummy[i]]] <- 1
+                newdata@.expr[l+i] <- object[[1]]$dummy.expr[i]
+            }
+        }
         ind.str <- paste(
             "array[",
             paste(.replace.col.with.expr1(object$ind.vars, newdata),
                   collapse = ", "),
             "]", sep = "")
-    else
+    } else
         ind.str <- object$ind.str
 
     if (object$family == "gaussian") {
