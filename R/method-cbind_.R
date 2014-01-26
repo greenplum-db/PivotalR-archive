@@ -27,10 +27,16 @@ setGeneric(
              ..., deparse.level = 1)
 {
     no.first <- missing(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`)
-    if (no.first && !is(..1, "db.obj") ||
+    has.db.obj <- FALSE
+    for (arg in c(...))
+        if (is(arg, "db.obj")) {
+            has.db.obj <- TRUE
+            break
+        }
+    if (no.first && !has.db.obj ||
         (!no.first &&
          !is(`__madlib_temp_27836b51_49d3_9d9a96_dc459ab0ef62__`,
-             "db.obj")))
+             "db.obj") && !has.db.obj))
     {
         if (no.first)
             args <- list(..., deparse.level = deparse.level)
