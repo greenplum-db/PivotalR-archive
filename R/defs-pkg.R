@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Private variables of the package
 ## -----------------------------------------------------------------------
@@ -26,10 +25,10 @@
 ## cannot be changed without exposing to users. If we really
 ## export these variables, they will easily interfere with other
 ## user defined variables.
-## 
+##
 ## The only way is to define a local environment inside the package.
 ##
-## The environment is a constant and cannot be changed, 
+## The environment is a constant and cannot be changed,
 ## but the variables inside this environment can be changed.
 ## The environment constant is not exported, and is thus hidden
 ## from the users.
@@ -161,3 +160,8 @@ as.db.Rview <- function (x) {
 ## Many functions in this package should operate on both classes.
 ## So we define this abstract class.
 setClassUnion("db.obj", members = c("db.data.frame", "db.Rquery"))
+
+## ----------------------------------------------------------------------
+
+## Abstract interface, which is the parent of all supported platforms
+setClassUnion("data.obj", members = c("db.obj"))

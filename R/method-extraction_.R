@@ -1,17 +1,12 @@
-
 ## -----------------------------------------------------------------------
 ## extraction function $ and [[
 ## -----------------------------------------------------------------------
 
 setMethod (
     "$",
-    signature(x = "db.obj"),
+    signature(x = "data.obj"),
     function (x, name) {
-        if (is(x, "db.Rquery"))
-            x.where <- x@.where
-        else
-            x.where <- ""
-        .create.db.Rquery(x, cols.i = as.character(name), x.where)            
+
     },
     valueClass = "db.Rquery")
 
@@ -85,7 +80,7 @@ setMethod (
         ##     n <- 3
         ##     j <- 1
         ## }
-        
+
         if (missing(i))
             i.missing <- TRUE
         else
@@ -122,7 +117,7 @@ setMethod (
             n <- 3
             j <- 1
         }
-        
+
         if (n == 2) { # select columns
             ## i.txt <- deparse(substitute(i))
             ## if (gsub("is.na\\s*\\(\\s*(.*\\S)\\s*\\)", "\\1", i.txt) ==
@@ -142,7 +137,7 @@ setMethod (
         } else if (n == 3) { # several cases
             if (i.missing) {
                 .create.db.Rquery(x, cols.i = j, x.where)
-            } else if (is(i, "db.Rquery")) {          
+            } else if (is(i, "db.Rquery")) {
                 where.str <- i@.expr
                 if (length(where.str) != 1)
                     stop("More than 2 boolean expressions in selecting row!")
@@ -212,9 +207,9 @@ setMethod (
         message("Error : format wrong!")
         stop()
     }
-    
+
     sort <- .generate.sort(x)
-    
+
     if (is(x, "db.Rquery")) {
         if (x@.parent == x@.source)
             tbl <- x@.parent
@@ -232,7 +227,7 @@ setMethod (
     else where.str <- ""
 
     is.col.i.char <- is.character(cols.i)
-    
+
     if (is.col.i.char) {
         if (all(cols.i %in% names(x))) {
             cols.i <- .gwhich(names(x), cols.i)
@@ -241,7 +236,7 @@ setMethod (
             return (NULL)
             ## message("Error : column does not exist!")
             ## stop()
-        }            
+        }
     } else if (is(cols.i, "numeric") || is.null(cols.i)) {
         if (!is.null(cols.i)) {
             cols.i <- cols.i[cols.i != 0]
@@ -281,7 +276,7 @@ setMethod (
             expr <- x@.expr[cols.i]
         col.name <- names(x)[cols.i]
     }
-    
+
     if (length(expr) == 0) return (new("db.Rquery"))
     i.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                    sep = " as ", collapse = ", ")
