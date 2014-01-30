@@ -6,7 +6,14 @@ setMethod (
     "$",
     signature(x = "data.obj"),
     function (x, name) {
+        if (name %in% names(x)) {
+            nss <- names(x)
+            col.i <- match(name, nss)
+        } else
+            return (NULL)
 
+        col.info <- .get.cols(x, col.i)
+        .create.data.obj(col.info)
     },
     valueClass = "db.Rquery")
 
