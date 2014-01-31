@@ -5,10 +5,14 @@
 db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
                  verbose = TRUE)
 {
+    if (!.is.conn.id.valid(conn.id))
+        stop(conn.id, " is not a valid connection ID. ",
+             "Use db.list() to view the available choices")
+
     warns <- .suppress.warnings (conn.id, "warning")
     sql <- paste(..., sep = sep)
     if (verbose) {
-        message("Executing in database connection ", conn.id, ":")
+        message("Executing in database connection ", conn.id, ":\n")
         cat(sql, "\n\n")
     }
     ## if (!is.character(sql))
