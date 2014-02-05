@@ -4,6 +4,9 @@ context("Test madlib.lm")
 ## Test preparations
 
 ## Need valid 'port' and 'dbname' values
+## It is not necessary to run the check, but it is a good reminder to
+## the writer of the tests that these environment variables are needed
+## by these tests.
 .check.params(c("port", "dbname"), environment())
 
 ## connection ID

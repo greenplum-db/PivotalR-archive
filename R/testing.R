@@ -36,7 +36,10 @@ test <- function(filter = NULL,
     package <- "PivotalR"
     reporter <- match.arg(reporter)
 
-    test_path <- paste(system.file("tests", package = package), "/internal")
+    test_path <- system.file("tests", package = package)
+    if (test_path == "")
+        stop("You need to use --install-tests option to install ",
+             "the tests when you are installing PivotalR!")
     source(paste(test_path, "/envvars.R", sep = ""))
     param.lst <- .get.param.inputs(.tests.need.these)
 
