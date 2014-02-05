@@ -21,7 +21,8 @@
 
 ## ----------------------------------------------------------------------
 
-test <- function()
+test <- function(filter = NULL,
+                 reporter = c("summary", "tap", "minimal", "stop"))
 {
     installed.pkgs <- .get.installed.pkgs()
     if (! "testthat" %in% installed.pkgs) {
@@ -32,12 +33,14 @@ test <- function()
     }
     library(testthat)
 
-    param.lst <- .get.param.inputs(.tests.need.these)
     package <- "PivotalR"
-    reporter <- "summary"
-    filter <- NULL
-    test_path <- system.file("tests", package = package)
-    reporter <- testthat:::find_reporter(reporter)
+    reporter <- match.arg(reporter)
+
+    test_path <- paste(system.file("tests", package = package), "/internal")
+    source(paste(test_path, "/envvars.R", sep = ""))
+    param.lst <- .get.param.inputs(.tests.need.these)
+
+    reporter <- eval(parse(text = "testthat:::find_reporter(reporter)"))
     env <- new.env(parent = getNamespace(package))
     for (i in names(param.lst)) env[[i]] <- param.lst[[i]]
     test_dir(test_path, reporter = reporter, env = env, filter = filter)

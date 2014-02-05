@@ -24,7 +24,7 @@ test_that("madlib.lm returns the correct class", {
     fm <- lm(rings ~ . - id - sex, data = dat.mm)
     ##
     expect_that(fdb, is_a("lm.madlib"))
-    expect_that(fdb$coef, equals(as.numeric(fm$coefficients)))
+    expect_that(fdb$coef, equals(fm$coefficients))
 })
 
 ## ----------------------------------------------------------------------
