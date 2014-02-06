@@ -4,9 +4,8 @@ context("Example tests which shows how to write tests")
 ## Test preparations
 
 ## Need valid 'port' and 'dbname' values
-## It is not necessary to run the check, but it is a good reminder to
-## the writer of the tests that these environment variables are needed
-## by these tests.
+## This function will get these parameters from the user's
+## interactive inputs if they have not been defined.
 .get.param.inputs(c("port", "dbname"))
 
 ## connection ID

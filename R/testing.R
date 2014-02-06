@@ -1,3 +1,4 @@
+## The environment that contains all environment variables
 .testing.env <- new.env(parent = getNamespace(.this.pkg.name))
 
 ## ----------------------------------------------------------------------
@@ -17,7 +18,8 @@
 ## ----------------------------------------------------------------------
 
 test <- function(filter = NULL,
-                 reporter = c("summary", "tap", "minimal", "stop"))
+                 reporter = c("summary", "tap", "minimal", "stop"),
+                 env.file = NULL)
 {
     test_path <- system.file("tests", package = .this.pkg.name)
     if (test_path == "")
@@ -35,15 +37,23 @@ test <- function(filter = NULL,
     }
     library(testthat)
 
-    ## source(paste(test_path, "/envvars.R", sep = ""))
-    ## param.lst <- .get.param.inputs(.tests.need.these)
-
     reporter <- eval(parse(text = "testthat:::find_reporter(reporter)"))
-    ## env <- new.env(parent = getNamespace(package))
-    ## for (i in names(param.lst)) env[[i]] <- param.lst[[i]]
+
+    if (!is.null(env.file))
+        .fill.testing.env(env.file)
+
     test_dir(test_path, reporter = reporter, env = .testing.env, filter = filter)
     if (reporter$failed) {
         stop("Test failures", call. = FALSE)
     }
     invisible()
+}
+
+## ----------------------------------------------------------------------
+
+## Given a file, put all values in the file into testing.env
+## Each line of the file should be a key : value pair
+.fill.testing.env <- function(env.file)
+{
+
 }
