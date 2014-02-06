@@ -55,5 +55,11 @@ test <- function(filter = NULL,
 ## Each line of the file should be a key : value pair
 .fill.testing.env <- function(env.file)
 {
-
+    con <- file(env.file)
+    params <- readLines(con)
+    close(con)
+    for (line in params) {
+        words <- .strip(strsplit(line, ":")[[1]])
+        assign(words[1], words[2], envir = .testing.env)
+    }
 }
