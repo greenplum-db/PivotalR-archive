@@ -59,7 +59,9 @@ test <- function(filter = NULL,
     params <- readLines(con)
     close(con)
     for (line in params) {
+        if (grepl("^\\s*#", line)) next # allow '#' to start a comment
         words <- .strip(strsplit(line, ":")[[1]])
-        assign(words[1], words[2], envir = .testing.env)
+        if (length(words) >= 2)
+            assign(words[1], words[2], envir = .testing.env)
     }
 }
