@@ -1,4 +1,4 @@
-context("Test madlib.lm")
+context("Example tests which shows how to write tests")
 
 ## ----------------------------------------------------------------------
 ## Test preparations
@@ -7,7 +7,7 @@ context("Test madlib.lm")
 ## It is not necessary to run the check, but it is a good reminder to
 ## the writer of the tests that these environment variables are needed
 ## by these tests.
-.check.params(c("port", "dbname"), environment())
+.get.param.inputs(c("port", "dbname"))
 
 ## connection ID
 cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
