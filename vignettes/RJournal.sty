@@ -2,7 +2,7 @@
 % Copyright (C) 2010 by the R Foundation
 % Copyright (C) 2013 by the R Journal
 %
-% Originally written by Kurt Hornik and Friedrich Leisch with subsequent 
+% Originally written by Kurt Hornik and Friedrich Leisch with subsequent
 % edits by the editorial board
 
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
@@ -13,10 +13,10 @@
 % Overall page layout, fonts etc -----------------------------------------------
 
 % Issues of of \emph{The R Journal} are created from the standard \LaTeX{}
-% document class \pkg{report}. 
+% document class \pkg{report}.
 
 \RequirePackage{geometry}
-\geometry{a4paper, 
+\geometry{a4paper,
    textwidth=14cm, top=1cm, bottom=1cm,
    includehead,includefoot,centering,
    footskip=1.5cm}
@@ -24,7 +24,7 @@
 
 \RequirePackage{fancyhdr}
 \fancyhead{}
-\fancyheadoffset{2cm} 
+\fancyheadoffset{2cm}
 \fancyhead[L]{\textsc{\RJ@sectionhead}}
 \fancyhead[R]{\thepage}
 \fancyfoot{}
@@ -33,7 +33,7 @@
 \pagestyle{fancy}
 
 % We use the following fonts (all with T1 encoding):
-% 
+%
 %   rm   & palatino
 %   tt   & inconsolata
 %   sf   & helvetica
@@ -43,7 +43,8 @@
 
 \RequirePackage[scaled=0.92]{helvet}
 \RequirePackage{palatino,mathpazo}
-\RequirePackage[scaled=1.02]{inconsolata}
+%\RequirePackage[scaled=1.02]{inconsolata}
+\RequirePackage[scaled=1.02]{zi4}
 \RequirePackage[T1]{fontenc}
 
 \RequirePackage[hyphens]{url}
@@ -100,7 +101,7 @@
 
 % Article layout ---------------------------------------------------------------
 
-% Environment |article| clears the article header information at its beginning. 
+% Environment |article| clears the article header information at its beginning.
 % We use |\FloatBarrier| from the placeins package to keep floats within
 % the article.
 \RequirePackage{placeins}
@@ -113,7 +114,7 @@
 \setstretch{1}%
 \noindent%
 \small%
-\textbf{Abstract} #1 
+\textbf{Abstract} #1
 }
 
 % The real work is done by a redefined version of |\maketitle|.  Note
@@ -167,13 +168,13 @@
 }
 
 % We want bibliographies as starred sections within articles.
-% 
+%
 \RequirePackage[sectionbib,round]{natbib}
 \bibliographystyle{abbrvnat}
 
 % Equations, figures and tables are counted within articles, but we do
 % not show the article number. For equations it becomes a bit messy to avoid
-% having hyperref getting it wrong. 
+% having hyperref getting it wrong.
 
 % \numberwithin{equation}{chapter}
 \renewcommand{\theequation}{\@arabic\c@equation}
