@@ -17,11 +17,15 @@
 
 ## ----------------------------------------------------------------------
 
-test <- function(filter = NULL,
+test <- function(path = "tests", filter = NULL,
                  reporter = c("summary", "tap", "minimal", "stop"),
                  env.file = NULL)
 {
-    test_path <- system.file("tests", package = .this.pkg.name)
+    if (path == "tests")
+        test_path <- system.file(path, package = .this.pkg.name)
+    else
+        test_path <- path
+
     if (test_path == "")
         stop("You need to use --install-tests option to install ",
              "the tests when you are installing PivotalR!")

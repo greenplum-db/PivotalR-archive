@@ -7,11 +7,11 @@
 .elnet.gaus.cd <- function (data, x, y, alpha, lambda, standardize, control,
                             glmnet, params, call)
 {
-    warnings <- .suppress.warnings(conn.id(data))
     if (is.null(control$control$verbose) || control$control$verbose)
-        message("Warning: The coordinate descent algorithm implemented ",
+        warning("The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
                 "is larger than a couple of thousands!")
+    warnings <- .suppress.warnings(conn.id(data))
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
@@ -96,7 +96,7 @@
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
-    for (i in seq_len(length(col.name))) 
+    for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
@@ -136,11 +136,11 @@
 .elnet.binom.cd <- function (data, x, y, alpha, lambda, standardize, control,
                              params, call)
 {
-    warnings <- .suppress.warnings(conn.id(data))
     if (is.null(control$control$verbose) || control$control$verbose)
-        message("Warning: The coordinate descent algorithm implemented ",
+        warning("The coordinate descent algorithm implemented ",
                 "here may not work very well when the number of features ",
                 "is larger than a couple of thousands!")
+    warnings <- .suppress.warnings(conn.id(data))
     n <- length(x)
     N <- nrow(data)
     ind.vars <- x
@@ -224,7 +224,7 @@
     rst$ind.vars <- rows
     col.name <- gsub("\"", "", data@.col.name)
     appear <- data@.appear.name
-    for (i in seq_len(length(col.name))) 
+    for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
     rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
@@ -287,13 +287,13 @@
 
     mid$p <- 1 / (1 + exp(-1 * mid$lin))
     mid$x <- db.array(x)
-   
+
     ## mid$w[mid$p < 1e-5 | mid$p > 1 - 1e-5] <- 1e-5
     ## mid$p[mid$p < 1e-5] <- 0
     ## mid$p[mid$p > 1 - 1e-5] <- 1
 
-    ## f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE) 
-    ## f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE) 
+    ## f <- as.db.data.frame(mid, is.view = FALSE, verbose = FALSE)
+    ## f <- as.db.data.frame(mid, is.view = TRUE, verbose = FALSE)
     f <- as.db.Rview(mid)
 
     ## w <- f$w
@@ -302,7 +302,7 @@
     wx <- w * f$x
     z <- f$lin + (f$y - f$p) / w
     wz <- w * f$lin + f$y - f$p
-    
+
     compute <- Reduce(cbind2, c(crossprod(x, wx), crossprod(wx, z),
                                 mean(Reduce(cbind2, c(wx, x, z, wz, w)))))
 
@@ -328,7 +328,7 @@
     my <- compute[,5]
     mwz <- compute[,6]
     mw <- compute[,7]
-    
+
     iter <- 0
     ## coef <- rep(0, n+1)
 
