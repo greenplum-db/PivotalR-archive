@@ -1,4 +1,3 @@
-
 ## ----------------------------------------------------------------------
 ## Universal database connection utilities
 ## Multiple R connection packages are supported
@@ -15,8 +14,8 @@
 db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = user,
                         password = "", port = 5432,
                         madlib = "madlib", conn.pkg = "RPostgreSQL",
-                        default.schemas = NULL)
-{    
+                        default.schemas = NULL, verbose = TRUE)
+{
     ## argument type check
     if (!.is.arg.string(host) ||
         !.is.arg.string(user) ||
@@ -33,30 +32,43 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         pkg.to.load <- .supported.connections[i]
         ## if the package is not installed, install it
         installed.pkgs <- .get.installed.pkgs()
-        if (!(conn.pkg.name %in% installed.pkgs)) 
+        if (!(conn.pkg.name %in% installed.pkgs))
         {
             if (conn.pkg.name == "rpostgresql" && !("dbi" %in% installed.pkgs)) {
-                message("Package DBI is going to be installed!\n")
+                if (verbose) message("Package DBI is going to be installed!")
                 install.packages(paste(.localVars$pkg.path, "/dbi/DBI.tar.gz",
                                        sep = ""), repos = NULL, type = "source")
             }
-            message(paste("Package ", pkg.to.load,
-                          " is going to be installed so that ",
-                          .this.pkg.name,
-                          " could connect to databases.\n", sep = ""))
+            if (verbose)
+                message(paste("Package ", pkg.to.load,
+                              " is going to be installed so that ",
+                              .this.pkg.name,
+                              " could connect to databases.\n", sep = ""))
             install.packages(pkgs = pkg.to.load)
             if (!(conn.pkg.name %in% .get.installed.pkgs()))
                 stop("The package could not be installed!")
         }
 
-        eval(parse(text = paste("library(", pkg.to.load, ")", sep = "")))
+        if (verbose)
+            eval(
+                parse(
+                    text = paste(
+                    "library(", pkg.to.load, ")", sep = "")))
+        else
+            eval(
+                parse(
+                    text = paste(
+                    "suppressMessages(library(", pkg.to.load, "))", sep = "")))
+
         command <- paste(".db.connect.", conn.pkg.name, "(host=\"", host,
                          "\", user=\"", user, "\", dbname=\"", dbname,
                          "\", password=\"", password, "\", port=", port,
                          ", madlib=\"", madlib, "\"",
                          ")", sep = "")
         result <- eval(parse(text = command))
-        cat(paste("Created a connection to database with ID", result, "\n"))
+        if (verbose)
+            cat(paste("Created a connection to database with ID",
+                      result, "\n"))
         .madlib.version.number(result) # record the madlib version number
 
         if (!is.null(default.schemas)) {
@@ -73,7 +85,7 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
         res <- .get.res(paste("set application_name = '",
                               .this.pkg.name, "'", sep = ""),
                         conn.id = result)
-        
+
         return (result)
     }
     else
@@ -90,7 +102,7 @@ db.default.schemas <- function (conn.id = 1, set = NULL)
 {
     if (!.is.conn.id.valid(conn.id))
         stop(conn.id, " is not a valid connection ID !")
-    
+
     if (is.null(set)) {
         res <- .db.getQuery("show search_path", conn.id = conn.id)
         if (is(res, .err.class))
@@ -111,7 +123,7 @@ db.search.path <- function (conn.id = 1, set = NULL)
     db.default.schemas(conn.id, set)
 }
 
-## ---------------------------------------------------------------------- 
+## ----------------------------------------------------------------------
 
 ## disconnect a connection
 db.disconnect <- function (conn.id = 1, verbose = TRUE, force = FALSE)
@@ -209,7 +221,7 @@ db.list <- function ()
                 cat("MADlib   :    not installed in schema", schema.madlib(idx[1]), "\n")
             else
                 cat("MADlib   :    installed in schema", schema.madlib(idx[1]), "\n")
-            
+
             ## pkg <- .localVars$db[[idx[2]]]$conn.pkg
             ## id <- which(tolower(.supported.connections) == pkg)
             ## cat(paste("Conn pkg :    ", .supported.connections[id],
@@ -226,14 +238,14 @@ db.objects <- function (search = NULL, conn.id = 1)
 {
     if (!.is.conn.id.valid(conn.id))
         stop("Connection ID ", conn.id, " is not valid!")
-        
+
     res <- .db.getQuery("select table_schema, table_name from information_schema.tables", conn.id = conn.id)
 
     if (is.null(search)) {
         res <- paste(res[,1], res[,2], sep = ".")
         return (res[order(res)])
     }
-    
+
     search <- gsub("\\.", "\\\\.", search)
     final.res <- character(0)
     for (i in seq_len(dim(res)[1])) {
@@ -407,9 +419,9 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
             type = "character")
         table_schema <- character(0)
         for (schema in schemas)
-            if (.db.existsTable(c(schema, table), conn.id)) 
+            if (.db.existsTable(c(schema, table), conn.id))
                 table_schema <- c(table_schema, schema)
-        
+
         if (identical(table_schema, character(0))) return (list(FALSE, c("", table)))
         schema.str <- strsplit(table_schema, "_")
         for (i in seq_len(length(schema.str))) {
@@ -417,7 +429,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
             if (str[1] == "pg" && str[2] == "temp")
                 return (list(TRUE, c(table_schema[i], table)))
         }
-        return (list(FALSE, c("", table)))        
+        return (list(FALSE, c("", table)))
     }
 }
 
@@ -433,7 +445,7 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
 
 ## ----------------------------------------------------------------------
 
-.db.writeTable <- function (table, r.obj, add.row.names = TRUE, 
+.db.writeTable <- function (table, r.obj, add.row.names = TRUE,
                             overwrite = FALSE, append = FALSE,
                             distributed.by = NULL, # only for GPDB
                             is.temp = FALSE,
@@ -473,4 +485,3 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
                      "(table=table, idx=id)", sep = "")
     eval(parse(text = command))
 }
-
