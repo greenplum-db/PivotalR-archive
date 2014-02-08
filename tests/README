@@ -1,0 +1,110 @@
+Introduction to PivotalR testing framework
+
+• PivotalR has a complete testing framework. It is automated.
+
+• For users
+
+    ◦ During installation, one needs to use '--install-tests' if he wants to
+      run tests. For example, two methods for installation
+        ◦ In bash terminal
+          $ R CMD install --install-tests PivotalR_0.1.15.tar.gz
+        ◦ In R console,
+          > install.packages('PivotalR', INSTALL_opts = c('--install-tests'))
+
+    ◦ After installation, in R console, run all tests
+
+       > library(PivotalR)
+       > PivotalR:::test()
+
+       The function 'test' is a hidden function that is not exposed to
+       normal users.
+
+• The testing function user manual:
+
+    PivotalR:::test(path = "tests", filter = NULL,
+                    reporter = c("summary", "tap", "minimal", "stop"),
+                    env.file = NULL)
+
+    ◦ Arguments:
+         ▸ path         A string, default is "tests", where the test files
+                        are stored. The default location is PivotalR's
+                        installation-dir/tests. But you can specify a
+                        particular directory where the testing files are
+                        stored. This is particular useful when you are
+                        developing new tests for PivotalR.
+
+         ▸ filter       A string, default is NULL, file name pattern of
+                        those to be executed. Instead of running all tests
+                        under the testing folder, one can choose to run
+                        only some of them. When it is NULL, all tests will
+                        be run.
+
+         ▸ reporter     A string, default is "summary". Other choices
+                        include "tap", "minimal" and "stop". This decides
+                        how the testing result is presented. See the manual
+                        for package 'testthat' for more details about these
+                        choices.
+
+         ▸ env.file     A string, file path, default is NULL. PivotalR tests
+                        usually need some environment parameters, for example,
+                        port and dbname for database port number and database
+                        name respectively. If this is NULL, these values are
+                        to be input by the user interactively, otherwise they
+                        are to be loaded from this file. A row of this file
+                        should start with the format of "key : value", which
+                        specifies the variable name and its value. The same
+                        key can appear multiple time, but only the first takes
+                        effect. All other contents in this file will be ignored
+                        and can be used as comments. Using a file to pass
+                        environment parameters into the tests is useful when
+                        you want to automated the tests.
+
+   ◦ Details:
+
+        The testing framework is build upon the R package "testthat" [1].
+        If this package is not installed on the user's machine, it will be
+        fetched from CRAN and installed when the user runs the tests for
+        the first time.
+
+        [1] testthat: Testthat code and Tools to make testing fun, Hadley
+            Wickham, http://CRAN.R-project.org/package=testthat (2013).
+
+• Some basic guidelines for developers
+
+    ◦ All the test files should be put into tests/ folder
+
+    ◦ All the test files should start with "test".
+
+    ◦ We recommend to use ".r" as the file extension name for the tests.
+      Although it actually does not matter if you use ".R", we want to
+      differentiate the tests with the normal R code files.
+
+    ◦ "tests/test-examples.r" contains several example tests. It shows you
+      how to write tests. For more details about how to write tests, please
+      refer to the user manual of package "testthat" [2], or R Journal's
+      introduction paper [3].
+
+      [2] testthat CRAN page,
+          http://cran.r-project.org/web/packages/testthat/index.html.
+
+      [3] testthat: Getting Started with Testing,
+          http://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf
+
+    ◦ In the tests, one can use the data sets "abalone" and "null.data",
+      which are included in the PivotalR package. Please refer to the user
+      manual for the details about these two data sets.
+
+    ◦ If one wants to use additional data set files in the tests, he should
+      put those data set files in another repository outside of PivotalR
+      package, and pass the path of the data sets into the tests as an
+      environment parameter. We enforce this because CRAN has a size
+      limitation for the package size. In general, it is not recommended to
+      use additional data files. It is recommended to put the data in the
+      databases, and let PivotalR use them from there. If you want to load
+      the data set into memory, use "lk" (see the user manual about "lk"
+      function).
+
+    ◦ As has been explained, the recommended way to use additional data
+      sets in the tests is to load them directly from the connected
+      databases. Just like what we have been doing in the TINC tests for
+      MADlib.

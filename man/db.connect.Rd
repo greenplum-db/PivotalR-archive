@@ -12,7 +12,7 @@
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
 password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL",
-default.schemas = NULL)
+default.schemas = NULL, verbose = TRUE)
 }
 
 \arguments{
@@ -46,12 +46,15 @@ default.schemas = NULL)
   \item{default.schemas}{
     A string, default is \code{NULL}. The search path or default schemas
     of the database that you want to use. The string must be a set of
-  schema names 
+  schema names
     separated by commas. One can also use
   \code{\link{db.default.schemas}} or
-  \code{\link{db.search.path}}  to display or set the search 
+  \code{\link{db.search.path}}  to display or set the search
   path in the database.
-  }
+}
+\item{verbose}{
+  A logival value, default is \code{TRUE}, whether to print some information while connecting to the database.
+}
  }
 
 \value{
@@ -80,7 +83,7 @@ default.schemas = NULL)
 
   \code{\link{connection info}} the functions that extract information
   about the connection.
-  
+
   \code{\link{conn.eql}} tests whether two connections are the same.
 
   \code{\link{db.search.path}} and \code{\link{db.default.schemas}}

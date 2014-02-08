@@ -46,7 +46,8 @@ test <- function(path = "tests", filter = NULL,
     if (!is.null(env.file))
         .fill.testing.env(env.file)
 
-    test_dir(test_path, reporter = reporter, env = .testing.env, filter = filter)
+    testthat::test_dir(test_path, reporter = reporter,
+                       env = .testing.env, filter = filter)
     if (reporter$failed) {
         stop("Test failures", call. = FALSE)
     }
