@@ -19,32 +19,24 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     else
         res <- numeric(0)
 
-    for (i in seq(str))
-    {
-        if (is.na(str[i])) {
-            res <- rbind(res, rep(NA, n))
-            next
-        }
-
-        if (type == "character") {
-            elm <- .regmatches(str[i],
-                               gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
-                                        str[i], perl=T))[[1]]
-            elm <- as.character(elm)
-        } else {
-            elm <- strsplit(gsub("(\\{|\\})", "", str[i]), ",")[[1]]
-            if (type == "integer")
-                elm <- as.integer(elm)
-            else if (type == "logical")
-                elm <- as.logical(elm)
-            else
-                elm <- as.numeric(elm)
-        }
-
-        res <- rbind(res, elm)
+    if (type == "character") {
+        elm <- matrix(unlist(.regmatches(
+            str,
+            gregexpr("[^,\"\\s\\{\\}]+|\"[^\"]*\"",
+                     str, perl=T))), nrow = length(str), byrow = TRUE)
+    } else {
+        elm <- matrix(unlist(strsplit(gsub("(\\{|\\})", "", str), ",")),
+                      nrow = length(str), byrow = TRUE)
+        elm[elm == "NULL"] <- NA
+        if (type == "integer")
+            class(elm) <- "integer"
+        else if (type == "logical")
+            class(elm) <- "logical"
+        else
+            class(elm) <- "numeric"
     }
-    row.names(res) <- NULL
-    res
+
+    elm
 }
 
 ## -----------------------------------------------------------------------
