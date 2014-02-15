@@ -9,7 +9,7 @@
   A generic function to do boostrap aggregating for a given machine
   learning model. The user might need to write a wrapper
   for the training function so that they could satisfy the format
-  requirements 
+  requirements
   desceribed in the following.
 }
 
@@ -19,28 +19,28 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 
 \arguments{
   \item{train}{
-    A training function. It must have only one argument named
+    A training function. It must have only one argument
   \code{data}. Given the data, it produces the model.
   }
-  
+
   \item{data}{
     A \code{\linkS4class{db.obj}} object, which wraps the data in the
-    database. 
+    database.
   }
-  
+
   \item{nbags}{
     An integer, default is 10. The number of bagging sampling.
   }
-  
+
   \item{fraction}{
     A double, default is 1. The fraction of data in each bagging
-    sample. 
+    sample.
   }
 }
 
 \value{
   A \code{bagging.model} object, which is actually a list of fitted
-  models. 
+  models.
 }
 
 \references{
@@ -49,14 +49,14 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
   \code{\link{predict.bagging.model}} makes predictions using the result
   of this function.
-  
+
   \code{\link{generic.cv}} for cross-validation
 
   \code{\link{sample,db.obj-method}} samples data from a table
