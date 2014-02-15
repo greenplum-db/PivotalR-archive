@@ -19,7 +19,8 @@
 
 test <- function(path = "tests", filter = NULL,
                  reporter = c("summary", "tap", "minimal", "stop"),
-                 env.file = NULL)
+                 env.file = NULL, env.vars = list(),
+                 clean.test.env = FALSE)
 {
     if (path == "tests")
         test_path <- system.file(path, package = .this.pkg.name)
@@ -45,9 +46,17 @@ test <- function(path = "tests", filter = NULL,
 
     if (!is.null(env.file))
         .fill.testing.env(env.file)
+    else if (length(env.vars) > 0)
+        for (var in names(env.vars))
+            assign(var, env.vars[[var]], envir = .testing.env)
+
+    if (clean.test.env)
+        for (var in ls(.testing.env))
+            rm(var, envir = .testing.env)
 
     testthat::test_dir(test_path, reporter = reporter,
                        env = .testing.env, filter = filter)
+
     if (reporter$failed) {
         stop("Test failures", call. = FALSE)
     }
