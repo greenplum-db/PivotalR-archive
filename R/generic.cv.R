@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Generic cross-validation, not a wrapper of MADlib function
 ## -----------------------------------------------------------------------
@@ -54,9 +53,9 @@ generic.cv <- function (train, predict, metric, data,
         err <- numeric(0)
         for (i in 1:k) {
             if (verbose) cat("Running on fold", i, "now ...\n")
-            fits <- train(data = cuts$train[[i]])
-            pred <- predict(object = fits, newdata = cuts$valid[[i]])
-            err <- c(err, as.numeric(metric(predicted = pred, actual = cuts$valid[[i]])))
+            fits <- train(cuts$train[[i]])
+            pred <- predict(fits, cuts$valid[[i]])
+            err <- c(err, as.numeric(metric(pred, cuts$valid[[i]])))
             if (is(data, "db.obj")) delete(fits)
         }
 
@@ -88,11 +87,10 @@ generic.cv <- function (train, predict, metric, data,
                     else
                         args <- rbind(args, as.vector(unlist(arg.list)))
                 }
-                arg.list$data <- cuts$train[[i]]
+                arg.list[[length(arg.list)+1]] <- cuts$train[[i]]
                 fits <- do.call(train, arg.list)
-                pred <- predict(object = fits, newdata = cuts$valid[[i]])
-                err.k <- c(err.k, as.numeric(metric(predicted = pred,
-                                                    actual = cuts$valid[[i]])))
+                pred <- predict(fits, cuts$valid[[i]])
+                err.k <- c(err.k, as.numeric(metric(pred, cuts$valid[[i]])))
                 if (is(data, "db.obj")) delete(fits)
             }
             err <- rbind(err, err.k)
@@ -110,7 +108,7 @@ generic.cv <- function (train, predict, metric, data,
         else best <- which.max(rst$avg)
 
         arg.list <- .create.args(arg.names, params, best)
-        arg.list$data <- data
+        arg.list[[length(arg.list) + 1]] <- data
         best.fit <- do.call(train, arg.list)
         arg.list$data <- NULL
         if (verbose) cat("Done.\n")
@@ -156,7 +154,7 @@ generic.cv <- function (train, predict, metric, data,
 
 ## cut the data in an approximate way, but faster
 .approx.cut.data <- function (x, k)
-{    
+{
     conn.id <- conn.id(x)
     tmp <- .unique.string()
     id.col <- .unique.string()
@@ -204,22 +202,22 @@ generic.cv <- function (train, predict, metric, data,
 
 ## ## ----------------------------------------------------------------------
 
-## plot.cv.generic <- function (x, ...) 
+## plot.cv.generic <- function (x, ...)
 ## {
 ##     cvobj = x
 ##     xlab = "params"
-##     plot.args = list(x = , y = x$metric$avg, 
-##     ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
+##     plot.args = list(x = , y = x$metric$avg,
+##     ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name,
 ##     type = "n")
 ##     new.args = list(...)
-##     if (length(new.args)) 
+##     if (length(new.args))
 ##         plot.args[names(new.args)] = new.args
 ##     do.call("plot", plot.args)
-##     error.bars(sign.lambda * log(cvobj$lambda), cvobj$cvup, cvobj$cvlo, 
+##     error.bars(sign.lambda * log(cvobj$lambda), cvobj$cvup, cvobj$cvlo,
 ##         width = 0.01, col = "darkgrey")
-##     points(sign.lambda * log(cvobj$lambda), cvobj$cvm, pch = 20, 
+##     points(sign.lambda * log(cvobj$lambda), cvobj$cvm, pch = 20,
 ##         col = "red")
-##     axis(side = 3, at = sign.lambda * log(cvobj$lambda), labels = paste(cvobj$nz), 
+##     axis(side = 3, at = sign.lambda * log(cvobj$lambda), labels = paste(cvobj$nz),
 ##         tick = FALSE, line = 0)
 ##     abline(v = sign.lambda * log(cvobj$lambda.min), lty = 3)
 ##     abline(v = sign.lambda * log(cvobj$lambda.1se), lty = 3)

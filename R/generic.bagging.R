@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Bagging method, not a wrapper of MADlib function
 ## -----------------------------------------------------------------------
@@ -21,7 +20,7 @@ generic.bagging <- function (train, data, nbags = 10, fraction = 1)
     ## idat <- .create.indexed.temp.table(data)
     for (i in 1:nbags) {
         data.use <- sample(data, size, replace = TRUE)
-        res[[i]] <- train(data = data.use)
+        res[[i]] <- train(data.use)
         delete(data.use)
     }
     ## delete(idat)
@@ -130,7 +129,7 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     db.str <- (.get.dbms.str(conn.id))$db.str
     if (db.str == "HAWQ")
         stop("HAWQ does not support creating function yet!")
-    
+
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
     if (!is.null(.localVars$db[[id]]$func)) {
         k <- which(.localVars$db[[id]]$func[,1] == funcname)

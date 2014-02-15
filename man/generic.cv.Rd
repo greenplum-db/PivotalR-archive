@@ -20,22 +20,21 @@ approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
 
 \arguments{
   \item{train}{
-    A training function. It must have at least one argument named
-    \code{data}. Given the data, it produces the model. It can also have
+    A training function. Its first argument must be a \code{\linkS4class{db.obj}} object which is the wrapper for the data in database.
+    Given the data, it produces the model. It can also have
   other parameters that specifies the model, and these parameters must
   appear in the list \code{params}.
   }
 
   \item{predict}{
-    A prediction function. It must have only two arguments named
-    \code{object} and \code{newdata}, which are the fitted model and
-    the new data input for prediction.
+    A prediction function. It must have only two arguments, which are the fitted model (the first argument) and
+    the new data input for prediction (the second argument).
   }
 
   \item{metric}{
-    A metric function. It must have only two arguments named
-    \code{predicted} and \code{actual}, where \code{predicted} is the
-    redictions and \code{actual} is the actual value. This function shoud measure the difference between the predicted and actual values and produce a single numeric value.
+    A metric function. It must have only two arguments.
+    The first argument is the
+    prediction and the second is the data that contains the actual value. This function shoud measure the difference between the predicted and actual values and produce a single numeric value.
   }
 
   \item{data}{
@@ -136,7 +135,7 @@ err <- generic.cv(function(data) {
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
-dat <- data.frame(x, y) 
+dat <- data.frame(x, y)
 delete("eldata")
 z <- as.db.data.frame(dat, "eldata")
 
@@ -146,8 +145,8 @@ g <- generic.cv(
 alpha, lambda = lambda, control = list(random.stepsize=TRUE))
     },
     predict = predict,
-    metric = function (predicted, actual) {
-        lk(mean((actual$y - predicted)^2))
+    metric = function (predicted, data) {
+        lk(mean((data$y - predicted)^2))
     },
     data = z,
     params = list(alpha=1, lambda=seq(0,0.2,0.1)),
