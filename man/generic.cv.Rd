@@ -25,35 +25,35 @@ approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
   other parameters that specifies the model, and these parameters must
   appear in the list \code{params}.
   }
-  
+
   \item{predict}{
     A prediction function. It must have only two arguments named
     \code{object} and \code{newdata}, which are the fitted model and
     the new data input for prediction.
   }
-  
+
   \item{metric}{
     A metric function. It must have only two arguments named
     \code{predicted} and \code{actual}, where \code{predicted} is the
     redictions and \code{actual} is the actual value. This function shoud measure the difference between the predicted and actual values and produce a single numeric value.
   }
-  
+
   \item{data}{
     A \code{\linkS4class{db.obj}} object, which wraps the data in the
     database, used for cross-validation. Or a \code{data.frame}, which contains data in memory.
   }
-  
+
   \item{params}{
     A list, default is \code{NULL}. The values of each parameters used
     by the training function. An array of values for each parameter is
-    an element 
+    an element
     in the list. The value arrays for different parameters do not have
     to be the same length. The arrays of shorter lengths are circularly
-    expanded to the length of the longest element. 
+    expanded to the length of the longest element.
   }
-  
+
   \item{k}{
-    An integer, default is 10. The cross-validation fold number.  
+    An integer, default is 10. The cross-validation fold number.
   }
 
   \item{approx.cut}{
@@ -61,7 +61,7 @@ approx.cut = TRUE, verbose = TRUE, find.min = TRUE)
   }
 
   \item{verbose}{
-    A logical value, default is \code{TRUE}. Whether to print 
+    A logical value, default is \code{TRUE}. Whether to print
   }
 
   \item{find.min}{
@@ -87,7 +87,7 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 
   - \code{avg} The average metric value for each set of parameters.
 
-  - \code{std} The standard deviation for the metric values of each set   of parameters.
+  - \code{std} The standard deviation for the metric values of each set of parameters.
 
 - \code{vals} A matrix that contains all the metric value measured, whose rows correspond to different set of parameters, and columns correspond to different folds of cross-validation.
 }
@@ -108,7 +108,7 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -136,8 +136,7 @@ err <- generic.cv(function(data) {
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
-dat <- as.data.frame(cbind(x, y))
-
+dat <- data.frame(x, y) 
 delete("eldata")
 z <- as.db.data.frame(dat, "eldata")
 
@@ -150,7 +149,7 @@ alpha, lambda = lambda, control = list(random.stepsize=TRUE))
     metric = function (predicted, actual) {
         lk(mean((actual$y - predicted)^2))
     },
-    data = dat,
+    data = z,
     params = list(alpha=1, lambda=seq(0,0.2,0.1)),
     k = 5, find.min = TRUE)
 
