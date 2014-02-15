@@ -25,6 +25,8 @@ test_that("Examples of speed test", {
     expect_that(madlib.lm(rings ~ . - id - sex, data = dat.db), takes_less_than(3))
 })
 
+##
+
 test_that("Examples of class attributes", {
     ## do some calculation inside test_that
     ## These values are not avilable outside test_that function
@@ -35,7 +37,7 @@ test_that("Examples of class attributes", {
     expect_that(fdb$data, is_a("db.data.frame"))
 })
 
-## To make the computation results available to later tests
+## To make the computation results available to later test_that
 ## need to do the calculation on the upper level
 fdb <- madlib.lm(rings ~ . - id - sex, data = dat.db)
 fm <- summary(lm(rings ~ . - id - sex, data = dat.mm))
@@ -47,10 +49,14 @@ test_that("Examples of value equivalent", {
     expect_that(fdb$std_err, is_equivalent_to(fm$coefficients[,2]))
 })
 
+##
+
 test_that("Examples of testing TRUE or FALSE", {
     expect_that("no_such_col" %in% fdb$col.name, is_false())
     expect_that(fdb$has.intercept,               is_true())
 })
+
+##
 
 test_that("Example of identical", {
     ## Two values are equal but not identical
@@ -60,6 +66,8 @@ test_that("Example of identical", {
     expect_that(fdb$r2, is_identical_to(r2))
 })
 
+##
+
 test_that("Examples of testing string existence", {
     tmp <- dat.db
     tmp$new.col <- 1
@@ -68,15 +76,21 @@ test_that("Examples of testing string existence", {
     expect_that(print(tmp), prints_text("temporary"))
 })
 
+##
+
 test_that("Examples of testing errors", {
     expect_that(db.q("\\dn", verbose = FALSE), # prevent printing un-needed info
                 throws_error("syntax error"))
 })
 
+##
+
 test_that("Examples of testing warnings", {
     expect_that(madlib.elnet(rings ~ . - id, data = dat.db, method = "cd"),
                 gives_warning("number of features is larger"))
 })
+
+##
 
 test_that("Examples of testing message", {
     expect_that(db.q("select * from", content(dat.db)),
@@ -85,11 +99,15 @@ test_that("Examples of testing message", {
 
 ## If you want to use the combinations of multiple
 ## variables, use 'for' loops
+## The following examples show that you can use
+## 'for' loops to construct test cases.
 test_that("Examples of running tests in loop", {
     rows <- c(1, 5, 10)
     for (n in rows)
         expect_that(nrow(lk(dat.db, n)), equals(n))
 })
+
+##
 
 test_that("Examples of using multiple loops", {
     fit.this <- "rings ~ height + whole"

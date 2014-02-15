@@ -13,8 +13,8 @@ test_that("Install-check should run without error", {
         y <- rnorm(100, 0.1, 2)
 
         dat <- data.frame(x, y)
-        delete("eldata")
-        z <- as.db.data.frame(dat, "eldata", verbose = FALSE)
+        delete("eldata", conn.id = cid)
+        z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)
 
         g <- generic.cv(
             train = function (data, alpha, lambda) {
@@ -28,8 +28,11 @@ test_that("Install-check should run without error", {
             data = z,
             params = list(alpha=1, lambda=seq(0,0.2,0.1)),
             k = 5, find.min = TRUE, verbose = FALSE)
-    }, has_no_error())
+    }, has_no_error())})
 
+##
+
+test_that("Install-check 2", {
     expect_that(
     {
         err <- generic.cv(
