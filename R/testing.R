@@ -82,3 +82,18 @@ test <- function(path = "tests", filter = NULL,
         }
     }
 }
+
+## ----------------------------------------------------------------------
+
+## Used for tests, no error during execution
+has_no_error <- function ()
+{
+    function(expr) {
+        res <- try(force(expr), TRUE)
+        has_error <- inherits(res, "try-error")
+        if (has_error) {
+            return(expectation(FALSE, "code generated an error"))
+        }
+        expectation(TRUE, "")
+    }
+}

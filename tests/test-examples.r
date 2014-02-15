@@ -22,7 +22,7 @@ dat.mm <- abalone
 
 test_that("Examples of speed test", {
     # takes les than 2 seconds
-    expect_that(madlib.lm(rings ~ . - id - sex, data = dat.db), takes_less_than(2))
+    expect_that(madlib.lm(rings ~ . - id - sex, data = dat.db), takes_less_than(3))
 })
 
 test_that("Examples of class attributes", {
@@ -99,7 +99,7 @@ test_that("Examples of using multiple loops", {
         fit.this <- paste(fit.this, "+", var)
         for (n in rows)
             expect_that(madlib.lm(formula(fit.this), data = dat.db[dat.db$id < n, ]),
-                        takes_less_than(2))
+                        takes_less_than(3))
     }
 })
 
