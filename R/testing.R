@@ -3,13 +3,14 @@
 
 ## ----------------------------------------------------------------------
 
-.get.param.inputs <- function(param.names = c("port", "dbname"))
+.get.param.inputs <- function(param.names = c("port", "dbname"),
+                              reset = FALSE)
 {
     testing.vars <- ls(.testing.env)
-    if (any(!param.names %in% testing.vars)) {
+    if (reset || any(!param.names %in% testing.vars)) {
         cat("\n")
         for (i in param.names)
-            if (!i %in% testing.vars) {
+            if (reset || !i %in% testing.vars) {
                 .testing.env[[i]] <- readline(paste(i, "? ", sep = ""))
             }
     }

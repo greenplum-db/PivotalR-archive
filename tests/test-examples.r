@@ -12,17 +12,17 @@ context("Examples that show how to write tests")
 cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
 
 ## data in the datbase
-dat.db <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## data in the memory
-dat.mm <- abalone
+dat.im <- abalone
 
 ## ----------------------------------------------------------------------
 ## Tests
 
 test_that("Examples of speed test", {
     # takes les than 2 seconds
-    expect_that(madlib.lm(rings ~ . - id - sex, data = dat.db), takes_less_than(3))
+    expect_that(madlib.lm(rings ~ . - id - sex, data = dat), takes_less_than(3))
 })
 
 ##
@@ -30,8 +30,8 @@ test_that("Examples of speed test", {
 test_that("Examples of class attributes", {
     ## do some calculation inside test_that
     ## These values are not avilable outside test_that function
-    fdb <- madlib.lm(rings ~ . - id - sex, data = dat.db)
-    fm <- summary(lm(rings ~ . - id - sex, data = dat.mm))
+    fdb <- madlib.lm(rings ~ . - id - sex, data = dat)
+    fm <- summary(lm(rings ~ . - id - sex, data = dat.im))
     ##
     expect_that(fdb,      is_a("lm.madlib"))
     expect_that(fdb$data, is_a("db.data.frame"))
@@ -39,8 +39,8 @@ test_that("Examples of class attributes", {
 
 ## To make the computation results available to later test_that
 ## need to do the calculation on the upper level
-fdb <- madlib.lm(rings ~ . - id - sex, data = dat.db)
-fm <- summary(lm(rings ~ . - id - sex, data = dat.mm))
+fdb <- madlib.lm(rings ~ . - id - sex, data = dat)
+fm <- summary(lm(rings ~ . - id - sex, data = dat.im))
 
 test_that("Examples of value equivalent", {
     ## numeric values are the same, but names are not
@@ -60,7 +60,7 @@ test_that("Examples of testing TRUE or FALSE", {
 
 test_that("Example of identical", {
     ## Two values are equal but not identical
-    ## expect_that(fdb$r2, is_identical_to(fm$r.squared))
+    ## expect_that(fdb$r2, is_identical_to(fm$r.squared)) # will fail
 
     r2 <- fdb$r2 # same object, identical
     expect_that(fdb$r2, is_identical_to(r2))
@@ -69,7 +69,7 @@ test_that("Example of identical", {
 ##
 
 test_that("Examples of testing string existence", {
-    tmp <- dat.db
+    tmp <- dat
     tmp$new.col <- 1
     ##
     expect_that(names(tmp), matches("new.col", all = FALSE)) # one value matches
@@ -86,14 +86,14 @@ test_that("Examples of testing errors", {
 ##
 
 test_that("Examples of testing warnings", {
-    expect_that(madlib.elnet(rings ~ . - id, data = dat.db, method = "cd"),
+    expect_that(madlib.elnet(rings ~ . - id, data = dat, method = "cd"),
                 gives_warning("number of features is larger"))
 })
 
 ##
 
 test_that("Examples of testing message", {
-    expect_that(db.q("select * from", content(dat.db)),
+    expect_that(db.q("select * from", content(dat)),
                 shows_message("Executing"))
 })
 
@@ -104,7 +104,7 @@ test_that("Examples of testing message", {
 test_that("Examples of running tests in loop", {
     rows <- c(1, 5, 10)
     for (n in rows)
-        expect_that(nrow(lk(dat.db, n)), equals(n))
+        expect_that(nrow(lk(dat, n)), equals(n))
 })
 
 ##
@@ -116,9 +116,54 @@ test_that("Examples of using multiple loops", {
     for (var in vars) {
         fit.this <- paste(fit.this, "+", var)
         for (n in rows)
-            expect_that(madlib.lm(formula(fit.this), data = dat.db[dat.db$id < n, ]),
+            expect_that(madlib.lm(formula(fit.this), data = dat[dat$id < n, ]),
                         takes_less_than(3))
     }
+})
+
+## Some complicated functions need multiple lines, which can be put inside
+## a pair of {}
+
+test_that("Install-check should run without error", {
+    expect_that(
+    {
+        x <- matrix(rnorm(100*20),100,20)
+        y <- rnorm(100, 0.1, 2)
+
+        dat <- data.frame(x, y) # this data is available only in this block
+        delete("eldata", conn.id = cid)
+        z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)
+
+        g <- generic.cv(
+            train = function (data, alpha, lambda) {
+                madlib.elnet(y ~ ., data = data, family = "gaussian", alpha =
+                             alpha, lambda = lambda, control = list(random.stepsize=TRUE))
+            },
+            predict = predict,
+            metric = function (predicted, data) {
+                lk(mean((data$y - predicted)^2))
+            },
+            data = z,
+            params = list(alpha=1, lambda=seq(0,0.2,0.1)),
+            k = 5, find.min = TRUE, verbose = FALSE)
+    }, has_no_error())}) # has_no_error is usually used for doc Examples
+
+##
+
+test_that("Install-check 2", {
+    expect_that(
+    {
+        err <- generic.cv(
+            function(data) {
+                madlib.lm(rings ~ . - id - sex, data = data)
+            },
+            predict,
+            function(predicted, data) {
+                lookat(mean((data$rings - predicted)^2))
+            },
+            data = dat, # this dat is the global dat
+            verbose = FALSE)
+    }, has_no_error())
 })
 
 ## ----------------------------------------------------------------------
