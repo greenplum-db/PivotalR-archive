@@ -29,7 +29,8 @@ Introduction to PivotalR testing framework
     PivotalR:::test(path = "tests", filter = NULL,
                     reporter = c("summary", "tap", "minimal", "stop"),
                     env.file = NULL, env.vars = list(),
-                    clean.test.env = FALSE)
+                    clean.test.env = FALSE,
+                    run = c("tests", "examples", "both"))
 
     ◦ Arguments:
          ▸ path         A string, default is "tests", where the test files
@@ -92,6 +93,27 @@ Introduction to PivotalR testing framework
                             be re-entered. This can be used to re-set the
                             values of environment variables.
 
+         ▸ run          A string, default is "tests", and other choices are
+                        "examples" and "both". "t", "e" and "b" also work.
+
+                        Use "tests" to run the tests in installation-dir/tests.
+                        Use "examples" to run the examples in the user doc.
+                        Use "both" to run both of them.
+
+                        When running doc examples, we use "has_no_error" in the
+                        "expect_that" tests. So we do not check whether the
+                        results are correct. As long as the example can run
+                        without an error, the test passes.
+
+                        If you want to run the example in an Rd file (the user
+                        help file), you need to add special tags into the
+                        example section:
+                            %% @test port       The port number
+                            %% @test dbname     The database name
+                        which also inform the testing framework that this
+                        example needs these environment variables. Each line
+                        should have only one environment variable, and the
+                        comment in the end of the line is optional.
 
    ◦ Details:
 
