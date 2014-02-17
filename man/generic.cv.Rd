@@ -117,32 +117,38 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 
 \examples{
 \dontrun{
+%% @test port Database port number
+%% @test dbname Database name
+
 ## set up the database connection
-db.connect(port = 14526, dbname = "madlib")
+cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
 
-y <- db.data.frame("abalone")
+## ----------------------------------------------------------------------
 
-err <- generic.cv(function(data) {
-                      madlib.lm(rings ~ . - id - sex, data = data)
-                  },
-                  predict,
-                  function(predicted, data) {
-                      lookat(mean((data$rings - predicted)^2))
-                  }, data = y)
+dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
-## -------------------------------------------
+err <- generic.cv(     function(data) {
+        madlib.lm(rings ~ . - id - sex, data = data)
+    },
+    predict,
+    function(predicted, data) {
+        lookat(mean((data$rings - predicted)^2))
+    }, data = dat, verbose = FALSE)
+
+## ----------------------------------------------------------------------
 
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
 dat <- data.frame(x, y)
-delete("eldata")
-z <- as.db.data.frame(dat, "eldata")
+delete("eldata", conn.id = cid)
+z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)
 
 g <- generic.cv(
     train = function (data, alpha, lambda) {
-        madlib.elnet(y ~ ., data = data, family = "gaussian", alpha =
-alpha, lambda = lambda, control = list(random.stepsize=TRUE))
+        madlib.elnet(y ~ ., data = data, family = "gaussian",
+        alpha = alpha, lambda = lambda,
+        control = list(random.stepsize=TRUE))
     },
     predict = predict,
     metric = function (predicted, data) {
@@ -150,11 +156,15 @@ alpha, lambda = lambda, control = list(random.stepsize=TRUE))
     },
     data = z,
     params = list(alpha=1, lambda=seq(0,0.2,0.1)),
-    k = 5, find.min = TRUE)
+    k = 5, find.min = TRUE, verbose = FALSE)
 
 plot(g$params$lambda, g$metric$avg, type = 'b')
 
 g$best
+
+## ----------------------------------------------------------------------
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

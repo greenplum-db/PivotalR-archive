@@ -29,7 +29,8 @@ Introduction to PivotalR testing framework
     PivotalR:::test(path = "tests", filter = NULL,
                     reporter = c("summary", "tap", "minimal", "stop"),
                     env.file = NULL, env.vars = list(),
-                    clean.test.env = FALSE)
+                    clean.test.env = FALSE,
+                    run = c("tests", "examples", "both"))
 
     ◦ Arguments:
          ▸ path         A string, default is "tests", where the test files
@@ -43,7 +44,11 @@ Introduction to PivotalR testing framework
                         those to be executed. Instead of running all tests
                         under the testing folder, one can choose to run
                         only some of them. When it is NULL, all tests will
-                        be run.
+                        be run. If not "NULL", only tests with file names
+                        matching this regular expression will be executed.
+                        Matching will take on the file name after it has been
+                        stripped of "test-" from the beginning and ".r" from
+                        the end of the file name.
 
          ▸ reporter     A string, default is "summary". Other choices
                         include "tap", "minimal" and "stop". This decides
@@ -74,22 +79,45 @@ Introduction to PivotalR testing framework
 
                         and run in bash shell
 
-                        $ Rscript -e "library(PivotalR); PivotalR:::test(env.file='env.txt')"
+                        $ Rscript -e "library(PivotalR);
+                                      PivotalR:::test(env.file='env.txt')"
 
                         to execute all the tests.
 
          ▸ env.vars     A list, default is an empty list: list(). The list of
                         environment variables. Their values can be set by using
-                        this list. If env.file is not NULL, this will be ignored,
-                        but it has higher priority than the interactive way of
-                        setting the environment variables. This can be used to
-                        re-set the values of environment variables.
+                        this list. If env.file is not NULL, this will be
+                        ignored, but it has higher priority than the
+                        interactive way of setting the environment variables.
+                        This can be used to re-set the values of environment
+                        variables.
 
          ▸ clean.test.env   A logical value, default is FALSE. If it is TRUE,
                             all environment variables are clean up, and need to
-                            be re-entered. This can be used to re-set the values
-                            of environment variables.
+                            be re-entered. This can be used to re-set the
+                            values of environment variables.
 
+         ▸ run          A string, default is "tests", and other choices are
+                        "examples" and "both". "t", "e" and "b" also work.
+
+                        Use "tests" to run the tests in installation-dir/tests.
+                        Use "examples" to run the examples in the user doc.
+                        Use "both" to run both of them.
+
+                        When running doc examples, we use "has_no_error" in the
+                        "expect_that" tests. So we do not check whether the
+                        results are correct. As long as the example can run
+                        without an error, the test passes.
+
+                        If you want to run the example in an Rd file (the user
+                        help file), you need to add special tags into the
+                        example section:
+                            %% @test port       The port number
+                            %% @test dbname     The database name
+                        which also inform the testing framework that this
+                        example needs these environment variables. Each line
+                        should have only one environment variable, and the
+                        comment in the end of the line is optional.
 
    ◦ Details:
 
@@ -101,15 +129,65 @@ Introduction to PivotalR testing framework
         [1] testthat: Testthat code and Tools to make testing fun, Hadley
             Wickham, http://CRAN.R-project.org/package=testthat (2013).
 
+    ◦ Examples:
+
+        > library(PivotalR)
+        > PivotalR:::test()
+        > PivotalR:::test(run = 'b', env.vars = list(port=5433,
+        +   dbname = "madlib")) # reset environment variables
+        > PivotalR:::test(filter = 'example') # run some test files
+
+• Other helper functions
+
+    (1) has_no_error, takes_less_than, equals, is_equivalent_to, is_false,
+        is_true, is_a, is_identical_to, matches, prints_text, throws_error,
+        gives_warning, shows_message
+
+        All of these functions can be used in "expect_that" to test an
+        expression, which can be a single line expression or multiple
+        lines of expressions surrounded by a pair of "{...}".
+
+        See tests/test-examples.r for how to use them. "testthat" package [1]
+        user manual has detailed explenation for all of these functions
+        except "has_no_error", which is added by PivotalR and has a very
+        clear meaning.
+
+    (2) .get.param.inputs(param.names = c("port", "dbname"), reset = FALSE)
+
+        We call this function at the beginning of each function right after
+        "context". If the environment variables in the vector param.names
+        are not defined yet, the user will be prompted to input their values.
+
+         ▸ param.names  A vector of strings, default is c("port", "dbname").
+                        The environment variables needed in the current
+                        test*.r file.
+
+         ▸ reset        A logical, default is FALSE. By default, if an
+                        environment variable has be defined during execution
+                        of other test*.r file, the user will not be asked
+                        again for the value of this variable.
+
+                        For example, even if the user may have
+                        ".get.param.inputs('port')" in all of test*.r files,
+                        he just needs to enter port number only once. Here,
+                        we assume that "port" has the same meaning in all test
+                        files. However, the user can override this behavior by
+                        setting "reset = TRUE", which forces the test file to
+                        ask again the value of "port", even if it has been
+                        asked before. This can be useful when "port" has
+                        different meanings in different test files. Of course,
+                        the user can use different variable name to avoid all
+                        of this by using "port1" instead of "port" in the
+                        files where "port" has a different meaning.
+
+                        DO NOT USE this if you want to make the tests
+                        automated.
+
 • Some basic guidelines for developers
 
     ◦ All the test files should be put into tests/ folder
 
-    ◦ All the test files should start with "test".
-
-    ◦ We recommend to use ".r" as the file extension name for the tests.
-      Although it actually does not matter if you use ".R", we want to
-      differentiate the tests with the normal R code files.
+    ◦ All the test files should start with "test-" and end with ".r".
 
     ◦ "tests/test-examples.r" contains several example tests. It shows you
       how to write tests. For more details about how to write tests, please
