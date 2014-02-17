@@ -44,7 +44,11 @@ Introduction to PivotalR testing framework
                         those to be executed. Instead of running all tests
                         under the testing folder, one can choose to run
                         only some of them. When it is NULL, all tests will
-                        be run.
+                        be run. If not "NULL", only tests with file names
+                        matching this regular expression will be executed.
+                        Matching will take on the file name after it has been
+                        stripped of "test-" from the beginning and ".r" from
+                        the end of the file name.
 
          ▸ reporter     A string, default is "summary". Other choices
                         include "tap", "minimal" and "stop". This decides
@@ -125,6 +129,14 @@ Introduction to PivotalR testing framework
         [1] testthat: Testthat code and Tools to make testing fun, Hadley
             Wickham, http://CRAN.R-project.org/package=testthat (2013).
 
+    ◦ Examples:
+
+        > library(PivotalR)
+        > PivotalR:::test()
+        > PivotalR:::test(run = 'b', env.vars = list(port=5433,
+        +   dbname = "madlib")) # reset environment variables
+        > PivotalR:::test(filter = 'example') # run some test files
+
 • Other helper functions
 
     (1) has_no_error, takes_less_than, equals, is_equivalent_to, is_false,
@@ -168,15 +180,14 @@ Introduction to PivotalR testing framework
                         of this by using "port1" instead of "port" in the
                         files where "port" has a different meaning.
 
+                        DO NOT USE this if you want to make the tests
+                        automated.
+
 • Some basic guidelines for developers
 
     ◦ All the test files should be put into tests/ folder
 
-    ◦ All the test files should start with "test".
-
-    ◦ We recommend to use ".r" as the file extension name for the tests.
-      Although it actually does not matter if you use ".R", we want to
-      differentiate the tests with the normal R code files.
+    ◦ All the test files should start with "test-" and end with ".r".
 
     ◦ "tests/test-examples.r" contains several example tests. It shows you
       how to write tests. For more details about how to write tests, please

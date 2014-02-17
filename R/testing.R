@@ -41,6 +41,16 @@ test <- function(path = "tests", filter = NULL,
     else
         origin.conn.id <- .localVars$conn.id[,1]
 
+    ## close unclosed connection opened during testing
+    cleanup.conn <- function() {
+        if (identical(.localVars$conn.id, integer(0)))
+            curr.conn.id <- integer(0)
+        else
+            curr.conn.id <- .localVars$conn.id[,1]
+        for (i in setdiff(curr.conn.id, origin.conn.id))
+            db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+    }
+
     reporter <- match.arg(reporter)
 
     installed.pkgs <- .get.installed.pkgs()
@@ -67,23 +77,19 @@ test <- function(path = "tests", filter = NULL,
     if (run == "examples" || run == "both") {
         cat(testthat::colourise("Running examples in the user doc ---------\n",
                                 fg = "light blue"))
-        .run.doc.example(reporter, filter)
+        tryCatch(.run.doc.example(reporter, filter),
+                 interrupt = function(cond) cleanup.conn())
+        cleanup.conn()
     }
 
     if (run == "tests" || run == "both") {
         cat(testthat::colourise("Running tests ----------------------------\n",
                                 fg = "light blue"))
-        testthat::test_dir(test_path, reporter = reporter,
-                           env = .testing.env, filter = filter)
+        tryCatch(testthat::test_dir(test_path, reporter = reporter,
+                                    env = .testing.env, filter = filter),
+                 interrupt = function(cond) cleanup.conn())
+        cleanup.conn()
     }
-
-    ## close unclosed connection opened during testing
-    if (identical(.localVars$conn.id, integer(0)))
-        curr.conn.id <- integer(0)
-    else
-        curr.conn.id <- .localVars$conn.id[,1]
-    for (i in setdiff(curr.conn.id, origin.conn.id))
-        db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
 
     if (reporter$failed) {
         stop("Test failures", call. = FALSE)
