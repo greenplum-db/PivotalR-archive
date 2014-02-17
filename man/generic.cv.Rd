@@ -116,10 +116,15 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 }
 
 \examples{
-\dontrun{ %% @test port Database port number %% @test dbname Database name 
+\dontrun{
+%% @test port Database port number
+%% @test dbname Database name
+
 ## set up the database connection
 cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
- ## ---------------------------------------------------------------------- 
+
+## ----------------------------------------------------------------------
+
 dat <- db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 err <- generic.cv(     function(data) {
@@ -130,7 +135,7 @@ err <- generic.cv(     function(data) {
         lookat(mean((data$rings - predicted)^2))
     }, data = dat, verbose = FALSE)
 
-## -------------------------------------------
+## ----------------------------------------------------------------------
 
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
@@ -141,7 +146,9 @@ z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)
 
 g <- generic.cv(
     train = function (data, alpha, lambda) {
-        madlib.elnet(y ~ ., data = data, family = "gaussian",                      alpha = alpha, lambda = lambda,                      control = list(random.stepsize=TRUE))
+        madlib.elnet(y ~ ., data = data, family = "gaussian",
+        alpha = alpha, lambda = lambda,
+        control = list(random.stepsize=TRUE))
     },
     predict = predict,
     metric = function (predicted, data) {
@@ -153,7 +160,11 @@ g <- generic.cv(
 
 plot(g$params$lambda, g$metric$avg, type = 'b')
 
-g$best  ## ----------------------------------------------------------------------  db.disconnect(cid, verbose = FALSE)
+g$best
+
+## ----------------------------------------------------------------------
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

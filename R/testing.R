@@ -93,10 +93,11 @@ has_no_error <- function ()
         res <- try(force(expr), TRUE)
         has_error <- inherits(res, "try-error")
         if (has_error) {
-            return(expectation(FALSE,
-                               paste("code generated an error:",
-                                     as.character(res))))
+            return (eval(parse(
+                text = paste("expectation(FALSE,",
+                paste("'code generated an error: ",
+                      as.character(res), "'", sep = "")))))
         }
-        expectation(TRUE, "")
+        eval(parse(text = "expectation(TRUE, '')"))
     }
 }
