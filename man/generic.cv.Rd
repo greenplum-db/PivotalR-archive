@@ -125,7 +125,7 @@ cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
 
 ## ----------------------------------------------------------------------
 
-dat <- db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 err <- generic.cv(     function(data) {
         madlib.lm(rings ~ . - id - sex, data = data)
