@@ -65,14 +65,14 @@ test <- function(path = "tests", filter = NULL,
             rm(var, envir = .testing.env)
 
     if (run == "examples" || run == "both") {
-        cat(colourise("Running examples in the user doc -----------\n",
-                      fg = "light blue"))
+        cat(testthat::colourise("Running examples in the user doc ---------\n",
+                                fg = "light blue"))
         .run.doc.example(reporter, filter)
     }
 
     if (run == "tests" || run == "both") {
-        cat(colourise("Running tests ------------------------------\n",
-                      fg = "light blue"))
+        cat(testthat::colourise("Running tests ----------------------------\n",
+                                fg = "light blue"))
         testthat::test_dir(test_path, reporter = reporter,
                            env = .testing.env, filter = filter)
     }
@@ -135,7 +135,7 @@ has_no_error <- function ()
 .run.doc.example <- function(reporter, filter)
 {
     library(tools)
-    x <- Rd_db(.this.pkg.name)
+    x <- tools::Rd_db(.this.pkg.name)
 
     outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
     dir.create(outpath, recursive = TRUE)
