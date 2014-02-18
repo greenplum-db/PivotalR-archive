@@ -117,11 +117,11 @@ When \code{approx.cut} is \code{TRUE}, which is the default, a column of uniform
 
 \examples{
 \dontrun{
-%% @test port Database port number
-%% @test dbname Database name
+%% @test .port Database port number
+%% @test .dbname Database name
 
 ## set up the database connection
-cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## ----------------------------------------------------------------------
 

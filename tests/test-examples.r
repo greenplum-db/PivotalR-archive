@@ -6,7 +6,7 @@ context("Examples that show how to write tests")
 ## Need valid 'port' and 'dbname' values
 ## This function will get these parameters from the user's
 ## interactive inputs if they have not been defined.
-.get.param.inputs(c("port", "dbname"))
+.get.param.inputs(c(".port", ".dbname"))
 
 ## connection ID
 cid <- db.connect(port = port, dbname = dbname, verbose = FALSE)

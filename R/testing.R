@@ -3,7 +3,7 @@
 
 ## ----------------------------------------------------------------------
 
-.get.param.inputs <- function(param.names = c("port", "dbname"),
+.get.param.inputs <- function(param.names = c(".port", ".dbname"),
                               reset = FALSE)
 {
     testing.vars <- ls(.testing.env)
