@@ -1,5 +1,6 @@
 ## The environment that contains all environment variables
 .testing.env <- new.env(parent = getNamespace(.this.pkg.name))
+.continuous.env <- new.env(parent = globalenv()) # used for continuous testing
 
 ## ----------------------------------------------------------------------
 
@@ -219,4 +220,43 @@ continuous.test <- function(path = "tests", filter = NULL,
                             clean.test.env = FALSE)
 {
 
+}
+
+## ----------------------------------------------------------------------
+
+## check directory state
+.dir_state <- function(path, pattern = NULL, hash = TRUE)
+{
+    files <- dir(path, pattern, full.names = TRUE, recursive = TRUE)
+    if (hash) {
+        sapply(files, digest::digest, file = TRUE)
+    }
+    else {
+        setNames(file.info(files)$mtime, files)
+    }
+}
+
+## ----------------------------------------------------------------------
+
+## source files
+.source_dir <- function (path, pattern = "\\.[rR]$", env = NULL, chdir = TRUE)
+{
+    files <- sort(dir(path, pattern, full.names = TRUE, recursive = TRUE))
+    if (is.null(env)) {
+        env <- new.env(parent = globalenv())
+    }
+    lapply(files, sys.source, chdir = chdir, envir = env)
+}
+
+## ----------------------------------------------------------------------
+
+## compare the states of one directory
+.compare_state <- function (old, new)
+{
+    added <- setdiff(names(new), names(old))
+    deleted <- setdiff(names(old), names(new))
+    same <- intersect(names(old), names(new))
+    modified <- names(new[same])[new[same] != old[same]]
+    n <- length(added) + length(deleted) + length(modified)
+    list(n = n, added = added, deleted = deleted, modified = modified)
 }
