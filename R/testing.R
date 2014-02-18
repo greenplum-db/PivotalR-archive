@@ -78,8 +78,14 @@ test <- function(path = "tests", filter = NULL,
         cat(testthat::colourise("Running examples in the user doc ---------\n",
                                 fg = "light blue"))
         tryCatch(.run.doc.example(reporter, filter),
-                 interrupt = function(cond) cleanup.conn())
+                 interrupt = function(cond) {
+                     cleanup.conn()
+                     unlink(.localVars$example.tmppath, recursive = TRUE)
+                     rm(example.tmppath, envir = .localVars)
+                 })
         cleanup.conn()
+        unlink(.localVars$example.tmppath, recursive = TRUE)
+        rm(example.tmppath, envir = .localVars)
     }
 
     if (run == "tests" || run == "both") {
@@ -145,6 +151,7 @@ has_no_error <- function ()
 
     outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
     dir.create(outpath, recursive = TRUE)
+    .localVars$example.tmppath <- outpath
 
     ## loop over all Rd files
     for (i in seq_along(x)) {
