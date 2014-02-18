@@ -225,27 +225,20 @@ continuous.test <- function(path = "tests", filter = NULL,
 ## ----------------------------------------------------------------------
 
 ## check directory state
-.dir_state <- function(path, pattern = NULL, hash = TRUE)
+.dir_state <- function(path)
 {
-    files <- dir(path, pattern, full.names = TRUE, recursive = TRUE)
-    if (hash) {
-        sapply(files, digest::digest, file = TRUE)
-    }
-    else {
-        setNames(file.info(files)$mtime, files)
-    }
+    files <- dir(path, NULL, full.names = TRUE, recursive = TRUE)
+    sapply(files, digest::digest, file = TRUE)
 }
 
 ## ----------------------------------------------------------------------
 
 ## source files
-.source_dir <- function (path, pattern = "\\.[rR]$", env = NULL, chdir = TRUE)
+.source_dir <- function (path)
 {
+    pattern = "\\.[rR]$"
     files <- sort(dir(path, pattern, full.names = TRUE, recursive = TRUE))
-    if (is.null(env)) {
-        env <- new.env(parent = globalenv())
-    }
-    lapply(files, sys.source, chdir = chdir, envir = env)
+    lapply(files, sys.source, chdir = TRUE, envir = .continuous.env)
 }
 
 ## ----------------------------------------------------------------------
