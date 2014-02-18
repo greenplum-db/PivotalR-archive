@@ -97,8 +97,7 @@ test <- function(path = "tests", filter = NULL,
             assign(var, env.vars[[var]], envir = .testing.env)
 
     if (clean.test.env)
-        for (var in ls(.testing.env, all.names = TRUE))
-            rm(var, envir = .testing.env)
+        do.call(rm, c(ls(.testing.env), envir = .testing.env))
 
     if (run == "examples" || run == "both") {
         cat(testthat::colourise("Running examples in the user doc ---------\n",
@@ -214,12 +213,17 @@ has_no_error <- function ()
 
 ## ----------------------------------------------------------------------
 
-continuous.test <- function(path = "tests", filter = NULL,
+continuous.test <- function(root, filter = NULL,
                             reporter = c("summary", "tap", "minimal", "stop"),
                             env.file = NULL, env.vars = list(),
-                            clean.test.env = FALSE)
+                            clean.test.env = FALSE,
+                            run = c("tests", "examples", "both"))
 {
-
+    root <- normalizePath(root) # package directory
+    r_dir <- paste(root, "/R/", sep = "") # R code folder
+    tests_dir <- paste(root, "/tests/", sep = "") # tests folder
+    src_dir <- paste(root, "/src/", sep = "") # C/C++ source code folder
+    man_dir <- paste(root, "/man/", sep = "") # manual examples folder
 }
 
 ## ----------------------------------------------------------------------
