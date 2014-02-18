@@ -210,3 +210,13 @@ has_no_error <- function ()
 
     invisible()
 }
+
+## ----------------------------------------------------------------------
+
+continuous.test <- function(path = "tests", filter = NULL,
+                            reporter = c("summary", "tap", "minimal", "stop"),
+                            env.file = NULL, env.vars = list(),
+                            clean.test.env = FALSE)
+{
+
+}
