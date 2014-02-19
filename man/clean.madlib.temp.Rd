@@ -3,7 +3,7 @@
 
 \title{
   Delete all the result tables created during calculations of
-  MADlib 
+  MADlib
 }
 \description{
   Some MADlib wrapper functions create result tables that cannot be
@@ -14,18 +14,29 @@
   3 tables when they are not useful anymore using
   \code{\link{delete,arima.css.madlib-method}}. One can also choose to
   all such tables created by many such functions together using this
-  function. 
+  function.
 }
 
 \usage{
-clean.madlib.temp(conn.id = 1)
+clean.madlib.temp(conn.id = 1, cascade = FALSE, verbose = TRUE)
 }
 
 \arguments{
   \item{conn.id}{
     An integer, the connection ID of the database. See
   \code{\link{db.connect}} for more details.
-  }
+}
+\item{cascade}{
+  A logical, default is \code{FALSE}. When it is \code{TRUE}, the table
+  is forcefully removed from the database with everything that depends
+  on it.
+}
+\item{verbose}{
+  A logical, default is \code{TRUE}. When it is \code{TRUE}, a dot "."
+  will be printed to the output for every successfully deleted table,
+  and a comma "," will be printed to the output for every table that
+  cannot be successfully removed.
+}
 }
 
 \details{
@@ -36,7 +47,7 @@ clean.madlib.temp(conn.id = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -46,7 +57,7 @@ clean.madlib.temp(conn.id = 1)
 
   \code{\link{delete,arima.css.madlib-method}} deletes the result of
   \code{\link{madlib.arima}} together with the model, residual and statistics
-  tables. 
+  tables.
 }
 
 \examples{
@@ -77,7 +88,7 @@ s
 clean.madlib.temp(conn.id=1)
 
 ## s still exists but the 3 tables (model, residuals, etc.) are deleted
-s 
+s
 }
 }
 
