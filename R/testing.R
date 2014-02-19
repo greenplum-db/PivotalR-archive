@@ -365,10 +365,7 @@ continuous.test <- function(root, filter = NULL,
 .dir_state <- function(path)
 {
     files <- dir(path, NULL, full.names = TRUE, recursive = TRUE)
-    z <- sapply(files, digest::digest, file = TRUE)
-    x <- names(z)
-    names(x) <- as.character(z)
-    x
+    sapply(files, digest::digest, file = TRUE)
 }
 
 ## ----------------------------------------------------------------------
