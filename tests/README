@@ -26,11 +26,19 @@ Introduction to PivotalR testing framework
 
 • The testing function user manual:
 
-    PivotalR:::test(path = "tests", filter = NULL,
-                    reporter = c("summary", "tap", "minimal", "stop"),
-                    env.file = NULL, env.vars = list(),
-                    clean.test.env = FALSE,
-                    run = c("tests", "examples", "both"))
+    ◦ Description:
+
+      This internal function is used to run tests and doc examples after
+      the package has been installed. Each test that has passed will
+      print a green "." on the output.
+
+    ◦ Usage:
+
+      PivotalR:::test(path = "tests", filter = NULL,
+                      reporter = c("summary", "tap", "minimal", "stop"),
+                      env.file = NULL, env.vars = list(),
+                      clean.test.env = FALSE,
+                      run = c("tests", "examples", "both"))
 
     ◦ Arguments:
          ▸ path         A string, default is "tests", where the test files
@@ -136,6 +144,29 @@ Introduction to PivotalR testing framework
         > PivotalR:::test(run = 'b', env.vars = list(.port=5433,
         +   .dbname = "madlib")) # reset environment variables
         > PivotalR:::test(filter = 'example') # run some test files
+
+• The test skipping function user manual
+
+    ◦ Description:
+
+      This function is used to skip tests. It can skip a single or multiple
+      "expect_that" tests, or a single or multiple "test_that" groups. Each
+      test that has been skipped will print a purple "," to the output.
+
+    ◦ Usage:
+
+      skip_if(cond, test.expr)
+
+    ◦ Arguments:
+
+         ▸ cond         An expression or a block of expressions enclosed by "{"
+                        and "}", which gives a logical value (TRUE/FALSE) as the
+                        result.
+
+         ▸ test.expr    An expression or a block of expressions enclosed by "{"
+                        and "}", which contains any valid R expression including
+                        "test_that" or "expect_that". When cond is TRUE, the tests
+                        will be skipped and a blue "," will be printed.
 
 • Other helper functions
 

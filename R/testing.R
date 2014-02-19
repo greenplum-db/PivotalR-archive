@@ -18,6 +18,29 @@
 
 ## ----------------------------------------------------------------------
 
+## skip an "expect_that" test if cond is TRUE
+skip_if <- function(cond, test.expr)
+{
+    expr <- deparse(substitute(test.expr))
+    l <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
+    if (cond) {
+        if (.localVars$test.reporter %in% c("summary", "minimal"))
+            for (i in seq_len(l)) cat(testthat::colourise(",", fg = "purple"))
+        else if (.localVars$test.reporter == "tap") {
+            for (i in seq_len(l)) {
+                .localVars$test.skip <- .localVars$test.skip + 1
+                cmd <- paste("test_that(\"SKIP this test ", .localVars$test.skip,
+                             "\", expect_that(TRUE, is_true()))", sep = "")
+                eval(parse(text = cmd))
+            }
+        }
+    } else {
+        test.expr
+    }
+}
+
+## ----------------------------------------------------------------------
+
 test <- function(path = "tests", filter = NULL,
                  reporter = c("summary", "tap", "minimal", "stop"),
                  env.file = NULL, env.vars = list(),
@@ -52,6 +75,8 @@ test <- function(path = "tests", filter = NULL,
     }
 
     reporter <- match.arg(reporter)
+    .localVars$test.reporter <- reporter
+    .localVars$test.skip <- 0
 
     installed.pkgs <- .get.installed.pkgs()
     if (! "testthat" %in% installed.pkgs) {
