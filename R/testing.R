@@ -6,7 +6,7 @@
 .get.param.inputs <- function(param.names = c(".port", ".dbname"),
                               reset = FALSE)
 {
-    testing.vars <- ls(.testing.env)
+    testing.vars <- ls(.testing.env, all.names = TRUE)
     if (reset || any(!param.names %in% testing.vars)) {
         cat("\n")
         for (i in param.names)
@@ -71,7 +71,7 @@ test <- function(path = "tests", filter = NULL,
             assign(var, env.vars[[var]], envir = .testing.env)
 
     if (clean.test.env)
-        for (var in ls(.testing.env))
+        for (var in ls(.testing.env, all.names = TRUE))
             rm(var, envir = .testing.env)
 
     if (run == "examples" || run == "both") {
