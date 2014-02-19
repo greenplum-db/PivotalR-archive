@@ -75,10 +75,6 @@ test <- function(path = "tests", filter = NULL,
             db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
     }
 
-    reporter <- match.arg(reporter)
-    .localVars$test.reporter <- reporter
-    .localVars$test.skip <- 0
-
     installed.pkgs <- .get.installed.pkgs()
     if (! "testthat" %in% installed.pkgs) {
         message("Package 'testthat' is going to be installed!")
@@ -88,6 +84,9 @@ test <- function(path = "tests", filter = NULL,
     }
     library(testthat)
 
+    reporter <- match.arg(reporter)
+    .localVars$test.reporter <- reporter
+    .localVars$test.skip <- 0
     reporter <- eval(parse(text = "testthat:::find_reporter(reporter)"))
 
     if (!is.null(env.file))
@@ -100,7 +99,7 @@ test <- function(path = "tests", filter = NULL,
         do.call(rm, c(ls(.testing.env), envir = .testing.env))
 
     if (run == "examples" || run == "both") {
-        cat(testthat::colourise("Running examples in the user doc ---------\n",
+        cat(testthat::colourise("Running examples in the user doc -----\n",
                                 fg = "light blue"))
         tryCatch(.run.doc.example(reporter, filter),
                  interrupt = function(cond) {
@@ -114,7 +113,7 @@ test <- function(path = "tests", filter = NULL,
     }
 
     if (run == "tests" || run == "both") {
-        cat(testthat::colourise("Running tests ----------------------------\n",
+        cat(testthat::colourise("Running tests ------------------------\n",
                                 fg = "light blue"))
         tryCatch(testthat::test_dir(test_path, reporter = reporter,
                                     env = .testing.env, filter = filter),
@@ -169,12 +168,15 @@ has_no_error <- function ()
 ## ----------------------------------------------------------------------
 
 ## run doc example
-.run.doc.example <- function(reporter, filter)
+.run.doc.example <- function(reporter, filter, r_root = NULL)
 {
     library(tools)
-    x <- tools::Rd_db(.this.pkg.name)
+    if (is.null(r_root))
+        x <- tools::Rd_db(.this.pkg.name)
+    else
+        x <- tools::Rd_db(dir = r_root)
 
-    outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
+    outpath <- normalizePath(paste("/tmp/", .unique.string(), "/", sep = ""))
     dir.create(outpath, recursive = TRUE)
     .localVars$example.tmppath <- outpath
 
@@ -224,6 +226,137 @@ continuous.test <- function(root, filter = NULL,
     tests_dir <- paste(root, "/tests/", sep = "") # tests folder
     src_dir <- paste(root, "/src/", sep = "") # C/C++ source code folder
     man_dir <- paste(root, "/man/", sep = "") # manual examples folder
+    des_file <- paste(root, "/DESCRIPTION", sep = "")
+
+    ## connections before testing
+    ## so that we can close all un-closed connections after testing
+    if (identical(.localVars$conn.id, integer(0)))
+        origin.conn.id <- integer(0)
+    else
+        origin.conn.id <- .localVars$conn.id[,1]
+
+    ## close unclosed connection opened during testing
+    cleanup.conn <- function() {
+        if (identical(.localVars$conn.id, integer(0)))
+            curr.conn.id <- integer(0)
+        else
+            curr.conn.id <- .localVars$conn.id[,1]
+        for (i in setdiff(curr.conn.id, origin.conn.id))
+            db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+    }
+
+    installed.pkgs <- .get.installed.pkgs()
+    if (! "testthat" %in% installed.pkgs) {
+        message("Package 'testthat' is going to be installed!")
+        install.packages(pkgs = "testthat")
+        if (! "testthat" %in% .get.installed.pkgs())
+            stop("The package 'testthat' could not be installed!")
+    }
+    library(testthat)
+
+    reporter <- match.arg(reporter)
+    reporter <- eval(parse(text = "testthat:::find_reporter(reporter)"))
+
+    if (!is.null(env.file))
+        .fill.testing.env(env.file)
+    else if (length(env.vars) > 0)
+        for (var in names(env.vars))
+            assign(var, env.vars[[var]], envir = .continuous.env)
+
+    if (clean.test.env)
+        do.call(rm, c(ls(.continuous.env), envir = .continuous.env))
+
+    is.first.run <- TRUE # first time to run the tests
+
+    exclude <- c("onAttach.R", "testing.R")
+
+    tryCatch(repeat {
+        ## test_path
+        test_r_path <- normalizePath(paste("/tmp/", .unique.string(),
+                                         "/", sep = ""))
+        test_tests_path <- normalizePath(paste("/tmp/", .unique.string(),
+                                               "/", sep = ""))
+        test_man_path <- normalizePath(paste("/tmp/", .unique.string(),
+                                             "/", sep = ""))
+        dir.create(test_r_path, recursive = TRUE)
+        dir.create(test_tests_path, recursive = TRUE)
+        dir.create(test_man_path, recursive = TRUE)
+
+        if (is.first.run) {
+            file.copy(r_dir, test_r_path, recursive = TRUE)
+            file.copy(tests_dir, test_r_path, recursive = TRUE)
+            file.copy(man_dir, test_man_path, recursive = TRUE)
+            file.copy(des_file, test_man_path)
+        } else {
+            if (r_diff$n == 0 && tests_diff$n == 0 && man_diff$n == 0 &&
+                src_diff$n == 0) {
+                unlink(c(test_r_path, test_tests_path, test_man_path),
+                       recursive = TRUE, force = TRUE)
+                ans <- .get.continue.choice()
+            }
+
+
+
+            if (any(exclude %in% r_diff$added) ||
+                any(exclude %in% r_diff$deleted) ||
+                any(exclude %in% r_diff$modified) ||
+                src_diff$n > 0) {
+                message("Some of onAttach.R, testing.R or C/C++ source code ",
+                        "are changed, and you need to re-compile the package.")
+                unlink(c(test_r_path, test_tests_path, test_man_path),
+                       recursive = TRUE, force = TRUE)
+                break
+            }
+
+            if (r_diff$n > 0) {
+                file.copy(r_dir, test_r_path, recursive = TRUE)
+                file.copy(tests_dir, test_r_path, recursive = TRUE)
+                file.copy(man_dir, test_man_path, recursive = TRUE)
+                file.copy(des_file, test_man_path)
+            } else {
+
+                file.copy()
+            }
+
+        }
+
+        .source_dir(test_r_path)
+
+        if (run == "examples" || run == "both") {
+            cat(testthat::colourise("Running examples in the user doc -----\n",
+                                    fg = "light blue"))
+            .run.doc.example(reporter, filter)
+            cleanup.conn()
+        }
+
+        if (run == "tests" || run == "both") {
+            cat(testthat::colourise("Running tests ------------------------\n",
+                                    fg = "light blue"))
+            testthat::test_dir(test_path, reporter = reporter,
+                               env = .testing.env, filter = filter)
+            cleanup.conn()
+        }
+
+        unlink(c(test_r_path, test_tests_path, test_man_path),
+               recursive = TRUE, force = TRUE)
+
+        ans <- .get.continue.choice()
+
+    }, interrupt = function(cond) {
+        cleanup.conn()
+        unlink(c(test_r_path, test_tests_path, test_man_path),
+               recursive = TRUE, force = TRUE)
+    })
+}
+
+## ----------------------------------------------------------------------
+
+.get.continue.choice <- function()
+{
+    ans <- readline(testthat::colourise(
+        "Want to re-run the tests (Yes/All/Stop or No) ?",
+        fg = "red"))
+    match.arg(tolower(ans), c('yes', 'all', 'stop', 'no'))
 }
 
 ## ----------------------------------------------------------------------
@@ -232,7 +365,10 @@ continuous.test <- function(root, filter = NULL,
 .dir_state <- function(path)
 {
     files <- dir(path, NULL, full.names = TRUE, recursive = TRUE)
-    sapply(files, digest::digest, file = TRUE)
+    z <- sapply(files, digest::digest, file = TRUE)
+    x <- names(z)
+    names(x) <- as.character(z)
+    x
 }
 
 ## ----------------------------------------------------------------------
