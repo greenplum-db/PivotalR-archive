@@ -9,7 +9,7 @@
 {
     if (is.null(.localVars$drv$rpostgresql))
         .localVars$drv$rpostgresql <- DBI::dbDriver("PostgreSQL")
-    
+
     n.db <- length(.localVars$db)
     func <- getMethod("dbConnect", signature="PostgreSQLDriver",
                       where=as.environment("package:RPostgreSQL"))
@@ -22,7 +22,7 @@
         conn.id <- 1
     else
         conn.id <- max(.localVars$conn.id[,1]) + 1
-    
+
     .localVars$db[[n.db+1]] <- list(
         conn = db.connection,
         conn.id = conn.id,
@@ -37,7 +37,7 @@
 
     .localVars$conn.id <- rbind(.localVars$conn.id,
                                 c(conn.id, n.db + 1))
-    
+
     .localVars$conn.type[["rpostgresql"]] <- c(
         .localVars$conn.type[["rpostgresql"]],
         conn.id)
@@ -165,9 +165,9 @@
 
 ## -----------------------------------------------------------------------
 
-.db.writeTable.rpostgresql <- function (table, r.obj, add.row.names, 
+.db.writeTable.rpostgresql <- function (table, r.obj, add.row.names,
                                         overwrite, append, distributed.by,
-                                        is.temp, 
+                                        is.temp,
                                         idx, header, nrows = 50, sep = ",",
                                         eol="\n", skip = 0, quote = "\"",
                                         field.types, ...)
@@ -188,18 +188,18 @@
                        signature=c("PostgreSQLConnection", "character",
                        "data.frame"),
                        where=as.environment("package:RPostgreSQL"))
-    
+
     ## only for GPDB
     ## This why this function is so complicated
     dist.str <- .get.distributed.by.str(conn.id, distributed.by)
-    
+
     if (!append)
     {
         ## need to create the table first
         if (is.character(r.obj)) # create from file
         {
             new.con <- conn
-            
+
             if (is.temp) {
                 check.temp <- .db.existsTempTable(name, conn.id)
                 name <- check.temp[[2]]
@@ -224,7 +224,7 @@
                     return(FALSE)
                 }
             }
-            
+
             ## compute full path name (have R expand ~, etc)
             fn <- file.path(dirname(r.obj), basename(r.obj))
             if(missing(header) || missing(add.row.names))
@@ -237,9 +237,9 @@
                 close(f)
                 nf <- length(unique(flds))
             }
-            
+
             if(missing(header)) header <- nf==2
-            
+
             if(missing(add.row.names))
             {
                 if(header)
@@ -247,7 +247,7 @@
                 else
                     add.row.names <- FALSE
             }
-            
+
             new.table <- !.db.existsTable(name, conn.id)
             if(new.table)
             {
@@ -272,14 +272,21 @@
                     "table %s already exists -- use append=TRUE?", name))
             }
 
-            ## After the table has been created, one can append data to it
-            func2(conn = .localVars$db[[idx]]$conn,
-                  name = name, value = value,
-                  overwrite = overwrite, append = TRUE,
-                  header = header, nrows = nrows,
-                  sep = sep,
-                  eol=eol, skip = skip, quote = quote,
-                  field.types = field.types, ...)
+            fmt <- paste("COPY %s FROM '%s' ","WITH DELIMITER AS '%s' ",
+                         if(!is.null(quote)) "CSV HEADER QUOTE AS  '%s'", sep="")
+
+            if(is.null(quote))
+                sql <- sprintf(fmt, name,fn, sep)
+            else
+                sql <- sprintf(fmt, name,fn, sep, quote)
+
+            print(sql)
+            rs <- try(.db.sendQuery(sql, conn.id))
+            if(inherits(rs, .err.class)){
+                warning("could not load data into table")
+                return(FALSE)
+            }
+            TRUE
         }
         else # create table from a data frame --------------------------------
         {
@@ -301,7 +308,7 @@
                         paste("table", name,
                               "exists in database: aborting assignTable"))
                     return(FALSE)
-                }         
+                }
             }
             else
             {

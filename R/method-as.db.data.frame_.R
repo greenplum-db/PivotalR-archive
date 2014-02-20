@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Convert other R objects into db.data.frame
 ## -----------------------------------------------------------------------
@@ -49,7 +48,7 @@ setMethod (
             table.name <- .unique.string()
             is.temp <- TRUE
         }
-        .method.as.db.data.frame.1(x, 
+        .method.as.db.data.frame.1(x,
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
                                    distributed.by, is.temp, ...)
@@ -70,7 +69,7 @@ setMethod (
             table.name <- .unique.string()
             is.temp <- TRUE
         }
-        
+
         f <- paste(getwd(), "/", x, sep = "")
         if (file.exists(f)) x <- f
         else if (!file.exists(x))
@@ -95,11 +94,11 @@ setMethod (
         table.name <- .unique.string()
         is.temp <- TRUE
     }
-    
+
     exists <- db.existsObject(table.name, conn.id, is.temp)
     if (is.temp) exists <- exists[[1]]
     if (exists) stop("The table already exists in connection ", conn.id, "!")
-    
+
     if (!.is.arg.string(key)) stop("ID column name must be a string!")
     if (!identical(key, character(0)) &&
         key == "row.names" && !add.row.names)
@@ -157,12 +156,12 @@ setMethod (
     distributed.by = NULL, nrow = NULL, field.types = NULL,
     factor.full = rep(FALSE, length(names(x)))) { # whether expand all levels
         warnings <- .suppress.warnings(conn.id(x))
-        
+
         if (is.null(table.name)) {
             table.name <- .unique.string()
             is.temp <- TRUE
         }
-        
+
         conn.id <- conn.id(x)
 
         if (is.view || !all(distributed.by %in% x@.col.name))
@@ -175,7 +174,7 @@ setMethod (
         if (exists) stop("The table already exists in connection ",
                          conn.id, "!")
 
-        if (is.temp) 
+        if (is.temp)
             temp.str <- "temp"
         else
             temp.str <- ""
@@ -188,7 +187,7 @@ setMethod (
             where <- paste(" where", x@.where)
         else
             where <- ""
-        
+
         if (x@.source == x@.parent)
             tbl <- x@.parent
         else
@@ -206,7 +205,7 @@ setMethod (
         ## grouping column.
         if (is.null(field.types)) {
             data.types <- x@.col.data_type
-            extra <- paste(x@.expr, 
+            extra <- paste(x@.expr,
                            paste("\"", names(x), "\"", sep = ""),
                            sep = " as ", collapse = ",")
         } else {
@@ -228,7 +227,7 @@ setMethod (
         appear <- x@.col.name
         is.factor <- x@.is.factor
         factor.ref <- x@.factor.ref
-        
+
         dummy <- character(0)
         dummy.expr <- character(0)
         factor.ref <- rep(as.character(NA), length(x@.is.factor))
@@ -274,7 +273,7 @@ setMethod (
                         dummy <- c(dummy, new.col)
                         dummy.expr <- c(dummy.expr, dex)
                     }
-                } 
+                }
             }
         }
 
@@ -330,7 +329,7 @@ setMethod (
         tbn <- strsplit(table.name, "\\.")[[1]]
         tbnn <- paste("\"", .strip(tbn, "\""),
                       "\"", collapse = ".", sep = "")
-        
+
         if (tbnn == content(x))
             stop("cannot copy an object into itself!")
         list(res = as.db.data.frame(x[,], tbnn, FALSE,
