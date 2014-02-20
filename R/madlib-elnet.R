@@ -1,4 +1,3 @@
-
 ## ----------------------------------------------------------------------
 ## Wrapper function for MADlib's elastic_net function
 ## ----------------------------------------------------------------------
@@ -29,9 +28,9 @@ madlib.elnet <- function (formula, data,
     .check.madlib.version(data)
     conn.id <- conn.id(data)
 
-    db.str <- (.get.dbms.str(conn.id))$db.str
-    if (db.str == "HAWQ")
-        stop("Current HAWQ does not support this function!")
+    db <- .get.dbms.str(conn.id)
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+        stop("MADlib on HAWQ 1.1 does not support this function!")
 
     warnings <- .suppress.warnings(conn.id)
 

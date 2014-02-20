@@ -1,4 +1,3 @@
-
 ## ----------------------------------------------------------------------
 ## Wrapper function for MADlib's ARIMA
 ## ----------------------------------------------------------------------
@@ -30,7 +29,7 @@ setMethod (
     if (length(names(x)) != 1 || length(names(ts)) != 1)
         stop("ARIMA can only have one time stamp column and ",
              "one time series value column !")
-    
+
     data <- cbind2(x, ts)
     f.str <- paste(names(x), "~", names(ts))
 
@@ -98,21 +97,21 @@ setMethod (
 
     if (length(order) != 3)
         stop("ARIMA needs order to be an integer array of length 3 !")
-    
+
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
-    
+
     ## Only newer versions of MADlib are supported
     .check.madlib.version(data, 1.2)
 
     conn.id <- conn.id(data)
-    
-    db.str <- (.get.dbms.str(conn.id))$db.str
-    if (db.str == "HAWQ")
-        stop("Right now MADlib on HAWQ does not support ARIMA !")
-    
+
+    db <- .get.dbms.str(conn.id)
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+        stop("MADlib on HAWQ 1.1 does not support ARIMA !")
+
     warnings <- .suppress.warnings(conn.id)
 
     ## analyze the formula
@@ -122,7 +121,7 @@ setMethod (
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     ## tbl.source <- gsub("\"", "", content(data))
     tbl.source <- content(data)
-    
+
     if (length(params$ind.vars) != 1)
         stop("Only one time stamp is allowed !")
 
@@ -131,7 +130,7 @@ setMethod (
         grp <- "NULL"
     else
         stop("Right now MADlib does not support grouping in ARIMA !")
-    
+
     ## allow expressions as time series and time stamp
     ## create intermediate tables to accomodate this
     col.names <- names(data)
@@ -171,11 +170,11 @@ setMethod (
     p <- order[1]
     d <- order[2]
     q <- order[3]
-    
+
     ## retrieve the coefficients
     res <- preview(tbl.output, conn.id=conn.id, "all")
     rst <- list()
-    
+
     rst$coef <- numeric(0) # coefficients
     rst$s.e. <- numeric(0) # standard errors
     coef.names <- character(0)
@@ -208,7 +207,7 @@ setMethod (
     rst$loglik <- res$log_likelihood
     rst$iter.num <- res$iter_num
     rst$exec.time <- res$exec_time
-    
+
     ## create db.data.frame object for residual table
     rst$residuals <- db.data.frame(paste(tbl.output, "_residual", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
@@ -221,7 +220,7 @@ setMethod (
     ## will delete it
     if (is.tbl.source.temp) rst$temp.source <- TRUE
     else rst$temp.source <- FALSE
-                
+
     .restore.warnings(warnings)
 
     class(rst) <- "arima.css.madlib"
@@ -274,9 +273,9 @@ show.arima.css.madlib <- function (object)
 predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
 {
     conn.id <- conn.id(object$model)
-    
+
     warnings <- .suppress.warnings(conn.id)
-    
+
     tbl.output <- .unique.string()
     tbl.model <- .strip(content(object$model), "\"")
     madlib <- schema.madlib(conn.id) # MADlib schema name
@@ -287,6 +286,6 @@ predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
     rst <- db.data.frame(tbl.output, conn.id=conn.id, verbose = FALSE)
 
     .restore.warnings(warnings)
-    
+
     rst
 }
