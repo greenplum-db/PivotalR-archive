@@ -1,12 +1,9 @@
-## The environment that contains all environment variables
-.testing.env <- new.env(parent = getNamespace(.this.pkg.name))
-.continuous.env <- new.env(parent = globalenv()) # used for continuous testing
-
-## ----------------------------------------------------------------------
-
+## get interactive input for testing environment variables
 .get.param.inputs <- function(param.names = c(".port", ".dbname"),
                               reset = FALSE)
 {
+    if (!all(grepl("^\\.", param.names)))
+        stop("Testing environment variable names must start with '.' !")
     testing.vars <- ls(.testing.env, all.names = TRUE)
     if (reset || any(!param.names %in% testing.vars)) {
         cat("\n")
@@ -22,7 +19,7 @@
 ## skip an "expect_that" test if cond is TRUE
 skip_if <- function(cond, test.expr)
 {
-    expr <- deparse(substitute(test.expr))
+    expr <- deparse(substitute(test.expr), width.cutoff = 500)
     l <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
     if (cond) {
         if (.localVars$test.reporter %in% c("summary", "minimal"))
@@ -96,7 +93,8 @@ test <- function(path = "tests", filter = NULL,
             assign(var, env.vars[[var]], envir = .testing.env)
 
     if (clean.test.env)
-        do.call(rm, c(ls(.testing.env), envir = .testing.env))
+        do.call(rm, c(ls(.testing.env, all.names = TRUE),
+                      envir = .testing.env))
 
     if (run == "examples" || run == "both") {
         cat(testthat::colourise("Running examples in the user doc -----\n",
@@ -177,7 +175,7 @@ has_no_error <- function ()
     else
         x <- tools::Rd_db(dir = r_root)
 
-    outpath <- normalizePath(paste("/tmp/", .unique.string(), "/", sep = ""))
+    outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
     dir.create(outpath, recursive = TRUE)
     .localVars$example.tmppath <- outpath
 
@@ -266,29 +264,31 @@ continuous.test <- function(root, filter = NULL,
             assign(var, env.vars[[var]], envir = .continuous.env)
 
     if (clean.test.env)
-        do.call(rm, c(ls(.continuous.env), envir = .continuous.env))
+        do.call(rm, c(ls(.continuous.env, all.names = TRUE),
+                      envir = .continuous.env))
+    else
+        do.call(rm, c(ls(.continuous.env, all.names = FALSE),
+                      envir = .continuous.env))
 
     is.first.run <- TRUE # first time to run the tests
 
     exclude <- c("onAttach.R", "testing.R")
+    not.copy <- "onAttach.R"
 
     ans <- "no-choice"
 
     tryCatch(repeat {
         ## test_path
-        test_r_path <- normalizePath(paste("/tmp/", .unique.string(),
-                                         "/", sep = ""))
-        test_tests_path <- normalizePath(paste("/tmp/", .unique.string(),
-                                               "/", sep = ""))
-        test_man_path <- normalizePath(paste("/tmp/", .unique.string(),
-                                             "/", sep = ""))
+        test_r_path <- paste("/tmp/", .unique.string(), "/", sep = "")
+        test_tests_path <- paste("/tmp/", .unique.string(), "/", sep = "")
+        test_man_path <- paste("/tmp/", .unique.string(), "/", sep = "")
         dir.create(test_r_path, recursive = TRUE)
         dir.create(test_tests_path, recursive = TRUE)
         dir.create(test_man_path, recursive = TRUE)
 
         if (is.first.run || ans == "all") {
             file.copy(r_dir, test_r_path, recursive = TRUE)
-            do.call(file.remove, as.list(paste(test_r_path, "R/", exclude,
+            do.call(file.remove, as.list(paste(test_r_path, "R/", not.copy,
                                                sep = "")))
             file.copy(tests_dir, test_tests_path, recursive = TRUE)
             file.copy(man_dir, test_man_path, recursive = TRUE)
@@ -376,7 +376,7 @@ continuous.test <- function(root, filter = NULL,
 
         }
 
-        .source_dir(test_r_path)
+        .source_dir(paste(test_r_path, "R/", sep = ""))
 
         if (run == "examples" || run == "both") {
             cat(testthat::colourise("Running examples in the user doc -----\n",
@@ -399,7 +399,7 @@ continuous.test <- function(root, filter = NULL,
                                    env = .continuous.env, filter = filter)
                 cleanup.conn()
             } else
-                message("No test file has been added or modified. "
+                message("No test file has been added or modified. ",
                         "No tests to run!")
         }
 

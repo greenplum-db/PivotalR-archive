@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Private variables of the package
 ## -----------------------------------------------------------------------
@@ -26,10 +25,10 @@
 ## cannot be changed without exposing to users. If we really
 ## export these variables, they will easily interfere with other
 ## user defined variables.
-## 
+##
 ## The only way is to define a local environment inside the package.
 ##
-## The environment is a constant and cannot be changed, 
+## The environment is a constant and cannot be changed,
 ## but the variables inside this environment can be changed.
 ## The environment constant is not exported, and is thus hidden
 ## from the users.
@@ -40,6 +39,10 @@
 ## (3) conn.type - a list with vector element, contains connection pkg
 ## for each conn id
 ## (4) drv - drivers for each connection packages
+
+## The environment that contains all testing environment variables
+.testing.env <- new.env(parent = getNamespace(.this.pkg.name))
+.continuous.env <- new.env(parent = globalenv()) # used for continuous testing
 
 
 ## -----------------------------------------------------------------------
