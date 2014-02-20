@@ -13,7 +13,7 @@
   \code{\link{as.db.data.frame}}. \code{\link{preview}} can fetch a part
   of the result of executing the SQL query. Thus one does not need to
   create a table for every step of the operations, and the data
-  transfered between R and the database is minimized. 
+  transfered between R and the database is minimized.
 }
 
 \section{Objects from the Class}{
@@ -37,7 +37,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
     \item{\code{.expr}:}{
       Object of class \code{"character"}. An array of expression
       strings for columns of the table that the SQL query can be
-      materialized into. It is not to used by the 
+      materialized into. It is not to used by the
       normal users.
     }
 
@@ -55,7 +55,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
 
     \item{\code{.conn.id}:}{
       Object of class \code{"numeric"}, an integer. The ID number of the
-      database 
+      database
       connection where \code{.source} resides. The functions
       \code{\link{conn.id}} and \code{\link{conn.id<-}} can get and set
       this value.
@@ -71,7 +71,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
     \item{\code{.key}:}{
       Object of class \code{"character"}. The name of the primary key
       column name in \code{.source}. Currently only one primary key
-      column is 
+      column is
       supported. This value can be set during the creation of the object
       when using the function \code{\link{db.data.frame}}. The functions
       \code{\link{key}} and \code{\link{key<-}} can be used to get and
@@ -99,7 +99,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
     \item{\code{.is.factor}:}{
       Object of class \code{"logical"}. An array of logical values which
       indicate whether each column of the table that the SQL query can
-      be materialized 
+      be materialized
       into is a factor. This
       is not to be used by the normal users.
     }
@@ -112,7 +112,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
       \code{.factor.suffix} is a random string, otherwise it is just an
       empty string. This is not to be used by the normal users. It is
       used only the MADlib wrapper functions that support categorical
-      variables. 
+      variables.
     }
 
     \item{\code{.factor.ref}:}{
@@ -152,7 +152,7 @@ this class.
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -177,8 +177,14 @@ this class.
 \dontrun{
 showClass("db.Rquery")
 
-db.connect(port = 5433)
-x <- db.data.frame("abalone") # x points to table "abalone"
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 ## create several db.Rquery objects
 y <- x[,1:2]
@@ -191,9 +197,12 @@ preview(y)
 preview(z)
 
 ## materialize a db.Rquery object
-z <- as.db.data.frame(z, "abalone_rings_larger_10")
+delete("abalone_rings_larger_10", conn.id = cid)
+z <- as.db.data.frame(z, "abalone_rings_larger_10", conn.id = cid, verbose = FALSE)
 
 dim(z) # no error
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

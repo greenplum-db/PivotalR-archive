@@ -23,14 +23,14 @@ content(x)
 
 \value{
   A string, the content of \code{db.obj} object \code{x}.   A
-  \code{db.data.frame} object's content is the table/view name that it 
+  \code{db.data.frame} object's content is the table/view name that it
   points to. A \code{db.Rquery} object's content is the SQL query that
   represents the operations applied on an existing \code{db.data.frame}.
 }
 
 \author{
    Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -44,10 +44,14 @@ content(x)
 
 \examples{
 \dontrun{
-## create a database connection using default settings
-db.connect()
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-y <- as.db.data.frame(abalone, "abalone") # create a table
+delete("abalone")
+y <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE) # create a table
 x <- db.data.frame("abalone")
 
 ## actually, x and y are pointing the same table
@@ -64,6 +68,8 @@ content(x[1:10,])
 content(colSums(x))
 content(by(x, NULL, sum))
 content(by(x, x$sex, sum))
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

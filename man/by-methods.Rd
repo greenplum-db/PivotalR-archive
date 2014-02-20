@@ -23,7 +23,7 @@
     A list of \code{db.Rquery} objects. Each of
     the list element selects one or multiple columns of \code{data}. When the value is
     \code{NULL}, no grouping of data is done, and the aggregate function
-    \code{FUN} will be applied onto 
+    \code{FUN} will be applied onto
     all the data.
   }
 
@@ -53,7 +53,7 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -66,12 +66,15 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
 
 \examples{
 \dontrun{
-help("by,db.obj-method") # display this doc
-
-## Suppose a valid database connection 1 has been created by db.connect
+## help("by,db.obj-method") # display this doc
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone") # use default connection 1
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## mean values for each column
 preview(by(x, x$sex, mean))
@@ -82,10 +85,12 @@ preview(by(x[,-c(1,2)], x[,2], mean)) # the same
 preview(by(x[,-c(1,2)], x[,"sex"], mean)) # the same
 
 ## The return type of FUN is not db.obj
-dat <- as.db.data.frame(abalone)
+dat <- x
 
 ## Fit linear model to each group of data
 by(dat, dat$sex, function(x) madlib.lm(rings ~ . - id - sex, data = x))
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

@@ -25,7 +25,7 @@ distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose =
 TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
-distributed.by = NULL, is.temp = FALSE, ...) 
+distributed.by = NULL, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose =
 TRUE, is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by =
@@ -148,7 +148,7 @@ and it defaults to 0.
 
     A list of \code{key=value} pairs, where the value is a string of
     data type. Force the new table to use the data type for the column
-    \code{key}. 
+    \code{key}.
   }
 
   \item{factor.full}{
@@ -158,19 +158,19 @@ and it defaults to 0.
 
 \value{
   A \code{db.data.frame} object. It points to a table whose name is
-  given by \code{table.name} in connection \code{conn.id}. 
+  given by \code{table.name} in connection \code{conn.id}.
 
 }
 
 \note{
 
-  All the \code{as.db.data.frame} accept the option \code{field.types}. 
-  
+  All the \code{as.db.data.frame} accept the option \code{field.types}.
+
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -190,19 +190,23 @@ and it defaults to 0.
 \examples{
 \dontrun{
 ## get the help for a method
-help("as.db.data.frame")
-help("as.db.data.frame,db.Rquery-method")
+## help("as.db.data.frame")
+## help("as.db.data.frame,db.Rquery-method")
 
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## preview of a table
 preview(x, nrows = 10) # extract 10 rows of data
 
 ## do some operations and preview the result
-y <- (x[,1:2] + 1.2) * 2
+y <- (x[,-2] + 1.2) * 2
 preview(y, 20, FALSE)
 
 ## table abalone has a column named "id"
@@ -210,12 +214,14 @@ preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 
 ## create a copied table
 ## x[,] converts x from db.data.frame object to db.Rquery object
-z <- as.db.data.frame(x[,], "abalone1")
+z <- as.db.data.frame(x[,], conn.id = cid, verbose = FALSE)
 
 ## Force the data type, use random table name
 
-z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"))
+z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"),
+                       conn.id = cid, verbose = FALSE)
 
+db.disconnect(cid, verbose = FALSE)
 } }
 
 \keyword{utility}

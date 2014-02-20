@@ -13,7 +13,7 @@
   As a sub-class of \code{\linkS4class{db.Rquery}}, this class contains
   all the slots that belong to \code{\linkS4class{db.Rquery}}. It also
   has one additional slot as is described in the following.
-  
+
   \describe{
     \item{\code{.is.crossprod}:}{
       A vector of logical values, which has the same length as the
@@ -23,7 +23,7 @@
   \item{\code{.is.symmetric}:}{
     A vector of logical values, which has the same length as the
     number of columns. Whether the column contains matrices that are
-    symmetric. 
+    symmetric.
   }
     \item{\code{.dim}:}{
         Dimension of the matrix represented by this object.
@@ -42,7 +42,7 @@ this class.
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -56,14 +56,22 @@ this class.
 \dontrun{
 showClass("db.Rcrossprod")
 
-db.connect(port = 5433)
-x <- db.data.frame("abalone") # x points to table "abalone"
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+## x points to table "abalone"
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 lookat(crossprod(x[,-c(1,2)]))
 
 x$arr <- db.array(1, x$length, x$diameter)
 
 lookat(crossprod(x$arr))
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 
