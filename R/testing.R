@@ -168,7 +168,8 @@ has_no_error <- function ()
 ## ----------------------------------------------------------------------
 
 ## run doc example
-.run.doc.example <- function(reporter, filter, r_root = NULL)
+.run.doc.example <- function(reporter, filter, r_root = NULL,
+                             envir = .testing.env)
 {
     library(tools)
     if (is.null(r_root))
@@ -208,13 +209,14 @@ has_no_error <- function ()
     }
 
     testthat::test_dir(outpath, reporter = reporter,
-                       env = .testing.env, filter = filter)
+                       env = envir, filter = filter)
 
     invisible()
 }
 
 ## ----------------------------------------------------------------------
 
+## Continuous testing
 continuous.test <- function(root, filter = NULL,
                             reporter = c("summary", "tap", "minimal", "stop"),
                             env.file = NULL, env.vars = list(),
@@ -270,6 +272,8 @@ continuous.test <- function(root, filter = NULL,
 
     exclude <- c("onAttach.R", "testing.R")
 
+    ans <- "no-choice"
+
     tryCatch(repeat {
         ## test_path
         test_r_path <- normalizePath(paste("/tmp/", .unique.string(),
@@ -282,40 +286,92 @@ continuous.test <- function(root, filter = NULL,
         dir.create(test_tests_path, recursive = TRUE)
         dir.create(test_man_path, recursive = TRUE)
 
-        if (is.first.run) {
+        if (is.first.run || ans == "all") {
             file.copy(r_dir, test_r_path, recursive = TRUE)
-            file.copy(tests_dir, test_r_path, recursive = TRUE)
+            do.call(file.remove, as.list(paste(test_r_path, "R/", exclude,
+                                               sep = "")))
+            file.copy(tests_dir, test_tests_path, recursive = TRUE)
             file.copy(man_dir, test_man_path, recursive = TRUE)
             file.copy(des_file, test_man_path)
+
+            old.r.state <- .dir_state(r_dir)
+            old.tests.state <- .dir_state(tests_dir)
+            old.man.state <- .dir_state(man_dir)
+            old.src.state <- .dir_state(src_dir)
+
+            l.tests <- 1
+            l.man <- 1
         } else {
-            if (r_diff$n == 0 && tests_diff$n == 0 && man_diff$n == 0 &&
-                src_diff$n == 0) {
+            new.r.state <- .dir_state(r_dir)
+            new.tests.state <- .dir_state(tests_dir)
+            new.man.state <- .dir_state(man_dir)
+            new.src.state <- .dir_state(src_dir)
+
+            r.diff <- .compare_state(old.r.state, new.r.state)
+            tests.diff <- .compare_state(old.tests.state, new.tests.state)
+            man.diff <- .compare_state(old.man.state, new.man.state)
+            src.diff <- .compare_state(old.src.state, new.src.state)
+
+            old.r.state <- new.r.state
+            old.tests.state <- new.tests.state
+            old.man.state <- new.man.state
+            old.src.state <- new.src.state
+
+            ## Nothing has been changed
+            if (r.diff$n == 0 && tests.diff$n == 0 && man.diff$n == 0 &&
+                src.diff$n == 0) {
                 unlink(c(test_r_path, test_tests_path, test_man_path),
                        recursive = TRUE, force = TRUE)
+                cat(testthat::colourise("Nothing has been changed. No test will be run\n\n", fg = "light red"))
                 ans <- .get.continue.choice()
+                next
             }
 
-
-
-            if (any(exclude %in% r_diff$added) ||
-                any(exclude %in% r_diff$deleted) ||
-                any(exclude %in% r_diff$modified) ||
-                src_diff$n > 0) {
+            ## If some files changed, we need to stop
+            if (any(exclude %in% r.diff$added) ||
+                any(exclude %in% r.diff$deleted) ||
+                any(exclude %in% r.diff$modified) ||
+                src.diff$n > 0) {
                 message("Some of onAttach.R, testing.R or C/C++ source code ",
-                        "are changed, and you need to re-compile the package.")
+                        "are changed, and you need to re-build ",
+                        "and re-install the package.")
                 unlink(c(test_r_path, test_tests_path, test_man_path),
                        recursive = TRUE, force = TRUE)
                 break
             }
 
-            if (r_diff$n > 0) {
+            if (r.diff$n > 0) {
+                ## any R source changed, re-run all tests
                 file.copy(r_dir, test_r_path, recursive = TRUE)
+                do.call(file.remove, as.list(paste(test_r_path, "R/", exclude,
+                                                   sep = "")))
                 file.copy(tests_dir, test_r_path, recursive = TRUE)
                 file.copy(man_dir, test_man_path, recursive = TRUE)
                 file.copy(des_file, test_man_path)
-            } else {
 
-                file.copy()
+                l.tests <- 1
+                l.man <- 1
+            } else {
+                ## only some man or test files changed
+                file.copy(r_dir, test_r_path, recursive = TRUE)
+                do.call(file.remove, as.list(paste(test_r_path, "R/", exclude,
+                                                   sep = "")))
+                tests.changed <- c(tests.diff$added, tests$modified)
+                l.tests <- length(tests.changed)
+                if (l.tests > 0) {
+                    dir.create(paste(test_tests_path, "tests/", sep = ""))
+                    file.copy(tests.changed, paste(test_tests_path,
+                                                   "tests/", sep = ""))
+                }
+
+                man.changed <- c(man.diff$added, man.diff$modified)
+                l.man <- length(man.changed)
+                if (l.man > 0) {
+                    dir.create(paste(test_man_path, "man/", sep = ""))
+                    file.copy(man.changed, paste(test_man_path,
+                                                 "man/", sep = ""))
+                    file.copy(des_file, test_man_path)
+                }
             }
 
         }
@@ -325,16 +381,26 @@ continuous.test <- function(root, filter = NULL,
         if (run == "examples" || run == "both") {
             cat(testthat::colourise("Running examples in the user doc -----\n",
                                     fg = "light blue"))
-            .run.doc.example(reporter, filter)
-            cleanup.conn()
+            if (l.man > 0) {
+                .run.doc.example(reporter, filter, test_man_path,
+                                 .continuous.env)
+                cleanup.conn()
+            } else
+                message("No manual file has been added or modified. ",
+                        "No example to run!")
         }
 
         if (run == "tests" || run == "both") {
             cat(testthat::colourise("Running tests ------------------------\n",
                                     fg = "light blue"))
-            testthat::test_dir(test_path, reporter = reporter,
-                               env = .testing.env, filter = filter)
-            cleanup.conn()
+            if (l.tests > 0) {
+                testthat::test_dir(paste(test_tests_path, "tests/", sep = ""),
+                                   reporter = reporter,
+                                   env = .continuous.env, filter = filter)
+                cleanup.conn()
+            } else
+                message("No test file has been added or modified. "
+                        "No tests to run!")
         }
 
         unlink(c(test_r_path, test_tests_path, test_man_path),
