@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## utility functions exposed to the users
 ## -----------------------------------------------------------------------
@@ -6,6 +5,14 @@
 is.db.data.frame <- function (x)
 {
     is(x, "db.data.frame")
+}
+
+## ----------------------------------------------------------------------
+
+## available packages, to check whether RODBC and RPostgreSQL are
+## already installed
+.get.installed.pkgs <- function () {
+    tolower(attr(installed.packages(), "dimnames")[[1]])
 }
 
 ## -----------------------------------------------------------------------
@@ -29,7 +36,7 @@ is.db.data.frame <- function (x)
         valid[[i]] <- y[y[,id]>tick[i] & y[,id]<=tick[i+1],-id]
         train[[i]] <- y[!(y[,id]>tick[i] & y[,id]<=tick[i+1]),-id]
     }
-    
+
     list(train = train, valid = valid, inter = y, dist.by = y@.dist.by)
 }
 
@@ -49,7 +56,7 @@ is.db.data.frame <- function (x)
 ## restore all warning levels
 .restore.warnings <- function (pre.warn)
 {
-    msg.level <- .set.msg.level(pre.warn$msg.level, pre.warn$conn.id) 
+    msg.level <- .set.msg.level(pre.warn$msg.level, pre.warn$conn.id)
     options(warn = pre.warn$warn.r) # reset R warning level
 }
 
@@ -60,7 +67,7 @@ is.db.data.frame <- function (x)
 .get.package.path <- function ()
 {
     version <- .localVars$R.ver
-    if (version != R.version.string && as.numeric(version) < 2.13) 
+    if (version != R.version.string && as.numeric(version) < 2.13)
         eval(parse(text = paste(".path.package(\"", .this.pkg.name, "\")",
                    sep = "")))
     else
@@ -130,7 +137,7 @@ is.db.data.frame <- function (x)
         y
     } else {
         regmatches(x, m, invert)
-    }    
+    }
 }
 
 ## ----------------------------------------------------------------------

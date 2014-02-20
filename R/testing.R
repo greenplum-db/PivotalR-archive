@@ -1,15 +1,16 @@
 ## get interactive input for testing environment variables
 .get.param.inputs <- function(param.names = c(".port", ".dbname"),
-                              reset = FALSE)
+                              reset = FALSE,
+                              envir = parent.env(environment()))
 {
     if (!all(grepl("^\\.", param.names)))
         stop("Testing environment variable names must start with '.' !")
-    testing.vars <- ls(.testing.env, all.names = TRUE)
+    testing.vars <- ls(envir, all.names = TRUE)
     if (reset || any(!param.names %in% testing.vars)) {
         cat("\n")
         for (i in param.names)
             if (reset || !i %in% testing.vars) {
-                .testing.env[[i]] <- readline(paste(i, "? ", sep = ""))
+                envir[[i]] <- readline(paste(i, "? ", sep = ""))
             }
     }
 }
