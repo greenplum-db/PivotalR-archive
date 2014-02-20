@@ -91,7 +91,6 @@ operations.
 
 %% @test .port Database port number
 %% @test .dbname Database name
-
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)

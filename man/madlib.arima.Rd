@@ -11,7 +11,7 @@
   and the other for the time stamps. The time stamp can be anything that
   can be ordered. This is because the rows of a table does not have
   inherent order and thus needs to be ordered by the extra time stamp
-  column. 
+  column.
 }
 
 \usage{
@@ -35,7 +35,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
   We must specify the time stamp because the table in database has no
   order of rows, and we have to order they according the given time
-  stamps. 
+  stamps.
   }
 
   \item{ts}{
@@ -50,7 +50,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
   \item{by}{
     A list of \code{\linkS4class{db.Rquery}}, the default is NULL. The
     grouping columns. Right now, this functionality is not implemented
-    yet. 
+    yet.
   }
 
   \item{order}{
@@ -61,7 +61,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
   \item{seasonal}{
     A list of \code{order} and \code{perid}, default is \code{list(order
     = c(0,0,0), period = NA)}. The seasonal orders and period. Currently
-    not implemented. 
+    not implemented.
   }
 
   \item{include.mean}{
@@ -79,7 +79,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
   \item{optim.method}{
     A string, the optimization method. The default is "LM", the
-    Levenberg-Marquardt algorithm. Right now, only "LM" is supported. 
+    Levenberg-Marquardt algorithm. Right now, only "LM" is supported.
   }
 
   \item{optim.control}{
@@ -94,7 +94,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
     (Default = 0.001)
 
     - e1: Algorithm-specific threshold for convergence (Default = 1e-15)
-    
+
     - e2: Algorithm-specific threshold for convergence (Default = 1e-15)
 
     - e3: Algorithm-specific threshold for convergence (Default = 1e-15)
@@ -122,13 +122,13 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
   MADlib's ARIMA function implements a parallel version of the LM
   algorithm to maximize the conditional log-likelihood, which is
-  suitable for big data. 
+  suitable for big data.
 }
 
 \value{
   Returns an \code{arima.css.madlib} object, which is a list that
   contains the following items:
-  
+
   \item{coef}{
     A vector of double values. The fitting coefficients of AR, MA and
     mean value (if \code{include.mean} is \code{TRUE}).
@@ -136,7 +136,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
   \item{s.e.}{
     A vector of double values. The standard errors of the fitting
-    coefficients. 
+    coefficients.
   }
 
   \item{series}{
@@ -156,7 +156,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
   }
 
   \item{loglik}{
-    the maximized conditional log-likelihood (of the differenced data). 
+    the maximized conditional log-likelihood (of the differenced data).
   }
 
   \item{iter.num}{
@@ -183,7 +183,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
     A \code{\linkS4class{db.data.frame}} object that points to the
     table that contains information including log-likelihood, sigma^2
     etc. This table is needed by
-    \code{\link{predict.arima.css.madlib}}. 
+    \code{\link{predict.arima.css.madlib}}.
   }
 
   \item{call}{
@@ -193,35 +193,35 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \references{
   [1] Rob J Hyndman and George Athanasopoulos: Forecasting: principles
-  and practice, http://otexts.com/fpp/ 
+  and practice, http://otexts.com/fpp/
 
   [2] Robert H. Shumway, David S. Stoffer: Time Series Analysis and Its
   Applications With R Examples, Third edition Springer Texts in
-  Statistics, 2010 
+  Statistics, 2010
 
   [3] Henri Gavin: The Levenberg-Marquardt method for nonlinear least
-  squares curve-fitting problems, 2011 
+  squares curve-fitting problems, 2011
 }
 
 \seealso{
     \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
   \code{\link{madlib.summary}} are MADlib
   wrapper functions.
-  
+
   \code{\link{delete}} deletes the result of
   this function together with the model, residual and statistics
-  tables. 
+  tables.
 
   \code{\link{print.arima.css.madlib}}, \code{\link{show.arima.css.madlib}} and
   \code{\link{summary.arima.css.madlib}} prints the result in a pretty
   format.
-  
+
   \code{predict.arima.css.madlib} makes forecast of the time series
   based upon the result of this function.
 }
@@ -229,7 +229,11 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 \examples{
 \dontrun{
 library(PivotalR)
-db.connect(port = 14526, dbname = "madlib")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## use double values as the time stamp
 ## Any values that can be ordered will work
@@ -239,7 +243,7 @@ example_time_series <- data.frame(id =
                              -0.3), ma=0.2), n=1000000) + 3.2)
 
 x <- as.db.data.frame(example_time_series, field.types = list(id="double
-     precision", val = "double precision"))
+     precision", val = "double precision"), conn.id = cid)
 
 dim(x)
 
@@ -273,6 +277,8 @@ lookat(sort(pred, F, pred$step_ahead), "all")
 
 ## Use expressions
 s <- madlib.arima(val+2 ~ I(id + 1), x, order = c(2,0,1))
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

@@ -63,7 +63,7 @@
         Indices specifying elements to extract or replace.  Indices
           are `numeric' or `character' vectors or
         \code{\linkS4class{db.Rquery}} object or empty (missing) or
-          `NULL'.  
+          `NULL'.
     }
 
 \item{name}{
@@ -73,7 +73,7 @@ A string. The column name.
 \item{value}{
 Any valid value, including \code{\linkS4class{db.Rquery}},
 \code{character}, \code{numeric}, \code{integer}, and \code{logical}
-object. The 
+object. The
 value that is used to replace the part of the \code{db.obj}.
 }
 
@@ -102,14 +102,19 @@ Not implemented yet.
 
 \examples{
 \dontrun{
-## Connect to a database
-db.connect(port = 5433)
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 x$area <- x[["length"]] * x[,"height"] # add a new column
 
 y <- x[,-c(1,2)] # use all columns except the first two
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

@@ -4,7 +4,7 @@
 \title{Functions for filtering \code{NA} values in data}
 
 \description{
-  'na.omit' returns the object with incomplete cases removed. 
+  'na.omit' returns the object with incomplete cases removed.
 }
 
 \usage{
@@ -31,7 +31,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -41,8 +41,18 @@
 
 \examples{
 \dontrun{
-dat <- as.db.data.frame(abalone, "abalone")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+delete("abalone", conn.id = cid)
+dat <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+
 madlib.lm(rings ~ . - sex - id, data = dat, na.action = na.omit)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

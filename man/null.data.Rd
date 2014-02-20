@@ -36,16 +36,19 @@ loaded whenever it is used.}
 
 \examples{
 \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## The user does not need to run data(abalone) to load the data
-
-# Suppose that a valid Connection 1 exists
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(null.data, "null_data") # use default connection 1
+delete("null_data", conn.id = cid)
+x <- as.db.data.frame(null.data, "null_data", conn.id = cid, verbose = FALSE)
 
 ## ERROR, because of NULL values
-fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto + 
-                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a + 
+fit <- madlib.lm(sf_mrtg_pct_assets ~ ris_asset + lncrcd + lnauto +
+                 lnconoth + lnconrp + intmsrfv + lnrenr1a + lnrenr2a +
                  lnrenr3a, data = x)
 
 ## select columns
@@ -63,6 +66,8 @@ dim(y)
 fit <- madlib.lm(sf_mrtg_pct_assets ~ ., data = y)
 
 fit
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 \keyword{database}

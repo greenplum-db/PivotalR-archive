@@ -21,7 +21,7 @@ db.list()
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -32,22 +32,28 @@ db.list()
 
 \seealso{
   \code{\link{db.connect}} connects to database.
-  
+
   \code{\link{db.disconnect}} disconnects a connection.
 
   \code{\link{connection info}} the functions that extract information
   about the connection.
-  
+
   \code{\link{conn.eql}} tests whether two connections are the same.
 }
 
 \examples{
 \dontrun{
-## connect to multiple databases
-db.connect(dbname = "mydb", port = 5433, madlib = "madlib")
-db.connect(dbname = "otherdb", port = 5432, madlib = "madlib07")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid1 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+cid2 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 db.list() # list the two connections
+
+db.disconnect(cid1, verbose = FALSE)
+db.disconnect(cid2, verbose = FALSE)
 }
 }
 

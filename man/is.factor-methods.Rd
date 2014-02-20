@@ -7,7 +7,7 @@
 
 \description{
   This function detects whether a \code{\linkS4class{db.obj}} object is a
-  categorical object. 
+  categorical object.
 }
 
 \usage{
@@ -16,7 +16,7 @@
 
 \arguments{
   \item{x}{
-    A \code{\linkS4class{db.obj}} object. 
+    A \code{\linkS4class{db.obj}} object.
   }
 }
 
@@ -27,7 +27,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -38,10 +38,14 @@
 
 \examples{
 \dontrun{
-## Suppose that a valid connection with ID 1 is already created by db.connect
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone") # use default connection 1
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## set sex to be a categorical variable
 x$sex <- as.factor(x$sex)
@@ -49,6 +53,8 @@ x$sex <- as.factor(x$sex)
 is.factor(x$sex)
 
 is.factor(x)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

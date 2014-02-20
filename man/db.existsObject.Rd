@@ -20,7 +20,7 @@ db.existsObject(name, conn.id = 1, is.temp = FALSE)
   \item{conn.id}{
     An integer, default is 1. The ID of the database connection.
   }
-  
+
   \item{is.temp}{
     A logical, default is \code{FALSE}. Whether this table/view is
     a temporary object.
@@ -47,7 +47,7 @@ db.existsObject(name, conn.id = 1, is.temp = FALSE)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -57,7 +57,17 @@ objects to See Also as \code{\link{help}}, ~~~
 
 \examples{
 \dontrun{
-db.existsObject("madlibtestdata.lin_ornstein", 1)
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+db.list()
+
+db.existsObject("madlibtestdata.lin_ornstein", cid)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 
