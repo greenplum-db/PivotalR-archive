@@ -101,10 +101,12 @@ test <- function(path = "tests", filter = NULL,
         for (var in ls(.testing.env, all.names = TRUE))
             rm(var, envir = .testing.env)
 
+    filter <- c(filter, filter)
+
     if (run == "examples" || run == "both") {
         cat(testthat::colourise("Running examples in the user doc ---------\n",
                                 fg = "light blue"))
-        tryCatch(.run.doc.example(reporter, filter),
+        tryCatch(.run.doc.example(reporter, filter[1]),
                  interrupt = function(cond) {
                      cleanup.conn()
                      unlink(.localVars$example.tmppath, recursive = TRUE)
@@ -116,10 +118,10 @@ test <- function(path = "tests", filter = NULL,
     }
 
     if (run == "tests" || run == "both") {
-        cat(testthat::colourise("Running tests ----------------------------\n",
+        cat(testthat::colourise("\nRunning tests ----------------------------\n",
                                 fg = "light blue"))
         tryCatch(testthat::test_dir(test_path, reporter = reporter,
-                                    env = .testing.env, filter = filter),
+                                    env = .testing.env, filter = filter[2]),
                  interrupt = function(cond) cleanup.conn())
         cleanup.conn()
     }
