@@ -106,11 +106,11 @@ test <- function(path = "tests", filter = NULL,
                  interrupt = function(cond) {
                      cleanup.conn()
                      unlink(.localVars$example.tmppath, recursive = TRUE)
-                     rm(example.tmppath, envir = .localVars)
+                     rm("example.tmppath", envir = .localVars)
                  })
         cleanup.conn()
         unlink(.localVars$example.tmppath, recursive = TRUE)
-        rm(example.tmppath, envir = .localVars)
+        rm("example.tmppath", envir = .localVars)
     }
 
     if (run == "tests" || run == "both") {
