@@ -44,7 +44,8 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}} for MADlib regression wrappers
 }
 
-\examples{ \dontrun{
+\examples{
+\dontrun{
 %% @test .port Database port number
 %% @test .dbname Database name
 ## set up the database connection
@@ -62,4 +63,5 @@ vcov(fit)
 vcov(fit[[1]])
 
 db.disconnect(cid, verbose = FALSE)
-} }
+}
+}

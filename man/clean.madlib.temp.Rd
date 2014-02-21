@@ -51,7 +51,6 @@ clean.madlib.temp(conn.id = 1)
 
 \examples{
 \dontrun{
-library(PivotalR)
 %% @test .port Database port number
 %% @test .dbname Database name
 ## set up the database connection

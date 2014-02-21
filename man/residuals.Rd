@@ -61,5 +61,7 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")
 
 residuals(fit)
+
+db.disconnect(cid)
 }
 }

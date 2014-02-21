@@ -289,9 +289,10 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
             TRUE
         }
     } else {
-        if (is.temp)
+        if (is.temp) {
+            .restore.warnings(warns)
             .db.existsTempTable(name, conn.id)
-        else {
+        } else {
             schemas <- arraydb.to.arrayr(
                 db.q("select current_schemas(True)",
                      conn.id=conn.id, verbose = FALSE),

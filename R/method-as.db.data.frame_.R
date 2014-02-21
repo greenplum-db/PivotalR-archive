@@ -97,26 +97,37 @@ setMethod (
 
     exists <- db.existsObject(table.name, conn.id, is.temp)
     if (is.temp) exists <- exists[[1]]
-    if (exists) stop("The table already exists in connection ", conn.id, "!")
+    if (exists) {
+        .restore.warnings(warnings)
+        stop("The table already exists in connection ", conn.id, "!")
+    }
 
     if (!.is.arg.string(key)) stop("ID column name must be a string!")
     if (!identical(key, character(0)) &&
-        key == "row.names" && !add.row.names)
+        key == "row.names" && !add.row.names) {
+        .restore.warnings(warnings)
         stop("Set row.names as TRUE if you want to use row.names as key!")
+    }
     ## argument default, and checking
     ## if (missing(conn.id)) conn.id <- 1
-    if (!.is.conn.id.valid(conn.id))
+    if (!.is.conn.id.valid(conn.id)) {
+        .restore.warnings(warnings)
         stop("There is no such a connection!")
+    }
     if (!.is.arg.string(table.name) ||
-        nchar(table.name) == 0)
+        nchar(table.name) == 0) {
+        .restore.warnings(warnings)
         stop("The table name is not quite right!")
+    }
     ## if (missing(distributed.by)) distributed.by <- NULL
     ## if (missing(is.temp)) is.temp <- FALSE
 
     table <- .db.analyze.table.name(table.name)
     if ((!is.temp && .db.existsTable(table, conn.id)) ||
-        (is.temp && .db.existsTempTable(table, conn.id)[[1]]))
+        (is.temp && .db.existsTempTable(table, conn.id)[[1]])) {
+        .restore.warnings(warnings)
         stop("Table already exists!")
+    }
 
     .db.writeTable(table, x, add.row.names = add.row.names,
                    distributed.by = distributed.by,
@@ -171,8 +182,11 @@ setMethod (
         exists <- db.existsObject(table.name, conn.id, is.temp)
 
         if (is.temp) exists <- exists[[1]]
-        if (exists) stop("The table already exists in connection ",
-                         conn.id, "!")
+        if (exists) {
+            .restore.warnings(warnings)
+            stop("The table already exists in connection ",
+                 conn.id, "!")
+        }
 
         if (is.temp)
             temp.str <- "temp"
@@ -295,9 +309,9 @@ setMethod (
                             " as (", content.str, nrow.str, ") ",
                             dist.str, sep = "")
 
-        db.q(create.str, conn.id = conn.id, verbose = FALSE) # create table
-
         .restore.warnings(warnings)
+
+        db.q(create.str, conn.id = conn.id, verbose = FALSE) # create table
 
         res <- db.data.frame(x = tbnn, conn.id = conn.id, key = x@.key,
                              verbose = verbose, is.temp = is.temp)

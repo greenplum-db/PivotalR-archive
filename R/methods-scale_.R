@@ -35,18 +35,22 @@ setMethod (
         both.numeric <- 0
         if (is.numeric(center)) {
             both.numeric <- both.numeric + 1
-            if (length(center) != lg)
+            if (length(center) != lg) {
+                .restore.warnings(warnings)
                 stop("The length of center vector must be equal to ",
                      "the number of columns of ", deparse(substitute(x)),
                      " (include array elements)!")
+            }
             avg1 <- center
         }
         if (is.numeric(scale)) {
             both.numeric <- both.numeric + 1
-            if (length(scale) != lg)
+            if (length(scale) != lg) {
+                .restore.warnings(warnings)
                 stop("The length of scale vector must be equal to ",
                      "the number of columns of ", deparse(substitute(x)),
                      " (include array elements)!")
+            }
             std1 <- scale
         }
 

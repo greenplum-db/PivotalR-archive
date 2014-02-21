@@ -87,7 +87,7 @@ test_that("Examples of testing string existence", {
 
 test_that("Examples of testing errors",
           ## 12
-          expect_this(db.q("\\dn", verbose = FALSE), # prevent printing un-needed info
+          expect_this(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
                       throws_error("syntax error")))
 
 ## ----------------------------------------------------------------------
@@ -101,7 +101,7 @@ test_that("Examples of testing warnings",
 
 test_that("Examples of testing message",
           ## 14
-          expect_this(db.q("select * from", content(dat)),
+          expect_this(db.q("select * from", content(dat), conn.id = cid),
                       shows_message("Executing")))
 
 ## ----------------------------------------------------------------------

@@ -72,7 +72,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
-y <- db.data.frame("abalone")
+y <- db.data.frame("abalone", conn.id = cid)
 
 fit <- generic.bagging(function(data) {
                            madlib.lm(rings ~ . - id - sex, data = data)

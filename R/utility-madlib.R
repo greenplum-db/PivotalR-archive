@@ -157,7 +157,7 @@ clean.madlib.temp <- function(conn.id = 1)
     for (tbl in db.objects(
         .unique.pattern(),
         conn.id=conn.id))
-        delete(tbl, conn.id=conn.id)
+        delete(tbl, conn.id=conn.id, cascade = TRUE)
 }
 
 ## ----------------------------------------------------------------------
