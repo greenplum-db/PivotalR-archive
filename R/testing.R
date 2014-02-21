@@ -199,7 +199,9 @@ has_no_error <- function ()
 
             cat("test_that('Example in ", filename, "', {expect_that({",
                 sep = "", file = con)
+            cat("sink('/tmp/", .unique.string(), ".txt')", sep = "", file = con)
             for (line in z[!pa]) cat(line, file = con)
+            cat("sink()", file = con)
             cat("}, has_no_error())})", file = con)
             close(con)
         }
