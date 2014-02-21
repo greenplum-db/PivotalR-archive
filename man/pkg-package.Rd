@@ -143,7 +143,7 @@ db.objects(conn.id = 1)
 
 ## create a table and the R object pointing to the table
 ## using the example data that comes with this package
-delete("abalone")
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone")
 
 ## OR if the table already exists, you can create the wrapper directly

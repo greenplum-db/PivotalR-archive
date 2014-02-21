@@ -81,7 +81,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table
-delete("abalone")
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =

@@ -127,7 +127,7 @@ Vars(model)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a data table in database and the R wrapper
-delete("abalone")
+delete("abalone", conn.id = cid)
 dat <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.lm(rings ~ length + diameter*sex, data = dat)

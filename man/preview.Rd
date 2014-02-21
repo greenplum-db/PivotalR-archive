@@ -55,7 +55,7 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
     \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}})
     object, which points to a table or view in
     the database; or a \code{\linkS4class{db.Rquery}} object, which
-    represents some 
+    represents some
     operations on a \code{\linkS4class{db.data.frame}} object. If \code{x}
     is a string, which means a table name, this function directly reads
     data from the table without having to wrap it with a
@@ -74,11 +74,11 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
   }
   \item{interactive}{
     A boolean, default is \code{FALSE}. If \code{x} is a view, then
-  extracting 
+  extracting
     data from it would actually compute the view, which might take a
     longer time, especially for large data sets. When \code{interactive}
     is TRUE, this function will ask the user whether to continue to
-    extract data from the view. 
+    extract data from the view.
   }
   \item{array}{
     Logical, default is \code{TRUE}. This decides how to parse columns
@@ -97,13 +97,13 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 }
 
 \details{
-When \code{x} is a \code{\linkS4class{db.data.frame}} object, this 
+When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   function reads the data in a table or view in the connected database.
 
-  When \code{x} is a \code{\linkS4class{db.Rquery}} object, this 
+  When \code{x} is a \code{\linkS4class{db.Rquery}} object, this
   function reads the result of some operations on a
-  \code{\linkS4class{db.data.frame}} 
-  object. 
+  \code{\linkS4class{db.data.frame}}
+  object.
 
   When \code{x} is a \code{\linkS4class{db.Rcrossprod}}
   object, this function output a matrix to R. If the matrix is symmetric,
@@ -120,7 +120,7 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   of the returned \code{data.frame}. A column of arrays is converted into
   a column of strings, see \code{\link{arraydb.to.arrayr}} for more
   details. Single-column tables created with \code{preview}, \code{lookat} or \code{lk} will be coerced to a vector if \code{drop == TRUE}.
-  
+
   For \code{db.Rcrossprod} objects, a matrix or list of matrix objects as appropriate (see above).
 }
 
@@ -129,7 +129,7 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
 
   Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com} wrote the
   \code{as.data.frame} methods.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -140,12 +140,15 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
 \examples{
 \dontrun{
 ## get the help for a method
-help("preview,db.Rquery-method")
-
-## Suppose that a valid connection with ID 1 exists
+## help("preview,db.Rquery-method")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## preview of a table
 preview(x, nrows = 10) # extract 10 rows of data
@@ -155,10 +158,14 @@ y <- (x[,1:2] + 1.2) * 2
 preview(y, 20, FALSE)
 
 ## table abalone has a column named "id"
-preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
+lk(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 
 ## use as.data.frame
-as.data.frame(x, 10) } }
+as.data.frame(x, 10)
+
+db.disconnect(cid, verbose = FALSE)
+}
+}
 
 \keyword{methods}
 \keyword{data operation}

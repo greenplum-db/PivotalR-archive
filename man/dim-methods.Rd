@@ -54,7 +54,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-delete("abalone")
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 ## preview of a table
 preview(x, nrows = 10) # extract 10 rows of data

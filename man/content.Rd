@@ -50,7 +50,7 @@ content(x)
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone")
+delete("abalone", conn.id = cid)
 y <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE) # create a table
 x <- db.data.frame("abalone")
 

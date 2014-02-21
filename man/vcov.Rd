@@ -22,7 +22,7 @@
     \item{object}{
         The regression model object, of class \code{lm.madlib}, \code{lm.madlib.grps}, \code{logregr.madlib}, \code{logregr.madlib.grps}.
     }
- 
+
     \item{...}{
         Other arguments, not used.
     }
@@ -36,7 +36,7 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -45,8 +45,14 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
 }
 
 \examples{ \dontrun{
-## create a table
-x <- as.db.data.frame(abalone, "abalone")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+preview(x, 10)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")
@@ -54,6 +60,6 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 vcov(fit)
 
 vcov(fit[[1]])
+
+db.disconnect(cid, verbose = FALSE)
 } }
-
-

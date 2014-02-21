@@ -25,7 +25,7 @@
 
 \value{
     The function returns the \code{lm.madlib} or \code{lm.madlib.grps}
-    object passed to the function 
+    object passed to the function
 }
 
 \author{
@@ -39,24 +39,7 @@
 }
 
 \examples{
-\dontrun{
-## Suppose that a valid connection with ID 1 exists
-
-## create a table from the example data.frame
-x <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(x, 10)
-
-## linear regression conditioned on nation value
-## i.e. grouping
-fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
-summary(fit[[1]]) # one model for a group
-summary(fit) # models for all groups
-
-## use I(.) for expressions
-fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2),
-data = x, heteroskedasticity = T)
-summary(fit)
-}
+## see the examples in madlib.lm
 }
 
 \keyword{madlib}

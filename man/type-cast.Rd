@@ -78,7 +78,7 @@ col.types(x)
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal Inc.  
+  Author: Predictive Analytics Team at Pivotal Inc.
 
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
@@ -90,9 +90,14 @@ col.types(x)
 
 \examples{
 \dontrun{
-## Suppose that a valid connection to a database (with ID=1) is established
-## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
 
 z <- as.integer(x > 1)
 lookat(z, 10)
@@ -103,6 +108,8 @@ lookat(z, 10)
 col.types(x)
 
 col.types(z)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

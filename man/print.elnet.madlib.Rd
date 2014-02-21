@@ -7,7 +7,7 @@
 }
 
 \description{
-    This function prints the results from \code{\link{madlib.elnet}} in a human-readable format.  
+    This function prints the results from \code{\link{madlib.elnet}} in a human-readable format.
 }
 
 \usage{
@@ -46,12 +46,7 @@
   \code{\link{madlib.elnet}} Wrapper for MADlib elastic net regularization.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-"print.elnet.madlib"
+## see the examples in madlib.elnet
 }
 
 \keyword{IO}

@@ -6,7 +6,7 @@
 \description{
     This function gives the unique values of a \code{db.obj}, which are
     the column
-    unique of a \code{db.table} or \code{db.view}. 
+    unique of a \code{db.table} or \code{db.view}.
 }
 
 \usage{
@@ -49,16 +49,20 @@
 }
 
 \examples{
-    \dontrun{
-## Suppose that a valid connection with ID 1 exists
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
-## preview of a table
-preview(x, nrows = 10) # extract 10 rows of data
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
 
 ## get unique of all columns
 unique(x$sex)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

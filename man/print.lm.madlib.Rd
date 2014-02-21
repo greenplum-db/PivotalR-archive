@@ -15,7 +15,7 @@
 ...)
 
 \method{print}{lm.madlib.grps}(x, digits = max(3L, getOption("digits") -
-3L), ...) 
+3L), ...)
 
 \method{show}{lm.madlib}(object)
 
@@ -57,25 +57,7 @@
 }
 
 \examples{
-\dontrun{
-## Suppose that a valid connection with ID 1 exists
-
-## create a table from the example data.frame
-x <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(x, 10)
-
-## linear regression conditioned on nation value
-## i.e. grouping
-fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
-
-## display the model for one group 
-print(fit[[1]])
-show(fit[[1]])
-
-## display the models for all groups
-print(fit)
-show(fit)
-    }
+## see the examples in madlib.lm
 }
 
 \keyword{IO}

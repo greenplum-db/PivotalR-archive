@@ -124,7 +124,7 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone")
+delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 x  <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
 

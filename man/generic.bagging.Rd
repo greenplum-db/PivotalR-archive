@@ -70,7 +70,7 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone")
+delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 y <- db.data.frame("abalone")
 

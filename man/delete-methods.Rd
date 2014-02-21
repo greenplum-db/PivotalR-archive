@@ -149,7 +149,7 @@ delete("abalone", cid, is.temp = TRUE)
 
 delete("abalone", cid, is.temp = FALSE)
 
-delete("abalone")
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 preview(x, 10)
