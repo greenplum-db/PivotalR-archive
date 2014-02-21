@@ -21,6 +21,9 @@ Introduction to PivotalR testing framework
        normal users. The user will be asked to input some environment
        parameters such as port number, database name etc.
 
+    ◦ When writing the tests, using "expect_this" instead of "expect_that".
+      "expect_this" can correctly handle the external database connections.
+
     ◦ The tests can also be run in an automated mode. See the user manual
       in the following about the argument "env.file".
 
@@ -113,7 +116,7 @@ Introduction to PivotalR testing framework
                         Use "both" to run both of them.
 
                         When running doc examples, we use "has_no_error" in the
-                        "expect_that" tests. So we do not check whether the
+                        "expect_this" tests. So we do not check whether the
                         results are correct. As long as the example can run
                         without an error, the test passes.
 
@@ -150,7 +153,7 @@ Introduction to PivotalR testing framework
     ◦ Description:
 
       This function is used to skip tests. It can skip a single or multiple
-      "expect_that" tests, or a single or multiple "test_that" groups. Each
+      "expect_this" tests, or a single or multiple "test_that" groups. Each
       test that has been skipped will print a purple "," to the output.
 
     ◦ Usage:
@@ -165,7 +168,7 @@ Introduction to PivotalR testing framework
 
          ▸ test.expr    An expression or a block of expressions enclosed by "{"
                         and "}", which contains any valid R expression including
-                        "test_that" or "expect_that". When cond is TRUE, the tests
+                        "test_that" or "expect_this". When cond is TRUE, the tests
                         will be skipped and a blue "," will be printed.
 
 • Other helper functions
@@ -174,7 +177,7 @@ Introduction to PivotalR testing framework
         is_true, is_a, is_identical_to, matches, prints_text, throws_error,
         gives_warning, shows_message
 
-        All of these functions can be used in "expect_that" to test an
+        All of these functions can be used in "expect_this" to test an
         expression, which can be a single line expression or multiple
         lines of expressions surrounded by a pair of "{...}".
 

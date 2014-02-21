@@ -304,7 +304,7 @@ fit <- madlib.glm(rings < 10 ~ arr - arr[1:2], data = array.data, family = "bino
 ## 4th example
 ## Step-wise feature selection
 start <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = "binomial")
-step(start)
+## step(start)
 
 db.disconnect(cid, verbose = FALSE)
 }

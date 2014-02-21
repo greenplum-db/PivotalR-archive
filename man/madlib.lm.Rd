@@ -270,7 +270,7 @@ fit <- madlib.lm(as.integer(rings < 10) ~ . - arr[1:2], data = array.data)
 ## 4th example
 ## Step-wise feature selection
 start <- madlib.lm(rings ~ . - id - sex, data = x)
-step(start)
+## step(start)
 
 db.disconnect(cid)
 }
