@@ -51,14 +51,14 @@ setMethod (
                 db.q(sql, conn.id = conn.id, verbose = FALSE)
             }
 
-            db.q(paste("insert into ", content(res),
-                       " (select * from ", tmp1, ")", sep = ""),
-                 conn.id = conn.id, verbose = FALSE)
+            if (max(fq[,1]) > 1) {
+                db.q(paste("insert into ", content(res),
+                           " (select * from ", tmp1, ")", sep = ""),
+                     conn.id = conn.id, verbose = FALSE)
+                delete(tmp1, is.temp = TRUE, cascade = TRUE)
+            }
 
             .restore.warnings(warnings)
-
-            delete(tmp1, is.temp = TRUE, cascade = TRUE)
-
             res@.dim[1] <- size
             res
         }

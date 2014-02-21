@@ -20,9 +20,9 @@ residuals.logregr.madlib <- function(object, ...)
 ## ----------------------------------------------------------------------
 
 residuals.lm.madlib.grps <- function(object, ...)
-    lapply(residuals, object)
+    lapply(object, residuals)
 
 ## ----------------------------------------------------------------------
 
 residuals.logregr.madlib.grps <- function(object, ...)
-    lapply(residuals, object)
+    lapply(object, residuals)
