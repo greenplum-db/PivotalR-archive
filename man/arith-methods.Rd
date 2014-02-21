@@ -98,6 +98,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 ## ----------------------------------------------------------------------
 
 ## create a table from the example data.frame "abalone"
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 x$rings <- (x$rings + 2.3) * 3 # change the values
@@ -110,7 +111,6 @@ fit <- madlib.lm(rings ~ area, data = x)
 
 ## ----------------------------------------------------------------------
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

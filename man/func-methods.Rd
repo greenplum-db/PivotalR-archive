@@ -95,20 +95,20 @@ operations.
 %% @test .dbname Database name
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
-cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+cid <- db.connect(port = .port, dbname = .dbname)
 
 ## create a table from the example data.frame "abalone"
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 x$rings <- exp(x$rings) # change the values
 
-x$area <- log(x$length * x$height) # add a new column
+x$area <- log((x$length + 1) * (x$height + 1)) # add a new column
 
 lk(x$area, 10) # view the actual values computed in database
 
 fit <- madlib.lm(rings ~ area, data = x)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

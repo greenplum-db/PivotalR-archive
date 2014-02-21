@@ -42,12 +42,12 @@ array.len(x)
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 y <- db.array(x[-2]) # put columns into an array
 names(y) # "agg_opr"
 array.len(y$agg_opr) # 9
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

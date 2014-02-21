@@ -295,8 +295,7 @@ setMethod (
                             " as (", content.str, nrow.str, ") ",
                             dist.str, sep = "")
 
-        .get.res(sql = create.str, conn.id = conn.id,
-                 warns = warnings) # create table
+        db.q(create.str, conn.id = conn.id, verbose = FALSE) # create table
 
         .restore.warnings(warnings)
 

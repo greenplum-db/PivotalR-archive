@@ -137,11 +137,11 @@ setMethod (
     if (!(.strip(params$ind.vars, "\"") %in% col.names) ||
         !(.strip(params$dep.str, "\"") %in% col.names)) {
         new.src <- .unique.string()
-        res <- .get.res(sql = paste("create table ", new.src, " as ",
-                        "select ", params$dep.str, " as tval, ",
-                        params$ind.vars, " as tid from ", tbl.source,
-                        sep = ""),
-                        conn.id = conn.id)
+        res <- db.q(paste("create table ", new.src, " as ",
+                          "select ", params$dep.str, " as tval, ",
+                          params$ind.vars, " as tid from ", tbl.source,
+                          sep = ""),
+                    conn.id = conn.id, verbose = FALSE)
         if (is.tbl.source.temp) delete(tbl.source)
         is.tbl.source.temp <- TRUE
         tbl.source <- new.src
@@ -165,7 +165,7 @@ setMethod (
                  optim.control.str, "')", sep = "")
 
     ## execute and get the result
-    res <- .get.res(sql=sql, conn.id=conn.id)
+    res <- db.q(sql, conn.id=conn.id, verbose = FALSE)
 
     p <- order[1]
     d <- order[2]
@@ -282,7 +282,7 @@ predict.arima.css.madlib <- function(object, n.ahead = 1, ...)
     sql <- paste("select ", madlib, ".arima_forecast('",
                  tbl.model, "', '", tbl.output, "',",
                  n.ahead, ")", sep = "")
-    res <- .get.res(sql=sql, conn.id=conn.id)
+    res <- db.q(sql, conn.id=conn.id, verbose = FALSE)
     rst <- db.data.frame(tbl.output, conn.id=conn.id, verbose = FALSE)
 
     .restore.warnings(warnings)

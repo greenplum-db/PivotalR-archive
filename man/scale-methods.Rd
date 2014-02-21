@@ -83,9 +83,9 @@
 %% @test .dbname Database name
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
-cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+cid <- db.connect(port = .port, dbname = .dbname)
 
-x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+x <- as.db.data.frame(abalone, conn.id = cid)
 lk(x, 10)
 
 s <- scale(x[-c(1,2)]) # scale all numeric columns
@@ -95,7 +95,7 @@ scales <- attr(s, "scaled:scale")
 
 ## create the scaled table
 delete("scaled_abalone")
-y <- as.db.data.frame(s, "scaled_abalone", conn.id = cid, verbose = FALSE)
+y <- as.db.data.frame(s, "scaled_abalone")
 
 lk(y, 10)
 

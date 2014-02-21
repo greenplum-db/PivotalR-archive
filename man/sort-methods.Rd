@@ -62,7 +62,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 lk(x, 10)
 
-y  <- sort(x, decreasing = FALSE, list(x$nation, x$sector) )
+y  <- sort(x, decreasing = FALSE, list(x$id, x$sex) )
 # get the SQL query to be run
 content(y)
 # get the sorted output

@@ -80,21 +80,23 @@ is.temp = FALSE)
 %% @test .dbname Database name
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
-cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+cid <- db.connect(port = .port, dbname = .dbname)
 
 ## create a table using as.db.data.frame
-x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 ## create an object pointing to the table
-y <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
+y <- db.data.frame("abalone", conn.id = cid)
 
 ## x and y point to the same table
 eql(x, y) # returns TRUE
 
 ## create an object pointing to a table in a schema
-z <- db.data.frame("myschema.mytable")
+db.q("create schema myschema", conn.id = cid)
+z <- as.db.data.frame(abalone, "myschema.abalone", conn.id = cid)
+db.q("drop schema myschema cascade", conn.id = cid)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

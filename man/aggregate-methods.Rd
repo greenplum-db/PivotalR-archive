@@ -138,6 +138,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 ## ----------------------------------------------------------------------
 
 ## create a table from the example data.frame "abalone"
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 ## get the mean of a column
@@ -178,7 +179,6 @@ db.array(1, x[,3:5], x[,6:7], x[,8:10])
 
 ## ----------------------------------------------------------------------
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -128,7 +128,7 @@ y <- (x[,1:2] + 1.2) * 2
 lk(y, 20)
 
 ## table abalone has a column named "id"
-lk(sort(x, by = "id"), 20) # the preview is ordered by "id" value
+lk(sort(x, INDICES = x$id), 20) # the preview is ordered by "id" value
 
 ## use as.data.frame
 as.data.frame(x, 10)

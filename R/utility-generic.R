@@ -110,8 +110,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                       table[1], "'", sep = ""))
     } else if (l == 1) {
         schemas <- arraydb.to.arrayr(
-            .get.res(sql="select current_schemas(True)",
-                     conn.id=conn.id, warns=warns),
+            db.q("select current_schemas(True)",
+                 conn.id=conn.id, verbose = FALSE),
             type = "character")
         table_schema <- character(0)
         for (schema in schemas)

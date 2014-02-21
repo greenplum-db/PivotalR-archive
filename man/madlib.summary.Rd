@@ -124,6 +124,7 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
+delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 x  <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
 
@@ -145,7 +146,6 @@ summary_result  <- madlib.summary(x, target.cols=c('rings', 'length', 'diameter'
 
 print(summary_result)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

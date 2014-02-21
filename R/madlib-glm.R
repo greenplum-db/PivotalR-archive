@@ -109,7 +109,8 @@ madlib.glm <- function (formula, data,
     }
 
     ## execute the logistic regression and get the result
-    res <- .get.res(sql, tbl.output, conn.id)
+    res <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
+                conn.id = conn.id, verbose = FALSE)
 
     ## drop temporary tables
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)

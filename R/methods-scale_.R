@@ -61,7 +61,7 @@ setMethod (
                          ".utils_var_scales(vec, ", col.dim,
                          ")) as f, count(vec) as n from (",
                          content(y), ") h) s", sep = "")
-            res <- .get.res(sql, conn.id = conn.id)
+            res <- db.q(sql, conn.id = conn.id, verbose = FALSE, nrows = -1)
             n <- res$n[1] # row dimension
             ## savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))
             savg <- res$mean

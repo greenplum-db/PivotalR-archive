@@ -93,6 +93,8 @@ books <- data.frame(
     other.author = c(NA, "Ripley", NA, NA, NA, NA,
                      "Venables & Smith"))
 
+delete("books", conn.id = cid)
+delete("authors", conn.id = cid)
 as.db.data.frame(books, 'books', conn.id = cid, verbose = FALSE)
 as.db.data.frame(authors, 'authors', conn.id = cid, verbose = FALSE)
 

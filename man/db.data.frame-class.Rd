@@ -161,12 +161,12 @@ showClass("db.data.frame")
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
+delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 x <- db.data.frame("abalone", conn.id = cid, verbose = FALSE) # x points to table "abalone"
 
 lk(x)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

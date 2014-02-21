@@ -84,7 +84,8 @@ madlib.lm <- function (formula, data, na.action = NULL,
     }
 
     ## execute and get the result, error handling is taken care of
-    res <- .get.res(sql, tbl.output, conn.id)
+    res <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
+                conn.id = conn.id, verbose = FALSE)
 
     if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
         model <- NULL

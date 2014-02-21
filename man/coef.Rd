@@ -54,6 +54,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
@@ -63,7 +64,6 @@ coef(fit)
 
 coef(fit[[1]])
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 } }
 

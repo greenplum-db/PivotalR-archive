@@ -75,6 +75,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create db.table object pointing to a data table
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 ## Example 1 --------
@@ -131,7 +132,6 @@ random.sample <- lk(sort(ap, FALSE, NULL), 1000) # sort randomly
 
 plot(random.sample)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

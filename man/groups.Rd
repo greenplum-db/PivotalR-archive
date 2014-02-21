@@ -69,6 +69,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame
+delete("abalone", conn.id = cid)
 source_data <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 lk(source_data, 10)
 
@@ -79,7 +80,6 @@ groups(fit) # all grouping column values
 
 groups(fit[[1]]) # the first model's grouping column value
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -365,6 +365,7 @@
                  intercept, ", (", y.str, ")::boolean, ", x.str,
                  ")) as loss from ",
                  tbl, where.str, sort$str, sep = "")
-    loss <- as.numeric(.get.res(sql, conn.id = conn.id))
+    loss <- as.numeric(db.q(sql, nrows = -1,
+                            conn.id = conn.id, verbose = FALSE))
     -(loss + lambda*((1-alpha)*sum(coef^2)/2 + alpha*sum(abs(coef))))
 }

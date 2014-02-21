@@ -210,16 +210,15 @@ y <- (x[,-2] + 1.2) * 2
 lk(y, 20, FALSE)
 
 ## table abalone has a column named "id"
-lk(sort(x, INDICES = "id"), 20) # the preview is ordered by "id" value
+lk(sort(x, INDICES = x$id), 20) # the preview is ordered by "id" value
 
 ## create a copied table
 ## x[,] converts x from db.data.frame object to db.Rquery object
-z <- as.db.data.frame(x[,], conn.id = cid, verbose = FALSE)
+z <- as.db.data.frame(x[,])
 
 ## Force the data type, use random table name
 
-z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"),
-                       conn.id = cid, verbose = FALSE)
+z1 <- as.db.data.frame(x$rings, field.types = list(rings="integer"))
 
 db.disconnect(cid, verbose = FALSE)
 } }

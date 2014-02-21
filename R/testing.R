@@ -236,6 +236,6 @@ expect_this <- function(expr, judge)
     expect_that(tryCatch(expr,
                          error = function(c) {
                              cleanup.conn()
-                             stop(c)
+                             stop(c$message)
                          }), judge)
 }

@@ -253,9 +253,9 @@ fit <- madlib.lm(rings ~ . - id | sex + (id < 2000), data = x)
 
 ## 3rd example
 ## The table has two columns: x is an array, y is double precision
-dat <- source_data
-dat$arr <- db.array(source_data[,-c(1,2)])
-array.data <- as.db.data.frame(dat, conn.id = cid, verbose = FALSE)
+dat <- x
+dat$arr <- db.array(x[,-c(1,2)])
+array.data <- as.db.data.frame(dat)
 
 ## Fit to y using every element of x
 ## This does not work in R's lm, but works in madlib.lm
@@ -272,7 +272,7 @@ fit <- madlib.lm(as.integer(rings < 10) ~ . - arr[1:2], data = array.data)
 start <- madlib.lm(rings ~ . - id - sex, data = x)
 step(start)
 
-db.disconnect(cid, verbose = FALSE)
+db.disconnect(cid)
 }
 }
 

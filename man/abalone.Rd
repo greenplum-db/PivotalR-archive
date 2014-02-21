@@ -78,6 +78,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
 ## The user does not need to run data(abalone) to load the data
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", key = "id", conn.id = cid, verbose = FALSE)
 
 ## preview the actual data
@@ -86,7 +87,6 @@ lk(x)
 ## preview the actual data ordered by id
 lk(sort(x, FALSE, x$id))
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

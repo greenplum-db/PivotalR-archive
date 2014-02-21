@@ -254,7 +254,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
-dat <- as.data.frame(cbind(x, y))
+dat <- data.frame(x, y)
 
 delete("eldata")
 z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)

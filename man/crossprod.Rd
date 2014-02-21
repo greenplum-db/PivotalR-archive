@@ -60,6 +60,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
+delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 lookat(crossprod(x[,-c(1,2)]))
@@ -99,7 +100,6 @@ p <- pca(dat[,-c(1,2)])
 
 p$val # eigenvalues
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -47,11 +47,11 @@
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
+delete("abalone", conn.id = cid)
 dat <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 madlib.lm(rings ~ . - sex - id, data = dat, na.action = na.omit)
 
-delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }
