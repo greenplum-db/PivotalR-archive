@@ -104,7 +104,7 @@ x$rings <- (x$rings + 2.3) * 3 # change the values
 
 x$area <- x$length * x$height # add a new column
 
-preview(x$area, 10) # view the actual values computed in database
+lk(x$area, 10) # view the actual values computed in database
 
 fit <- madlib.lm(rings ~ area, data = x)
 

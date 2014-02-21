@@ -60,7 +60,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(x, 10)
+lk(x, 10)
 
 row.sum <- rowSums(x[,-2]) # the second column is text
 row.avg <- rowMeans(x[,-2])

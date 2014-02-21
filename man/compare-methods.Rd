@@ -153,7 +153,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 ## create a table from the example data.frame "abalone"
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
-preview(x[x$length > 10,])
+lk(x[x$length > 10,])
 
 db.disconnect(cid, verbose = FALSE)
 }

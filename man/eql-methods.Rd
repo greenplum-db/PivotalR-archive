@@ -33,7 +33,7 @@ A logical.  Returns \code{TRUE} is the objects are equal.
 }
 
 \seealso{
-  \code{\link{preview}} Displays the actual data in a \code{\linkS4class{db.obj}} object.
+  \code{\link{lk}} or \code{\link{lookat}} Displays the actual data in a \code{\linkS4class{db.obj}} object.
 }
 \examples{
 \dontrun{

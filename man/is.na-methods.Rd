@@ -29,7 +29,7 @@ The return value is a \code{db.Rquery} object.
 }
 
 \seealso{
-  \code{\link{preview}} Displays the contents of a \code{db.obj} object.
+  \code{\link{lk}} or \code{\link{lookat}} Displays the contents of a \code{db.obj} object.
 }
 \examples{
 \dontrun{

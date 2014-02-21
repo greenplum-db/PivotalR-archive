@@ -74,7 +74,7 @@ to \code{sort(x, FALSE, "random")}. When
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 y <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(y, 10)
+lk(y, 10)
 
 dim(y)
 

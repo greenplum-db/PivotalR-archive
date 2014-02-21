@@ -82,10 +82,10 @@ delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", key = "id", conn.id = cid, verbose = FALSE)
 
 ## preview the actual data
-preview(x)
+lk(x)
 
 ## preview the actual data ordered by id
-preview(sort(x))
+lk(sort(x, FALSE, x$id))
 
 db.disconnect(cid, verbose = FALSE)
 }

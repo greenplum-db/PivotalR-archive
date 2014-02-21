@@ -32,19 +32,6 @@ setMethod (
     "preview",
     signature (x = "db.table"),
     def = function (x, nrows = 100, array = TRUE, drop = TRUE) {
-        ## warn.r <- getOption("warn")
-        ## options(warn = -1)
-        ## if (array) {
-        ##     x <- .expand.array(x)
-        ##     res <- .db.getQuery(paste("select * from (", content(x), ") s",
-        ##                               .limit.str(nrows), sep = ""),
-        ##                         conn.id(x))
-        ## } else
-        ##     res <- .db.getQuery(paste("select * from ", content(x),
-        ##                               .limit.str(nrows), sep = ""),
-        ##                         conn.id(x))
-        ## options(warn = warn.r) # reset R warning level
-        ## res
         if (length(names(x)) == 1 && x@.col.data_type == "array")
             z <- x[[names(x)]]
         else

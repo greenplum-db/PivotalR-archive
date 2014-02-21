@@ -68,11 +68,11 @@ x <- as.db.data.frame(abalone, "abalone", conn.id = cid1, verbose = FALSE)
 
 db.disconnect(cid1) # disconnect connection 1
 
-## preview(x) # gives an error since connection 1 is disconnected
+## lookat(x) # gives an error since connection 1 is disconnected
 
 conn.id(x) <- cid2 # 1 and 2 are the same
 
-preview(x) # gives what you want
+lk(x) # gives what you want
 
 db.disconnect(cid1, verbose = FALSE)
 db.disconnect(cid2, verbose = FALSE)

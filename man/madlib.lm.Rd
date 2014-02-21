@@ -236,7 +236,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(x, 10)
+lk(x, 10)
 
 ## linear regression conditioned on nation value
 ## i.e. grouping

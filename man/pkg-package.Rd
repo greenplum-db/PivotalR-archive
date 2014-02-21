@@ -122,9 +122,6 @@ include
 ## get the help for the package
 help("PivotalR-package")
 
-## get the help for one method
-help("preview,db.Rquery-method")
-
 ## get help for a function
 help(madlib.lm)
 
@@ -155,7 +152,7 @@ names(x) # column names of the data table
 
 madlib.summary(x) # look at a summary for each column
 
-preview(x, 20) # look at a sample of the data
+lk(x, 20) # look at a sample of the data
 
 ## look at a sample sorted by id column
 lookat(sort(x, decreasing = FALSE, x$id), 20)
@@ -177,7 +174,7 @@ ap$pred <- predict(fit1, x) # add a column which is the predicted values
 
 ## If the data set is very big, you do not want to load all the
 ## data points into R and plot. We can just plot a random sample.
-random.sample <- preview(sort(ap, FALSE, "random"), 1000) # sort randomly
+random.sample <- lk(sort(ap, FALSE, "random"), 1000) # sort randomly
 
 plot(random.sample) # plot a random sample
 
@@ -213,7 +210,7 @@ lookat(mean((y$rings < 10) == predict(fit4, y)))
 ## Group by Examples --------
 
 ## mean value of each column except the "id" column
-preview(by(x[,-1], x$sex, mean))
+lk(by(x[,-1], x$sex, mean))
 
 ## standard deviation of each column except the "id" column
 lookat(by(x[,-1], x$sex, sd))
@@ -235,7 +232,7 @@ lookat(m, 20)
 y <- x$length + x$height + 2.3
 z <- x$length * x$height / 3
 
-preview(y < z, 20)
+lk(y < z, 20)
 
 ## ------------------------------------------------------------------------
 ## Deal with NULL values

@@ -272,7 +272,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 source_data <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
-preview(source_data, 10)
+lk(source_data, 10)
 
 ## linear regression conditioned on nation value
 ## i.e. grouping

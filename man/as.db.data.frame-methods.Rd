@@ -182,7 +182,7 @@ and it defaults to 0.
   \code{\link{db.data.frame}} creates an object pointing to a table/view
   in the database.
 
-  \code{\link{preview}} reads data from the table
+  \code{\link{lk}} looks at data from the table
 
   \code{\linkS4class{db.Rquery}} this type of object represents
   operations on an existing \code{\linkS4class{db.data.frame}} object.
@@ -203,14 +203,14 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## preview of a table
-preview(x, nrows = 10) # extract 10 rows of data
+lk(x, nrows = 10) # extract 10 rows of data
 
 ## do some operations and preview the result
 y <- (x[,-2] + 1.2) * 2
-preview(y, 20, FALSE)
+lk(y, 20, FALSE)
 
 ## table abalone has a column named "id"
-preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
+lk(sort(x, by = "id"), 20) # the preview is ordered by "id" value
 
 ## create a copied table
 ## x[,] converts x from db.data.frame object to db.Rquery object

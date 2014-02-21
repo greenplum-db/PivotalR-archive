@@ -10,7 +10,7 @@
   an existing \code{\linkS4class{db.data.frame}} object. These
   operations are actually a SQL query, which one can choose to
   materialize in the database using
-  \code{\link{as.db.data.frame}}. \code{\link{preview}} can fetch a part
+  \code{\link{as.db.data.frame}}. \code{\link{lk}} can fetch a part
   of the result of executing the SQL query. Thus one does not need to
   create a table for every step of the operations, and the data
   transfered between R and the database is minimized.
@@ -19,7 +19,7 @@
 \section{Objects from the Class}{
 Objects can be created by almost all functions/methods that can be
 applied onto \code{\linkS4class{db.data.frame}} except
-\code{\link{content}}, \code{\link{preview}} and \code{\link{delete}}.
+\code{\link{content}}, \code{\link{lk}} and \code{\link{delete}}.
 
 \code{db.Rview-class} is a sub-class of \code{db.Rquery-class}, and it behaves just like "view" in the databases except that it exists only in R. Usually there is no difference to use \code{db.Rview} or \code{db.Rquery}. \code{\link{as.db.Rview}} casts a \code{db.Rquery} object into a \code{db.Rview} object.
 
@@ -170,7 +170,7 @@ this class.
   Class \code{\linkS4class{db.data.frame}} is another sub-class of
   \code{\linkS4class{db.obj}}.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} display a part of the table
 }
 
 \examples{
@@ -192,9 +192,9 @@ z <- x[x$rings > 10,]
 
 dim(z) # get an error
 
-preview(y)
+lk(y)
 
-preview(z)
+lk(z)
 
 ## materialize a db.Rquery object
 delete("abalone_rings_larger_10", conn.id = cid)

@@ -52,7 +52,7 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(x, 10)
+lk(x, 10)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")

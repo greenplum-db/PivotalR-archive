@@ -128,7 +128,7 @@ delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 x  <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
 
-preview(x, 10)
+lk(x, 10)
 
 # madlib.summary
 summary_result  <- madlib.summary(x)

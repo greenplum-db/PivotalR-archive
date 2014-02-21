@@ -46,7 +46,7 @@
 If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then this function returns
   a \code{db.Rquery} object, which is actually the SQL query that does
   the "GROUP BY". It computes the group-by values. The result can be
-  viewed using \code{\link{preview}} or \code{\link{lookat}}.
+  viewed using \code{\link{lk}} or \code{\link{lookat}}.
 
   If the return type of \code{FUN} is not a \code{\linkS4class{db.obj}} object, then this function returns a list, which contains a number of sub-lists. Each sub-list contains two items: (1) \code{index}, an array of strings, a set of distinct values of the \code{INDICES} converted to string; and (2) \code{result}, the result produced by \code{FUN} applying onto the group of data that has the set of distinct values. The total number of sub-lists is equal to the total number of groups of data partitioned by \code{INDICES}.
 }
@@ -61,7 +61,7 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
   \code{\link{Aggregate functions}} lists all the supported aggregate
   functions.
 
-  \code{\link{preview}} can display the actual result of this function.
+  \code{\link{lk}} or \code{\link{lookat}} can display the actual result of this function.
 }
 
 \examples{
@@ -77,12 +77,12 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## mean values for each column
-preview(by(x, x$sex, mean))
+lk(by(x, x$sex, mean))
 
 ## No need to compute the mean of id and sex
-preview(by(x[,-c(1,2)], x$sex, mean))
-preview(by(x[,-c(1,2)], x[,2], mean)) # the same
-preview(by(x[,-c(1,2)], x[,"sex"], mean)) # the same
+lk(by(x[,-c(1,2)], x$sex, mean))
+lk(by(x[,-c(1,2)], x[,2], mean)) # the same
+lk(by(x[,-c(1,2)], x[,"sex"], mean)) # the same
 
 ## The return type of FUN is not db.obj
 dat <- x

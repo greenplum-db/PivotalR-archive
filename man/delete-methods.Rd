@@ -152,11 +152,11 @@ delete("abalone", cid, is.temp = FALSE)
 delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
-preview(x, 10)
+lk(x, 10)
 
 y <- as.db.data.frame(abalone, "abalone", conn.id = cid, is.temp = TRUE)
 
-preview(y, 10)
+lk(y, 10)
 
 db.existsObject("abalone", cid, is.temp = TRUE)
 

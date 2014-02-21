@@ -49,7 +49,7 @@ this class.
 \seealso{
   \code{\linkS4class{db.Rquery}} is the superclass.
 
-  \code{\link{preview}} display the matrix
+  \code{\link{lk}} or \code{\link{lookat}} display the matrix
 }
 
 \examples{

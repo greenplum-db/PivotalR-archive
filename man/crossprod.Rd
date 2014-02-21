@@ -32,7 +32,7 @@
   \code{\linkS4class{db.Rquery}}. It is actually a vectorized version of
   the resulting product matrix represented in an array. If you want to
   take a look at the actual values inside this matrix,
-  \code{\link{preview}} or \code{\link{lookat}} can be used to extract
+  \code{\link{lk}} or \code{\link{lookat}} can be used to extract
   the correct matrix format as long as the matrix can be loaded into the
   memory. Usually the resulting product matrix is not too large because
   the number \code{n} of columns is usually not too large and the

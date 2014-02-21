@@ -45,7 +45,7 @@ export("[<-.db.obj")
 
 exportMethods("as.factor")
 
-export("preview", "delete", "key", "key<-")
+export("delete", "key", "key<-")
 
 exportMethods("is.factor")
 

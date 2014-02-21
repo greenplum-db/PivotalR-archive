@@ -57,7 +57,7 @@
 \value{
   A \code{db.Rquery} object. It computes the centering and/or scaling of
   code{x} for each column including array elements. The result can be
-  viewed using \code{\link{preview}} or \code{\link{lookat}}.
+  viewed using \code{\link{lk}} or \code{\link{lookat}}.
 
   The numeric
   centering and scalings used (if any) are returned as attributes
@@ -86,7 +86,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(x, 10)
+lk(x, 10)
 
 s <- scale(x[-c(1,2)]) # scale all numeric columns
 

@@ -48,7 +48,7 @@
 \seealso{
   \code{\link{by}} has similar syntax to this function.
 
-  \code{\link{preview}} to view portion of the data table
+  \code{\link{lk}} or \code{\link{lookat}} to view portion of the data table
 }
 
 \examples{
@@ -60,7 +60,7 @@
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-preview(x, 10)
+lk(x, 10)
 
 y  <- sort(x, decreasing = FALSE, list(x$nation, x$sector) )
 # get the SQL query to be run

@@ -118,7 +118,7 @@ Class \code{\linkS4class{db.obj}}, directly.
 \code{\link{conn.id}}, \code{\link{conn.id<-}},
 \code{\link{eql}}, \code{\link{key}}, \code{\link{key<-}},
 \code{\link{merge,db.obj,db.obj-method}},
-\code{\link{preview}}, \code{\link{print,db.data.frame-method}},
+\code{\link{print,db.data.frame-method}},
 \code{\link{show,db.data.frame-method}},
 \code{\link{sort,db.obj-method}}, \code{\link{subset,db.obj-method}},
 \code{\link{Arith methods}}, \code{\link{Compare methods}},
@@ -148,7 +148,7 @@ Class \code{\linkS4class{db.obj}}, directly.
   \code{\linkS4class{db.Rquery}} is another sub-class of
   \code{\linkS4class{db.obj}}.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} or \code{\link{lookat}} display a part of the table
 }
 
 \examples{
@@ -165,7 +165,7 @@ delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 x <- db.data.frame("abalone", conn.id = cid, verbose = FALSE) # x points to table "abalone"
 
-preview(x)
+lk(x)
 
 db.disconnect(cid, verbose = FALSE)
 }

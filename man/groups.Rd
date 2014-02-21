@@ -71,7 +71,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 ## create a table from the example data.frame
 delete("abalone", conn.id = cid)
 source_data <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
-preview(source_data, 10)
+lk(source_data, 10)
 
 ## logistic regression
 fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)

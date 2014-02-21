@@ -59,7 +59,7 @@ information associated with a \code{db.table} or \code{db.view} object.
 }
 
 \seealso{
-  \code{\link{preview}} Displays the contents of an associated table.
+  \code{\link{lk}} or \code{\link{lookat}} Displays the contents of an associated table.
 }
 \examples{
 \dontrun{

@@ -104,7 +104,7 @@ x$rings <- exp(x$rings) # change the values
 
 x$area <- log(x$length * x$height) # add a new column
 
-preview(x$area, 10) # view the actual values computed in database
+lk(x$area, 10) # view the actual values computed in database
 
 fit <- madlib.lm(rings ~ area, data = x)
 

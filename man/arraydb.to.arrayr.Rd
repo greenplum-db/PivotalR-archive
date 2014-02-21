@@ -76,7 +76,7 @@ arraydb.to.arrayr(str, type = "double", n = 1)
 }
 
 \seealso{
-  \code{\link{preview}} extracts the data of a table
+  \code{\link{lk}} or \code{link{lookat}} extracts the data of a table
 }
 
 \examples{
@@ -100,7 +100,7 @@ arraydb.to.arrayr(str, "character") # c("a", "b", "\"c, d\"")
 ## table_in_database has a column of arrays
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 x$col.array <- db.array(x[,3:10])
-dat <- preview(x, nrows = 50, array = FALSE) # extract the actual data
+dat <- lk(x, nrows = 50, array = FALSE) # extract the actual data
 arraydb.to.arrayr(dat$col.array, "double") # an array of 50 rows
 
 ## ----------------------------------------------------------------------
