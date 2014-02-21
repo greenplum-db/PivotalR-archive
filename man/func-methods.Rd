@@ -98,7 +98,7 @@ operations.
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 x$rings <- exp(x$rings) # change the values
 
@@ -108,6 +108,7 @@ lk(x$area, 10) # view the actual values computed in database
 
 fit <- madlib.lm(rings ~ area, data = x)
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

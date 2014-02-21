@@ -165,7 +165,7 @@ db.existsObject("abalone", cid, is.temp = FALSE)
 delete("abalone", cid)
 
 p <- db.objects()
-p[p[,2] == "abalone",]
+p[p == "abalone"]
 
 ## Example: delete multiple tables
 ## all table in public schema start with "ornste"

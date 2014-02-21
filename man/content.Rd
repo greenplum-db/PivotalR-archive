@@ -50,7 +50,6 @@ content(x)
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone", conn.id = cid)
 y <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE) # create a table
 x <- db.data.frame("abalone")
 
@@ -62,13 +61,14 @@ content(x$id)
 content(x$id < 10)
 content(x[,1:5])
 content(x == y) # this is different from eql(x, y)
-content(sort(x, by = "id"))
+content(sort(x, INDICES = "id"))
 content(x[x$id<10,])
 content(x[1:10,])
 content(colSums(x))
 content(by(x, NULL, sum))
 content(by(x, x$sex, sum))
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

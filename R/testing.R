@@ -196,13 +196,12 @@ has_no_error <- function ()
             cat(".get.param.inputs(c(",
                 paste("'", params, "'", collapse = ",", sep = ""),
                 "))\n\n", sep = "", file = con)
-
-            cat("test_that('Example in ", filename, "', {expect_that({",
+            cat("test_that('Example in ", filename,
+                "', expect_this(capture.output({",
                 sep = "", file = con)
-            cat("sink('/tmp/", .unique.string(), ".txt')", sep = "", file = con)
             for (line in z[!pa]) cat(line, file = con)
-            cat("sink()", file = con)
-            cat("}, has_no_error())})", file = con)
+            cat("}, file = '", outpath, "/tmp-", filename,
+                "-out.txt'), has_no_error()))", sep = "", file = con)
             close(con)
         }
     }
@@ -211,4 +210,32 @@ has_no_error <- function ()
                        env = .testing.env, filter = filter)
 
     invisible()
+}
+
+## ----------------------------------------------------------------------
+
+expect_this <- function(expr, judge)
+{
+    ## connections before testing
+    ## so that we can close all un-closed connections after testing
+    if (identical(.localVars$conn.id, integer(0)))
+        origin.conn.id <- integer(0)
+    else
+        origin.conn.id <- .localVars$conn.id[,1]
+
+    ## close unclosed connection opened during testing
+    cleanup.conn <- function() {
+        if (identical(.localVars$conn.id, integer(0)))
+            curr.conn.id <- integer(0)
+        else
+            curr.conn.id <- .localVars$conn.id[,1]
+        for (i in setdiff(curr.conn.id, origin.conn.id))
+            db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+    }
+
+    expect_that(tryCatch(expr,
+                         error = function(c) {
+                             cleanup.conn()
+                             stop(c)
+                         }), judge)
 }

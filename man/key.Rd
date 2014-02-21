@@ -49,8 +49,8 @@ The return value is the primary key of the table.
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-x <- db.data.frame(content(abalone), key = 'id', conn.id = cid, verbose = FALSE)
+tmp <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+x <- db.data.frame(content(tmp), key = 'id', conn.id = cid, verbose = FALSE)
 
 ## getting the primary key
 key(x) # Display the primary key for x

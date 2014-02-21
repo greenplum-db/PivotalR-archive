@@ -42,8 +42,8 @@ A logical.  Returns   \code{TRUE} if the input is of type \code{db.data.frame}
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
-x <- db.data.frame(content(abalone), conn.id = cid, key = 'id')
+tmp <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+x <- db.data.frame(content(tmp), conn.id = cid, key = 'id')
 
 ## getting the primary key
 is.db.data.frame(x) #check if x is of type db.data.frame

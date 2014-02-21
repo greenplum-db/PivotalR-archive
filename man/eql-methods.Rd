@@ -43,7 +43,6 @@ A logical.  Returns \code{TRUE} is the objects are equal.
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone", conn.id = cid)
 as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 x <- db.data.frame('abalone', conn.id = cid, key = 'id') # use default connection 1
@@ -58,6 +57,7 @@ z <- x[,] # x is a db.data.frame object, but z is not
 
 eql(x,z) # This returns false
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

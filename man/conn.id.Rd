@@ -59,7 +59,7 @@ conn.id(x) <- value
 cid1 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 cid2 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-do.list() # list the two connections
+db.list() # list the two connections
 
 conn.eql(cid1, cid2) # returns TRUE
 

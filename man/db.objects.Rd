@@ -51,7 +51,7 @@ db.objects(search = NULL, conn.id = 1)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table using as.db.data.frame
-x <- as.db.data.frame(abalone, "abalone", conn.id = conid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 db.objects(conn.id = cid) # list all tables/views
 

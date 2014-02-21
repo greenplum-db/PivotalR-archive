@@ -110,6 +110,7 @@ fit <- madlib.lm(rings ~ area, data = x)
 
 ## ----------------------------------------------------------------------
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -183,7 +183,6 @@ showClass("db.Rquery")
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone", conn.id = cid)
 x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 ## create several db.Rquery objects
@@ -197,11 +196,12 @@ lk(y)
 lk(z)
 
 ## materialize a db.Rquery object
-delete("abalone_rings_larger_10", conn.id = cid)
 z <- as.db.data.frame(z, "abalone_rings_larger_10", conn.id = cid, verbose = FALSE)
 
 dim(z) # no error
 
+delete("abalone_rings_larger_10", conn.id = cid)
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -47,6 +47,7 @@ y <- db.array(x[-2]) # put columns into an array
 names(y) # "agg_opr"
 array.len(y$agg_opr) # 9
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -127,7 +127,6 @@ Vars(model)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a data table in database and the R wrapper
-delete("abalone", conn.id = cid)
 dat <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.lm(rings ~ length + diameter*sex, data = dat)
@@ -144,12 +143,13 @@ margins(fit, ~ length + sex.I, factor.continuous = TRUE)
 ## one of them is an array column
 dat1 <- cbind(db.array(dat[,-c(1,2,10)]), dat[,10])
 names(dat1) <- c("x", "y")
-delete("abalone_array")
 dat1 <- as.db.data.frame(dat1, "abalone_array", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.glm(y < 10 ~ x[-1], data = dat1, family = "logistic")
 margins(fit, ~ x[2:5])
 
+delete("abalone_array")
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }

@@ -94,6 +94,7 @@ eql(x, y) # returns TRUE
 ## create an object pointing to a table in a schema
 z <- db.data.frame("myschema.mytable")
 
+delete("abalone", conn.id = cid)
 db.disconnect(cid, verbose = FALSE)
 }
 }
