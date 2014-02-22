@@ -105,7 +105,7 @@ test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
     filter <- c(filter, filter)
 
     if (run == "examples" || run == "both") {
-        cat(testthat::colourise("\nRunning examples in the user doc ---------\n",
+        cat(testthat::colourise("\nRunning examples in the user doc ------\n",
                                 fg = "light blue"))
         tryCatch(.run.doc.example(reporter, filter[1], man.path),
                  finally = {
@@ -116,7 +116,7 @@ test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
     }
 
     if (run == "tests" || run == "both") {
-        cat(testthat::colourise("\nRunning tests ----------------------------\n",
+        cat(testthat::colourise("\nRunning tests -------------------------\n",
                                 fg = "light blue"))
         tryCatch(testthat::test_dir(test_path, reporter = reporter,
                                     env = .testing.env, filter = filter[2]),

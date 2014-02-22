@@ -28,26 +28,30 @@ Introduction to PivotalR testing framework
 • The testing function user manual:
 
     ◦ Description:
-
       This internal function is used to run tests and doc examples after
       the package has been installed. Each test that has passed will
       print a green "." on the output.
 
     ◦ Usage:
-
-      PivotalR:::test(path = "tests", filter = NULL,
+      PivotalR:::test(tests.path = "tests", man.path = NULL, filter = NULL,
                       reporter = c("summary", "tap", "minimal", "stop"),
                       env.file = NULL, env.vars = list(),
                       clean.test.env = FALSE,
                       run = c("tests", "examples", "both"))
 
     ◦ Arguments:
-         ▸ path         A string, default is "tests", where the test files
+         ▸ tests.path   A string, default is "tests", where the test files
                         are stored. The default location is PivotalR's
                         installation-dir/tests. But you can specify a
                         particular directory where the testing files are
                         stored. This is particular useful when you are
                         developing new tests for PivotalR.
+
+         ▸ man.path     A string, default is "NULL", which means that the
+                        manual file (with examples) in the installation is
+                        used. The user can specify other paths that contains
+                        both "man/" folder and "DESCRIPTION" file, i.e the
+                        root directory of PivotalR source code.
 
          ▸ filter       A string, default is NULL, file name pattern of
                         those to be executed. Instead of running all tests
@@ -57,7 +61,10 @@ Introduction to PivotalR testing framework
                         matching this regular expression will be executed.
                         Matching will take on the file name after it has been
                         stripped of "test-" from the beginning and ".r" from
-                        the end of the file name.
+                        the end of the file name. When "run = 'both'", the user
+                        can pass a vector of strings to filter, and examples
+                        will use filter[1], the normal tests will use
+                        filter[2].
 
          ▸ reporter     A string, default is "summary". Other choices
                         include "tap", "minimal" and "stop". This decides
@@ -129,7 +136,6 @@ Introduction to PivotalR testing framework
                         comment in the end of the line is optional.
 
    ◦ Details:
-
         The testing framework is build upon the R package "testthat" [1].
         If this package is not installed on the user's machine, it will be
         fetched from CRAN and installed when the user runs the tests for
@@ -139,7 +145,6 @@ Introduction to PivotalR testing framework
             Wickham, http://CRAN.R-project.org/package=testthat (2013).
 
     ◦ Examples:
-
         > library(PivotalR)
         > PivotalR:::test()
         > PivotalR:::test(run = 'b', env.vars = list(.port=5433,
@@ -149,25 +154,23 @@ Introduction to PivotalR testing framework
 • The test skipping function user manual
 
     ◦ Description:
-
       This function is used to skip tests. It can skip a single or multiple
       "expect_this" tests, or a single or multiple "test_that" groups. Each
       test that has been skipped will print a purple "," to the output.
 
     ◦ Usage:
-
       skip_if(cond, test.expr)
 
     ◦ Arguments:
+         ▸ cond         An expression or a block of expressions enclosed by
+                        "{" and "}", which gives a logical value (TRUE/FALSE)
+                        as the result.
 
-         ▸ cond         An expression or a block of expressions enclosed by "{"
-                        and "}", which gives a logical value (TRUE/FALSE) as the
-                        result.
-
-         ▸ test.expr    An expression or a block of expressions enclosed by "{"
-                        and "}", which contains any valid R expression including
-                        "test_that" or "expect_this". When cond is TRUE, the tests
-                        will be skipped and a blue "," will be printed.
+         ▸ test.expr    An expression or a block of expressions enclosed by
+                        "{" and "}", which contains any valid R expression
+                        including "test_that" or "expect_this". When cond is
+                        TRUE, the tests will be skipped and a blue "," will
+                        be printed.
 
 • Other helper functions
 
