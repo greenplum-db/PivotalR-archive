@@ -237,9 +237,12 @@ expect_this <- function(expr, judge)
             db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
     }
 
+    expr.str <- deparse(substitute(expr), width.cutoff=500)
+    expr.str <- paste(expr.str[2:(length(expr.str)-1)], collapse = "\n")
+
     expect_that(tryCatch(expr,
                          error = function(c) {
                              cleanup.conn()
-                             stop(c$message)
+                             stop("\n\n", expr.str, "\n\nERROR: ", c$message)
                          }), judge)
 }
