@@ -134,14 +134,20 @@ setMethod (
                    is.temp = is.temp, conn.id = conn.id, ...)
 
     if (length(table) == 1 && !is.temp) {
-        table_schema <- .db.getQuery("select current_schema()", conn.id);
+        table_schema <- db.q("select current_schema()", conn.id = conn.id, verbose = FALSE);
         table.str <- paste(table_schema, ".", table, sep = "")
     } else
         table.str <- table.name
-    if (! identical(key, character(0)))
-        .db.getQuery(paste("alter table ", table.str,
-                           " add primary key (\"",
-                           key, "\")", sep = ""), conn.id)
+    if (! identical(key, character(0))) {
+        db <- .get.dbms.str(conn.id)
+        if (db$db.str == "HAWQ") {
+            .restore.warnings(warnings)
+            stop("HAWQ does not support primary keys!")
+        }
+        db.q("alter table ", table.str,
+             " add primary key (\"",
+             key, "\")", conn.id = conn.id, verbose = FALSE)
+    }
 
     .restore.warnings(warnings)
 

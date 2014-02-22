@@ -164,7 +164,7 @@ has_no_error <- function ()
             return (eval(parse(
                 text = paste("expectation(FALSE,",
                 paste("'code generated an error: ",
-                      as.character(res), "'", sep = "")))))
+                      as.character(res), "')", sep = "")))))
         }
         eval(parse(text = "expectation(TRUE, '')"))
     }
