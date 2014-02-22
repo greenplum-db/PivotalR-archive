@@ -43,17 +43,17 @@ skip_if <- function(cond, test.expr)
 
 ## ----------------------------------------------------------------------
 
-test <- function(path = "tests", filter = NULL,
+test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
                  reporter = c("summary", "tap", "minimal", "stop"),
                  env.file = NULL, env.vars = list(),
                  clean.test.env = FALSE, run = c("tests", "examples", "both"))
 {
     run <- match.arg(run)
 
-    if (path == "tests")
-        test_path <- system.file(path, package = .this.pkg.name)
+    if (tests.path == "tests")
+        test_path <- system.file(tests.path, package = .this.pkg.name)
     else
-        test_path <- path
+        test_path <- tests.path
 
     if (test_path == "")
         stop("You need to use --install-tests option to install ",
@@ -107,7 +107,7 @@ test <- function(path = "tests", filter = NULL,
     if (run == "examples" || run == "both") {
         cat(testthat::colourise("\nRunning examples in the user doc ---------\n",
                                 fg = "light blue"))
-        tryCatch(.run.doc.example(reporter, filter[1]),
+        tryCatch(.run.doc.example(reporter, filter[1], man.path),
                  finally = {
                      cleanup.conn()
                      unlink(.localVars$example.tmppath, recursive = TRUE)
@@ -173,10 +173,13 @@ has_no_error <- function ()
 ## ----------------------------------------------------------------------
 
 ## run doc example
-.run.doc.example <- function(reporter, filter)
+.run.doc.example <- function(reporter, filter, r_root = NULL)
 {
     library(tools)
-    x <- tools::Rd_db(.this.pkg.name)
+    if (is.null(r_root))
+        x <- tools::Rd_db(.this.pkg.name)
+    else
+        x <- tools::Rd_db(dir = r_root)
 
     outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
     dir.create(outpath, recursive = TRUE)
