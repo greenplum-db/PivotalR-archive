@@ -1,6 +1,7 @@
 Introduction to PivotalR testing framework
 
-• PivotalR has a complete testing framework. It is automated.
+• PivotalR has a complete testing framework. It is automated. And it is
+  built upon the package "testthat" 0.8.1.
 
 • For users
 
