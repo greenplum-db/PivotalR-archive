@@ -21,9 +21,6 @@ Introduction to PivotalR testing framework
        normal users. The user will be asked to input some environment
        parameters such as port number, database name etc.
 
-    ◦ When writing the tests, using "expect_this" instead of "expect_that".
-      "expect_this" can correctly handle the external database connections.
-
     ◦ The tests can also be run in an automated mode. See the user manual
       in the following about the argument "env.file".
 

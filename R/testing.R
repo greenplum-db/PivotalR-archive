@@ -104,7 +104,7 @@ test <- function(path = "tests", filter = NULL,
     filter <- c(filter, filter)
 
     if (run == "examples" || run == "both") {
-        cat(testthat::colourise("Running examples in the user doc ---------\n",
+        cat(testthat::colourise("\nRunning examples in the user doc ---------\n",
                                 fg = "light blue"))
         tryCatch(.run.doc.example(reporter, filter[1]),
                  interrupt = function(cond) {

@@ -23,7 +23,7 @@ dat.im <- abalone
 test_that("Examples of speed test",
           ## takes les than 2 seconds
           ## 1
-          expect_this(madlib.lm(rings ~ . - id - sex, data = dat),
+          expect_that(madlib.lm(rings ~ . - id - sex, data = dat),
                       takes_less_than(3)))
 
 ## ----------------------------------------------------------------------
@@ -34,8 +34,8 @@ test_that("Examples of class attributes", {
     fdb <- madlib.lm(rings ~ . - id - sex, data = dat)
     fm <- summary(lm(rings ~ . - id - sex, data = dat.im))
     ## 2, 3
-    expect_this(fdb,      is_a("lm.madlib"))
-    expect_this(fdb$data, is_a("db.data.frame"))
+    expect_that(fdb,      is_a("lm.madlib"))
+    expect_that(fdb$data, is_a("db.data.frame"))
 })
 
 ## ----------------------------------------------------------------------
@@ -49,28 +49,28 @@ fm <- summary(lm(rings ~ . - id - sex, data = dat.im))
 test_that("Examples of value equivalent", {
     ## numeric values are the same, but names are not
     ## 4, 5, 6
-    expect_this(fdb$coef,    equals(as.numeric(fm$coefficients[,1])))
-    expect_this(fdb$coef,    is_equivalent_to(fm$coefficients[,1]))
-    expect_this(fdb$std_err, is_equivalent_to(fm$coefficients[,2]))
+    expect_that(fdb$coef,    equals(as.numeric(fm$coefficients[,1])))
+    expect_that(fdb$coef,    is_equivalent_to(fm$coefficients[,1]))
+    expect_that(fdb$std_err, is_equivalent_to(fm$coefficients[,2]))
 })
 
 ## ----------------------------------------------------------------------
 
 test_that("Examples of testing TRUE or FALSE", {
     ## 7, 8
-    expect_this("no_such_col" %in% fdb$col.name, is_false())
-    expect_this(fdb$has.intercept,               is_true())
+    expect_that("no_such_col" %in% fdb$col.name, is_false())
+    expect_that(fdb$has.intercept,               is_true())
 })
 
 ## ----------------------------------------------------------------------
 
 test_that("Example of identical", {
     ## Two values are equal but not identical
-    ## expect_this(fdb$r2, is_identical_to(fm$r.squared)) # will fail
+    ## expect_that(fdb$r2, is_identical_to(fm$r.squared)) # will fail
 
     r2 <- fdb$r2 # same object, identical
     ## 9
-    expect_this(fdb$r2, is_identical_to(r2))
+    expect_that(fdb$r2, is_identical_to(r2))
 })
 
 ## ----------------------------------------------------------------------
@@ -79,29 +79,29 @@ test_that("Examples of testing string existence", {
     tmp <- dat
     tmp$new.col <- 1
     ## 10, 11
-    expect_this(names(tmp), matches("new.col", all = FALSE)) # one value matches
-    expect_this(print(tmp), prints_text("temporary"))
+    expect_that(names(tmp), matches("new.col", all = FALSE)) # one value matches
+    expect_that(print(tmp), prints_text("temporary"))
 })
 
 ## ----------------------------------------------------------------------
 
 test_that("Examples of testing errors",
           ## 12
-          expect_this(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
+          expect_that(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
                       throws_error("syntax error")))
 
 ## ----------------------------------------------------------------------
 
 test_that("Examples of testing warnings",
           ## 13
-          expect_this(madlib.elnet(rings ~ . - id, data = dat, method = "cd"),
+          expect_that(madlib.elnet(rings ~ . - id, data = dat, method = "cd"),
                       gives_warning("number of features is larger")))
 
 ## ----------------------------------------------------------------------
 
 test_that("Examples of testing message",
           ## 14
-          expect_this(db.q("select * from", content(dat), conn.id = cid),
+          expect_that(db.q("select * from", content(dat), conn.id = cid),
                       shows_message("Executing")))
 
 ## ----------------------------------------------------------------------
@@ -115,7 +115,7 @@ test_that("Examples of running tests in loop", {
     rows <- c(1, 5, 10)
     ## 15, 16, 17
     for (n in rows)
-        expect_this(nrow(lk(dat, n)), equals(n))
+        expect_that(nrow(lk(dat, n)), equals(n))
 })
 
 ## ----------------------------------------------------------------------
@@ -128,7 +128,7 @@ test_that("Examples of using multiple loops", {
     for (var in vars) {
         fit.this <- paste(fit.this, "+", var)
         for (n in rows)
-            expect_this(madlib.lm(formula(fit.this), data = dat[dat$id < n, ]),
+            expect_that(madlib.lm(formula(fit.this), data = dat[dat$id < n, ]),
                         takes_less_than(3))
     }
 })
@@ -140,7 +140,7 @@ test_that("Examples of using multiple loops", {
 
 test_that("Install-check should run without error",
           ## 30
-          expect_this({
+          expect_that({
               x <- matrix(rnorm(100*20),100,20)
               y <- rnorm(100, 0.1, 2)
 
@@ -166,7 +166,7 @@ test_that("Install-check should run without error",
 
 test_that("Install-check 2",
           ## 31
-          expect_this({
+          expect_that({
               err <- generic.cv(
                   function(data) {
                       madlib.lm(rings ~ . - id - sex, data = data)
@@ -185,7 +185,7 @@ test_that("Install-check 2",
 
 test_that("Different results on different platforms",
           ## 32
-          expect_this(
+          expect_that(
               as.character(db.q("select version()", conn.id = cid,
                                 verbose = FALSE)),
               if (.get.dbms.str(cid)$db.str == "HAWQ") {
@@ -200,7 +200,7 @@ test_that("Different results on different platforms",
 
 test_that("Different results on different versions of HAWQ",
           ## 33
-          expect_this(
+          expect_that(
               as.character(db.q("select madlib.version()", conn.id = cid,
                                 verbose = FALSE)),
           {
@@ -226,12 +226,12 @@ skip_if(TRUE, {
         tmp <- dat
         tmp$new.col <- 1
         ##
-        expect_this(names(tmp), matches("new.col", all = FALSE))
-        expect_this(print(tmp), prints_text("temporary"))
+        expect_that(names(tmp), matches("new.col", all = FALSE))
+        expect_that(print(tmp), prints_text("temporary"))
     })
 
     test_that("Also always skip this",
-              expect_this(db.q("\\dn", verbose = FALSE),
+              expect_that(db.q("\\dn", verbose = FALSE),
                           throws_error("syntax error")))
 })
 
@@ -242,7 +242,7 @@ db <- .get.dbms.str(cid)
 skip_if(db$db.str %in% c("HAWQ", "PostgreSQL"),
         test_that("Skip this on HAWQ",
                   ## 37
-                  expect_this(db.q("\\dn", verbose = FALSE),
+                  expect_that(db.q("\\dn", verbose = FALSE),
                               throws_error("syntax error"))))
 
 test_that("Skip some tests", {
@@ -250,8 +250,8 @@ test_that("Skip some tests", {
     tmp$new.col <- 1
     ## 38, 39
     skip_if(db$db.str == "HAWQ" && grepl("^1\\.2", db$version.str),
-            expect_this(names(tmp), matches("new.col", all = FALSE)))
-    expect_this(print(tmp), prints_text("temporary"))
+            expect_that(names(tmp), matches("new.col", all = FALSE)))
+    expect_that(print(tmp), prints_text("temporary"))
 })
 
 ## ----------------------------------------------------------------------
