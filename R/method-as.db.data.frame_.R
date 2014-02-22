@@ -146,7 +146,8 @@ setMethod (
         }
         db.q("alter table ", table.str,
              " add primary key (\"",
-             key, "\")", conn.id = conn.id, verbose = FALSE)
+             key, "\")", sep = "",
+             conn.id = conn.id, verbose = FALSE)
     }
 
     .restore.warnings(warnings)
