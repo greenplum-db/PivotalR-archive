@@ -39,24 +39,31 @@ db.q(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 
 \seealso{
-  \code{\link{db.connect}}, \code{\link{db.objects}},   \code{\link{db.list}}, 
+  \code{\link{db.connect}}, \code{\link{db.objects}},   \code{\link{db.list}},
 }
 
 \examples{
 \dontrun{
-## Suppose a connection has been create with connection ID 1
-db.q("show search_path")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+db.q("show search_path", conn.id = cid)
 db.q("drop table if exists tr;",
       "create temp table tr (idx integer,
                             val double precision);",
-      "insert into tr values (1, 2.3), (2, 3.4)")
-db.q("select * from tr")
+      "insert into tr values (1, 2.3), (2, 3.4)", conn.id = cid)
+db.q("select * from tr", conn.id = cid)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

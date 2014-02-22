@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Utility functions used by madlib
 ## -----------------------------------------------------------------------
@@ -9,8 +8,8 @@
     ## Only newer versions of MADlib are supported
     conn.id <- conn.id(data)
     idx <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
-    db.info <- .get.dbms.str(conn.id)
-    if (db.info$db.str != "HAWQ") {
+    db <- .get.dbms.str(conn.id)
+    if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
         if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
             .madlib.version.number(conn.id) < allowed.version)
             stop("MADlib error: Please use Madlib version v",
@@ -158,7 +157,7 @@ clean.madlib.temp <- function(conn.id = 1)
     for (tbl in db.objects(
         .unique.pattern(),
         conn.id=conn.id))
-        delete(tbl, conn.id=conn.id)
+        delete(tbl, conn.id=conn.id, cascade = TRUE)
 }
 
 ## ----------------------------------------------------------------------

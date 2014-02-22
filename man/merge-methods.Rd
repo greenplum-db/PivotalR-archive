@@ -5,7 +5,7 @@
 \title{Computing a join on two tables}
 
 \description{
-This method is equivalent to a database \var{join} on two tables, and the merge can be by common column or row names.  It supports the equivalent of inner, left-outer, right-outer, and full-outer join operations.  This method is similar to \link{merge.data.frame}.  
+This method is equivalent to a database \var{join} on two tables, and the merge can be by common column or row names.  It supports the equivalent of inner, left-outer, right-outer, and full-outer join operations.  This method is similar to \link{merge.data.frame}.
 }
 
 \usage{
@@ -16,7 +16,7 @@ key = x@.key, suffixes = c("_x","_y"), ...)
 
 \arguments{
   \item{x,y}{
-    The signature of the method.  Both argument are \code{db.obj} objects, and their associated tables will be merged.  
+    The signature of the method.  Both argument are \code{db.obj} objects, and their associated tables will be merged.
   }
 
   \item{by,by.x,by.y}{
@@ -32,11 +32,11 @@ key = x@.key, suffixes = c("_x","_y"), ...)
   }
 
   \item{all.y}{
-    logical; analogous to \code{all.x}.  
+    logical; analogous to \code{all.x}.
   }
 
   \item{key}{
-    specifies the primary key of the newly created table.   
+    specifies the primary key of the newly created table.
   }
 
   \item{suffixes}{
@@ -49,33 +49,38 @@ key = x@.key, suffixes = c("_x","_y"), ...)
 }
 
 \details{
-See \link{merge.data.frame}.  Note that \code{merge.data.frame} supports an \code{incomparables} argument, which is not yet supported here.  
+See \link{merge.data.frame}.  Note that \code{merge.data.frame} supports an \code{incomparables} argument, which is not yet supported here.
 }
 
 \value{
-  A \code{\linkS4class{db.Rquery}} object, which expresses the \var{join} operation.  
+  A \code{\linkS4class{db.Rquery}} object, which expresses the \var{join} operation.
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
-} 
+}
 
 
 \seealso{
-  \code{\link{merge.data.frame}} a merge operation for two data frames.  
+  \code{\link{merge.data.frame}} a merge operation for two data frames.
 }
 
 \examples{
 \dontrun{
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create sample databases
 authors <- data.frame(
     surname = I(c("Tukey", "Venables", "Tierney", "Ripley", "McNeil")),
     nationality = c("US", "Australia", "US", "UK", "Australia"),
     deceased = c("yes", rep("no", 4)))
+
 books <- data.frame(
     name = I(c("Tukey", "Venables", "Tierney",
              "Ripley", "Ripley", "McNeil", "R Core")),
@@ -88,14 +93,19 @@ books <- data.frame(
     other.author = c(NA, "Ripley", NA, NA, NA, NA,
                      "Venables & Smith"))
 
-as.db.data.frame(books, 'books')
-as.db.data.frame(authors, 'authors')
+delete("books", conn.id = cid)
+delete("authors", conn.id = cid)
+as.db.data.frame(books, 'books', conn.id = cid, verbose = FALSE)
+as.db.data.frame(authors, 'authors', conn.id = cid, verbose = FALSE)
 
-#Cast them as db.data.frame objects
-a <- db.data.frame('authors')
-b <- db.data.frame('books')
-#Merge them together
-m1 <- merge(a,b, by.x = "surname", by.y = "name", all = TRUE)
+## Cast them as db.data.frame objects
+a <- db.data.frame('authors', conn.id = cid, verbose = FALSE)
+b <- db.data.frame('books', conn.id = cid, verbose = FALSE)
+
+## Merge them together
+m1 <- merge(a, b, by.x = "surname", by.y = "name", all = TRUE)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

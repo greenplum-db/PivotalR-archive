@@ -33,13 +33,13 @@
 
 \value{
   For ungrouped regressions, \code{residuals} returns an object of class \code{\linkS4class{db.Rquery}}
-    
+
     For grouped regressions, \code{residuals} returns a list of \code{\linkS4class{db.Rquery}} objects giving the output of these methods for each of the component models. Similarly, \code{AIC} for a grouped regression returns a vector of the AICs for each of the component models.
 }
 
 \author{
   Author: Predictive Analytics Team, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -48,14 +48,20 @@
 }
 
 \examples{ \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## create a table
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")
 
 residuals(fit)
-} }
 
-
+db.disconnect(cid)
+}
+}

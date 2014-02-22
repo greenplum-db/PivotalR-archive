@@ -57,7 +57,7 @@ to \code{sort(x, FALSE, "random")}. When
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -67,10 +67,14 @@ to \code{sort(x, FALSE, "random")}. When
 
 \examples{
 \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
 ## set up the database connection
-db.connect(port = 14526, dbname = "madlib")
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-y <- db.data.frame("abalone")
+y <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(y, 10)
 
 dim(y)
 
@@ -87,6 +91,8 @@ dim(b)
 lookat(b)
 
 delete(b)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 \keyword{methods}

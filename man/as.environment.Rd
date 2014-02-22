@@ -30,12 +30,13 @@
 \value{
   For \code{as.environment}, the created environment. Note that no data is transferred to the client; all objects in the environment are queries pointing back to the host.
 
-For \code{with}, a \code{\linkS4class{db.Rquery}} stored query object representing the expression. Use \code{\link{preview}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
+For \code{with}, a \code{\linkS4class{db.Rquery}} stored query object
+representing the expression. Use \code{\link{lk}}, \code{\link{lookat}} or \code{\link{as.data.frame}} to execute the query on the host and retrieve its contents.
 }
 
 \author{
   Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 

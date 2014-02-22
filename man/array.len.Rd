@@ -10,7 +10,7 @@ array.len(x)
 
 \arguments{
   \item{x}{
-    A \code{\linkS4class{db.obj}} object. 
+    A \code{\linkS4class{db.obj}} object.
   }
 }
 
@@ -20,7 +20,7 @@ array.len(x)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -35,10 +35,20 @@ array.len(x)
 
 \examples{
 \dontrun{
-x <- as.db.data.frame(abalone, "abalone")
+%% @test .port Database port number
+%% @test .dbname Database name
+
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 y <- db.array(x[-2]) # put columns into an array
 names(y) # "agg_opr"
 array.len(y$agg_opr) # 9
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

@@ -1,4 +1,3 @@
-
 ## ----------------------------------------------------------------------
 ## Wrapper function for MADlib's lm function
 ## ----------------------------------------------------------------------
@@ -25,9 +24,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
     conn.id <- conn.id(data) # connection ID
 
     ## Check for HAWQ
-    db.str <- (.get.dbms.str(conn.id))$db.str
-    if (db.str == "HAWQ" && hetero)
-        stop("Currently MADlib on HAWQ does not support computing ",
+    db <- .get.dbms.str(conn.id)
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str) && hetero)
+        stop("MADlib on HAWQ 1.1 does not support computing ",
              "heteroskedasticity in linear regression.")
 
     ## suppress both SQL and R warnings
@@ -52,8 +51,8 @@ madlib.lm <- function (formula, data, na.action = NULL,
     if (is.null(params$grp.str))
         grp <- "NULL"
     else
-        if (db.str == "HAWQ") {
-            stop("Currently MADlib on HAWQ does not support grouping ",
+        if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
+            stop("MADlib on HAWQ 1.1 does not support grouping ",
                  "in linear regression.")
         } else if (.madlib.version.number(conn.id) > 0.7)
             grp <- paste("'", params$grp.str, "'", sep = "")
@@ -71,7 +70,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
     ## tbl.source <- gsub("\"", "", content(data))
     tbl.source <- content(data)
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    if (db.str == "HAWQ") {
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
         tbl.output <- NULL
         sql <- paste("select (f).* from (select ", madlib, ".linregr(",
                      params$dep.str, ",", params$ind.str, ") as f from ",
@@ -85,9 +84,10 @@ madlib.lm <- function (formula, data, na.action = NULL,
     }
 
     ## execute and get the result, error handling is taken care of
-    res <- .get.res(sql, tbl.output, conn.id)
+    res <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
+                conn.id = conn.id, verbose = FALSE)
 
-    if (db.str == "HAWQ")
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
         model <- NULL
     else
         model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)

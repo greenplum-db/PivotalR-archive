@@ -263,15 +263,20 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
 }
 
 \examples{
-    \dontrun{
-## connect to a data base
-db.connect(dbname = "exampledb", user = "example", host = "localhost", port = 5433)
-source_data <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(source_data, 10)
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+source_data <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+
+lk(source_data, 10)
 
 ## linear regression conditioned on nation value
 ## i.e. grouping
-fit <- madlib.glm(interlocks ~ . | nation, data = source_data, heteroskedasticity = T)
+fit <- madlib.glm(rings ~ . -id | sex, data = source_data, heteroskedasticity = T)
 fit
 
 ## logistic regression
@@ -279,26 +284,29 @@ fit
 ## logistic regression
 ## The dependent variable must be a logical variable
 ## Here it is y < 10.
-fit <- madlib.glm(interlocks < 10 ~ . - 1 , data = source_data)
+fit <- madlib.glm(rings < 10 ~ . - id - 1 , data = source_data, family = "binomial")
 
-fit <- madlib.glm(interlocks < 10 ~ assets + as.factor(nation) + sector,
-data = source_data)
+fit <- madlib.glm(rings < 10 ~ sex + length + diameter,
+data = source_data, family = "logistic")
 
 ## 3rd example
 ## The table has two columns: x is an array, y is double precision
-array.data <- db.data.frame("tbl_has_array_column")
+dat <- source_data
+dat$arr <- db.array(source_data[,-c(1,2)])
+array.data <- as.db.data.frame(dat)
 
 ## Fit to y using every element of x
 ## This does not work in R's lm, but works in madlib.lm
-fit <- madlib.glm(y < 10 ~ x, data = array.data, family = "binomial")
+fit <- madlib.glm(rings < 10 ~ arr, data = array.data, family = "binomial")
 
-fit <- madlib.glm(y < 10 ~ x - x[1:2], data = array.data, family = "binomial")
+fit <- madlib.glm(rings < 10 ~ arr - arr[1:2], data = array.data, family = "binomial")
 
 ## 4th example
 ## Step-wise feature selection
-dat <- as.db.data.frame(abalone, "abalone")
-start <- madlib.glm(rings < 10 ~ . - id - sex, data = dat, family = "binomial")
-step(start)
+start <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = "binomial")
+## step(start)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

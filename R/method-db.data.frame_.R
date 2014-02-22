@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## create a R object that points to something inside the database
 ## -----------------------------------------------------------------------
@@ -11,28 +10,30 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
     if (!.is.conn.id.valid(conn.id))
         stop("Connection ID ", conn.id, " is not valid!")
     warnings <- .suppress.warnings(conn.id)
-    
+
     tbn <- strsplit(x, "\\.")[[1]]
     x <- paste("\"", .strip(tbn, "\""),
                "\"", collapse = ".", sep = "")
-    
+
     ## a vector (schema_name, table_name) or just table_name
-    table <- .db.analyze.table.name(x) 
+    table <- .db.analyze.table.name(x)
     exists <- db.existsObject(x, conn.id, is.temp)
     if (is.temp) {
         table <- exists[[2]]
         exists <- exists[[1]]
     }
 
-    if (!exists)
+    if (!exists) {
+        .restore.warnings(warnings)
         stop("No such object in the connection ", conn.id)
+    }
 
     if (length(table) == 1)
         content <- paste("\"", .strip(table, "\""), "\"", sep = "")
     else
         content <- paste("\"", .strip(table, "\""),
                          "\"", sep = "", collapse = ".")
-    
+
     if (.is.view(table, conn.id))
     {
         ## view
@@ -72,8 +73,10 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
 
     res@.col.name <- col.info$column_name
     if (!identical(res@.key, character(0)) &&
-        (! res@.key %in% res@.col.name))
+        (! res@.key %in% res@.col.name)) {
+        .restore.warnings(warnings)
         stop("The key column does not exist!")
+    }
     res@.col.data_type <- tolower(col.info$data_type)
     res@.col.udt_name <- tolower(col.info$udt_name)
 
@@ -104,4 +107,3 @@ db.data.frame <- function (x, conn.id = 1, key = character(0), verbose = TRUE,
 
     return (res)
 }
-

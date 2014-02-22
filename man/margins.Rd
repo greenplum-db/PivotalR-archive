@@ -120,8 +120,15 @@ Vars(model)
 }
 \examples{
 \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname)
+
 ## create a data table in database and the R wrapper
-dat <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+dat <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 fit <- madlib.lm(rings ~ length + diameter*sex, data = dat)
 margins(fit)
@@ -137,10 +144,13 @@ margins(fit, ~ length + sex.I, factor.continuous = TRUE)
 ## one of them is an array column
 dat1 <- cbind(db.array(dat[,-c(1,2,10)]), dat[,10])
 names(dat1) <- c("x", "y")
+delete("abalone_array", conn.id = cid)
 dat1 <- as.db.data.frame(dat1, "abalone_array")
 
 fit <- madlib.glm(y < 10 ~ x[-1], data = dat1, family = "logistic")
 margins(fit, ~ x[2:5])
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Predict
 ## -----------------------------------------------------------------------
@@ -50,8 +49,9 @@ predict.logregr.madlib.grps <- function (object, newdata,
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
 
-    db.str <- (.get.dbms.str(conn.id(newdata)))$db.str
-    if (db.str == "HAWQ") stop("HAWQ does not support this!")
+    db <- .get.dbms.str(conn.id(newdata))
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+        stop("MADlib on HAWQ 1.1 does not support this!")
     madlib <- schema.madlib(conn.id(newdata))
 
     strs <- .get.extra.str(newdata)
@@ -175,7 +175,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
     if (!is(newdata, "db.obj"))
         stop("New data for prediction must be a db.obj!")
 
-    db.str <- (.get.dbms.str(conn.id(newdata)))$db.str
+    db <- .get.dbms.str(conn.id(newdata))
     madlib <- schema.madlib(conn.id(newdata))
 
     strs <- .get.extra.str(newdata)
@@ -200,7 +200,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
         ind.vars <- .replace.col.with.expr1(object[[1]]$ind.vars, newdata)
     } else
         ind.vars <- object[[1]]$ind.vars
-    if (db.str != "HAWQ") {
+    if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
         ind.str <- paste("array[", paste(ind.vars, collapse = ","), "]",
                          sep = "")
     } else {
@@ -212,7 +212,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
     ## grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
 
     if (length(object) == 1) {
-        if (db.str != "HAWQ") {
+        if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
             if (object[[1]]$has.intercept) {
                 coef <- object[[1]]$coef[-1]
                 intercept <- object[[1]]$coef[1]
@@ -259,7 +259,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
                                                newdata)
             expr <- paste(expr, tmp, " then ", sep = "")
 
-            if (db.str != "HAWQ") {
+            if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
                 if (object[[i]]$has.intercept) {
                     coef <- object[[i]]$coef[-1]
                     intercept <- object[[i]]$coef[1]

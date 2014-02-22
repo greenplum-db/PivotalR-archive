@@ -9,7 +9,7 @@
 \description{
   The function computes the cross product of two matrices. The matrix is
   stored in the table either as multiple columns of data or a column of
-  arrays.  
+  arrays.
 }
 
 \usage{
@@ -32,7 +32,7 @@
   \code{\linkS4class{db.Rquery}}. It is actually a vectorized version of
   the resulting product matrix represented in an array. If you want to
   take a look at the actual values inside this matrix,
-  \code{\link{preview}} or \code{\link{lookat}} can be used to extract
+  \code{\link{lk}} or \code{\link{lookat}} can be used to extract
   the correct matrix format as long as the matrix can be loaded into the
   memory. Usually the resulting product matrix is not too large because
   the number \code{n} of columns is usually not too large and the
@@ -41,7 +41,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -51,12 +51,17 @@
 \examples{
 \dontrun{
 ## get the help for a method
-help("crossprod,db.obj-method")
+## help("crossprod,db.obj-method")
 
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 lookat(crossprod(x[,-c(1,2)]))
 
@@ -79,7 +84,7 @@ pca <- function (x, center = TRUE, scale = FALSE)
     d <- delete(z) # delete the intermediate table
     res <- eigen(m) # only this computation is in R
     n <- attr(y, "row.number") # save the computation to count rows
-     
+
     ## return the result
     list(val = sqrt(res$values/(n-1)), # eigenvalues
          vec = res$vectors, # columns of this matrix are eigenvectors
@@ -88,15 +93,16 @@ pca <- function (x, center = TRUE, scale = FALSE)
 }
 
 ## create a data table with a random name
-dat <- as.db.data.frame(abalone)
+dat <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
 
 ## exclude id and sex columns
 p <- pca(dat[,-c(1,2)])
 
 p$val # eigenvalues
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 
 \keyword{methods}
 \keyword{math}
-

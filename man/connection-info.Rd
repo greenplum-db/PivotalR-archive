@@ -55,7 +55,7 @@ conn.pkg(conn.id = 1)
 
 \value{
   For \code{user}, a string, which is the user name.
-  
+
   For \code{host}, a string, which is the host address.
 
   For \code{dbname}, a string, which is the database name.
@@ -80,7 +80,7 @@ conn.pkg(conn.id = 1)
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -98,24 +98,33 @@ conn.pkg(conn.id = 1)
 
 \examples{
 \dontrun{
-user(1)
-host(2)
-dbname() # use default connection 1
-dbms()
-madlib()
-madlib.version()
-schema.madlib()
-conn.pkg()
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid1 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+cid2 <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+user(cid1)
+host(cid2)
+dbname(cid1) # use default connection 1
+dbms(cid1)
+madlib(cid1)
+madlib.version(cid1)
+schema.madlib(cid1)
+conn.pkg(cid1)
 
 ## conn is mostly for other packages
-con <- conn(1) # get the connection object
+con <- conn(cid1) # get the connection object
 dbListTables(con) # directly use functions in package RPostgreSQL
 
 ## This package provides a better function to list all tables/views
-db.objects(1) # list all tables/views with their schema in connection 1
+db.objects(cid1) # list all tables/views with their schema in connection 1
+
+db.disconnect(cid1, verbose = FALSE)
+db.disconnect(cid2, verbose = FALSE)
 }
 }
 
 \keyword{utility}
 \keyword{database}
-

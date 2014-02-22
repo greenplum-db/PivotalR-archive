@@ -1,12 +1,6 @@
 \name{preview}
 \alias{lk}
 \alias{lookat}
-\alias{preview}
-\alias{preview,character-method}
-\alias{preview,db.view-method}
-\alias{preview,db.table-method}
-\alias{preview,db.Rquery-method}
-\alias{preview,db.Rcrossprod-method}
 \alias{as.data.frame.db.table}
 \alias{as.data.frame.db.view}
 \alias{as.data.frame.db.Rquery}
@@ -15,24 +9,10 @@
   Read the actual data stored in a table of database.
 }
 \description{
-  These functions read the actual data from a database table or operation, returning a \code{\link{data.frame}} or other object as appropriate. \code{lookat} and \code{lk} are actually the same as \code{preview} with \code{interactive} always being \code{FALSE}.
+  These functions read the actual data from a database table or operation, returning a \code{\link{data.frame}} or other object as appropriate. \code{lookat} and \code{lk} are actually the same.
 }
 
 \usage{
-preview(x, ..., drop = TRUE)
-
-\S4method{preview}{db.table}(x, nrows = 100, array = TRUE, drop = TRUE)
-
-\S4method{preview}{db.view}(x, nrows = 100, interactive = FALSE,
-array = TRUE, drop = TRUE)
-
-\S4method{preview}{db.Rquery}(x, nrows = 100, interactive = FALSE,
-array = TRUE, drop = TRUE)
-
-\S4method{preview}{db.Rcrossprod}(x, nrows = 100, interactive = FALSE, drop = TRUE)
-
-\S4method{preview}{character}(x, conn.id = 1, nrows = 100, array = TRUE, drop = TRUE)
-
 lookat(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 
 lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
@@ -55,7 +35,7 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
     \code{\linkS4class{db.table}} and \code{\linkS4class{db.view}})
     object, which points to a table or view in
     the database; or a \code{\linkS4class{db.Rquery}} object, which
-    represents some 
+    represents some
     operations on a \code{\linkS4class{db.data.frame}} object. If \code{x}
     is a string, which means a table name, this function directly reads
     data from the table without having to wrap it with a
@@ -71,14 +51,6 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
   \code{NULL} or \code{"all"} or a non-positive value, then all data in the table will be send
   into R. Be careful, you do not want to do this if the data table is
   very large.
-  }
-  \item{interactive}{
-    A boolean, default is \code{FALSE}. If \code{x} is a view, then
-  extracting 
-    data from it would actually compute the view, which might take a
-    longer time, especially for large data sets. When \code{interactive}
-    is TRUE, this function will ask the user whether to continue to
-    extract data from the view. 
   }
   \item{array}{
     Logical, default is \code{TRUE}. This decides how to parse columns
@@ -97,13 +69,13 @@ lk(x, nrows = 100, array = TRUE, conn.id = 1, drop = TRUE)
 }
 
 \details{
-When \code{x} is a \code{\linkS4class{db.data.frame}} object, this 
+When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   function reads the data in a table or view in the connected database.
 
-  When \code{x} is a \code{\linkS4class{db.Rquery}} object, this 
+  When \code{x} is a \code{\linkS4class{db.Rquery}} object, this
   function reads the result of some operations on a
-  \code{\linkS4class{db.data.frame}} 
-  object. 
+  \code{\linkS4class{db.data.frame}}
+  object.
 
   When \code{x} is a \code{\linkS4class{db.Rcrossprod}}
   object, this function output a matrix to R. If the matrix is symmetric,
@@ -119,8 +91,8 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   For \code{db.data.frame} and \code{db.Rquery} objects, a data frame. Each column in the table becomes a column
   of the returned \code{data.frame}. A column of arrays is converted into
   a column of strings, see \code{\link{arraydb.to.arrayr}} for more
-  details. Single-column tables created with \code{preview}, \code{lookat} or \code{lk} will be coerced to a vector if \code{drop == TRUE}.
-  
+  details. Single-column tables created with \code{lookat} or \code{lk} will be coerced to a vector if \code{drop == TRUE}.
+
   For \code{db.Rcrossprod} objects, a matrix or list of matrix objects as appropriate (see above).
 }
 
@@ -129,7 +101,7 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
 
   Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com} wrote the
   \code{as.data.frame} methods.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -139,26 +111,31 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
 }
 \examples{
 \dontrun{
-## get the help for a method
-help("preview,db.Rquery-method")
-
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## preview of a table
-preview(x, nrows = 10) # extract 10 rows of data
+lk(x, nrows = 10) # extract 10 rows of data
 
 ## do some operations and preview the result
 y <- (x[,1:2] + 1.2) * 2
-preview(y, 20, FALSE)
+lk(y, 20)
 
 ## table abalone has a column named "id"
-preview(sort(x, by = "id"), 20) # the preview is ordered by "id" value
+lk(sort(x, INDICES = x$id), 20) # the preview is ordered by "id" value
 
 ## use as.data.frame
-as.data.frame(x, 10) } }
+as.data.frame(x, 10)
+
+db.disconnect(cid, verbose = FALSE)
+}
+}
 
 \keyword{methods}
 \keyword{data operation}

@@ -82,9 +82,9 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                      "to display or set the current default schemas.")
         }
 
-        res <- .get.res(paste("set application_name = '",
-                              .this.pkg.name, "'", sep = ""),
-                        conn.id = result)
+        res <- db.q(paste("set application_name = '",
+                          .this.pkg.name, "'", sep = ""),
+                    conn.id = result, verbose = FALSE)
 
         return (result)
     }
@@ -274,13 +274,13 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
         if (is.temp) stop("Temporary tables may not specify a schema name!")
         schema <- name[1]
         table <- name[2]
-        ct <- .get.res(sql=paste("select count(*) from ",
-                       "information_schema.tables where ",
-                       "table_name = '",
-                       .strip(table, "\""),
-                       "' and table_schema = '",
-                       .strip(schema, "\""), "'", sep = ""),
-                       conn.id=conn.id, warns=warns)
+        ct <- db.q(paste("select count(*) from ",
+                         "information_schema.tables where ",
+                         "table_name = '",
+                         .strip(table, "\""),
+                         "' and table_schema = '",
+                         .strip(schema, "\""), "'", sep = ""),
+                   conn.id=conn.id, verbose = FALSE)
         if (ct == 0) {
             .restore.warnings(warns)
             FALSE
@@ -289,12 +289,13 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
             TRUE
         }
     } else {
-        if (is.temp)
+        if (is.temp) {
+            .restore.warnings(warns)
             .db.existsTempTable(name, conn.id)
-        else {
+        } else {
             schemas <- arraydb.to.arrayr(
-                .get.res(sql="select current_schemas(True)",
-                         conn.id=conn.id, warns=warns),
+                db.q("select current_schemas(True)",
+                     conn.id=conn.id, verbose = FALSE),
                 type = "character")
             table_schema <- character(0)
             for (schema in schemas)

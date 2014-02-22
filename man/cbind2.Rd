@@ -48,11 +48,15 @@ x and y.
 }
 \examples{
 \dontrun{
-
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- db.data.frame('abalone') # use default connection 1
+delete('abalone', conn.id = cid)
+x <- as.db.data.frame(abalone, 'abalone', conn.id = cid, verbose = FALSE)
 
 fit <- madlib.lm(rings ~ . - id - sex, data = x)
 
@@ -72,6 +76,8 @@ unlist(Map(function(x)
 
 ## sum of all columns (excluding the 2nd column)
 Reduce(function(left, right) left + right, as.list(x[-2]))
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

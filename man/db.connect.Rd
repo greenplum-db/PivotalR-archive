@@ -93,8 +93,13 @@ default.schemas = NULL, verbose = TRUE)
 \examples{
 \dontrun{
 ## connect to a database
-db.connect(host = "localhost", user = "me", dbname = "me", password =
-"", port = 5432, madlib = "madlib")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

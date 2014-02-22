@@ -42,7 +42,7 @@
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -53,8 +53,14 @@
 }
 
 \examples{ \dontrun{
-## create a table
-x <- as.db.data.frame(abalone, "abalone")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
 
 row.sum <- rowSums(x[,-2]) # the second column is text
 row.avg <- rowMeans(x[,-2])
@@ -62,4 +68,7 @@ row.avg <- rowMeans(x[,-2])
 ## lokk at 10 results
 lk(row.sum, 10)
 lk(row.avg, 10)
-} }
+
+db.disconnect(cid, verbose = FALSE)
+}
+}

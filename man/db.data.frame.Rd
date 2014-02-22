@@ -4,7 +4,7 @@
 
 \title{
   Create a \code{db.data.frame} object pointing to a table/view in the
-  database 
+  database
 }
 
 \description{
@@ -24,26 +24,26 @@ is.temp = FALSE)
 
 \arguments{
   \item{x}{
-    A string. It is the name of an existing table/view in the database. 
+    A string. It is the name of an existing table/view in the database.
   }
-  
+
   \item{conn.id}{
     An integer, default is 1. The ID number of the database connection
     where the table resides.
   }
-  
+
   \item{key}{
     A string, default is \code{character(0)}. The name of the primary
     key column. A primary key is a column in a table which must contain a
     unique value which can be used to identify each and every row of a
-    table uniquely. 
+    table uniquely.
   }
-  
+
   \item{verbose}{
     A logical, default is \code{TRUE}. Whether to print a short message
     when the object in the database is created.
   }
-  
+
   \item{is.temp}{
     A logical, default is \code{FALSE}. Whether the existing table/view
     in the database is temporary.
@@ -53,13 +53,13 @@ is.temp = FALSE)
 \value{
   A \code{db.data.frame} object. More precisely, a \code{db.table}
   object if it points to an existing table in the database, and a
-  \code{db.view} object 
+  \code{db.view} object
   if it points to an existing view in the database.
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -76,20 +76,28 @@ is.temp = FALSE)
 
 \examples{
 \dontrun{
-## create connection to a database
-db.connect(port = 5433) # using default values
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname)
 
 ## create a table using as.db.data.frame
-x <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
 ## create an object pointing to the table
-y <- db.data.frame("abalone")
+y <- db.data.frame("abalone", conn.id = cid)
 
 ## x and y point to the same table
 eql(x, y) # returns TRUE
 
 ## create an object pointing to a table in a schema
-z <- db.data.frame("myschema.mytable")
+db.q("create schema myschema", conn.id = cid)
+z <- as.db.data.frame(abalone, "myschema.abalone", conn.id = cid)
+db.q("drop schema myschema cascade", conn.id = cid)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

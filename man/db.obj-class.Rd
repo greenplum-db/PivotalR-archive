@@ -6,7 +6,7 @@
 \title{Abstract Class \code{"db.obj"}}
 \description{
   The super class of \code{\linkS4class{db.data.frame}} and
-  \code{\linkS4class{db.Rquery}} 
+  \code{\linkS4class{db.Rquery}}
 }
 
 \section{Objects from the Class}{
@@ -20,7 +20,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -32,9 +32,9 @@
   and at the same time creates a new table in the database.
 
   \code{\linkS4class{db.data.frame}} and \code{\linkS4class{db.Rquery}}
-  are the sub-classes. 
+  are the sub-classes.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} or \code{\link{lookat}} displays a part of the table
 }
 
 \keyword{classes}

@@ -57,17 +57,17 @@
 \value{
   A \code{db.Rquery} object. It computes the centering and/or scaling of
   code{x} for each column including array elements. The result can be
-  viewed using \code{\link{preview}} or \code{\link{lookat}}.
+  viewed using \code{\link{lk}} or \code{\link{lookat}}.
 
   The numeric
   centering and scalings used (if any) are returned as attributes
-  "scaled:center" and "scaled:scale". The number of rows in the table is also 
+  "scaled:center" and "scaled:scale". The number of rows in the table is also
   returned as the attribute "row.number".
 }
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -78,12 +78,15 @@
 
 \examples{
 \dontrun{
-help("scale,db.obj-method") # display this doc
+## help("scale,db.obj-method") # display this doc
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname)
 
-## Suppose a valid database connection 1 has been created by db.connect
-
-## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone") # use default connection 1
+x <- as.db.data.frame(abalone, conn.id = cid)
+lk(x, 10)
 
 s <- scale(x[-c(1,2)]) # scale all numeric columns
 
@@ -91,7 +94,12 @@ centers <- attr(s, "scaled:center")
 scales <- attr(s, "scaled:scale")
 
 ## create the scaled table
+delete("scaled_abalone")
 y <- as.db.data.frame(s, "scaled_abalone")
+
+lk(y, 10)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

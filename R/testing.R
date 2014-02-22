@@ -22,7 +22,9 @@
 skip_if <- function(cond, test.expr)
 {
     expr <- deparse(substitute(test.expr))
-    l <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
+    l1 <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
+    l2 <- sum(sapply(gregexpr("expect_this\\(", expr), function(s) sum(s>0)))
+    l <- l1 + l2
     if (cond) {
         if (.localVars$test.reporter %in% c("summary", "minimal"))
             for (i in seq_len(l)) cat(testthat::colourise(",", fg = "purple"))
@@ -41,17 +43,17 @@ skip_if <- function(cond, test.expr)
 
 ## ----------------------------------------------------------------------
 
-test <- function(path = "tests", filter = NULL,
+test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
                  reporter = c("summary", "tap", "minimal", "stop"),
                  env.file = NULL, env.vars = list(),
                  clean.test.env = FALSE, run = c("tests", "examples", "both"))
 {
     run <- match.arg(run)
 
-    if (path == "tests")
-        test_path <- system.file(path, package = .this.pkg.name)
+    if (tests.path == "tests")
+        test_path <- system.file(tests.path, package = .this.pkg.name)
     else
-        test_path <- path
+        test_path <- tests.path
 
     if (test_path == "")
         stop("You need to use --install-tests option to install ",
@@ -70,8 +72,9 @@ test <- function(path = "tests", filter = NULL,
             curr.conn.id <- integer(0)
         else
             curr.conn.id <- .localVars$conn.id[,1]
-        for (i in setdiff(curr.conn.id, origin.conn.id))
+        for (i in setdiff(curr.conn.id, origin.conn.id)) {
             db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+        }
     }
 
     reporter <- match.arg(reporter)
@@ -99,30 +102,31 @@ test <- function(path = "tests", filter = NULL,
         for (var in ls(.testing.env, all.names = TRUE))
             rm(var, envir = .testing.env)
 
+    filter <- c(filter, filter)
+
     if (run == "examples" || run == "both") {
-        cat(testthat::colourise("Running examples in the user doc ---------\n",
+        cat(testthat::colourise("\nRunning examples in the user doc ------\n",
                                 fg = "light blue"))
-        tryCatch(.run.doc.example(reporter, filter),
-                 interrupt = function(cond) {
+        tryCatch(.run.doc.example(reporter, filter[1], man.path),
+                 finally = {
                      cleanup.conn()
                      unlink(.localVars$example.tmppath, recursive = TRUE)
                      rm("example.tmppath", envir = .localVars)
                  })
-        cleanup.conn()
-        unlink(.localVars$example.tmppath, recursive = TRUE)
-        rm("example.tmppath", envir = .localVars)
     }
 
     if (run == "tests" || run == "both") {
-        cat(testthat::colourise("Running tests ----------------------------\n",
+        cat(testthat::colourise("\nRunning tests -------------------------\n",
                                 fg = "light blue"))
         tryCatch(testthat::test_dir(test_path, reporter = reporter,
-                                    env = .testing.env, filter = filter),
-                 interrupt = function(cond) cleanup.conn())
-        cleanup.conn()
+                                    env = .testing.env, filter = filter[2]),
+                 finally = {
+                     cleanup.conn()
+                 })
     }
 
     if (reporter$failed) {
+        cleanup.conn()
         stop("Test failures", call. = FALSE)
     }
     invisible()
@@ -157,10 +161,11 @@ has_no_error <- function ()
         res <- try(force(expr), TRUE)
         has_error <- inherits(res, "try-error")
         if (has_error) {
+            err <- gsub("'", "\\\\'", as.character(res))
             return (eval(parse(
                 text = paste("expectation(FALSE,",
                 paste("'code generated an error: ",
-                      as.character(res), "'", sep = "")))))
+                      err, "')", sep = "")))))
         }
         eval(parse(text = "expectation(TRUE, '')"))
     }
@@ -169,10 +174,13 @@ has_no_error <- function ()
 ## ----------------------------------------------------------------------
 
 ## run doc example
-.run.doc.example <- function(reporter, filter)
+.run.doc.example <- function(reporter, filter, r_root = NULL)
 {
     library(tools)
-    x <- tools::Rd_db(.this.pkg.name)
+    if (is.null(r_root))
+        x <- tools::Rd_db(.this.pkg.name)
+    else
+        x <- tools::Rd_db(dir = r_root)
 
     outpath <- paste("/tmp/", .unique.string(), "/", sep = "")
     dir.create(outpath, recursive = TRUE)
@@ -196,11 +204,12 @@ has_no_error <- function ()
             cat(".get.param.inputs(c(",
                 paste("'", params, "'", collapse = ",", sep = ""),
                 "))\n\n", sep = "", file = con)
-
-            cat("test_that('Example in ", filename, "', {expect_that({",
+            cat("test_that('Example in ", filename,
+                "', expect_this(capture.output({",
                 sep = "", file = con)
             for (line in z[!pa]) cat(line, file = con)
-            cat("}, has_no_error())})", file = con)
+            cat("}, file = '", outpath, "/tmp-", filename,
+                "-out.txt'), has_no_error()))", sep = "", file = con)
             close(con)
         }
     }
@@ -209,4 +218,35 @@ has_no_error <- function ()
                        env = .testing.env, filter = filter)
 
     invisible()
+}
+
+## ----------------------------------------------------------------------
+
+expect_this <- function(expr, judge)
+{
+    ## connections before testing
+    ## so that we can close all un-closed connections after testing
+    if (identical(.localVars$conn.id, integer(0)))
+        origin.conn.id <- integer(0)
+    else
+        origin.conn.id <- .localVars$conn.id[,1]
+
+    ## close unclosed connection opened during testing
+    cleanup.conn <- function() {
+        if (identical(.localVars$conn.id, integer(0)))
+            curr.conn.id <- integer(0)
+        else
+            curr.conn.id <- .localVars$conn.id[,1]
+        for (i in setdiff(curr.conn.id, origin.conn.id))
+            db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+    }
+
+    expr.str <- deparse(substitute(expr), width.cutoff=500)
+    expr.str <- paste(expr.str[2:(length(expr.str)-1)], collapse = "\n")
+
+    expect_that(tryCatch(expr,
+                         error = function(c) {
+                             cleanup.conn()
+                             stop("\n\n", expr.str, "\n\nERROR: ", c$message)
+                         }), judge)
 }

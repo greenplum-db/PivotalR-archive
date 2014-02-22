@@ -55,7 +55,7 @@
 \value{ For ungrouped regressions, \code{logLik} returns an object of
     class \code{logLik}, and \code{extractAIC} returns a length-2
     numeric vector giving the edf and AIC.
-    
+
     For grouped regressions, \code{logLik} and \code{extractAIC} return
   a list giving the output of these methods for each of the component
   models. Similarly, \code{AIC} for a grouped regression returns a
@@ -63,7 +63,7 @@
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -72,9 +72,15 @@
 }
 
 \examples{ \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table
-x <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")
@@ -82,6 +88,7 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 AIC(fit)
 
 AIC(fit[[1]])
-} }
 
-
+db.disconnect(cid, verbose = FALSE)
+}
+}

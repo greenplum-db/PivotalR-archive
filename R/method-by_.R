@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## by method
 ## -----------------------------------------------------------------------
@@ -9,6 +8,7 @@ setMethod (
     "by",
     signature(data = "db.obj"),
     function (data, INDICES, FUN, ..., simplify = TRUE) {
+        if (is.null(INDICES)) return (FUN(data, ...))
         if (is.list(INDICES))
             indx <- .combine.list(INDICES)
         else
@@ -32,7 +32,7 @@ setMethod (
         }
 
         use <- get.piece(data, as.character(indx), v)
-        fit0 <- FUN(use)
+        fit0 <- FUN(use, ...)
         if (!is(fit0, "db.obj")) {
             vals <- lk(unique(db.array(as.character(indx, array = FALSE))))
             if (!is.data.frame(vals))
@@ -47,7 +47,8 @@ setMethod (
                 }
 
                 use <- get.piece(data, as.character(indx), w)
-                rst[[count+1]] <- list(index = vals[i,], result = FUN(use))
+                rst[[count+1]] <- list(index = vals[i,],
+                                       result = FUN(use, ...))
                 count <- count + 1
             }
             return (rst)
@@ -99,7 +100,7 @@ setMethod (
                 src <- parent
             }
 
-            tmp <- FUN(data)
+            tmp <- FUN(data, ...)
 
             expr <- tmp@.expr
             col.name <- tmp@.col.name

@@ -10,7 +10,7 @@
 }
 \section{Objects from the Class}{
 Objects can be created by calls of \code{\link{db.data.frame}} or
-\code{\link{as.db.data.frame}} 
+\code{\link{as.db.data.frame}}
 }
 
 \section{Slots}{
@@ -21,7 +21,7 @@ Objects can be created by calls of \code{\link{db.data.frame}} or
       Object of class \code{"character"}. The name of the primary key
       column name when the view is materialized. The view in the
    database does not have a primary key. Currently only one
-      primary key column is 
+      primary key column is
       supported. This value can be set during the creation of the object
       when using the function \code{\link{db.data.frame}}. The functions
       \code{\link{key}} and \code{\link{key<-}} can be used to get and
@@ -42,7 +42,7 @@ Class \code{"\linkS4class{db.obj}"}, by class "db.data.frame", distance 2.
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -55,13 +55,13 @@ Class \code{"\linkS4class{db.obj}"}, by class "db.data.frame", distance 2.
 
   \code{\linkS4class{db.data.frame}} is the superclass.
 
-  \code{\linkS4class{db.table}} is the other subclass of 
+  \code{\linkS4class{db.table}} is the other subclass of
   \code{\linkS4class{db.data.frame}}
 
   \code{\linkS4class{db.Rquery}} is another sub-class of
   \code{\linkS4class{db.obj}}.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} or \code{\link{lookat}} display a part of the table
 }
 
 \keyword{classes}

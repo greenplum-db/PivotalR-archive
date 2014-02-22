@@ -47,21 +47,28 @@
 
 \seealso{
   \code{\link{by}} has similar syntax to this function.
-  
-  \code{\link{preview}} to view portion of the data table
+
+  \code{\link{lk}} or \code{\link{lookat}} to view portion of the data table
 }
 
 \examples{
 \dontrun{
-# Suppose that a valid connection with ID 1 exists
-x  <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(x, 10)
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-y  <- sort(x, decreasing = FALSE, list(x$nation, x$sector) )
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
+
+y  <- sort(x, decreasing = FALSE, list(x$id, x$sex) )
 # get the SQL query to be run
 content(y)
 # get the sorted output
-preview(y)
+lk(y, 20)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

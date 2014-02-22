@@ -20,7 +20,7 @@
   table/view that it points to. It deletes a \code{db.Rquery} object. It
   can also directly delete a table or view in the database. When applied
   onto some composite data objects, it deletes the data table wrapped by
-  them. 
+  them.
 }
 
 \usage{
@@ -60,7 +60,7 @@ FALSE)
     \code{db.data.frame} object;
 
     Or a string, the table/view name to delete in the database;
-    
+
     Or an object which is the result of \code{\link{madlib.arima}}. In the
     this case, the result model tables wrapped by \code{model},
     \code{residuals} and \code{statistics} will be deleted.
@@ -84,7 +84,7 @@ FALSE)
     Or an object which is the result of \code{\link{generic.bagging}}.         In this case, all result model tables will be deleted.
 
 Or an object which is the result of \code{\link{madlib.elnet}}. In this casem all result model tables will be deleted.
-} 
+}
 
 \item{conn.id}{
   An integer, default is 1. The connection ID to the database.
@@ -115,14 +115,14 @@ Or an object which is the result of \code{\link{madlib.elnet}}. In this casem al
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
 \seealso{
   \code{\link{db.data.frame}} creates an object pointing to a table/view
   in the database.
-  
+
   \code{\link{db.objects}} lists all tables and views in a database
   together with their schema.
 
@@ -139,32 +139,40 @@ Or an object which is the result of \code{\link{madlib.elnet}}. In this casem al
 
 \examples{
 \dontrun{
-## Suppose a valid connection 2 exists
-delete("abalone", 2, is.temp = TRUE)
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-delete("abalone", 2, is.temp = FALSE)
+delete("abalone", cid, is.temp = TRUE)
 
-x <- as.db.data.frame(abalone, "abalone", conn.id = 2)
+delete("abalone", cid, is.temp = FALSE)
 
-preview(x, 10)
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid)
 
-y <- as.db.data.frame(abalone, "abalone", conn.id = 2, is.temp = TRUE)
+lk(x, 10)
 
-preview(y, 10)
+y <- as.db.data.frame(abalone, "abalone", conn.id = cid, is.temp = TRUE)
 
-db.existsObject("abalone", 2, is.temp = TRUE)
+lk(y, 10)
 
-db.existsObject("abalone", 2, is.temp = FALSE)
+db.existsObject("abalone", cid, is.temp = TRUE)
 
-delete("abalone", 2)
+db.existsObject("abalone", cid, is.temp = FALSE)
+
+delete("abalone", cid)
 
 p <- db.objects()
-p[p[,2] == "abalone",]
+p[p == "abalone"]
 
 ## Example: delete multiple tables
 ## all table in public schema start with "ornste"
-to.delete <- db.objects("public.ornste", conn.id = 2)
-for (table.name in to.delete) delete(table.name, conn.id = 2)
+to.delete <- db.objects("public.ornste", conn.id = cid)
+for (table.name in to.delete) delete(table.name, conn.id = cid)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

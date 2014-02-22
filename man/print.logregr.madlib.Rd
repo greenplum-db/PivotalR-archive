@@ -12,10 +12,10 @@
 
 \usage{
 \method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") -
-3L), ...) 
+3L), ...)
 
 \method{print}{logregr.madlib.grps}(x, digits = max(3L,
-getOption("digits") - 3L), ...) 
+getOption("digits") - 3L), ...)
 
 \method{show}{logregr.madlib}(object)
 
@@ -57,23 +57,9 @@ getOption("digits") - 3L), ...)
 }
 
 \examples{
-    \dontrun{
-## Suppose that a valid connection with ID 1 exists
-## create a table from the example data.frame
-source_data <- as.db.data.frame(abalone, "abalone")
-preview(source_data, 10)
-
-## logistic regression
-fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)
-
-## display a model for one group 
-fit[[1]]
-print(f[[1]])
-
-## display all models for all groups
-fit
-print(fit)
-    }
+\dontrun{
+## see the examples in madlib.glm
+}
 }
 
 \keyword{IO}

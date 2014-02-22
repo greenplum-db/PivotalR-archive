@@ -10,7 +10,7 @@
 }
 \section{Objects from the Class}{
 Objects can be created by calls of \code{\link{db.data.frame}} or
-\code{\link{as.db.data.frame}} 
+\code{\link{as.db.data.frame}}
 }
 \section{Slots}{
   As a sub-class, this class has all the slots of
@@ -28,7 +28,7 @@ Objects can be created by calls of \code{\link{db.data.frame}} or
     \item{\code{.dim}:}{
       Object of class \code{"numeric"}. A two-integer array, the
       dimension information of the table that this object points to. The
-      first 
+      first
       integer is the total row number of the table, and the second is
       the number of columns of the
       table. \code{\link{dim,db.table-method}} gets this value.
@@ -46,7 +46,7 @@ See \code{\linkS4class{db.data.frame}} for all the methods that can take
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -59,13 +59,13 @@ See \code{\linkS4class{db.data.frame}} for all the methods that can take
 
   \code{\linkS4class{db.data.frame}} is the superclass.
 
-  \code{\linkS4class{db.view}} is the other subclass of 
+  \code{\linkS4class{db.view}} is the other subclass of
   \code{\linkS4class{db.data.frame}}
 
   \code{\linkS4class{db.Rquery}} is another sub-class of
   \code{\linkS4class{db.obj}}.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} or \code{\link{lookat}} display a part of the table
 }
 
 \keyword{classes}

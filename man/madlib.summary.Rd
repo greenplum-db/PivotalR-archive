@@ -117,27 +117,36 @@ madlib.summary(x, target.cols = NULL, grouping.cols = NULL,
 \examples{
 \dontrun{
 ## get the help for a method
-help("madlib.summary")
+## help("madlib.summary")
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## Suppose that a valid connection with ID 1 exists
-x  <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(x, 10)
+delete("abalone", conn.id = cid)
+as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+x  <- db.data.frame("abalone", conn.id = cid, verbose = FALSE)
+
+lk(x, 10)
 
 # madlib.summary
 summary_result  <- madlib.summary(x)
 print(summary_result)
 
 # madlib.summary
-summary_result  <- madlib.summary(x, target.cols=c('assets', 'sector'),
-                                    grouping.cols=c('nation'),
+summary_result  <- madlib.summary(x, target.cols=c('rings', 'length', 'diameter'),
+                                    grouping.cols=c('sex'),
                                     get.distinct=FALSE,
                                     get.quartiles=TRUE,
                                     ntile=c(0.1, 0.6),
                                     n.mfv=5,
                                     estimate=TRUE,
                                     interactive=FALSE)
+
 print(summary_result)
 
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

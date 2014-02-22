@@ -64,10 +64,15 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 
 \examples{
 \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
 ## set up the database connection
-db.connect(port = 14526, dbname = "madlib")
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-y <- db.data.frame("abalone")
+delete("abalone", conn.id = cid)
+as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+y <- db.data.frame("abalone", conn.id = cid)
 
 fit <- generic.bagging(function(data) {
                            madlib.lm(rings ~ . - id - sex, data = data)
@@ -76,6 +81,8 @@ fit <- generic.bagging(function(data) {
 pred <- predict(fit, newdata = y) # make prediction
 
 lookat(mean((y$rings - pred)^2)) # mean squared error
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

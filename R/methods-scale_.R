@@ -14,9 +14,9 @@ setMethod (
             stop("center and scale must be numeric or logical !")
 
         conn.id <- conn.id(x)
-        db.str <- (.get.dbms.str(conn.id))$db.str
-        if (db.str == "HAWQ")
-            stop("HAWQ does not support this function yet!")
+        db <- .get.dbms.str(conn.id)
+        if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+            stop("MADlib on HAWQ 1.1 does not support this function yet!")
 
         warnings <- .suppress.warnings(conn.id)
 
@@ -29,27 +29,31 @@ setMethod (
             y <- db.array(x)
         names(y) <- "vec"
         col.dim <- length(strsplit(y@.expr, ",")[[1]])
-        
+
         madlib <- schema.madlib(conn.id)
 
         both.numeric <- 0
         if (is.numeric(center)) {
             both.numeric <- both.numeric + 1
-            if (length(center) != lg)
+            if (length(center) != lg) {
+                .restore.warnings(warnings)
                 stop("The length of center vector must be equal to ",
                      "the number of columns of ", deparse(substitute(x)),
                      " (include array elements)!")
+            }
             avg1 <- center
         }
         if (is.numeric(scale)) {
             both.numeric <- both.numeric + 1
-            if (length(scale) != lg)
+            if (length(scale) != lg) {
+                .restore.warnings(warnings)
                 stop("The length of scale vector must be equal to ",
                      "the number of columns of ", deparse(substitute(x)),
                      " (include array elements)!")
+            }
             std1 <- scale
         }
-        
+
         if (both.numeric != 2) {
             ## NOTE: I am using unnest here
             ## For the reason, please see the definition of
@@ -61,7 +65,7 @@ setMethod (
                          ".utils_var_scales(vec, ", col.dim,
                          ")) as f, count(vec) as n from (",
                          content(y), ") h) s", sep = "")
-            res <- .get.res(sql, conn.id = conn.id)
+            res <- db.q(sql, conn.id = conn.id, verbose = FALSE, nrows = -1)
             n <- res$n[1] # row dimension
             ## savg <- as.vector(arraydb.to.arrayr(res$mean, "double"))
             savg <- res$mean

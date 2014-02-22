@@ -32,13 +32,13 @@
 }
 
 \value{ For ungrouped regressions, a named numeric vector giving the fitted coefficients.
-    
+
     For grouped regressions, a list giving the coefficients for each of the component
   models.
 }
 
 \author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -47,9 +47,15 @@
 }
 
 \examples{ \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table
-x <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 "binomial")
@@ -57,6 +63,8 @@ fit <- madlib.glm(rings < 10 ~ . - id | sex, data = x, family =
 coef(fit)
 
 coef(fit[[1]])
+
+db.disconnect(cid, verbose = FALSE)
 } }
 
 \keyword{utility}

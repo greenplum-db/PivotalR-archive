@@ -12,7 +12,7 @@
 
 \section{Objects from the Class}{
 Objects can be created by calls of \code{\link{db.data.frame}} or
-\code{\link{as.db.data.frame}}. 
+\code{\link{as.db.data.frame}}.
 
 The object represents a real table/view in the database. Usually it is
 NOT recommended to directly manipulate the internal slots of these objects.
@@ -34,7 +34,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
 
     \item{\code{.conn.id}:}{
       Object of class \code{"numeric"}, an integer. The ID number of the
-      database 
+      database
       connection where the table resides. The functions
       \code{\link{conn.id}} and \code{\link{conn.id<-}} can get and set
       this value.
@@ -52,7 +52,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
 
     \item{\code{.col.udt_name}:}{
       Object of class \code{"character"}. The 1D array of column udt
-      names of 
+      names of
       the table/view that this \code{db.data.frame} points to. This is
       not to used by normal users.
     }
@@ -77,7 +77,7 @@ NOT recommended to directly manipulate the internal slots of these objects.
       \code{.factor.suffix} is a random string, otherwise it is just an
       empty string. This is not to be used by the normal users. It is
       used only the MADlib wrapper functions that support categorical
-      variables. 
+      variables.
     }
 
     \item{\code{.factor.ref}:}{
@@ -117,8 +117,8 @@ Class \code{\linkS4class{db.obj}}, directly.
 \code{\link{dim,db.Rquery-method}}, \code{\link{names,db.obj-method}},
 \code{\link{conn.id}}, \code{\link{conn.id<-}},
 \code{\link{eql}}, \code{\link{key}}, \code{\link{key<-}},
-\code{\link{merge,db.obj,db.obj-method}}, 
-\code{\link{preview}}, \code{\link{print,db.data.frame-method}},
+\code{\link{merge,db.obj,db.obj-method}},
+\code{\link{print,db.data.frame-method}},
 \code{\link{show,db.data.frame-method}},
 \code{\link{sort,db.obj-method}}, \code{\link{subset,db.obj-method}},
 \code{\link{Arith methods}}, \code{\link{Compare methods}},
@@ -129,7 +129,7 @@ Class \code{\linkS4class{db.obj}}, directly.
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -148,17 +148,26 @@ Class \code{\linkS4class{db.obj}}, directly.
   \code{\linkS4class{db.Rquery}} is another sub-class of
   \code{\linkS4class{db.obj}}.
 
-  \code{\link{preview}} display a part of the table
+  \code{\link{lk}} or \code{\link{lookat}} display a part of the table
 }
 
 \examples{
 \dontrun{
 showClass("db.data.frame")
 
-db.connect(port = 5433)
-x <- db.data.frame("abalone") # x points to table "abalone"
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-preview(x)
+delete("abalone", conn.id = cid)
+as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+x <- db.data.frame("abalone", conn.id = cid, verbose = FALSE) # x points to table "abalone"
+
+lk(x)
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

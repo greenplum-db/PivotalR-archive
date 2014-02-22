@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Wrapper function for MADlib's linear, logistic and multinomial
 ## logistic regressions
@@ -74,14 +73,14 @@ madlib.glm <- function (formula, data,
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     tbl.source <- analyzer$tbl.source
 
-    db.str <- (.get.dbms.str(conn.id(data)))$db.str
+    db <- .get.dbms.str(conn.id(data))
 
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL::text"
     else
-        if (db.str == "HAWQ")
-            stop("Right now MADlib on HAWQ does not support grouping ",
+        if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+            stop("MADlib on HAWQ 1.1 does not support grouping ",
                  "in logistic regression !")
         else
             grp <- paste("'", params$grp.str, "'")
@@ -91,7 +90,7 @@ madlib.glm <- function (formula, data,
     ## tbl.source <- gsub("\"", "", content(data))
     tbl.source <- content(data)
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    if (db.str == "HAWQ") {
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
         tbl.output <- NULL
         sql <- paste("select (f).* from (select ", madlib,
                      ".logregr('", tbl.source, "', '",
@@ -110,13 +109,14 @@ madlib.glm <- function (formula, data,
     }
 
     ## execute the logistic regression and get the result
-    res <- .get.res(sql, tbl.output, conn.id)
+    res <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
+                conn.id = conn.id, verbose = FALSE)
 
     ## drop temporary tables
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
 
-    if (db.str == "HAWQ")
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
         model <- NULL
     else
         model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
@@ -170,7 +170,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
-        
+
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
             cond <- .row.action(.combine.list(Map(function(x) {
@@ -194,7 +194,7 @@ madlib.glm <- function (formula, data,
 
         rst[[i]]$origin.data <- origin.data
         rst[[i]]$nobs <- nrow(rst[[i]]$data)
-        
+
         class(rst[[i]]) <- "logregr.madlib"
     }
 
@@ -263,7 +263,7 @@ print.logregr.madlib.grps <- function (x,
                                       `Pr(>|z|)` = x[[i]]$p_values),
                                 row.names = rows, check.names = FALSE),
                      digits = digits, signif.stars = TRUE)
-        
+
         cat("Log likelihood:", x[[i]]$log_likelihood, "\n")
         cat("Condition Number:", x[[i]]$condition_no, "\n")
         cat("Number of iterations:", x[[i]]$num_iterations, "\n")
@@ -320,7 +320,7 @@ print.logregr.madlib <- function (x,
                                   `Pr(>|z|)` = x$p_values),
                             row.names = rows, check.names = FALSE),
                  digits = digits, signif.stars = TRUE)
-    
+
     cat("Log likelihood:", x$log_likelihood, "\n")
     cat("Condition Number:", x$condition_no, "\n")
     cat("Number of iterations:", x$num_iterations, "\n")

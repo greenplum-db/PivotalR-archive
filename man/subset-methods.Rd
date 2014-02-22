@@ -43,15 +43,20 @@
 
 \examples{
 \dontrun{
-## Suppose that a valid connection with ID 1 exists
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## create a table from the example data.frame
-x  <- db.data.frame("madlibtestdata.lin_ornstein")
-preview(x, 10)
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
 
-preview(x[1:3])
-preview(subset(x, 1:3))
-    }
+lk(x[1:3])
+lk(subset(x, 1:3))
+
+db.disconnect(cid, verbose = FALSE)
+}
 }
 
 \keyword{data operation}

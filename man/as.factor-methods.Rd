@@ -37,7 +37,7 @@
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -52,12 +52,16 @@
 \examples{
 \dontrun{
 ## get help for a method
-help("as.factor,db.obj-method")
+## help("as.factor,db.obj-method")
 
-## Suppose that a valid connection with ID 1 is already created by db.connect
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone") # use default connection 1
+## create a temporary table from the example data.frame "abalone"
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## set sex to be a categorical variable
 x$sex <- as.factor(x$sex)
@@ -66,18 +70,22 @@ fit1 <- madlib.lm(rings ~ . - id, data = x) # linear regression
 
 fit2 <- madlib.glm(rings < 10 ~ . - id, data = x, family = "binomial") # logistic regression
 
-## create another R db.data.frame object pointing to "abalone"
-z <- db.data.frame("abalone", conn.id = 1) # explicitly specify the connection
+## another temporary table
+z <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## specify factor during fitting
 fit3 <- madlib.lm(rings ~ as.factor(sex) + length + diameter, data = z)
 
-fit4 <- madlib.glm(rings < 10 ~ as.factor(sex) + length + diameter, data
+## as.factor is automatically used onto text column
+## so as.factor is not necessary
+fit4 <- madlib.glm(rings < 10 ~ sex + length + diameter, data
 = z, family = "binomial")
 
 ## using relevel to change the reference level
 x$sex <- relevel(x$sex, ref = "M")
 madlib.lm(rings ~ . - id, data = x) # use "M" as the reference level
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

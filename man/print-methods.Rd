@@ -46,7 +46,7 @@ information associated with a \code{db.table} or \code{db.view} object.
   database, the SQL database host, and the connection ID.
 
 
-	When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this function displays the temporary status of the input, and the table that it is derived from.  }
+    When the signature \code{x} is a \code{db.data.frame} object, the function also displays the associated table.  When the signature \code{x} is a \code{db.Rquery} object, this function displays the temporary status of the input, and the table that it is derived from.  }
 
 \value{
   This function returns nothing.
@@ -59,24 +59,24 @@ information associated with a \code{db.table} or \code{db.view} object.
 }
 
 \seealso{
-  \code{\link{preview}} Displays the contents of an associated table.
+  \code{\link{lk}} or \code{\link{lookat}} Displays the contents of an associated table.
 }
 \examples{
-  \dontrun{
-## Suppose that a valid connection with ID 1 exists
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## printing db.data.frame object
-print(x) # Display the associated table, and database information for x
-show(x)
-##Alternative way of doing the same thing
-x# Display the associated table, and database information for x
-  }
+x # Display the associated table, and database information for x
+
+db.disconnect(cid, verbose = FALSE)
+}
 }
 \keyword{IO}
 \keyword{utility}
-
-
-

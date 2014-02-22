@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Summary of a db.obj
 ## -----------------------------------------------------------------------
@@ -13,10 +12,10 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     ## Only newer versions of MADlib are supported
     .check.madlib.version(x)
 
-    db.str <- (.get.dbms.str(conn.id(x)))$db.str
-    if (db.str == "HAWQ")
-        stop("Right now MADlib on HAWQ does not support table summary !")
-    
+    db <- .get.dbms.str(conn.id(x))
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+        stop("MADlib on HAWQ 1.1 does not support table summary !")
+
     if (!is(x, "db.obj"))
         stop("Cannot operate on non db.obj objects!")
 
@@ -26,7 +25,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
              "the data!")
 
     warnings <- .suppress.warnings(conn.id(x))
-    
+
     if (is(x, "db.view") || is(x, "db.Rquery")) {
         if (interactive) {
             cat(deparse(substitute(x)),
@@ -61,7 +60,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
     get.quartiles <- .logical.string(get.quartiles)
     ntile <- .array.string(ntile, "FLOAT8[]")
     estimate <- .logical.string(estimate)
-    
+
     sql <- paste("SELECT ", schema.madlib(conn.id(x)),
                  ".summary('", tbl, "', '", out.tbl, "', ", target.cols,
                  ", ", grouping.cols, ",", get.distinct, ",",
@@ -76,17 +75,17 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                             conn.id(x)), silent = TRUE)
     if (is(res, .err.class))
         stop("Could not do the summary!")
-    
+
     ## .db.removeTable(out.tbl, conn.id(x))
     if (to.drop.tbl) .db.removeTable(tbl, conn.id(x))
 
     attr(res, "summary") <- db.data.frame(out.tbl, conn.id = conn.id(x),
                                           verbose = FALSE)
-    
+
     class(res) <- "summary.madlib"
 
     .restore.warnings(warnings)
-    
+
     return (res)
 }
 
@@ -106,7 +105,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
 {
     if (is.null(str))
         "NULL::TEXT"
-    else 
+    else
         ## paste("'", paste("\"", str, "\"", collapse = ", ", sep = ""),
         ##       "'", sep = "")
         paste("'", paste(str, collapse = ", ", sep = ""),
@@ -161,7 +160,7 @@ print.summary.madlib <- function (x,
         dat <- x[g, -(1:2)]
         dat.col <- dat[,1]
         dat <- dat[,-1]
-        
+
         output <- .arrange.summary(dat, dat.col, dat.names,
                                    digits = digits)
         print(format(output, justify = "left"), row.names = F, right = FALSE)

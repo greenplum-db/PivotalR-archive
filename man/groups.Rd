@@ -50,31 +50,38 @@
 
 \seealso{
   \code{\link{madlib.glm}} wrapper for MADlib linear and logistic regressions.
-  
+
   \code{\link{madlib.lm}} wrapper for MADlib linear regression
 
   \code{\link{predict.lm.madlib}}, \code{\link{predict.lm.madlib.grps}},
   \code{\link{predict.logregr.madlib}},
-  \code{\link{predict.logregr.madlib.grps}} make 
+  \code{\link{predict.logregr.madlib.grps}} make
   predictions for new data.
 }
 
 
 \examples{
-    \dontrun{
-## Suppose that a valid connection with ID 1 exists
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 ## create a table from the example data.frame
-source_data <- as.db.data.frame(abalone, "abalone")
-preview(source_data, 10)
+delete("abalone", conn.id = cid)
+source_data <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
+lk(source_data, 10)
 
 ## logistic regression
-fit <- madlib.logregr(rings < 10 ~ . - id | sex , data = source_data)
+fit <- madlib.glm(rings < 10 ~ . - id | sex , data = source_data, family = "binomial")
 
 groups(fit) # all grouping column values
 
 groups(fit[[1]]) # the first model's grouping column value
-       }
+
+db.disconnect(cid, verbose = FALSE)
+}
 }
 
 \keyword{madlib}

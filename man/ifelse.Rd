@@ -18,7 +18,7 @@
     \item{test}{
       A \code{db.obj} object, which has only one column. The column can be casted into boolean values.
     }
- 
+
     \item{yes}{
       A normal value or a \code{db.obj} object. It is the returned value when \code{test} is \code{TRUE}.
     }
@@ -34,7 +34,7 @@
 
 \author{
   Author: Hong Ooi, Pivotal Inc.
-  
+
   Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
 }
 
@@ -42,11 +42,21 @@
   \code{\linkS4class{db.obj}}
 }
 
-\examples{ \dontrun{
+\examples{
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
 ## create a table
-x <- as.db.data.frame(abalone, "abalone")
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## create a new db.obj with one-column,
 ## and values "small" or "big"
 z <- ifelse(x$rings < 10, "small", "big")
-} }
+
+db.disconnect(cid, verbose = FALSE)
+}
+}

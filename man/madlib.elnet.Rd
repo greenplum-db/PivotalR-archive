@@ -42,8 +42,8 @@ TRUE, method = c("fista", "igd", "sgd", "cd"), control = list(), glmnet
   A numeric value in [0,1], elastic net mixing parameter. The
           penalty is defined as
 
-                     (1-alpha)/2||beta||_2^2+alpha||beta||_1.           
-          
+                     (1-alpha)/2||beta||_2^2+alpha||beta||_1.
+
           'alpha=1' is the lasso penalty, and 'alpha=0' the ridge
           penalty.
 
@@ -130,18 +130,18 @@ All parameters have been explained above. The only one left is \code{verbose}.
 }
 
 \note{
-  The coordinate descent (\code{method = "cd"}) algorithm is currently only available in PivotalR. In the future, we will also implement it in MADlib. The idea is to do some part of the computation in memory. Due to the memory usage liimitation of the database, this method cannot handle the fitting where the number of features is too large (a couple of thousands). 
+  The coordinate descent (\code{method = "cd"}) algorithm is currently only available in PivotalR. In the future, we will also implement it in MADlib. The idea is to do some part of the computation in memory. Due to the memory usage liimitation of the database, this method cannot handle the fitting where the number of features is too large (a couple of thousands).
 }
 
 \details{
   the objective function for
      \code{"gaussian"} is
 
-                       1/2  RSS/nobs + lambda*penalty,                  
-     
+                       1/2  RSS/nobs + lambda*penalty,
+
      and for the other models it is
 
-                       -loglik/nobs + lambda*penalty.   
+                       -loglik/nobs + lambda*penalty.
 }
 
 \value{
@@ -245,13 +245,19 @@ All parameters have been explained above. The only one left is \code{verbose}.
 }
 \examples{
 \dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
 x <- matrix(rnorm(100*20),100,20)
 y <- rnorm(100, 0.1, 2)
 
-dat <- as.data.frame(cbind(x, y))
+dat <- data.frame(x, y)
 
 delete("eldata")
-z <- as.db.data.frame(dat, "eldata")
+z <- as.db.data.frame(dat, "eldata", conn.id = cid, verbose = FALSE)
 
 fit <- madlib.elnet(y ~ ., data = z, alpha = 0.2, lambda = 0.05, control
 = list(random.stepsize=TRUE))
@@ -260,6 +266,7 @@ fit
 
 lk(mean((z$y - predict(fit, z))^2)) # mean square error
 
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

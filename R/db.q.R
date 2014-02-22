@@ -9,30 +9,33 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
         stop(conn.id, " is not a valid connection ID. ",
              "Use db.list() to view the available choices")
 
-    warns <- .suppress.warnings (conn.id, "warning")
     sql <- paste(..., sep = sep)
     if (verbose) {
         message("Executing in database connection ", conn.id, ":\n")
         cat(sql, "\n\n")
     }
-    ## if (!is.character(sql))
-    ##     stop("can only execte a SQL query string!")
+
+    warns <- .suppress.warnings (conn.id, "warning")
 
     if (is.null(nrows) || (is.character(nrows) && nrows == "all")
         || nrows <= 0) nrows <- -1
-    res <- try(.db.sendQuery(sql, conn.id), silent = TRUE)
-    if (is(res, .err.class)) {
+    res <- tryCatch(
+        .db.sendQuery(sql, conn.id),
+        error = function(c) c,
+        interrupt = function(c) .restore.warnings(warns))
+    if (is(res, "error")) {
         .restore.warnings(warns)
-        stop(res[1])
+        stop(res$message)
     }
-    dat <- try(.db.fetch(res, nrows), silent = TRUE)
-    if (is(dat, .err.class)) {
-        .db.clearResult(res)
-        .restore.warnings(warns)
-        ## stop(dat[1])
-    } else {
-        .db.clearResult(res)
-        .restore.warnings(warns)
-        dat
-    }
+    dat <- tryCatch(
+        .db.fetch(res, nrows),
+        error = function(c) c,
+        finally = {
+            .db.clearResult(res)
+            .restore.warnings(warns)
+        })
+    if (is(dat, "error")) {
+        ## do nothing
+    } else
+        return (dat)
 }

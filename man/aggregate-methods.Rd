@@ -78,7 +78,7 @@ db.array(x, ...)
 
 \details{
     For aggregate functions: \code{mean}, \code{sum}, \code{count},
-    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature 
+    \code{max}, \code{min}, \code{sd}, and \code{var}, the signature
     \code{x} must be a reference to a single column in a table.
 
     For aggregate functions: \code{colMeans}, \code{colSums}, and \code{colAgg} the signature
@@ -126,11 +126,20 @@ db.array(x, ...)
 \examples{
 \dontrun{
 ## get the help for a method
-help("mean,db.obj-method")
+## help("mean,db.obj-method")
 
-## Suppose that a valid connection to a database (with ID=1) is established
+%% @test .port Database port number
+%% @test .dbname Database name
+
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+## ----------------------------------------------------------------------
+
 ## create a table from the example data.frame "abalone"
-x <- as.db.data.frame(abalone, "abalone")
+delete("abalone", conn.id = cid)
+x <- as.db.data.frame(abalone, "abalone", conn.id = cid, verbose = FALSE)
 
 ## get the mean of a column
 mean(x$diameter)
@@ -166,7 +175,11 @@ colAgg(x$diameter)
 colAgg(x)
 
 ## put everything into an array plus a constant 1 as the first element
-db.array(1, x, x, x)
+db.array(1, x[,3:5], x[,6:7], x[,8:10])
+
+## ----------------------------------------------------------------------
+
+db.disconnect(cid, verbose = FALSE)
 }
 }
 

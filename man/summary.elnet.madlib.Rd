@@ -35,15 +35,9 @@
   \code{\link{madlib.elnet}} Wrapper for MADlib elastic net regularization.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-"summary.elnet.madlib"
+## see the examples in madlib.elnet
 }
 
 \keyword{madlib}
 \keyword{stats}
 \keyword{math}
-
