@@ -72,8 +72,9 @@ test <- function(path = "tests", filter = NULL,
             curr.conn.id <- integer(0)
         else
             curr.conn.id <- .localVars$conn.id[,1]
-        for (i in setdiff(curr.conn.id, origin.conn.id))
+        for (i in setdiff(curr.conn.id, origin.conn.id)) {
             db.disconnect(conn.id = i, verbose = FALSE, force = TRUE)
+        }
     }
 
     reporter <- match.arg(reporter)
@@ -107,14 +108,11 @@ test <- function(path = "tests", filter = NULL,
         cat(testthat::colourise("\nRunning examples in the user doc ---------\n",
                                 fg = "light blue"))
         tryCatch(.run.doc.example(reporter, filter[1]),
-                 interrupt = function(cond) {
+                 finally = {
                      cleanup.conn()
                      unlink(.localVars$example.tmppath, recursive = TRUE)
                      rm("example.tmppath", envir = .localVars)
                  })
-        cleanup.conn()
-        unlink(.localVars$example.tmppath, recursive = TRUE)
-        rm("example.tmppath", envir = .localVars)
     }
 
     if (run == "tests" || run == "both") {
@@ -122,11 +120,13 @@ test <- function(path = "tests", filter = NULL,
                                 fg = "light blue"))
         tryCatch(testthat::test_dir(test_path, reporter = reporter,
                                     env = .testing.env, filter = filter[2]),
-                 interrupt = function(cond) cleanup.conn())
-        cleanup.conn()
+                 finally = {
+                     cleanup.conn()
+                 })
     }
 
     if (reporter$failed) {
+        cleanup.conn()
         stop("Test failures", call. = FALSE)
     }
     invisible()
