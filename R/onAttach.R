@@ -1,10 +1,10 @@
 ## Execute on attach
 
-## available packages, to check whether RODBC and RPostgreSQL are
-## already installed
-.get.installed.pkgs <- function () {
-    tolower(attr(installed.packages(), "dimnames")[[1]])
-}
+## -----------------------------------------------------------------------
+
+## The environment that contains all testing environment variables
+.testing.env <- new.env(parent = getNamespace(.this.pkg.name))
+.continuous.env <- new.env(parent = globalenv()) # used for continuous testing
 
 ## -----------------------------------------------------------------------
 

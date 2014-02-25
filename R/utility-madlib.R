@@ -152,12 +152,15 @@ groups.logregr.madlib.grps <- function (x)
 ## ----------------------------------------------------------------------
 
 ## delete all __madlib_temp_* tables from a database
-clean.madlib.temp <- function(conn.id = 1)
+clean.madlib.temp <- function(conn.id = 1, cascade = FALSE, verbose = TRUE)
 {
-    for (tbl in db.objects(
-        .unique.pattern(),
-        conn.id=conn.id))
-        delete(tbl, conn.id=conn.id, cascade = TRUE)
+    objs <- db.objects(.unique.pattern(), conn.id=conn.id)
+    for (tbl in objs) {
+        res <- delete(tbl, conn.id=conn.id, cascade = cascade)
+        if (verbose)
+            if (res) cat(".") else cat(",")
+    }
+    if (verbose) cat("\n")
 }
 
 ## ----------------------------------------------------------------------

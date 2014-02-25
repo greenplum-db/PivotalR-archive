@@ -18,14 +18,25 @@
 }
 
 \usage{
-clean.madlib.temp(conn.id = 1)
+clean.madlib.temp(conn.id = 1, cascade = FALSE, verbose = TRUE)
 }
 
 \arguments{
   \item{conn.id}{
     An integer, the connection ID of the database. See
   \code{\link{db.connect}} for more details.
-  }
+}
+\item{cascade}{
+  A logical, default is \code{FALSE}. When it is \code{TRUE}, the table
+  is forcefully removed from the database with everything that depends
+  on it.
+}
+\item{verbose}{
+  A logical, default is \code{TRUE}. When it is \code{TRUE}, a dot "."
+  will be printed to the output for every successfully deleted table,
+  and a comma "," will be printed to the output for every table that
+  cannot be successfully removed.
+}
 }
 
 \details{

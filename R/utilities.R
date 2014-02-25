@@ -7,6 +7,14 @@ is.db.data.frame <- function (x)
     is(x, "db.data.frame")
 }
 
+## ----------------------------------------------------------------------
+
+## available packages, to check whether RODBC and RPostgreSQL are
+## already installed
+.get.installed.pkgs <- function () {
+    tolower(attr(installed.packages(), "dimnames")[[1]])
+}
+
 ## -----------------------------------------------------------------------
 
 ## cut the data into k pieces
