@@ -19,14 +19,17 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
 
     if (is.null(nrows) || (is.character(nrows) && nrows == "all")
         || nrows <= 0) nrows <- -1
+
     res <- tryCatch(
         .db.sendQuery(sql, conn.id),
         error = function(c) c,
         interrupt = function(c) .restore.warnings(warns))
+
     if (is(res, "error")) {
         .restore.warnings(warns)
         stop(res$message)
     }
+
     dat <- tryCatch(
         .db.fetch(res, nrows),
         error = function(c) c,
@@ -34,6 +37,7 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
             .db.clearResult(res)
             .restore.warnings(warns)
         })
+
     if (is(dat, "error")) {
         ## do nothing
     } else

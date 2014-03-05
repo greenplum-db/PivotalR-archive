@@ -44,8 +44,9 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                                     verbose = interactive,
                                     pivot = FALSE)
         else
-            .db.getQuery(paste("create temp table", tbl,
-                               "as select * from", content(x)), conn.id(x))
+            db.q("create temp table", tbl,
+                 "as select * from", content(x),
+                 conn.id = conn.id(x), verbose = FALSE)
     } else {
         tbl <- content(x)
         to.drop.tbl <- FALSE
@@ -67,16 +68,9 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                  get.quartiles, ",", ntile, ",", n.mfv, ",", estimate,
                  ");", sep = "")
 
-    res <- try(.db.getQuery(sql, conn.id(x)), silent = TRUE)
-    if (is(res, .err.class))
-        stop("Could not do the summary!")
+    res <- db.q(sql, "select * from", out.tbl,
+                nrows = -1, conn.id = conn.id(x), verbose = FALSE)
 
-    res <- try(.db.getQuery(paste("select * from", out.tbl),
-                            conn.id(x)), silent = TRUE)
-    if (is(res, .err.class))
-        stop("Could not do the summary!")
-
-    ## .db.removeTable(out.tbl, conn.id(x))
     if (to.drop.tbl) .db.removeTable(tbl, conn.id(x))
 
     attr(res, "summary") <- db.data.frame(out.tbl, conn.id = conn.id(x),
