@@ -244,9 +244,9 @@ expect_this <- function(expr, judge)
     expr.str <- deparse(substitute(expr), width.cutoff=500)
     expr.str <- paste(expr.str[2:(length(expr.str)-1)], collapse = "\n")
 
-    expect_that(tryCatch(expr,
+    eval(parse(text = "expect_that(tryCatch(expr,
                          error = function(c) {
                              cleanup.conn()
-                             stop("\n\n", expr.str, "\n\nERROR: ", c$message)
-                         }), judge)
+                             stop('\n\n\', expr.str, '\n\nERROR: ', c$message)
+                         }), judge)"))
 }
