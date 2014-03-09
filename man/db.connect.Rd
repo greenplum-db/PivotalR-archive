@@ -12,7 +12,7 @@
 \usage{
 db.connect(host = "localhost", user = Sys.getenv("USER"), dbname = user,
 password = "", port = 5432, madlib = "madlib", conn.pkg = "RPostgreSQL",
-default.schemas = NULL, verbose = TRUE)
+default.schemas = NULL, verbose = TRUE, quick = FALSE)
 }
 
 \arguments{
@@ -54,6 +54,13 @@ default.schemas = NULL, verbose = TRUE)
 }
 \item{verbose}{
   A logival value, default is \code{TRUE}, whether to print some information while connecting to the database.
+}
+\item{quick}{
+  A logical value, default is \code{FALSE}. Whether to skip some of the
+  argument checks to speed up the creation of the connection. Useful
+  when using this function inside a function, where you have already
+  validate all the arguments. It is not recommended to set this value to
+  \code{TRUE} when you are using this function directly.
 }
  }
 

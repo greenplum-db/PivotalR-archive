@@ -14,8 +14,36 @@
 db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = user,
                         password = "", port = 5432,
                         madlib = "madlib", conn.pkg = "RPostgreSQL",
-                        default.schemas = NULL, verbose = TRUE)
+                        default.schemas = NULL, verbose = TRUE, quick = FALSE)
 {
+    if (quick) {
+        eval(parse(text = paste("suppressMessages(library(", conn.pkg, "))")))
+        command <- paste(".db.connect.", tolower(conn.pkg), "(host=\"", host,
+                         "\", user=\"", user, "\", dbname=\"", dbname,
+                         "\", password=\"", password, "\", port=", port,
+                         ", madlib=\"", madlib, "\"",
+                         ")", sep = "")
+        result <- eval(parse(text = command))
+        .madlib.version.number(result) # record the madlib version number
+
+        if (!is.null(default.schemas)) {
+            res <- .db.getQuery(paste("set search_path =",
+                                      default.schemas), conn.id = result)
+            if (is(res, .err.class))
+                stop("Could not set the default schemas ! ",
+                     "default.schemas must be a set of schema names ",
+                     "separated by commas. One can also use the ",
+                     "function db.default.schemas or db.search.path ",
+                     "to display or set the current default schemas.")
+        }
+
+        res <- db.q(paste("set application_name = '",
+                          .this.pkg.name, "'", sep = ""),
+                    conn.id = result, verbose = FALSE)
+
+        return (result)
+    }
+
     ## argument type check
     if (!.is.arg.string(host) ||
         !.is.arg.string(user) ||
