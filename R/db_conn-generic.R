@@ -114,6 +114,21 @@ db.connect <- function (host = "localhost", user = Sys.getenv("USER"), dbname = 
                           .this.pkg.name, "'", sep = ""),
                     conn.id = result, verbose = FALSE)
 
+        ## search_path = db.default.schemas(conn.id = result)[1,]
+        tryCatch(
+        {
+            tbl <- .unique.string()
+            db.q("
+                create table", tbl, "(idx integer);
+                drop table if exists", tbl, conn.id = result,
+                 verbose = FALSE)
+        },
+            error = function(s) {
+                warning("There is no default schema or the default schema is not writable! ",
+                        "Some functions need to create intermediate tables. ",
+                        "Use db.default.schemas to set a proper default scehma.\n")
+            })
+
         return (result)
     }
     else
@@ -143,6 +158,20 @@ db.default.schemas <- function (conn.id = 1, set = NULL)
             stop("Could not set the default schemas ! ",
                  "default.schemas must be a set of schema names ",
                  "separated by commas.")
+
+        tryCatch(
+        {
+            tbl <- .unique.string()
+            db.q("
+                create table", tbl, "(idx integer);
+                drop table if exists", tbl, conn.id = conn.id,
+                 verbose = FALSE)
+        },
+            error = function(s) {
+                warning("There is no default schema or the default schema is not writable! ",
+                        "Some functions need to create intermediate tables. ",
+                        "Use db.default.schemas to set a proper default scehma.\n")
+            })
     }
 }
 
