@@ -14,9 +14,9 @@
 
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
-\volume{6}
-\volnumber{1}
-\year{2015}
+\volume{X}
+\volnumber{Y}
+\year{2014}
 \month{June}
 
 %% replace RJtemplate with your article
