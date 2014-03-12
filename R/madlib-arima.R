@@ -172,25 +172,25 @@ setMethod (
     q <- order[3]
 
     ## retrieve the coefficients
-    res <- preview(tbl.output, conn.id=conn.id, "all")
+    res <- lk(tbl.output, conn.id=conn.id, -1)
     rst <- list()
 
     rst$coef <- numeric(0) # coefficients
     rst$s.e. <- numeric(0) # standard errors
     coef.names <- character(0)
     if (p != 0) {
-        rst$coef <- c(rst$coef, res[1,1:p])
-        rst$s.e. <- c(rst$s.e., res[1,p+(1:p)])
+        rst$coef <- c(rst$coef, as.numeric(res[1,1]))
+        rst$s.e. <- c(rst$s.e., as.numeric(res[1,2]))
         coef.names <- c(coef.names, paste("ar", 1:p, sep = ""))
     }
     if (q != 0) {
-        rst$coef <- c(rst$coef, res[1,2*p + (1:q)])
-        rst$s.e. <- c(rst$s.e., res[1,2*p+q+(1:q)])
+        rst$coef <- c(rst$coef, as.numeric(res[1,(p>0)*2+1]))
+        rst$s.e. <- c(rst$s.e., as.numeric(res[1,(p>0)*2+2]))
         coef.names <- c(coef.names, paste("ma", 1:q, sep = ""))
     }
     if (include.mean && d == 0) {
-        rst$coef <- c(rst$coef, res[1,dim(res)[2]-1])
-        rst$s.e. <- c(rst$s.e., res[1,dim(res)[2]])
+        rst$coef <- c(rst$coef, as.numeric(res[1,((p>0)+(q>0))*2+1]))
+        rst$s.e. <- c(rst$s.e., as.numeric(res[1,((p>0)+(q>0))*2+2]))
         coef.names <- c(coef.names, "mean")
     }
     names(rst$coef) <- coef.names
