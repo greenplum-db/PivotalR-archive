@@ -44,7 +44,8 @@ skip_if <- function(cond, test.expr)
 ## ----------------------------------------------------------------------
 
 test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
-                 reporter = c("summary", "tap", "minimal", "stop"),
+                 reporter = c("summary", "tap", "minimal", "stop", "silent",
+                 "teamcity", "list", "multi"),
                  env.file = NULL, env.vars = list(),
                  clean.test.env = FALSE, run = c("tests", "examples", "both"))
 {
