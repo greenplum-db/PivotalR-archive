@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Some operations for Arith and Compare
 ## 6 Compare operation methods, 7 Arith operation methods
@@ -879,6 +878,10 @@ setMethod (
                                                  collapse = ", "),
                                  "]", sep = "")
             }
+            col.data_type[i] <- res.type
+            col.udt_name[i] <- res.udt
+            col.name[i] <- paste(names(e1)[i1], "_", names(e2)[i2],
+                                 "_opr", sep = "")
             break
         } else if (e2@.col.data_type[i2] == "array") {
             tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
@@ -1009,9 +1012,15 @@ setMethod (
                    e1@.col.data_type %in% .num.types) {
             return (e2 * e1)
         } else {
-            .operate.two(e1, e2, " * ", list(.num.types),
+            res <- .operate.two(e1, e2, " * ", list(.num.types),
                          res.type = "double precision",
                          res.udt = "float8")
+            if (length(names(e1)) == 1 && e1@.col.data_type == "array" &&
+                length(names(e2)) == 1 && e2@.col.data_type == "array") {
+                res@.col.data_type <- "array"
+                res@.col.udt_name <- "_float8"
+            }
+            res
         }
     },
     valueClass = "db.Rquery")
