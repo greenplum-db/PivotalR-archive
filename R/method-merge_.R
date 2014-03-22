@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Merge method
 ## -----------------------------------------------------------------------
@@ -16,19 +15,17 @@ setMethod (
 
         if (is(x, "db.data.frame"))
             x.content <- paste(content(x), " s", sep = "")
-        else if (is(x, "db.Rquery") && x@.source == x@.parent &&
-                 x@.where == "")
-            x.content <- paste(x@.source, " s", sep = "")
-        else
-            x.content <- paste("(", content(x), ") s", sep = "")
+        else if (is(x, "db.Rquery")) {
+            x <- as.db.Rview(x)
+            x.content <- paste("(", x@.parent, ") s", sep = "")
+        }
 
         if (is(y, "db.data.frame"))
             y.content <- paste(content(y), " t", sep = "")
-        else if (is(y, "db.Rquery") && y@.source == y@.parent &&
-                 y@.where == "")
-            y.content <- paste(y@.source, " t", sep = "")
-        else
-            y.content = paste("(", content(y), ") t", sep = "")
+        else if (is(y, "db.Rquery")) {
+            y <- as.db.Rview(y)
+            y.content <- paste("(", y@.parent, ") t", sep = "")
+        }
 
         if (length(by.x) != length(by.y))
             stop("The columns used to merge should have the same number!")

@@ -1,4 +1,3 @@
-
 ## -----------------------------------------------------------------------
 ## Array operation utilities
 ## -----------------------------------------------------------------------
@@ -15,8 +14,8 @@
 {
     s <- gsub("array_agg\\(.*\\)", "", expr)
     if (s == "") return (expr)
-    
-    s <- gsub("array\\[(.*)\\]", "\\1", expr)
+
+    s <- gsub("^array\\[(.*)\\]$", "\\1", expr)
     if (s == expr) {
         n1 <- as.integer(.db.getQuery(paste(
             "select array_upper(", s, ", 1) from ",
