@@ -193,149 +193,145 @@
     ## This why this function is so complicated
     dist.str <- .get.distributed.by.str(conn.id, distributed.by)
 
-    if (!append)
+    ## need to create the table first
+    if (is.character(r.obj)) # create from file
     {
-        ## need to create the table first
-        if (is.character(r.obj)) # create from file
+        new.con <- conn
+
+        if (is.temp) {
+            check.temp <- .db.existsTempTable(name, conn.id)
+            name <- check.temp[[2]]
+        }
+        if((!is.temp && .db.existsTable(name, conn.id)) ||
+           (is.temp && check.temp[[1]]))
         {
-            new.con <- conn
-
-            if (is.temp) {
-                check.temp <- .db.existsTempTable(name, conn.id)
-                name <- check.temp[[2]]
-            }
-            if((!is.temp && .db.existsTable(name, conn.id)) ||
-               (is.temp && check.temp[[1]]))
+            if(overwrite)
             {
-                if(overwrite)
+                if(!.db.removeTable(name, conn.id))
                 {
-                    if(!.db.removeTable(name, conn.id))
-                    {
-                        warning(paste("table", name,
-                                      "couldn't be overwritten"))
-                        return(FALSE)
-                    }
-                }
-                else if(!append)
-                {
-                    warning(
-                        paste("table", name,
-                              "exists in database: aborting dbWriteTable"))
+                    warning(paste("table", name,
+                                  "couldn't be overwritten"))
                     return(FALSE)
                 }
-            }
-
-            ## compute full path name (have R expand ~, etc)
-            fn <- file.path(dirname(r.obj), basename(r.obj))
-            if(missing(header) || missing(add.row.names))
-            {
-                f <- file(fn, open="r")
-                if (skip>0) readLines(f, n=skip)
-                txtcon <- textConnection(readLines(f, n=2))
-                flds <- count.fields(txtcon, sep)
-                close(txtcon)
-                close(f)
-                nf <- length(unique(flds))
-            }
-
-            if(missing(header)) header <- nf==2
-
-            if(missing(add.row.names))
-            {
-                if(header)
-                    add.row.names <- if(nf==2) TRUE else FALSE
-                else
-                    add.row.names <- FALSE
-            }
-
-            new.table <- !.db.existsTable(name, conn.id)
-            if(new.table)
-            {
-                ## need to init table, say, with the first nrows lines
-                d <- read.table(fn, sep=sep, header=header, skip=skip,
-                                nrows=nrows, ...)
-                if (missing(field.types)) field.types <- NULL
-                sql <- .db.buildTableDefinition(new.con, table, d,
-                                                field.types, add.row.names,
-                                                dist.str, is.temp)
-                rs <- try(.db.sendQuery(sql, conn.id))
-                if(is(rs, .err.class)){
-                    warning("could not create table: aborting postgresqlImportFile")
-                    return(FALSE)
-                }
-                else
-                    func1(rs$res)
             }
             else if(!append)
             {
-                warning(sprintf(
-                    "table %s already exists -- use append=TRUE?", name))
-            }
-
-            fmt <- paste("COPY %s FROM '%s' ","WITH DELIMITER AS '%s' ",
-                         if(!is.null(quote)) "CSV HEADER QUOTE AS  '%s'", sep="")
-
-            if(is.null(quote))
-                sql <- sprintf(fmt, name,fn, sep)
-            else
-                sql <- sprintf(fmt, name,fn, sep, quote)
-
-            print(sql)
-            rs <- try(.db.sendQuery(sql, conn.id))
-            if(inherits(rs, .err.class)){
-                warning("could not load data into table")
+                warning(
+                    paste("table", name,
+                          "exists in database: aborting dbWriteTable"))
                 return(FALSE)
             }
-            TRUE
         }
-        else # create table from a data frame --------------------------------
+
+        ## compute full path name (have R expand ~, etc)
+        fn <- file.path(dirname(r.obj), basename(r.obj))
+        if(missing(header) || missing(add.row.names))
         {
-            if (is.temp) check.temp <- .db.existsTempTable(table, conn.id)
-            if((!is.temp && .db.existsTable(name, conn.id)) ||
-               (is.temp && check.temp[[1]]))
-            {
-                if (overwrite) {
-                    if (!.db.removeTable(name, conn.id))
-                    {
-                        warning(paste("table", name,
-                                      "couldn't be overwritten"))
-                        return(FALSE)
-                    }
-                }
-                else if (!append)
+            f <- file(fn, open="r")
+            if (skip>0) readLines(f, n=skip)
+            txtcon <- textConnection(readLines(f, n=2))
+            flds <- count.fields(txtcon, sep)
+            close(txtcon)
+            close(f)
+            nf <- length(unique(flds))
+        }
+
+        if(missing(header)) header <- nf==2
+
+        if(missing(add.row.names))
+        {
+            if(header)
+                add.row.names <- if(nf==2) TRUE else FALSE
+            else
+                add.row.names <- FALSE
+        }
+
+        new.table <- !.db.existsTable(name, conn.id)
+        if(new.table)
+        {
+            ## need to init table, say, with the first nrows lines
+            d <- read.table(fn, sep=sep, header=header, skip=skip,
+                            nrows=nrows, ...)
+            if (missing(field.types)) field.types <- NULL
+            sql <- .db.buildTableDefinition(new.con, table, d,
+                                            field.types, add.row.names,
+                                            dist.str, is.temp)
+            rs <- try(.db.sendQuery(sql, conn.id))
+            if(is(rs, .err.class)){
+                warning("could not create table: aborting postgresqlImportFile")
+                return(FALSE)
+            }
+            else
+                func1(rs$res)
+        }
+        else if(!append)
+        {
+            warning(sprintf(
+                "table %s already exists -- use append=TRUE?", name))
+        }
+
+        fmt <- paste("COPY %s FROM '%s' ","WITH DELIMITER AS '%s' ",
+                     if(!is.null(quote)) "CSV HEADER QUOTE AS  '%s'", sep="")
+
+        if(is.null(quote))
+            sql <- sprintf(fmt, name,fn, sep)
+        else
+            sql <- sprintf(fmt, name,fn, sep, quote)
+
+        rs <- try(.db.sendQuery(sql, conn.id))
+        if(inherits(rs, .err.class)){
+            warning("could not load data into table")
+            return(FALSE)
+        }
+        TRUE
+    }
+    else # create table from a data frame --------------------------------
+    {
+        if (is.temp) check.temp <- .db.existsTempTable(table, conn.id)
+        if((!is.temp && .db.existsTable(name, conn.id)) ||
+           (is.temp && check.temp[[1]]))
+        {
+            if (overwrite) {
+                if (!.db.removeTable(name, conn.id))
                 {
-                    warning(
-                        paste("table", name,
-                              "exists in database: aborting assignTable"))
+                    warning(paste("table", name,
+                                  "couldn't be overwritten"))
                     return(FALSE)
                 }
+            }
+            else if (!append)
+            {
+                warning(
+                    paste("table", name,
+                          "exists in database: aborting assignTable"))
+                return(FALSE)
+            }
+        }
+        else
+        {
+            if (missing(field.types)) field.types <- NULL
+            sql <- .db.buildTableDefinition(conn, table, r.obj,
+                                            field.types, add.row.names,
+                                            dist.str, is.temp)
+            rs <- try(.db.sendQuery(sql, conn.id))
+            if (is.temp) name <- (.db.existsTempTable(table,
+                                                      conn.id))[[2]]
+            if(is(rs, .err.class))
+            {
+                warning("could not create table: aborting assignTable")
+                return(FALSE)
             }
             else
             {
-                if (missing(field.types)) field.types <- NULL
-                sql <- .db.buildTableDefinition(conn, table, r.obj,
-                                                field.types, add.row.names,
-                                                dist.str, is.temp)
-                rs <- try(.db.sendQuery(sql, conn.id))
-                if (is.temp) name <- (.db.existsTempTable(table,
-                                                          conn.id))[[2]]
-                if(is(rs, .err.class))
-                {
-                    warning("could not create table: aborting assignTable")
-                    return(FALSE)
-                }
-                else
-                {
-                    func1(rs$res)#######
-                }
+                func1(rs$res)#######
             }
-
-            ## After the table has been created, one can append data to it
-            func3(conn = .localVars$db[[idx]]$conn,
-                  name = name, value = value,
-                  row.names = add.row.names,
-                  overwrite = overwrite, append = TRUE)
         }
+
+        ## After the table has been created, one can append data to it
+        func3(conn = .localVars$db[[idx]]$conn,
+              name = name, value = value,
+              row.names = add.row.names,
+              overwrite = overwrite, append = TRUE)
     }
 }
 

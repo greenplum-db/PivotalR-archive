@@ -445,13 +445,16 @@ db.existsObject <- function (name, conn.id = 1, is.temp = FALSE)
     if (length(table) == 1) {
         schema.str <- try(.db.table.schema.str(table, conn.id), silent = TRUE)
         if (is(schema.str, .err.class)) return (FALSE)
-        tbl.name <- table
+        #tbl.name <- table
     } else {
-        schema.str <- paste(" and table_schema = '", table[1], "'", sep = "")
-        tbl.name <- table[2]
+        schema.str <- paste("table_name = '", .strip(table[2], "\""),
+                            "' and table_schema = '", .strip(table[1], "\""), "'", sep = "")
+        #tbl.name <- table[2]
     }
-    ct <- .db.getQuery(paste("select count(*) from information_schema.tables where table_name = '",
-                             .strip(tbl.name, "\""), "'", .strip(schema.str, "\""), sep = ""), conn.id)
+
+    ct <- db.q("select count(*) from information_schema.tables where ",
+        .strip(schema.str, "\""), sep = "", conn.id=conn.id,
+        verbose = FALSE)
     if (ct == 0)
         FALSE
     else

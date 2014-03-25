@@ -42,7 +42,7 @@ setMethod (
     signature (x = "data.frame"),
     def = function (
     x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
-    key = character(0), distributed.by = NULL,
+    key = character(0), distributed.by = NULL, append = FALSE,
     is.temp = FALSE, ...) {
         if (is.null(table.name)) {
             table.name <- .unique.string()
@@ -51,7 +51,7 @@ setMethod (
         .method.as.db.data.frame.1(x,
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
-                                   distributed.by, is.temp, ...)
+                                   distributed.by, append, is.temp, ...)
     })
 
 ## -----------------------------------------------------------------------
@@ -63,7 +63,7 @@ setMethod (
     signature (x = "character"),
     def = function (
     x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
-    key = character(0), distributed.by = NULL,
+    key = character(0), distributed.by = NULL, append = FALSE,
     is.temp = FALSE, ...) {
         if (is.null(table.name)) {
             table.name <- .unique.string()
@@ -77,14 +77,14 @@ setMethod (
         .method.as.db.data.frame.1(x,
                                    table.name, verbose, conn.id,
                                    add.row.names, key,
-                                   distributed.by, is.temp, ...)
+                                   distributed.by, append, is.temp, ...)
     })
 
 ## -----------------------------------------------------------------------
 
 .method.as.db.data.frame.1 <- function (
     x, table.name = NULL, verbose = TRUE, conn.id = 1, add.row.names = FALSE,
-    key = character(0), distributed.by = NULL,
+    key = character(0), distributed.by = NULL, append = FALSE,
     is.temp = FALSE, ...)
 {
     if (!.is.conn.id.valid(conn.id))
@@ -98,8 +98,15 @@ setMethod (
     exists <- db.existsObject(table.name, conn.id, is.temp)
     if (is.temp) exists <- exists[[1]]
     if (exists) {
-        .restore.warnings(warnings)
-        stop("The table already exists in connection ", conn.id, "!")
+        if (!append) {
+            .restore.warnings(warnings)
+            stop("The table already exists in connection ", conn.id, "!")
+        }
+    } else {
+        if (append) {
+            .restore.warnings(warnings)
+            stop("The table to be appended does not exist in connection ", conn.id, "!")
+        }
     }
 
     if (!.is.arg.string(key)) stop("ID column name must be a string!")
@@ -123,14 +130,15 @@ setMethod (
     ## if (missing(is.temp)) is.temp <- FALSE
 
     table <- .db.analyze.table.name(table.name)
-    if ((!is.temp && .db.existsTable(table, conn.id)) ||
-        (is.temp && .db.existsTempTable(table, conn.id)[[1]])) {
+
+    if (!append && ((!is.temp && .db.existsTable(table, conn.id)) ||
+        (is.temp && .db.existsTempTable(table, conn.id)[[1]]))) {
         .restore.warnings(warnings)
         stop("Table already exists!")
     }
 
     .db.writeTable(table, x, add.row.names = add.row.names,
-                   distributed.by = distributed.by,
+                   distributed.by = distributed.by, append = append,
                    is.temp = is.temp, conn.id = conn.id, ...)
 
     if (length(table) == 1 && !is.temp) {
