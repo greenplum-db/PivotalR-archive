@@ -21,11 +21,11 @@
 
 \usage{ \S4method{as.db.data.frame}{character}(x, table.name = NULL,
 verbose = TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
-distributed.by = NULL, is.temp = FALSE, ...)
+distributed.by = NULL, append = FALSE, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{data.frame}(x, table.name = NULL, verbose =
 TRUE, conn.id = 1, add.row.names = FALSE, key = character(0),
-distributed.by = NULL, is.temp = FALSE, ...)
+distributed.by = NULL, append = FALSE, is.temp = FALSE, ...)
 
 \S4method{as.db.data.frame}{db.Rquery}(x, table.name = NULL, verbose =
 TRUE, is.view = FALSE, is.temp = FALSE, pivot = TRUE, distributed.by =
@@ -93,6 +93,11 @@ as.db.Rview(x)
     distributed randomly, and when this parameter is an empty string
     code{""}, Greenplum database automatically chooses a column and
     distribute the data according to that column.
+  }
+
+  \item{append}{
+    A logical, default is \code{FALSE}. Whether to append the content of a
+    file or data.frame to an existing table in the database.
   }
 
   \item{nrow}{
