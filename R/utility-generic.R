@@ -76,8 +76,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             if (distributed.by == "") # "" means no distributed by
                 dist.str <- ""
             else
-                dist.str <- paste("DISTRIBUTED BY (", distributed.by, ")",
-                                  sep = "")
+                dist.str <- paste("DISTRIBUTED BY (",
+                                  paste("\"", distributed.by, "\"", sep = ""),
+                                  ")", sep = "")
         }
     } else
         dist.str <- ""

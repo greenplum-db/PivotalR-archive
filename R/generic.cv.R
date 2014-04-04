@@ -166,7 +166,9 @@ generic.cv <- function (train, predict, metric, data,
             dist.str <- paste("distributed by (", id.col, ")", sep = "")
             dist.by <- id.col
         } else {
-            dist.str <- paste("distributed by (", dist.cols, ")", sep = "")
+            dist.str <- paste("distributed by (",
+                              paste("\"", dist.cols, "\"", sep = ""),
+                              ")", sep = "")
             dist.by <- dist.cols
         }
     } else {

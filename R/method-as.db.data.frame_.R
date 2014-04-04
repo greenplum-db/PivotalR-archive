@@ -279,7 +279,7 @@ setMethod (
                     idx <- idx + 1
                     distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
                     ## Produce a fixed order for distinct values
-                    distinct <- distinct[order(distinct, decreasing = TRUE)]
+                    distinct <- .strip(distinct[order(distinct, decreasing = TRUE)], "\"")
                     if (is.na(x@.factor.ref[i]))
                         avoid <- distinct[length(distinct)]
                     else

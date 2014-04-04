@@ -66,15 +66,12 @@ madlib.glm <- function (formula, data,
     .check.madlib.version(data)
 
     warnings <- .suppress.warnings(conn.id(data))
-
     analyzer <- .get.params(formula, data, na.action)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
     tbl.source <- analyzer$tbl.source
-
     db <- .get.dbms.str(conn.id(data))
-
     ## dependent, independent and grouping strings
     if (is.null(params$grp.str))
         grp <- "NULL::text"
