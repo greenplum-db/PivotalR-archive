@@ -1,7 +1,7 @@
 
 PKG_LIBS = adp/libadp.a
 
-# PKG_CXXFLAGS = -Wall
+PKG_CXXFLAGS = -Wno-return-type-c-linkage
 
 $(SHLIB): adp/libadp.a
 

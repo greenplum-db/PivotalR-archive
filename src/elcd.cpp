@@ -59,7 +59,7 @@ extern "C"
         int N = *(INTEGER(rN));
         double* iter = REAL(riter);
         double* loglik = REAL(rloglik);
-        
+
         int n = coef.size() - 1;
         double* prev = new double[n];
         for (int i = 0; i < n; i++) prev[i] = coef(i);
@@ -108,7 +108,7 @@ extern "C"
                 coef(n) = my;
                 for (int i = 0; i < n; i++)
                     coef(n) -= mx(i) * coef(i);
-            } 
+            }
             for (int i = 0; i < n; i++) prev[i] = coef(i);
         } while (true);
 
@@ -134,7 +134,7 @@ extern "C"
         for (int i = 0; i < n; i++)
             *loglik -= denom * coef(i) * coef(i) / 2 +
                 alpha * lambda * fabs(coef(i));
-        
+
         // un-standardize if standardize = TRUE
         if (standardize) {
             coef(n) = my;
@@ -145,13 +145,13 @@ extern "C"
         }
 
         *iter = count; // number of iterations
-        
+
         delete [] prev;
         return R_NilValue;
     }
 
     // ----------------------------------------------------------------------
-    
+
     SEXP elcd_binom(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx,
                     SEXP rmwz, SEXP rmw, SEXP ralpha, SEXP rlambda,
                     SEXP ractive_set,
@@ -182,7 +182,7 @@ extern "C"
 
         std::vector<int> idx(n,0);
         for (int i = 0; i < n; i++) idx[i] = i;
-        
+
         int count = 0;
         do {
             std::random_shuffle(idx.begin(), idx.end());
