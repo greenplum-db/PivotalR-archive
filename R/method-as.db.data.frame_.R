@@ -7,26 +7,25 @@ setGeneric (
     def = function (x, table.name = NULL, verbose = TRUE, ...) {
         x.str <- deparse(substitute(x))
         res <- standardGeneric("as.db.data.frame")
+        tst <- paste(res$res@.name, collapse = ".")
         if (verbose) {
             if (is.data.frame(x)) {
                 cat("\nThe data in the data.frame", x.str,
-                    "is stored into the table", table.name, "in database",
+                    "is stored into", tst, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n")
             } else if (is.character(x)) {
                 cat("\nThe data in the file", x.str,
-                    "is stored into the table", table.name, "in database",
+                    "is stored into", tst, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n")
             } else if (is(x, "db.Rquery")) {
                 cat("\nThe data created by", x.str,
-                    "is stored into", table.name, "in database",
+                    "is stored into", tst, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
             } else {
                 cat("\nThe data contained in table", content(x),
                     "which is wrapped by", x.str,
-                    "is copied into the table", table.name, "in database",
+                    "is copied into", tst, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
-                cat("An R object pointing to", table.name,
-                    "in connection", conn.id(x), "is created !\n")
             }
         }
 
