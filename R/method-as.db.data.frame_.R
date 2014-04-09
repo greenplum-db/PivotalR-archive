@@ -18,7 +18,7 @@ setGeneric (
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n")
             } else if (is(x, "db.Rquery")) {
                 cat("\nThe data created by", x.str,
-                    "is stored into the table", table.name, "in database",
+                    "is stored into", table.name, "in database",
                     dbname(res$conn.id), "on", host(res$conn.id), "!\n\n")
             } else {
                 cat("\nThe data contained in table", content(x),
