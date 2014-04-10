@@ -12,15 +12,19 @@
 }
 
 \usage{
-    \method{vcov}{lm.madlib.grps}(object, ...)
-    \method{vcov}{lm.madlib}(object, ...)
-    \method{vcov}{logregr.madlib.grps}(object, ...)
-    \method{vcov}{logregr.madlib}(object, ...)
+    \method{vcov}{lm.madlib.grps}(object, na.action = NULL, ...)
+    \method{vcov}{lm.madlib}(object, na.action = NULL, ...)
+    \method{vcov}{logregr.madlib.grps}(object, na.action = NULL, ...)
+    \method{vcov}{logregr.madlib}(object, na.action = NULL, ...)
 }
 
 \arguments{
     \item{object}{
         The regression model object, of class \code{lm.madlib}, \code{lm.madlib.grps}, \code{logregr.madlib}, \code{logregr.madlib.grps}.
+    }
+
+    \item{na.action}{
+        A function, default is \code{NULL}. Possible choice is \code{\link{na.omit,db.obj-method}}.
     }
 
     \item{...}{

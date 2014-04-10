@@ -30,11 +30,13 @@
     }
 
     y <- rownames(attr(object$terms, "factors"))[1]
-    if (!is.null(object$na.action)) {
-        res <- object$na.action(res, names(res))
-        res <- res[!is.na(object$data[[y]]), ]
-    } else if (!is.null(na.action)) {
+    if (!is.null(object$na.action)) na.action <- object$na.action
+    if (!is.null(na.action)) {
+        res[[y]] <- object$data[[y]]
         res <- na.action(res, names(res))
+        res <- res[, 1:(length(names(res))-1)]
+    } else if (object$num_missing_rows_skipped > 0) {
+        res <- na.omit(res, names(res))
         res <- res[!is.na(object$data[[y]]), ]
     }
     res
