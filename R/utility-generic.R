@@ -173,12 +173,12 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         paste(sample(y_digits,1), sample(hex_digits, 3),
               collapse='', sep = ''),
         paste(sample(hex_digits, 12), collapse=''), sep='_')
-    s <- paste("__madlib_temp_", s, "__", sep = "")
+    s <- paste("madlib_temp_", s, sep = "")
     s
 }
 
 .unique.pattern <- function()
-    "__madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}__"
+    "madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}"
 
 ## -----------------------------------------------------------------------
 

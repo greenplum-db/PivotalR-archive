@@ -233,6 +233,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
 {
     ## stopifnot(inherits(at, "list"))
 
+    if (!is.null(model$na.action)) na.action <- model$na.action
     if (!is.null(na.action)) {
         newdata <- na.action(newdata, vars =
                              c(rownames(attr(model$terms, "factors"))[1],
@@ -269,7 +270,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
 
     res <- .margins.lin(P, model, model$coef, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, f$factors,
-                        at.mean, factor.continuous, avgs = avgs)
+                        na.action, at.mean, factor.continuous, avgs = avgs)
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
@@ -337,6 +338,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
 {
     ## stopifnot(inherits(at, "list"))
 
+    if (!is.null(model$na.action)) na.action <- model$na.action
     if (!is.null(na.action)) {
         newdata <- na.action(newdata, vars =
                              c(rownames(attr(model$terms, "factors"))[1],
@@ -388,7 +390,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
 
     res <- .margins.log(P, model, model$coef, newdata, f$vars, f$is.ind,
                         f$is.factor, f$model.vars, sigma.name, f$factors,
-                        at.mean, factor.continuous, avgs = avgs)
+                        na.action, at.mean, factor.continuous, avgs = avgs)
 
     ## re-arrange the order of results
     ## in res, non-factor results are all in front of factor results
@@ -527,7 +529,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
 
 ## special margins for linear
 .margins.lin <- function(P, model, coef, data, vars, is.ind, is.factor,
-                         model.vars, factors, at.mean = FALSE,
+                         model.vars, factors, na.action, at.mean = FALSE,
                          factor.continuous = FALSE, avgs = NULL)
 {
     coefs <- as.list(coef)
@@ -667,7 +669,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
         se <- t(array(mar.se[-seq_len(m)], dim = c(n,m)))
     }
     names(mar) <- gsub("`", "", vars)
-    v <- vcov(model)
+    v <- vcov(model, na.action)
     se <- diag(se %*% v %*% t(se))
     return (list(mar=mar, se=se))
 }
@@ -675,7 +677,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
 ## ----------------------------------------------------------------------
 
 .margins.log <- function(P, model, coef, data, vars, is.ind, is.factor,
-                         model.vars, sigma, factors, at.mean = FALSE,
+                         model.vars, sigma, factors, na.action, at.mean = FALSE,
                          factor.continuous = FALSE, avgs = NULL)
 {
     conn.id <- conn.id(data)
@@ -856,7 +858,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
         }
     }
     names(mar) <- gsub("`", "", vars)
-    v <- vcov(model)
+    v <- vcov(model, na.action)
     se <- diag(se %*% v %*% t(se))
     return(list(mar=mar, se=se))
 }
