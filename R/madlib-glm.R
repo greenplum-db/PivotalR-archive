@@ -167,6 +167,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$model <- model
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
+        rst[[i]]$na.action <- na.action
 
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,
