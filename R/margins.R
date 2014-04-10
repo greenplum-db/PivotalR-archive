@@ -234,7 +234,9 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     ## stopifnot(inherits(at, "list"))
 
     if (!is.null(na.action)) {
-        newdata <- na.action(newdata, vars = Vars(model))
+        newdata <- na.action(newdata, vars =
+                             c(rownames(attr(model$terms, "factors"))[1],
+                               Vars(model)))
     }
 
     vars <- dydx
@@ -336,7 +338,9 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     ## stopifnot(inherits(at, "list"))
 
     if (!is.null(na.action)) {
-        newdata <- na.action(newdata, vars = Vars(model))
+        newdata <- na.action(newdata, vars =
+                             c(rownames(attr(model$terms, "factors"))[1],
+                               Vars(model)))
     }
 
     vars <- dydx
