@@ -2,7 +2,7 @@
 ## vcov methods for regressions
 ## ----------------------------------------------------------------------
 
-.extract.regr.x <- function(object)
+.extract.regr.x <- function(object, na.action)
 {
     x <- object$data
     for (i in seq_len(length(object$dummy))) {
@@ -28,14 +28,23 @@
         z[[intercept]] <- 1
         res <- cbind2(z[[intercept]], res)
     }
+
+    y <- rownames(attr(object$terms, "factors"))[1]
+    if (!is.null(object$na.action)) {
+        res <- object$na.action(res, names(res))
+        res <- res[!is.na(object$data[[y]]), ]
+    } else if (!is.null(na.action)) {
+        res <- na.action(res, names(res))
+        res <- res[!is.na(object$data[[y]]), ]
+    }
     res
 }
 
 ## ----------------------------------------------------------------------
 
-vcov.lm.madlib <- function(object, ...)
+vcov.lm.madlib <- function(object, na.action = NULL, ...)
 {
-    x <- .extract.regr.x(object)
+    x <- .extract.regr.x(object, na.action)
     n <- nrow(object$data)
     k <- length(names(x))
     compute <- cbind2(mean(residuals(object)^2), crossprod(x))
@@ -44,7 +53,7 @@ vcov.lm.madlib <- function(object, ...)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)
     xx@.is.symmetric <- TRUE; xx <- solve(lk(xx))
     delete(compute)
-    res <- mn * xx    
+    res <- mn * xx
 
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)
@@ -54,7 +63,7 @@ vcov.lm.madlib <- function(object, ...)
         rows <- c("(Intercept)", model.vars)
     else
         rows <- model.vars
-    for (i in seq_len(length(object$col.name))) 
+    for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
     colnames(res) <- rows
@@ -65,13 +74,14 @@ vcov.lm.madlib <- function(object, ...)
 
 ## ----------------------------------------------------------------------
 
-vcov.lm.madlib.grps <- function(object, ...) lapply(object, vcov)
+vcov.lm.madlib.grps <- function(object, na.action = NULL, ...)
+    lapply(object, vcov, na.action = na.action, ...)
 
 ## ----------------------------------------------------------------------
 
-vcov.logregr.madlib <- function(object, ...)
+vcov.logregr.madlib <- function(object, na.action = NULL, ...)
 {
-    x <- .extract.regr.x(object)
+    x <- .extract.regr.x(object, na.action)
     ## cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
     cx <- rowSums(object$coef * x)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
@@ -85,7 +95,7 @@ vcov.logregr.madlib <- function(object, ...)
         rows <- c("(Intercept)", model.vars)
     else
         rows <- model.vars
-    for (i in seq_len(length(object$col.name))) 
+    for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
     colnames(xx) <- rows
@@ -96,4 +106,5 @@ vcov.logregr.madlib <- function(object, ...)
 
 ## ----------------------------------------------------------------------
 
-vcov.logregr.madlib.grps <- function(object, ...) lapply(object, vcov)
+vcov.logregr.madlib.grps <- function(object, na.action = NULL, ...)
+    lapply(object, vcov, na.action = na.action, ...)
