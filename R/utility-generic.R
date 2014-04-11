@@ -282,7 +282,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                                         ref = ref[[data@.col.name[i]]])
                 }
             }
-            fterm <- .modeling.formula(formula(paste("~", right.hand)), fake)
+            if (attr(f.terms, "intercept") == 0) inter.str <- "-1"
+            else inter.str <- ""
+            fterm <- .modeling.formula(formula(paste("~", right.hand, inter.str)), fake)
             if (fterm[1] == "(Intercept)") fterm <- fterm[-1]
             right.hand <- paste(fterm, collapse = " + ")
         }
