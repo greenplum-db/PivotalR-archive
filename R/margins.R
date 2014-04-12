@@ -204,8 +204,10 @@ Vars <- function(model)
     ## ------- Add quotes -------
     mvars <- Vars(model)
     model.vars <- .add.quotes(gsub("`", "", model.vars), mvars)
+
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
+
     names(model.vars) <- paste("\"term.", seq_len(n), "\"", sep = "")
 
     if (any(! (gsub("\"", "", gsub("`", "", expand.vars)) %in%
@@ -215,8 +217,10 @@ Vars <- function(model)
              "or the table column names!")
 
     expand.vars <- paste("\"", expand.vars, "\"", sep = "")
-    expand.vars <- gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
-    expand.vars <- gsub("\"`([^\\[\\]]*)\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]", expand.vars)
+    expand.vars <- gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]",
+                        expand.vars, perl = TRUE)
+    expand.vars <- gsub("\"`([^\\[\\]]*)\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]",
+                        expand.vars, perl = TRUE)
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
@@ -1020,5 +1024,3 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
     } else
         var
 }
-
-
