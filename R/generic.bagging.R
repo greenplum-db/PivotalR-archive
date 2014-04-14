@@ -141,14 +141,16 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     sql.file <- paste(.localVars$pkg.path, "/sql/", funcname,
                       ".sql_in", sep = "")
     use.name <- .unique.string()
-    tmp.file <- paste("/tmp/", use.name, ".sql_in", sep = "")
+    ## tmp.file <- paste("/home/gpadmin/Downloads/tests/", use.name, ".sql_in", sep = "")
     old.name <- paste("pg_temp.", funcname, sep = "")
     new.name <- paste("pg_temp.", use.name, sep = "")
-    system(paste("sed -e \"s/", old.name, "/", new.name, "/g\" ", sql.file,
-                 " > ", tmp.file, sep = ""))
-    cmd <- paste(scan(tmp.file, what = 'a', sep = "\n", quiet = TRUE), collapse = "\n")
+    ## system(paste("sed -e \"s/", old.name, "/", new.name, "/g\" ", sql.file,
+    ##              " > ", tmp.file, sep = ""))
+    ## cmd <- paste(scan(tmp.file, what = 'a', sep = "\n", quiet = TRUE), collapse = "\n")
+    cmd <- paste(scan(sql.file, what = 'a', sep = "\n", quiet = TRUE), collapse = "\n")
+    cmd <- gsub(old.name, new.name, cmd)
     res <- .db.getQuery(cmd, conn.id)
-    system(paste("rm -f ", tmp.file, sep = ""))
+    ## system(paste("rm -f ", tmp.file, sep = ""))
 
     fn.schema <- .db.getQuery(paste("SELECT specific_schema from information_schema.routines where routine_name = '",
                                     use.name, "'", sep = ""), conn.id)
