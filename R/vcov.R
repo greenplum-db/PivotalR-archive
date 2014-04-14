@@ -29,15 +29,16 @@
         res <- cbind2(z[[intercept]], res)
     }
 
-    y <- rownames(attr(object$terms, "factors"))[1]
+    y <- all.vars(parse(text = rownames(attr(object$terms, "factors"))[1]))
     if (!is.null(object$na.action)) na.action <- object$na.action
     if (!is.null(na.action)) {
-        res[[y]] <- object$data[[y]]
+        x.names <- names(res)
+        for (i in y) res[[i]] <- object$data[[i]]
         res <- na.action(res, names(res))
-        res <- res[, 1:(length(names(res))-1)]
+        res <- res[, x.names]
     } else if (object$num_missing_rows_skipped > 0) {
         res <- na.omit(res, names(res))
-        res <- res[!is.na(object$data[[y]]), ]
+        for (i in y) res <- res[!is.na(object$data[[i]]), ]
     }
     res
 }
@@ -68,6 +69,7 @@ vcov.lm.madlib <- function(object, na.action = NULL, ...)
     for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
+    rows <- .strip(rows, "`")
     colnames(res) <- rows
     rownames(res) <- rows
 
@@ -100,6 +102,7 @@ vcov.logregr.madlib <- function(object, na.action = NULL, ...)
     for (i in seq_len(length(object$col.name)))
         if (object$col.name[i] != object$appear[i])
             rows <- gsub(object$col.name[i], object$appear[i], rows)
+    rows <- .strip(rows, "`")
     colnames(xx) <- rows
     rownames(xx) <- rows
 

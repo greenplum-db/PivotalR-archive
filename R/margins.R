@@ -240,9 +240,10 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
-        newdata <- na.action(newdata, vars =
-                             c(rownames(attr(model$terms, "factors"))[1],
-                               Vars(model)))
+        newdata <- na.action(
+            newdata, vars = c(
+                all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
+                Vars(model)))
     }
 
     vars <- dydx
@@ -346,9 +347,10 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
-        newdata <- na.action(newdata, vars =
-                             c(rownames(attr(model$terms, "factors"))[1],
-                               Vars(model)))
+        newdata <- na.action(
+            newdata, vars = c(
+                all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
+                Vars(model)))
     }
 
     vars <- dydx
@@ -426,6 +428,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                     collapse = ".")
     }
     rows <- gsub("([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
                       row.names = rows, check.names = FALSE)
