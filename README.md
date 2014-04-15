@@ -17,10 +17,10 @@ learning package [MADlib](http://madlib.net/) directly from R.
         vignette("pivotalr") # execute in R console to view the PDF file
 2. To install PivotalR:
     * Get the latest stable version from CRAN by running `install.packages("PivotalR")`
-    * Or try out the latest development version from github by running the following code:
+    * Or try out the latest development version from github by running the following code (Need R >= 3.0.2):
 
         ```
-        ## install.packages("devtools")
+        ## install.packages("devtools") # 'devtools' package is only available for R >= 3.0.2
         devtools::install_github("PivotalR", "gopivotal")
         ```
     * Or download the source tarball directly from [**here**](https://github.com/gopivotal/PivotalR/tarball/master), and then install the tarball
