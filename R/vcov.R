@@ -29,7 +29,7 @@
         res <- cbind2(z[[intercept]], res)
     }
 
-    y <- all.vars(parse(text = rownames(attr(object$terms, "factors"))[1]))
+    y <- setdiff(all.vars(parse(text = rownames(attr(object$terms, "factors"))[1])), names(res))
     if (!is.null(object$na.action)) na.action <- object$na.action
     if (!is.null(na.action)) {
         x.names <- names(res)

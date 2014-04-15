@@ -241,7 +241,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
         newdata <- na.action(
-            newdata, vars = c(
+            newdata, vars = union(
                 all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
                 Vars(model)))
     }
@@ -348,7 +348,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
         newdata <- na.action(
-            newdata, vars = c(
+            newdata, vars = union(
                 all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
                 Vars(model)))
     }
