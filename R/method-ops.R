@@ -186,6 +186,15 @@ setMethod (
 .txt.types <- c("character varying", "varchar", "character",
                 "char", "text")
 
+## --
+
+.time.types <- c("timestamp", "time", "date", "interval",
+                 "timestamp with time zone")
+
+.udt.time.types <- c("timestamp", "time", "date", "interval", "timestamptz")
+
+.time.change <- c("interval", "time", "integer", "interval", "interval")
+
 ## -----------------------------------------------------------------------
 
 setMethod (
@@ -365,20 +374,34 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## convert string to time types
-.replace.timestamp <- function (e1, res, s, op)
+.replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE,
+                                inverse = FALSE, always.interval = FALSE)
 {
-    types <- col.types(e1)
-    time.types <- c("timestamp", "time", "date", "interval")
+    types <- ifelse(e1@.col.data_type == "array",
+                    .strip(e1@.col.udt_name, "_"), e1@.col.udt_name)
+    idx <- match(types, .udt.time.types)
     for (i in seq_len(length(types))) {
-        for (t in time.types) {
-            if (grepl(t, types[i])) {
-                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t, sep = "")
-                res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
-                                           "\"", sep = ""),
-                                paste(res@.expr[i], " as \"",
-                                      res@.col.name[i], "\"", sep = ""),
-                                res@.content)
-                break
+        if (!is.na(idx[i])) {
+            t <- .time.types[idx[i]]
+            if (always.interval)
+                t1 <- "interval"
+            else
+                t1 <- t
+            if (inverse)
+                res@.expr[i] <- paste(s, "::", t1, op, e1@.expr[i], sep = "")
+            else
+                res@.expr[i] <- paste(e1@.expr[i], op, s, "::", t1, sep = "")
+            res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
+                                       "\"", sep = ""),
+                                 paste(res@.expr[i], " as \"",
+                                       res@.col.name[i], "\"", sep = ""),
+                                 res@.content)
+            if (res.type.change) {
+                res@.col.data_type[i] <- .time.change[idx[i]]
+                res@.col.udt_name[i] <- .time.change[idx[i]]
+            } else {
+                res@.col.data_type[i] <- t
+                res@.col.udt_name[i] <- t
             }
         }
     }
@@ -581,9 +604,24 @@ setMethod (
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
         res <- .compare(e1, e2, " + ", .num.types,
+                        cast = "",
                         res.type = "double precision",
                         res.udt = "float8")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+
+        for (i in seq_len(length(names(res)))) {
+            if (grepl("date$", e1@.col.udt_name[i])) {
+                res@.expr[i] <- paste(e1@.expr, " + ", e2, "::integer",
+                                      sep = "")
+                res@.content <- gsub(paste("NULL as \"", res@.col.name[i],
+                                           "\"", sep = ""),
+                                     paste(res@.expr[i], " as \"",
+                                           res@.col.name[i], "\"", sep = ""),
+                                     res@.content)
+                res@.col.data_type[i] <- "date"
+                res@.col.udt_name[i] <- "date"
+            }
+        }
         res
     },
     valueClass = "db.Rquery")
@@ -593,6 +631,32 @@ setMethod (
 setMethod (
     "+",
     signature(e1 = "numeric", e2 = "db.obj"),
+    function (e1, e2) {
+        e2 + e1
+    },
+    valueClass = "db.Rquery")
+
+## --
+setMethod (
+    "+",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        res <- .compare(e1, e2, " + ", .num.types,
+                        cast = "",
+                        res.type = "double precision",
+                        res.udt = "float8")
+        if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+        res <- .replace.timestamp(e1, res, e2, " + ", always.interval = TRUE)
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "+",
+    signature(e1 = "character", e2 = "db.obj"),
     function (e1, e2) {
         e2 + e1
     },
@@ -616,9 +680,37 @@ setMethod (
 
 setMethod (
     "-",
+    signature(e1 = "db.obj", e2 = "character"),
+    function (e1, e2) {
+        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        res <- .compare(e1, e2, " - ", .num.types, cast = "")
+        res <- .replace.timestamp(e1, res, e2, " - ", TRUE)
+        if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "-",
+    signature(e1 = "character", e2 = "db.obj"),
+    function (e1, e2) {
+        e1 <- paste("'", .strip(e1, "'"), "'", sep = "")
+        res <- .compare(e2, e1, " - ", .num.types, cast = "")
+        res <- .replace.timestamp(e2, res, e1, " - ", TRUE, TRUE)
+        if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
+        res
+    },
+    valueClass = "db.Rquery")
+
+## --
+
+setMethod (
+    "-",
     signature(e1 = "db.obj", e2 = "ANY"),
     function (e1, e2) {
-        if (nargs() == 1) -1 * e1
+        if (nargs() == 1) e1 * (-1)
         else e1 - e2
     },
     valueClass = "db.Rquery")
@@ -864,7 +956,8 @@ setMethod (
                 tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
                                         conn.id)
                 if (length(tmp2) != length(tmp1) && length(tmp2) != 1)
-                    stop("Two arrays have to have the same length or one of them has length of 1!")
+                    stop("Two arrays have to have the same length or one ",
+                         "of them has length of 1!")
                 expr[i] <- paste("array[", paste("(", tmp1, ")",
                                                  cast, op, "(",
                                                  tmp2, ")", sep = "",
@@ -914,6 +1007,7 @@ setMethod (
 
     expr.str <- paste(expr, paste("\"", col.name, "\"", sep = ""),
                       sep = " as ", collapse = ", ")
+
     new("db.Rquery",
         .content = paste("select ", expr.str, " from ", tbl,
         where.str, sort$str, sep = ""),
@@ -967,9 +1061,36 @@ setMethod (
             e1 <- unlist(lk(e1))
             return (e1 - e2)
         }
-        .operate.two(e1, e2, " - ", list(.num.types),
-                     res.type = "double precision",
-                     res.udt = "float8")
+
+        .combine.list(sapply(
+            seq_len(length(names(e1))),
+            function(i) {
+                s1 <- sapply(.udt.time.types,
+                             function(s) grepl(paste(s, "$", sep = ""),
+                                               e1@.col.udt_name[i]))
+                s2 <- sapply(.udt.time.types,
+                             function(s) grepl(paste(s, "$", sep = ""),
+                                               e2@.col.udt_name[i]))
+
+                if (any(s1) || any(s2)) {
+                    id <- union(seq_len(length(.time.types))[s1],
+                                seq_len(length(.time.types))[s2])[1]
+                    udt <- (if (.time.change[id] == "integer")
+                            "int4"
+                    else .time.change[id])
+
+                    .operate.two(
+                        e1[[i]], e2[[i]], " - ", list(.time.types),
+                        res.type = .time.change[id],
+                        cast = '',
+                        res.udt = (if (e1@.col.data_type[i] == "array")
+                                   paste("_", udt, sep = "") else udt))
+                } else {
+                    .operate.two(e1[[i]], e2[[i]], " - ", list(.num.types),
+                                 res.type = "double precision",
+                                 res.udt = "float8")
+                }
+            }))
     },
     valueClass = "db.Rquery")
 
