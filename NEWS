@@ -1,6 +1,11 @@
+# PivotalR 0.1.16.1
+
+  * Many bug fixes
+  * Support for date, time, time stamp and interval in database
+
 # PivotalR 0.1.15.1
 
-* Various bug fixes
-* Better error handling
-* Full support for HAWQ 1.2
-* A complete testing framework
+  * Various bug fixes 
+  * Better error handling
+  * Full support for HAWQ 1.2
+  * A complete testing framework
