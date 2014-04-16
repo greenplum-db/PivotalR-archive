@@ -42,14 +42,18 @@ Vars <- function(model)
 ## Add `\"\"` quotes to vars using model.vars
 .add.quotes <- function(vars, model.vars)
 {
-    as.vector(sapply(vars,
-           function(v) {
-               for (var in model.vars)
-                   v <- gsub(var, paste("`\"", var, "\"`", sep = ""), v)
-               v <- gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)",
-                         "(`\"\\2\"[\\3]`)", v)
-               v
-           }))
+    no.conflict.names <- sapply(seq_along(model.vars), function(i) .unique.string())
+    parse.var <- function (v) {
+        for (i in order(nchar(model.vars), decreasing = TRUE))
+            v <- gsub(model.vars[i], paste("`\"", no.conflict.names[i], "\"`", sep = ""),
+                      v, perl = TRUE)
+        for (i in seq_along(model.vars))
+            v <- gsub(no.conflict.names[i], model.vars[i], v, perl = TRUE)
+        v <- gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)",
+                  "(`\"\\2\"[\\3]`)", v, perl = TRUE)
+        v
+    }
+    as.vector(sapply(vars, parse.var))
 }
 
 ## ----------------------------------------------------------------------
@@ -204,7 +208,6 @@ Vars <- function(model)
     ## ------- Add quotes -------
     mvars <- Vars(model)
     model.vars <- .add.quotes(gsub("`", "", model.vars), mvars)
-
     model.vars <- lapply(model.vars, function(x)
                          eval(parse(text=paste("quote(", x, ")", sep = ""))))
 
