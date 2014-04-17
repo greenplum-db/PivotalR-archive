@@ -2,6 +2,19 @@
 ## vcov methods for regressions
 ## ----------------------------------------------------------------------
 
+.pseudo.inv <- function(X, tol = sqrt(.Machine$double.eps))
+{
+    ## Generalized Inverse of a Matrix
+    dnx <- dimnames(X)
+    if(is.null(dnx)) dnx <- vector("list", 2)
+    s <- svd(X)
+    nz <- s$d > tol * s$d[1]
+    structure(if(any(nz)) s$v[, nz] %*% (t(s$u[, nz])/s$d[nz]) else X,
+              dimnames = dnx[2:1])
+}
+
+## ----------------------------------------------------------------------
+
 .extract.regr.x <- function(object, na.action)
 {
     x <- object$data
@@ -54,7 +67,7 @@ vcov.lm.madlib <- function(object, na.action = NULL, ...)
     compute <- as.db.data.frame(compute, verbose = FALSE)
     mn <- lk(compute[,1]) * n / (n - k)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)
-    xx@.is.symmetric <- TRUE; xx <- solve(lk(xx))
+    xx@.is.symmetric <- TRUE; xx <- .pseudo.inv(lk(xx))
     delete(compute)
     res <- mn * xx
 
@@ -89,7 +102,7 @@ vcov.logregr.madlib <- function(object, na.action = NULL, ...)
     ## cx <- Reduce(function(l,r) l+r, as.list(object$coef * x))
     cx <- rowSums(object$coef * x)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
-    xx <- solve(lk(crossprod(x, a*x)))
+    xx <- .pseudo.inv(lk(crossprod(x, a*x)))
 
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)

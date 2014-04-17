@@ -264,14 +264,15 @@ setMethod (
             sql <- "select "
             for (i in seq_len(length(cats))) {
                 sql <- paste(sql, "array_agg(distinct case when ", cats[i],
-                             " is NULL then 'NULL' else ",
-                             cats[i], "::text end) as ",
+                             " is NULL then 'NULL' else (",
+                             cats[i], ")::text end) as ",
                              "distinct_", i, sep = "")
                 if (i != length(cats)) sql <- paste(sql, ",", sep = "")
             }
             ## scan through the table only once
             sql <- paste(sql, " from ", tbl, where, sep = "")
-            distincts <- .db.getQuery(sql, conn.id)
+            #distincts <- .db.getQuery(sql, conn.id)
+            distincts <- db.q(sql, conn.id = conn.id, verbose = FALSE)
             idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
@@ -291,7 +292,7 @@ setMethod (
                         is.factor <- c(is.factor, FALSE)
                         factor.ref <- c(factor.ref, as.character(NA))
                         if (extra != "") extra <- paste(extra, ", ")
-                        dex <- paste("(case when ", x@.expr[i], "::text = '",
+                        dex <- paste("(case when (", x@.expr[i], ")::text = '",
                                      distinct[j], "'",
                                      " then 1 else 0 end)", sep = "")
                         extra <- paste(extra, " ", dex, " as ",

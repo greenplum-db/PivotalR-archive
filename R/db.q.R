@@ -27,6 +27,10 @@ db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
 
     if (is(res, "error")) {
         .restore.warnings(warns)
+        if (!verbose) {
+            message("Executing in database connection ", conn.id, ":\n")
+            cat(sql, "\n\n")
+        }
         stop(res$message)
     }
 
