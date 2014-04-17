@@ -6,13 +6,14 @@
 \alias{margins.logregr.madlib.grps}
 \alias{print.margins}
 \alias{Vars}
+\alias{Terms}
 
 \title{
   Compute the marginal effects of regression models
 }
 
 \description{
-  \code{margins} calculates the marginal effects of the variables given the result of regressions (\code{\link{madlib.lm}}, \code{\link{madlib.glm}} etc). \code{Vars} lists all the variables used in the regression model. \code{Vars} is only used in \code{margins}.
+  \code{margins} calculates the marginal effects of the variables given the result of regressions (\code{\link{madlib.lm}}, \code{\link{madlib.glm}} etc). \code{Vars} lists all the variables used in the regression model. \code{Terms} lists the specified terms in the original model. \code{Vars} and \code{Terms} are only used in \code{margins}'s \code{dydx} option.
 }
 
 \usage{
@@ -36,6 +37,8 @@ factor.continuous = FALSE, na.action = NULL, ...)
 ...)
 
 Vars(model)
+
+Terms(term = NULL)
 }
 
 \arguments{
@@ -58,7 +61,7 @@ Vars(model)
         A string which indicates what should happen when the data
         contain \code{NA}s. Possible
         values include \code{\link{na.omit}}, \code{"na.exclude"},              \code{"na.fail"}
-  and \code{NULL}. Right now, \code{\link{na.omit,db.obj-method}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed, and see \code{\link{na.omit,db.obj-method}} for the preferred function interface.
+  and \code{NULL}. Right now, \code{\link{na.omit,db.obj-method}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered out and omitted on the MADlib side. User defined \code{na.action} function is allowed, and see \code{\link{na.omit,db.obj-method}} for the preferred function interface.
 }
   \item{\dots}{
     Other arguments, not implemented.
@@ -75,6 +78,10 @@ Vars(model)
           for complex numbers see \code{signif}.)  Non-integer values will
           be rounded down, and only values greater than or equal to 1
           and no greater than 22 are accepted.
+  }
+
+  \item{term}{
+      A vector of integers, the default is \code{NULL}. When \code{term=i}, compute the marginal effects of the i-th term. Even if this term contains multiple variables, we treat it as a variable independent of all others. When \code{term=NULL}, the marginal effects of all terms are calculated. In the final result, margianl effect results for \code{".term.1"}, \code{".term.2"} etc will be shown. By comparing with \code{names(model$coef)}, one can easily figure out which term corresponds to which expression. \code{(Intercept)} term's marginal effect cannot be computed using this (One can create an extra column that equals 1 and use it as a variable without using intercept by add -1 into the fitting formula).
   }
 }
 
@@ -134,11 +141,13 @@ fit <- madlib.lm(rings ~ length + diameter*sex, data = dat)
 margins(fit)
 margins(fit, at.mean = TRUE)
 margins(fit, factor.continuous = TRUE)
+margins(fit, dydx = ~ Vars(model) + Terms())
 
 fit <- madlib.glm(rings < 10 ~ length + diameter*sex, data = dat, family = "logistic")
 margins(fit, ~ length + sex)
 margins(fit, ~ length + sex.M, at.mean = TRUE)
 margins(fit, ~ length + sex.I, factor.continuous = TRUE)
+margins(fit, ~ Vars(model) + Terms())
 
 ## create a data table that has two columns
 ## one of them is an array column

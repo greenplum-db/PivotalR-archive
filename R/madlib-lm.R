@@ -118,15 +118,20 @@ madlib.lm <- function (formula, data, na.action = NULL,
     r.call <- match.call() # the current function call itself
     r.dummy <- data@.dummy
     r.dummy.expr <- data@.dummy.expr
+    term.names <- .term.names(r.has.intercept, r.ind.vars, r.col.name, r.appear)
 
     for (i in seq_len(n.grps)) {
         rst[[i]] <- list()
         for (j in seq(res.names))
             rst[[i]][[res.names[j]]] <- res[[res.names[j]]][i]
         rst[[i]]$coef <- r.coef[i,]
+        names(rst[[i]]$coef) <- term.names
         rst[[i]]$std_err <- r.std_err[i,]
+        names(rst[[i]]$std_err) <- term.names
         rst[[i]]$t_stats <- r.t_stats[i,]
+        names(rst[[i]]$t_stats) <- term.names
         rst[[i]]$p_values <- r.p_values[i,]
+        names(rst[[i]]$p_values) <- term.names
         rst[[i]]$grp.cols <- r.grp.cols
         rst[[i]]$grp.expr <- r.grp.expr
         rst[[i]]$has.intercept <- r.has.intercept
@@ -332,4 +337,23 @@ print.lm.madlib <- function (x,
 show.lm.madlib <- function (object)
 {
     print(object)
+}
+
+## -----------------------------------------------------------------------
+
+.term.names <- function(has.intercept, ind.vars, col.name, appear)
+{
+    if (has.intercept)
+        rows <- c("(Intercept)", ind.vars)
+    else
+        rows <- ind.vars
+    rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
+    for (i in seq_len(length(col.name)))
+        if (col.name[i] != appear[i])
+            rows <- gsub(col.name[i], appear[i], rows)
+    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    rows <- gsub("\\s", "", rows)
+    rows
 }
