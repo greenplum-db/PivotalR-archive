@@ -150,6 +150,11 @@ madlib.glm <- function (formula, data,
         for (j in seq(res.names))
             rst[[i]][[res.names[j]]] <- res[[res.names[j]]][[i]]
         rst[[i]]$coef <- r.coef[i,]
+        if (any(is.na(rst[[i]]$coef))) {
+            warning("NA in the result !")
+            class(rst[[i]]) <- "logregr.madlib"
+            next
+        }
         names(rst[[i]]$coef) <- term.names
         rst[[i]]$std_err <- r.std_err[i,]
         names(rst[[i]]$std_err) <- term.names
