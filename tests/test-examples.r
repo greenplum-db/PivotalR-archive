@@ -49,7 +49,7 @@ fm <- summary(lm(rings ~ . - id - sex, data = dat.im))
 test_that("Examples of value equivalent", {
     ## numeric values are the same, but names are not
     ## 4, 5, 6
-    expect_that(fdb$coef,    equals(as.numeric(fm$coefficients[,1])))
+    expect_that(as.numeric(fdb$coef),    equals(as.numeric(fm$coefficients[,1])))
     expect_that(fdb$coef,    is_equivalent_to(fm$coefficients[,1]))
     expect_that(fdb$std_err, is_equivalent_to(fm$coefficients[,2]))
 })
