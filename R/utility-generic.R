@@ -276,7 +276,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             names(fake) <- names(data)
             for (i in seq_len(l)) {
                 if (data@.is.factor[i]) {
-                    fake[,i] <- distinct[[data@.col.name[i]]]
+                    fake[,i] <- array(distinct[[data@.col.name[i]]], dim = c(max.level, 1))
                     fake[,i] <- as.factor(fake[,i])
                     fake[,i] <- relevel(fake[,i],
                                         ref = ref[[data@.col.name[i]]])
