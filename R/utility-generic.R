@@ -201,7 +201,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     fstr <- f.str[1]
     fstr <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "factor(\\1)",
                  fstr, perl = T)
-    fstr <- .gsub("factor\\((((?!as\\.factor).)*)\\)", "as.factor(\\1)",
+    fstr <- .gsub("([^\\.]|^)factor\\((((?!as\\.factor).)*)\\)", "\\1as.factor(\\2)",
                  fstr, perl = T)
 
     f2 <- f.str[2] # grouping columns, might be NA
@@ -432,11 +432,13 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     }
 }
 
+## ----------------------------------------------------------------------
+
 .replace.colon <- function(s)
 {
-    r <- .gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", s)
+    r <- .gsub("(\\d+)\\s*:\\s*(\\d+)", "\\1@\\2", s)
     r <- gsub(":", "*", r, perl = T)
-    r <- .gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", r)
+    r <- .gsub("(\\d+)@(\\d+)", "\\1:\\2", r)
     r
 }
 
