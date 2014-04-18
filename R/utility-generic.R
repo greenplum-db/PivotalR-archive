@@ -217,8 +217,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
         ## ## grouping column do not use factor
         f2.labels <- .gsub("I\\((.*)\\)", "(\\1)", f2.labels, perl = T)
-        f2.labels <- .gsub("as\\.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        f2.labels <- .gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- .gsub("as\\.factor\\((.*)\\)", "(\\1)", f2.labels, perl = T)
+        f2.labels <- .gsub("factor\\((.*)\\)", "(\\1)", f2.labels, perl = T)
 
         grp.expr <- f2.labels
         for (i in seq_len(length(f2.labels))) {
@@ -250,7 +250,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
-        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
+        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "(\\1)", right.hand, perl = T)
 
         if (sum(data@.is.factor) > 0) {
             distinct <- list()
@@ -295,8 +295,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         elm <- .regmatches(right.hand,
                            gregexpr("as\\.factor\\s*\\([^\\(\\)]+\\)",
                                     right.hand, perl=T))[[1]]
-        col <- .strip(.gsub("as\\.factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
+        col <- .strip(.gsub("as\\.factor\\s*\\(([^\\(\\)]+)\\)", "(\\1)", elm,
                            perl = T))
+        col <- gsub("^\\((.*)\\)$", "\\1", col)
         if (!all(col %in% names(data)))
             stop("At least one of the variables cannot be set to be a factor ",
                  "because either it does not exist in the data table ",
@@ -309,7 +310,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ## factors added by formula
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
 
-        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
+        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "(\\1)", right.hand, perl = T)
         ## right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
     }
 
@@ -329,8 +330,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## dependent variable
     ## factor does not play a role in dependent variable
     dep.var <- .gsub("I\\((.*)\\)", "(\\1)", rownames(f.factors)[1], perl = T)
-    dep.var <- .gsub("as\\.factor\\((.*)\\)", "\\1", dep.var, perl = T)
-    dep.var <- .gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
+    dep.var <- .gsub("as\\.factor\\((.*)\\)", "(\\1)", dep.var, perl = T)
+    dep.var <- .gsub("factor\\((.*)\\)", "(\\1)", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
     origin.dep <- dep.var
 
