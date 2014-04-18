@@ -150,7 +150,7 @@ madlib.glm <- function (formula, data,
         for (j in seq(res.names))
             rst[[i]][[res.names[j]]] <- res[[res.names[j]]][[i]]
         rst[[i]]$coef <- r.coef[i,]
-        if (any(is.na(rst[[i]]$coef))) {
+        if (all(is.na(rst[[i]]$coef))) {
             warning("NA in the result !")
             class(rst[[i]]) <- "logregr.madlib"
             next
@@ -234,21 +234,25 @@ print.logregr.madlib.grps <- function (x,
 {
     n.grps <- length(x)
 
-    if (x[[1]]$has.intercept)
-        rows <- c("(Intercept)", x[[1]]$origin.ind)
+    i <- 1
+    while (i <= n.grps) if (!all(is.na(x[[i]]$coef))) break
+    if (i == n.grps + 1) stop("All models' coefficients are NAs!")
+
+    if (x[[i]]$has.intercept)
+        rows <- c("(Intercept)", x[[i]]$origin.ind)
     else
-        rows <- x[[1]]$ind.vars
+        rows <- x[[i]]$ind.vars
     rows <- gsub("\"", "", rows)
-    for (i in seq_len(length(x[[1]]$col.name)))
-        if (x[[1]]$col.name[i] != x[[1]]$appear[i])
-            rows <- gsub(x[[1]]$col.name[i], x[[1]]$appear[i], rows)
-    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    for (j in seq_len(length(x[[i]]$col.name)))
+        if (x[[i]]$col.name[j] != x[[i]]$appear[j])
+            rows <- gsub(x[[i]]$col.name[j], x[[i]]$appear[j], rows)
+    rows <- .gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
     rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
 
     cat("\nMADlib Logistic Regression Result\n")
-    cat("\nCall:\n", paste(deparse(x[[1]]$call), sep = "\n", collapse = "\n"),
+    cat("\nCall:\n", paste(deparse(x[[i]]$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")
     if (n.grps > 1)
         cat("\nThe data is divided into", x$grps, "groups\n")
@@ -295,6 +299,7 @@ print.logregr.madlib <- function (x,
                                   getOption("digits") - 3L),
                                   ...)
 {
+    if (all(is.na(x$coef))) stop("Coefficients are NAs!")
     if (x$has.intercept)
         rows <- c("(Intercept)", x$ind.vars)
     else
