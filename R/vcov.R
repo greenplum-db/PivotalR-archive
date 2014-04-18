@@ -8,7 +8,8 @@
     dnx <- dimnames(X)
     if(is.null(dnx)) dnx <- vector("list", 2)
     s <- svd(X)
-    nz <- s$d > tol * s$d[1]
+    ## nz <- s$d > tol * s$d[1]
+    nz <- s$d > tol
     structure(if(any(nz)) s$v[, nz] %*% (t(s$u[, nz])/s$d[nz]) else X,
               dimnames = dnx[2:1])
 }
@@ -67,7 +68,9 @@ vcov.lm.madlib <- function(object, na.action = NULL, ...)
     compute <- as.db.data.frame(compute, verbose = FALSE)
     mn <- lk(compute[,1]) * n / (n - k)
     xx <- compute[,2]; class(xx) <- "db.Rcrossprod"; xx@.dim <- c(k,k)
-    xx@.is.symmetric <- TRUE; xx <- .pseudo.inv(lk(xx))
+    xx@.is.symmetric <- TRUE;
+    xx <- .pseudo.inv(lk(xx))
+    #xx <- solve(lk(xx))
     delete(compute)
     res <- mn * xx
 
@@ -103,6 +106,7 @@ vcov.logregr.madlib <- function(object, na.action = NULL, ...)
     cx <- rowSums(object$coef * x)
     a <- 1/((1 + exp(-1*cx)) * (1 + exp(cx)))
     xx <- .pseudo.inv(lk(crossprod(x, a*x)))
+    ##xx <- solve(lk(crossprod(x,a*x)))
 
     model.vars <- gsub("::[\\w\\s]+", "", object$ind.vars, perl = T)
     model.vars <- gsub("\"", "`", model.vars)

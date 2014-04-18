@@ -186,7 +186,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 .strip <- function (str, rm = "\\s")
 {
     rm.str <- paste("^", rm, "*(.*[^", rm, "])", rm, "*$", sep = "")
-    gsub(rm.str, "\\1", str, perl = TRUE)
+    .gsub(rm.str, "\\1", str, perl = TRUE)
 }
 
 ## -----------------------------------------------------------------------
@@ -199,9 +199,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     ## f.str <- .replace.array(f.str, data)
     fstr <- f.str[1]
-    fstr <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "factor(\\1)",
+    fstr <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "factor(\\1)",
                  fstr, perl = T)
-    fstr <- gsub("factor\\((((?!as\\.factor).)*)\\)", "as.factor(\\1)",
+    fstr <- .gsub("factor\\((((?!as\\.factor).)*)\\)", "as.factor(\\1)",
                  fstr, perl = T)
 
     f2 <- f.str[2] # grouping columns, might be NA
@@ -216,9 +216,9 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         f2.labels <- attr(f2.terms, "term.labels")
 
         ## ## grouping column do not use factor
-        f2.labels <- gsub("I\\((.*)\\)", "(\\1)", f2.labels, perl = T)
-        f2.labels <- gsub("as\\.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
-        f2.labels <- gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- .gsub("I\\((.*)\\)", "(\\1)", f2.labels, perl = T)
+        f2.labels <- .gsub("as\\.factor\\((.*)\\)", "\\1", f2.labels, perl = T)
+        f2.labels <- .gsub("factor\\((.*)\\)", "\\1", f2.labels, perl = T)
 
         grp.expr <- f2.labels
         for (i in seq_len(length(f2.labels))) {
@@ -250,7 +250,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
-        right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
+        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
 
         if (sum(data@.is.factor) > 0) {
             distinct <- list()
@@ -295,7 +295,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         elm <- .regmatches(right.hand,
                            gregexpr("as\\.factor\\s*\\([^\\(\\)]+\\)",
                                     right.hand, perl=T))[[1]]
-        col <- .strip(gsub("as\\.factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
+        col <- .strip(.gsub("as\\.factor\\s*\\(([^\\(\\)]+)\\)", "\\1", elm,
                            perl = T))
         if (!all(col %in% names(data)))
             stop("At least one of the variables cannot be set to be a factor ",
@@ -309,7 +309,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         ## factors added by formula
         for (cl in col) data[[cl]] <- as.factor(data[[cl]])
 
-        right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
+        right.hand <- .gsub("as\\.factor\\((((?!as\\.factor).)*)\\)", "\\1", right.hand, perl = T)
         ## right.hand <- gsub("factor\\((((?!factor).)*)\\)", "\\1", right.hand, perl = T)
     }
 
@@ -317,19 +317,20 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     f.labels <- attr(f.terms1, "term.labels")
     ## f.labels <- gsub("`([^`]*)(\\[\\d+\\])`", "\"\\1\"\\2", f.labels)
     f.intercept <- attr(f.terms, "intercept")
-    labels <- gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
-    labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
-    labels <- gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", labels)
-    labels <- gsub("I\\((.*)\\)", "(\\1)", labels, perl = T) # remove I()
+    ## labels <- .gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", f.labels)
+    ## labels <- gsub(":", "*", labels, perl = T) # replace interaction : with *
+    ## labels <- .gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", labels)
+    labels <- .replace.colon(f.labels)
+    labels <- .gsub("I\\((.*)\\)", "(\\1)", labels, perl = T) # remove I()
 
     ## vdata <- .expand.array(data)
     vdata <- data
 
     ## dependent variable
     ## factor does not play a role in dependent variable
-    dep.var <- gsub("I\\((.*)\\)", "(\\1)", rownames(f.factors)[1], perl = T)
-    dep.var <- gsub("as\\.factor\\((.*)\\)", "\\1", dep.var, perl = T)
-    dep.var <- gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
+    dep.var <- .gsub("I\\((.*)\\)", "(\\1)", rownames(f.factors)[1], perl = T)
+    dep.var <- .gsub("as\\.factor\\((.*)\\)", "\\1", dep.var, perl = T)
+    dep.var <- .gsub("factor\\((.*)\\)", "\\1", dep.var, perl = T)
     ## dep.var <- .replace.with.quotes(dep.var, data@.col.name)
     origin.dep <- dep.var
 
@@ -352,12 +353,25 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                     sep = "")))
     a.labels <- unlist(sapply(a, function(x) x[,]@.expr))
 
+    ## b <- eval(parse(text = paste("with(vdata, c(",
+    ##                 paste(.gsub("I\\((.*)\\)", "(\\1)",
+    ##                            setdiff(rownames(f.factors),
+    ##                                    colnames(f.factors))),
+    ##                       collapse = ", "), "))", sep = "")))
     b <- eval(parse(text = paste("with(vdata, c(",
-                    paste(gsub("I\\((.*)\\)", "(\\1)",
-                               setdiff(rownames(f.factors),
-                                       colnames(f.factors))),
-                          collapse = ", "), "))", sep = "")))
+        paste(.replace.colon(.gsub("I\\((.*)\\)", "(\\1)",
+            rownames(f.factors)[rowSums(f.factors) == 0])),
+              collapse = ", "), "))", sep = "")))
+    ## b2 <- eval(parse(text = paste("with(vdata, c(",
+    ##     paste(.replace.colon(.gsub("I\\((.*)\\)", "(\\1)", colnames(f.factors))),
+    ##           collapse = ", "), "))", sep = "")))
     b.labels <- unlist(sapply(b, function(x) x[,]@.expr))
+    ## b2.labels <- unlist(sapply(b2, function(x) x[,]@.expr))
+    ## remove <- match(b2.labels, b1.labels)
+    ## remove <- remove[!is.na(remove)]
+    ## if (length(remove) >0) b.labels <- b1.labels[-remove]
+    ## else b.labels <- character(0)
+    ## b.labels <- b1.labels[rowSums(f.factors) == 0]
     labels <- .strip(setdiff(a.labels, b.labels), "`")
 
     ## labels <- .replace.with.quotes(labels, data@.col.name)
@@ -381,7 +395,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     factor.full <- rep(TRUE, length(names(data)))
     if (!refresh) {
         model.vars <- .prepare.ind.vars(orig.labels)
-        model.vars <- gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
+        model.vars <- .gsub("`\"([^\\[\\]]*)\"\\[(\\d+)\\]`", "`\\1[\\2]`", model.vars)
         vars <- unique(all.vars(parse(text = model.vars)))
         idx <- match(vars, names(data))
         for (i in seq_len(length(idx))) {
@@ -407,6 +421,26 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 }
 
 ## -----------------------------------------------------------------------
+
+## repeatedly replace all patterns
+.gsub <- function(pattern, replace, str, ...)
+{
+    while (TRUE) {
+        .str <- gsub(pattern, replace, str, ...)
+        if (identical(.str, str)) return (.str)
+        str <- .str
+    }
+}
+
+.replace.colon <- function(s)
+{
+    r <- .gsub("\\[(\\d+):(\\d+)\\]", "[\\1@\\2]", s)
+    r <- gsub(":", "*", r, perl = T)
+    r <- .gsub("\\[(\\d+)@(\\d+)\\]", "[\\1:\\2]", r)
+    r
+}
+
+## ----------------------------------------------------------------------
 
 .modeling.formula <- function(formula, data)
 {
@@ -452,19 +486,19 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     cols <- cols[n.order]
     for (i in seq_len(length(cols))) {
         col <- cols[i]
-        vars <- gsub(paste(col, "([^_\\w]+)", sep = ""),
+        vars <- .gsub(paste(col, "([^_\\w]+)", sep = ""),
                      paste("\"", col, "\"\\1", sep = ""),
                      vars, perl = TRUE)
-        vars <- gsub(paste("([_\\w]+)\"", col, "\"", sep = ""),
+        vars <- .gsub(paste("([_\\w]+)\"", col, "\"", sep = ""),
                      paste("\\1", col, sep = ""),
                      vars, perl = TRUE)
-        vars <- gsub(paste("([^_\\w\"]+)", col, sep = ""),
+        vars <- .gsub(paste("([^_\\w\"]+)", col, sep = ""),
                      paste("\\1\"", col, "\"", sep = ""),
                      vars, perl = TRUE)
-        vars <- gsub(paste("\"", col, "\"([_\\w]+)", sep = ""),
+        vars <- .gsub(paste("\"", col, "\"([_\\w]+)", sep = ""),
                      paste(col, "\\1", sep = ""),
                      vars, perl = TRUE)
-        vars <- gsub(paste("^", col, "$", sep = ""),
+        vars <- .gsub(paste("^", col, "$", sep = ""),
                      paste("\"", col, "\"", sep = ""),
                      vars, perl = TRUE)
     }
@@ -575,7 +609,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             s <- paste("`", data@.col.name[i], "[", seq_len(l) - 1 + n0,
                        "]`",
                        sep = "", collapse = " + ")
-            fstr <- gsub(paste(data@.col.name[i], "\\s*([^\\[]|$)",
+            fstr <- .gsub(paste(data@.col.name[i], "\\s*([^\\[]|$)",
                                sep = ""),
                          paste("(", s, ")\\1", sep = ""), fstr)
         }
@@ -588,8 +622,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 ## whether two where strings are equivalent
 .eql.where <- function (where1, where2)
 {
-    s <- gsub("^not \\((.*)\\)$", "\\1", where1, perl = TRUE)
-    t <- gsub("^not \\((.*)\\)$", "\\1", where2, perl = TRUE)
+    s <- .gsub("^not \\((.*)\\)$", "\\1", where1, perl = TRUE)
+    t <- .gsub("^not \\((.*)\\)$", "\\1", where2, perl = TRUE)
     if (s != where1 && t != where2) {
         return (.eql.where(s, t))
     } else if ((s != where1 && t == where2) ||
@@ -597,15 +631,15 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         return (FALSE)
     }
 
-    s1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", s, perl = TRUE)
+    s1 <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", s, perl = TRUE)
     if (s1 == s) return (s == t)
-    s2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", s, perl = TRUE)
-    ss <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", s, perl = TRUE)
+    s2 <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", s, perl = TRUE)
+    ss <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", s, perl = TRUE)
 
-    t1 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", t, perl = TRUE)
+    t1 <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\1", t, perl = TRUE)
     if (t1 == t) return (FALSE)
-    t2 <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", t, perl = TRUE)
-    tt <- gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", t, perl = TRUE)
+    t2 <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\3", t, perl = TRUE)
+    tt <- .gsub("^\\((.*)\\) (and|or) \\((.*)\\)$", "\\2", t, perl = TRUE)
 
     if ((.eql.where(s1, t1) && .eql.where(s2, t2) && ss == tt) ||
         (.eql.where(s1, t2) && .eql.where(s2, t1) && ss == tt))
