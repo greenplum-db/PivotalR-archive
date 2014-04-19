@@ -261,27 +261,9 @@ setMethod (
         factor.ref <- rep(as.character(NA), length(x@.is.factor))
         if (pivot && !all(x@.is.factor == FALSE)) {
             cats <- x@.expr[x@.is.factor]
-            ## sql <- "select "
-            ## for (i in seq_len(length(cats))) {
-            ##     sql <- paste(sql, "array_agg(distinct case when ", cats[i],
-            ##                  " is NULL then 'NULL' else (",
-            ##                  cats[i], ")::text end) as ",
-            ##                  "distinct_", i, sep = "")
-            ##     if (i != length(cats)) sql <- paste(sql, ",", sep = "")
-            ## }
-            ## ## scan through the table only once
-            ## sql <- paste(sql, " from ", tbl, where, sep = "")
-            ## #distincts <- .db.getQuery(sql, conn.id)
-            ## distincts <- db.q(sql, conn.id = conn.id, verbose = FALSE)
-            ## idx <- 0
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    ## idx <- idx + 1
-                    ## distinct <- as.vector(arraydb.to.arrayr(distincts[[paste("distinct_",idx,sep="")]], "character"))
-                    ## Produce a fixed order for distinct values
-                    ## distinct <- .strip(distinct[order(distinct, decreasing = TRUE)], "\"")
-
-                    distinct <- lk(by(x[[i]], x[[i]], function(s) as.character(s)), -1)[,1]
+                    distinct <- lk(by(x[[i]], x[[i]], identity))[,1]
                     distinct[is.na(distinct)] <- "NULL"
                     distinct <- .strip(distinct[order(distinct, decreasing = TRUE)], "\"")
 
