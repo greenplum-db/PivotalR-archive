@@ -99,7 +99,7 @@
     for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*?)\\)\\[(\\d+?)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
     rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
@@ -227,7 +227,7 @@
     for (i in seq_len(length(col.name)))
         if (col.name[i] != appear[i])
             rows <- gsub(col.name[i], appear[i], rows)
-    rows <- gsub("\\(([^\\[\\]]*)\\)\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("\\(([^\\[\\]]*?)\\)\\[(\\d+?)\\]", "\\1[\\2]", rows)
     rows <- .reverse.consistent.func(rows)
     rows <- gsub("\\s", "", rows)
     names(rst$coef) <- rows
@@ -269,7 +269,7 @@
 
 .convert.to.double.array <- function (x)
 {
-    as.numeric(strsplit(gsub("^\\{(.*)\\}$", "\\1", x), ",")[[1]])
+    as.numeric(strsplit(gsub("^\\{(.*?)\\}$", "\\1", x), ",")[[1]])
 }
 
 ## ----------------------------------------------------------------------

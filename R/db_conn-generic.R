@@ -230,16 +230,16 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE, force = FALSE)
     dbms.str <- dbms(conn.id = conn.id)
     if (gsub(".*(HAWQ).*", "\\1", dbms.str, perl=T) == "HAWQ") {
         db.str <- "HAWQ"
-        version.str <- gsub(".*HAWQ[^\\d]+([\\d\\.]+).*", "\\1",
+        version.str <- gsub(".*HAWQ[^\\d]+?([\\d\\.]+?).*", "\\1",
                             dbms.str, perl=T)
     } else if (gsub(".*(Greenplum).*", "\\1", dbms.str,
                   perl=T) == "Greenplum") {
         db.str <- "Greenplum"
-        version.str <- gsub(".*Greenplum[^\\d]+([\\d\\.]+).*",
+        version.str <- gsub(".*Greenplum[^\\d]+?([\\d\\.]+?).*",
                             "\\1", dbms.str, perl=T)
     } else {
         db.str <- "PostgreSQL"
-        version.str <- gsub(".*PostgreSQL[^\\d]+([\\d\\.]+).*",
+        version.str <- gsub(".*PostgreSQL[^\\d]+?([\\d\\.]+?).*",
                             "\\1", dbms.str, perl=T)
     }
     list(db.str = db.str, version.str = version.str)

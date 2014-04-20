@@ -11,7 +11,7 @@ margins <- function (model, dydx = ~ Vars(model), newdata = model$data,
 {
     vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
     vars <- gsub("\"", "`", vars)
-    vars <- .gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`\"\\1\"[\\2]`", vars)
+    vars <- gsub("\\(`([^\\[\\]]*?)`\\)\\[(\\d+?)\\]", "`\"\\1\"[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
     vars <- .reverse.consistent.func(vars)
     vars
@@ -49,7 +49,7 @@ Vars <- function(model)
                       v, perl = TRUE)
         for (i in seq_along(model.vars))
             v <- gsub(no.conflict.names[i], model.vars[i], v, perl = TRUE)
-        v <- .gsub("([^`]|^)\"([^\\[\\]]*)\"\\[(\\d+)\\]([^`]|$)",
+        v <- gsub("([^`]|^)\"([^\\[\\]]*?)\"\\[(\\d+?)\\]([^`]|$)",
                   "(`\"\\2\"[\\3]`)", v, perl = TRUE)
         v
     }
@@ -114,9 +114,9 @@ Vars <- function(model)
         } else if (grepl("^[^\\[\\]]*\\[[^\\[\\]]*\\]$",
                          f.vars[i], perl = T)) {
             var <- gsub("`", "", f.vars[i])
-            x.str <- .gsub("([^\\[\\]]*)\\[[^\\[\\]]*\\]", "\\1", var,
+            x.str <- gsub("([^\\[\\]]*?)\\[[^\\[\\]]*?\\]", "\\1", var,
                            perl = TRUE)
-            idx <- .gsub("[^\\[\\]]*\\[([^\\[\\]]*)\\]", "\\1", var,
+            idx <- gsub("[^\\[\\]]*?\\[([^\\[\\]]*?)\\]", "\\1", var,
                          perl = TRUE)
             idx <- eval(parse(text = idx))
             expand.vars <- c(expand.vars, paste("`\"", .strip(x.str, "\""),
@@ -154,8 +154,8 @@ Vars <- function(model)
             function(i) {
                 sub <- factors[factors[,1] == factors[i,1],]
                 paste("\"", factors[i,1],
-                      .gsub(paste(".*(", .unique.pattern(), ").*", sep = ""),
-                            "\\1", factors[i,3], perl = TRUE),
+                      gsub(paste(".*(", .unique.pattern(), ").*", sep = ""),
+                           "\\1", factors[i,3], perl = TRUE),
                       factors[i,4], "\"", sep = "")
             }))
 
@@ -220,10 +220,10 @@ Vars <- function(model)
              "or the table column names!")
 
     expand.vars <- paste("\"", expand.vars, "\"", sep = "")
-    expand.vars <- .gsub("\"`\"([^\\[\\]]*)\"\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]",
-                         expand.vars, perl = TRUE)
-    expand.vars <- .gsub("\"`([^\\[\\]]*)\\[([^\\[\\]]*)\\]`\"", "\"\\1\"[\\2]",
-                         expand.vars, perl = TRUE)
+    expand.vars <- gsub("\"`\"([^\\[\\]]*?)\"\\[([^\\[\\]]*?)\\]`\"", "\"\\1\"[\\2]",
+                        expand.vars, perl = TRUE)
+    expand.vars <- gsub("\"`([^\\[\\]]*?)\\[([^\\[\\]]*?)\\]`\"", "\"\\1\"[\\2]",
+                        expand.vars, perl = TRUE)
 
     return (list(vars = expand.vars, is.ind = expand.is.ind,
                  is.factor = is.factor, factors = factors,
@@ -264,8 +264,8 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
         avgs <- lk(mean(newdata))
         avgs <- .expand.avgs(avgs)
         names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
-        names(avgs) <- .gsub("([^`]|^)\"([^\\[\\]]*)_avg\\[(\\d+)\\]\"([^`]|$)",
-                             "\"\\2\"[\\3]", names(avgs))
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*?)_avg\\[(\\d+?)\\]\"([^`]|$)",
+                            "\"\\2\"[\\3]", names(avgs))
     ## } else if (length(at) > 0) {
     ##     at.mean <- TRUE
     ##     avgs <- at
@@ -308,7 +308,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
                       rows[f$is.factor][i], 1:2],
             collapse = ".")
     }
-    rows <- .gsub("([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("([^\\[\\]]*?)\"\\[(\\d+?)\\]", "\\1[\\2]", rows)
 
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `t value` = t,
                             `Pr(>|t|)` = p), row.names = rows,
@@ -383,8 +383,8 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
         avgs <- .expand.avgs(avgs)
         names(avgs) <- gsub("_avg$", "", names(avgs))
         names(avgs) <- paste("\"", gsub("_avg$", "", names(avgs)), "\"", sep = "")
-        names(avgs) <- .gsub("([^`]|^)\"([^\\[\\]]*)_avg\\[(\\d+)\\]\"([^`]|$)",
-                             "\"\\2\"[\\3]", names(avgs))
+        names(avgs) <- gsub("([^`]|^)\"([^\\[\\]]*?)_avg\\[(\\d+?)\\]\"([^`]|$)",
+                            "\"\\2\"[\\3]", names(avgs))
         expr <- gsub("\\s", "",
                      paste(deparse(eval(parse(text = paste("substitute(",
                                               expr, ", avgs)", sep = "")))),
@@ -430,7 +430,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
                                               rows[f$is.factor][i], 1:2],
                                     collapse = ".")
     }
-    rows <- .gsub("([^\\[\\]]*)\"\\[(\\d+)\\]", "\\1[\\2]", rows)
+    rows <- gsub("([^\\[\\]]*?)\"\\[(\\d+?)\\]", "\\1[\\2]", rows)
 
     res <- data.frame(cbind(Estimate = mar, `Std. Error` = se, `z value` = z,
                             `Pr(>|z|)` = p),
@@ -1022,10 +1022,10 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
 {
     unique.string <- .unique.pattern()
     if (grepl(unique.string, var, perl = TRUE)) {
-        res1 <- .gsub(paste("^(.*)", unique.string, ".*$", sep = ""), "\\1",
-                      var, perl = TRUE)
-        res2 <- .gsub(paste("^.*", unique.string, "(.*)$", sep = ""), "\\1",
-                      var, perl = TRUE)
+        res1 <- gsub(paste("^(.*)", unique.string, ".*$", sep = ""), "\\1",
+                     var, perl = TRUE)
+        res2 <- gsub(paste("^.*", unique.string, "(.*)$", sep = ""), "\\1",
+                     var, perl = TRUE)
         c(res1, res2)
     } else
         var
