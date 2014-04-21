@@ -170,6 +170,10 @@ setMethod (
 
 ## -----------------------------------------------------------------------
 
+## Use this to represent NULL
+## user is extremely unlikely to use this name
+.null.string <- "<@#$NULL%^&>"
+
 ## convert a db.Rquery object into a db.data.frame object
 
 setMethod (
@@ -264,7 +268,7 @@ setMethod (
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
                     distinct <- lk(by(x[[i]], x[[i]], identity))[,1]
-                    distinct[is.na(distinct)] <- "NULL"
+                    distinct[is.na(distinct)] <- .null.string
                     distinct <- .strip(distinct[order(distinct, decreasing = TRUE)], "\"")
 
                     if (is.na(x@.factor.ref[i]))
@@ -285,7 +289,8 @@ setMethod (
                         extra <- paste(extra, " ", dex, " as ",
                                        "\"", new.col, "\"", sep = "")
                         appear <- c(appear, paste(x@.col.name[i],".",
-                                                  distinct[j], sep = ""))
+                                                  if (distinct[j] != .null.string) distinct[j]
+                                                  else "<NA>", sep = ""))
                         dummy <- c(dummy, new.col)
                         dummy.expr <- c(dummy.expr, dex)
                     }
