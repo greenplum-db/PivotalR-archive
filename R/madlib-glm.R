@@ -111,7 +111,7 @@ madlib.glm <- function (formula, data,
 
     ## drop temporary tables
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
-    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+    if (is.tbl.source.temp) delete(tbl.source, conn.id)
 
     if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
         model <- NULL

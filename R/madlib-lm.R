@@ -190,7 +190,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
     ## drop temporary tables
     ## HAWQ does not need to drop the output table
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
-    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+    if (is.tbl.source.temp) delete(tbl.source, conn.id)
 
     ## the class of a list of models
     class(rst) <- "lm.madlib.grps"

@@ -100,7 +100,7 @@ madlib.elnet <- function (formula, data,
                 sep = " ", nrows = -1)
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 
-    if (is.tbl.source.temp) .db.removeTable(tbl.source, conn.id)
+    if (is.tbl.source.temp) delete(tbl.source, conn.id)
     .restore.warnings(warnings)
 
     ## prepare the result
