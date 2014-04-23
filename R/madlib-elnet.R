@@ -7,7 +7,7 @@ setClass("elnet.madlib")
 madlib.elnet <- function (formula, data,
                           family = c("gaussian", "linear", "binomial",
                           "logistic"),
-                          na.action = NULL,
+                          na.action = NULL, na.as.level = FALSE,
                           alpha = 1, lambda = 0.1, standardize = TRUE,
                           method = c("fista", "igd", "sgd", "cd"),
                           control = list(),
@@ -34,7 +34,7 @@ madlib.elnet <- function (formula, data,
 
     warnings <- .suppress.warnings(conn.id)
 
-    analyzer <- .get.params(formula, data, na.action)
+    analyzer <- .get.params(formula, data, na.action, na.as.level)
     data <- analyzer$data
 
     params <- analyzer$params

@@ -243,10 +243,13 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
+        vars <- unique(gsub(paste(.unique.pattern(),
+                                  ".*$", sep = ""), "",
+                            Vars(model), perl = T))
         newdata <- na.action(
             newdata, vars = union(
                 all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
-                Vars(model)))
+                vars))
     }
 
     vars <- dydx
@@ -350,10 +353,13 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
+        vars <- unique(gsub(paste(.unique.pattern(),
+                                  ".*$", sep = ""), "",
+                            Vars(model), perl = T))
         newdata <- na.action(
             newdata, vars = union(
                 all.vars(parse(text = rownames(attr(model$terms, "factors"))[1])),
-                Vars(model)))
+                vars))
     }
 
     vars <- dydx

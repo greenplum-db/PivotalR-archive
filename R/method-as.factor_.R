@@ -78,6 +78,6 @@ setMethod(
             stop("Cannot relevel multiple columns!")
         if (!x@.is.factor) x <- as.factor(x)
         x@.factor.ref <- (if (is.null(ref) || is.na(ref))
-                          'NULL' else as.character(ref))
+                          .null.string else as.character(ref))
         x
     })

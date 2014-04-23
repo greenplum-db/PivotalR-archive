@@ -19,7 +19,7 @@
 }
 
 \usage{
-madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
+madlib.lm(formula, data, na.action = NULL, hetero = FALSE, na.as.level = FALSE, ...)
 }
 
 \arguments{
@@ -51,6 +51,11 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, ...)
   \code{TRUE}, then Breusch-Pagan test is performed on the fitting model
   and the corresponding test statistic and p-value are computed. See [1]
   for more details.
+  }
+
+  \item{na.as.level}{
+      A logical value, default is \code{FALSE}. Whether to treat \code{NA}
+      value as a level in a categorical variable or just ignore it.
   }
 
   \item{\dots}{

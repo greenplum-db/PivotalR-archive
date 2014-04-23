@@ -10,9 +10,9 @@
 }
 \usage{
 madlib.elnet(formula, data, family = c("gaussian", "linear", "binomial",
-"logistic"), na.action = NULL, alpha = 1, lambda = 0.1, standardize =
-TRUE, method = c("fista", "igd", "sgd", "cd"), control = list(), glmnet
-= FALSE, ...)
+"logistic"), na.action = NULL, na.as.level = FALSE, alpha = 1, lambda = 0.1,
+standardize = TRUE, method = c("fista", "igd", "sgd", "cd"),
+control = list(), glmnet = FALSE, ...)
 }
 
 \arguments{
@@ -38,6 +38,12 @@ TRUE, method = c("fista", "igd", "sgd", "cd"), control = list(), glmnet
         \code{"na.fail"}
         and \code{NULL}. Right now, \code{\link{na.omit}} has been implemented. When the value is \code{NULL}, nothing is done on the R side and \code{NA} values are filtered on the MADlib side. User defined \code{na.action} function is allowed.
 }
+
+  \item{na.as.level}{
+      A logical value, default is \code{FALSE}. Whether to treat \code{NA}
+      value as a level in a categorical variable or just ignore it.
+  }
+
 \item{alpha}{
   A numeric value in [0,1], elastic net mixing parameter. The
           penalty is defined as

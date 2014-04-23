@@ -9,7 +9,8 @@ setClass("lm.madlib.grps")
 ## will implement later in R (using temp table), or will implement
 ## in MADlib
 madlib.lm <- function (formula, data, na.action = NULL,
-                       hetero = FALSE, ...) # param name too long
+                       hetero = FALSE, na.as.level = FALSE,
+                       ...) # param name too long
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
@@ -33,7 +34,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
     warnings <- .suppress.warnings(conn.id)
 
     ## analyze the formula
-    analyzer <- .get.params(formula, data, na.action)
+    analyzer <- .get.params(formula, data, na.action, na.as.level)
 
     ## For db.view or db.R.query, create a temporary table
     ## For pivoted db.Rquery, realize the pivoting

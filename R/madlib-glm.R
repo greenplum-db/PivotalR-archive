@@ -54,7 +54,8 @@ madlib.glm <- function (formula, data,
 ## -----------------------------------------------------------------------
 
 .madlib.logregr <- function (formula, data, na.action = NULL, method = "irls",
-                             max.iter = 10000, tolerance = 1e-5)
+                             max.iter = 10000, tolerance = 1e-5,
+                             na.as.level = FALSE)
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
@@ -66,7 +67,7 @@ madlib.glm <- function (formula, data,
     .check.madlib.version(data)
 
     warnings <- .suppress.warnings(conn.id(data))
-    analyzer <- .get.params(formula, data, na.action)
+    analyzer <- .get.params(formula, data, na.action, na.as.level)
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp

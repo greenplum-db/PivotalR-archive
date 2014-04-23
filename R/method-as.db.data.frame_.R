@@ -183,6 +183,7 @@ setMethod (
     is.view = FALSE,
     is.temp = FALSE,  pivot = TRUE,
     distributed.by = NULL, nrow = NULL, field.types = NULL,
+    na.as.level = FALSE, # whether use NULL as a level
     factor.full = rep(FALSE, length(names(x)))) { # whether expand all levels
         warnings <- .suppress.warnings(conn.id(x))
 
@@ -268,7 +269,11 @@ setMethod (
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
                     distinct <- lk(by(x[[i]], x[[i]], identity))[,1]
-                    distinct[is.na(distinct)] <- .null.string
+                    if (na.as.level)
+                        distinct[is.na(distinct)] <- .null.string
+                    else
+                        distinct <- distinct[!is.na(distinct)]
+
                     distinct <- .strip(distinct[order(distinct, decreasing = TRUE)], "\"")
 
                     if (is.na(x@.factor.ref[i]))

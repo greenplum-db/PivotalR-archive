@@ -58,6 +58,9 @@ madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
         A list, extra parameters to be passed to linear or logistic
         regressions.
 
+        \code{na.as.level}: A logical value, default is \code{FALSE}. Whether to treat \code{NA}
+      value as a level in a categorical variable or just ignore it.
+
         For the linear regressions, the extra parameter is
         \code{hetero}. A logical, deafult is \code{FALSE}. If it is
   \code{TRUE}, then Breusch-Pagan test is performed on the fitting model
