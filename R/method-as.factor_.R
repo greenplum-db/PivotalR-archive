@@ -81,3 +81,19 @@ setMethod(
                           'NULL' else as.character(ref))
         x
     })
+
+## ---------------------------------------------------------------
+
+setGeneric ("addNA")
+
+setMethod(
+    "addNA",
+    signature(x = "db.obj"),
+    function(x, ifelse = FALSE) {
+        if (length(x@.col.name) != 1)
+            stop("Cannot add NA to multiple columns simutaneously!")
+        if (!x@.is.factor) x <- as.factor(x)
+        x@.na.as.level <- TRUE
+        x
+    })
+

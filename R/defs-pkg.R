@@ -92,6 +92,7 @@ setClass("db.data.frame",
              .appear.name = "character",
              .dummy = "character",
              .dummy.expr = "character",
+             .na.as.level = "logical",
              .is.factor = "logical",
              .factor.ref = "character",
              .dist.by = "character"
@@ -140,6 +141,7 @@ setClass("db.Rquery",
              .is.factor = "logical", # a boolean vector
              .factor.suffix = "character",
              .factor.ref = "character",
+             .na.as.level = "logical",
              .sort = "list", # order by
              .is.agg = "logical", # is this an aggrgate?
              .dist.by = "character"
