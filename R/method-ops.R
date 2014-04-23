@@ -172,31 +172,6 @@ setMethod (
 
 ## -----------------------------------------------------------------------
 
-.num.types <- c("smallint", "integer", "int2", "int4", "int4",
-                "bigint", "decimal", "numeric", "double precision",
-                "float8", "real", "serial", "bigserial")
-
-## --
-
-.int.types <- c("smallint", "integer", "int2", "int4", "int4",
-                "bigint")
-
-## --
-
-.txt.types <- c("character varying", "varchar", "character",
-                "char", "text")
-
-## --
-
-.time.types <- c("timestamp", "time", "date", "interval",
-                 "timestamp with time zone")
-
-.udt.time.types <- c("timestamp", "time", "date", "interval", "timestamptz")
-
-.time.change <- c("interval", "time", "integer", "interval", "interval")
-
-## -----------------------------------------------------------------------
-
 setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "numeric"),

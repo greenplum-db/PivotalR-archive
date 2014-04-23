@@ -26,10 +26,10 @@
 ## cannot be changed without exposing to users. If we really
 ## export these variables, they will easily interfere with other
 ## user defined variables.
-## 
+##
 ## The only way is to define a local environment inside the package.
 ##
-## The environment is a constant and cannot be changed, 
+## The environment is a constant and cannot be changed,
 ## but the variables inside this environment can be changed.
 ## The environment constant is not exported, and is thus hidden
 ## from the users.
@@ -40,6 +40,36 @@
 ## (3) conn.type - a list with vector element, contains connection pkg
 ## for each conn id
 ## (4) drv - drivers for each connection packages
+
+
+## Use this to represent NULL
+## user is extremely unlikely to use this name
+.null.string <- "<@#$NULL%^&>"
+
+## -----------------------------------------------------------------------
+
+.num.types <- c("smallint", "integer", "int2", "int4", "int4",
+                "bigint", "decimal", "numeric", "double precision",
+                "float8", "real", "serial", "bigserial")
+
+## --
+
+.int.types <- c("smallint", "integer", "int2", "int4", "int4",
+                "bigint")
+
+## --
+
+.txt.types <- c("character varying", "varchar", "character",
+                "char", "text")
+
+## --
+
+.time.types <- c("timestamp", "time", "date", "interval",
+                 "timestamp with time zone")
+
+.udt.time.types <- c("timestamp", "time", "date", "interval", "timestamptz")
+
+.time.change <- c("interval", "time", "integer", "interval", "interval")
 
 
 ## -----------------------------------------------------------------------
