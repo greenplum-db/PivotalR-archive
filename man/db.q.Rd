@@ -1,4 +1,5 @@
 \name{db.q}
+\alias{db}
 \alias{db.q}
 
 \title{
@@ -8,6 +9,8 @@
   This function sends SQL queries into the connected database to execute, and then extracts the result if there is any.
 }
 \usage{
+db(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
+
 db.q(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 }
 
