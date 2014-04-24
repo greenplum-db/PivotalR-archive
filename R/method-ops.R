@@ -1003,7 +1003,7 @@ setMethod (
                 break
             }
         if (v > 0 && e2@.col.data_type[i2] %in% data.types[[v]]) {
-            expr[i] <- paste("(", e1@.expr[i1], ")", (if (hide.case) "" else cast),
+            expr[i] <- paste("(", e1@.expr[i1], ")", (if (hide.cast) "" else cast),
                              op, "(", e2@.expr[i2], ")", sep = "")
         } else {
             expr[i] <- "NULL"
