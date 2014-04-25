@@ -55,10 +55,11 @@ setMethod (
 ## -----------------------------------------------------------------------
 
 ## operation between an db.obj and a single value
+## @param hide.cast for some operations (*, +, -), cast string is not necessary
 .compare <- function (e1, e2, cmp, data.types,
                       prefix = "", res.type = "boolean",
                       cast = "::double precision", res.udt = "bool",
-                      restore.array = TRUE)
+                      restore.array = TRUE, hide.cast = FALSE)
 {
     if (is(e1, "db.data.frame")) e1 <- e1[,]
 
@@ -95,7 +96,8 @@ setMethod (
         if (e1@.col.data_type[i] %in% data.types || is.na(data.types) || whole.array) {
             e2.str <- (if (e2[count %% l + 1] == "") "" else paste(
                 "(", e2[count %% l + 1], ")", sep = ""))
-            expr[i] <- paste(prefix, "(", e1@.expr[i], ")", cast,
+            expr[i] <- paste(prefix, "(", e1@.expr[i], ")",
+                             (if (hide.cast) "" else cast),
                              cmp, e2.str, sep = "")
             count <- count + 1
             i <- i + 1
@@ -121,8 +123,9 @@ setMethod (
                 col.udt_name[i] <- paste("_", res.udt, sep = "")
                 i <- i + 1
             } else {
-                expr.t <- paste(prefix, "(", tmp, ")", cast, cmp, e2.str,
-                                sep = "")
+                expr.t <- paste(prefix, "(", tmp, ")",
+                                (if (hide.cast) "" else cast),
+                                cmp, e2.str, sep = "")
                 expr <- c(expr[seq_len(i-1)], expr.t,
                           expr[(i+1)+seq_len(length(expr)-i)])
                 col.data_type <- c(col.data_type[seq_len(i-1)],
@@ -176,7 +179,7 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " > ", .num.types)
+        res <- .compare(e1, e2, " > ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -198,7 +201,7 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " < ", .num.types)
+        res <- .compare(e1, e2, " < ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -220,7 +223,7 @@ setMethod(
     ">=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " >= ", .num.types)
+        res <- .compare(e1, e2, " >= ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -242,7 +245,7 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " <= ", .num.types)
+        res <- .compare(e1, e2, " <= ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -264,7 +267,7 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " = ", .num.types)
+        res <- .compare(e1, e2, " = ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -330,7 +333,7 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "numeric"),
     function (e1, e2) {
-        res <- .compare(e1, e2, " <> ", .num.types)
+        res <- .compare(e1, e2, " <> ", .num.types, hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -581,7 +584,7 @@ setMethod (
         res <- .compare(e1, e2, " + ", .num.types,
                         cast = "",
                         res.type = "double precision",
-                        res.udt = "float8")
+                        res.udt = "float8", hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
 
         for (i in seq_len(length(names(res)))) {
@@ -645,7 +648,8 @@ setMethod (
     function (e1, e2) {
         res <- .compare(e1, e2, " - ", .num.types,
                         res.type = "double precision",
-                        res.udt = "float8")
+                        res.udt = "float8",
+                        hide.cast = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -672,7 +676,7 @@ setMethod (
     signature(e1 = "character", e2 = "db.obj"),
     function (e1, e2) {
         e1 <- paste("'", .strip(e1, "'"), "'", sep = "")
-        res <- .compare(e2, e1, " - ", .num.types, cast = "")
+        res <- .compare(e2, e1, " + ", .num.types, prefix = "-", cast = "")
         res <- .replace.timestamp(e2, res, e1, " - ", TRUE, TRUE)
         if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
         res
@@ -697,7 +701,8 @@ setMethod (
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
         res <- .compare(e2, e1, " + ", .num.types, prefix = "-",
-                        res.type = "double precision", res.udt = "float8")
+                        res.type = "double precision", res.udt = "float8",
+                        hide.cast = TRUE)
         if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
         res
     },
@@ -744,7 +749,7 @@ setMethod (
         } else {
             res <- .compare(e1, e2, " * ", .num.types,
                             res.type = "double precision",
-                            res.udt = "float8")
+                            res.udt = "float8", hide.cast = TRUE)
             if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
             res
         }
@@ -782,7 +787,8 @@ setMethod (
     signature(e1 = "numeric", e2 = "db.obj"),
     function (e1, e2) {
         res <- .compare(e2, e1, " * ", .num.types, prefix = "1./",
-                        res.type = "double precision", res.udt = "float8")
+                        res.type = "double precision", res.udt = "float8",
+                        hide.cast = TRUE)
         if (is(e2, "db.Rquery")) res@.is.agg <- e2@.is.agg
         res
     },
@@ -882,7 +888,7 @@ setMethod (
 .operate.two <- function (e1, e2, op, data.types,
                           res.type = "boolean",
                           cast = "::double precision",
-                          res.udt = "bool")
+                          res.udt = "bool", hide.cast = FALSE)
 {
     ## convert db.data.frame into db.Rquery
     if (is(e1, "db.data.frame")) e1 <- e1[,]
@@ -934,13 +940,15 @@ setMethod (
                     stop("Two arrays have to have the same length or one ",
                          "of them has length of 1!")
                 expr[i] <- paste("array[", paste("(", tmp1, ")",
-                                                 cast, op, "(",
+                                                 (if (hide.cast) "" else cast),
+                                                 op, "(",
                                                  tmp2, ")", sep = "",
                                                  collapse = ", "),
                                  "]", sep = "")
             } else {
                 expr[i] <- paste("array[", paste("(", tmp1, ")",
-                                                 cast, op, "(",
+                                                 (if (hide.cast) "" else cast),
+                                                 op, "(",
                                                  e2@.expr[i2], ")",
                                                  sep = "",
                                                  collapse = ", "),
@@ -955,7 +963,8 @@ setMethod (
             tmp2 <- .get.array.elements(e2@.expr[i2], tbl, where.str,
                                         conn.id)
             expr[i] <- paste("array[", paste("(", e1@.expr[i1], ")",
-                                             cast, op, "(",
+                                             (if (hide.cast) "" else cast),
+                                             op, "(",
                                              tmp2, ")",
                                              sep = "",
                                              collapse = ", "),
@@ -969,8 +978,8 @@ setMethod (
                 break
             }
         if (v > 0 && e2@.col.data_type[i2] %in% data.types[[v]]) {
-            expr[i] <- paste("(", e1@.expr[i1], ")", cast, op, "(",
-                             e2@.expr[i2], ")", sep = "")
+            expr[i] <- paste("(", e1@.expr[i1], ")", (if (hide.cast) "" else cast),
+                             op, "(", e2@.expr[i2], ")", sep = "")
         } else {
             expr[i] <- "NULL"
         }
@@ -1018,7 +1027,7 @@ setMethod (
         }
         .operate.two(e1, e2, " + ", list(.num.types),
                      res.type = "double precision",
-                     res.udt = "float8")
+                     res.udt = "float8", hide.cast = TRUE)
     },
     valueClass = "db.Rquery")
 
@@ -1063,7 +1072,7 @@ setMethod (
                 } else {
                     .operate.two(e1[[i]], e2[[i]], " - ", list(.num.types),
                                  res.type = "double precision",
-                                 res.udt = "float8")
+                                 res.udt = "float8", hide.cast = TRUE)
                 }
             }))
     },
@@ -1110,7 +1119,7 @@ setMethod (
         } else {
             res <- .operate.two(e1, e2, " * ", list(.num.types),
                          res.type = "double precision",
-                         res.udt = "float8")
+                         res.udt = "float8", hide.cast = TRUE)
             if (length(names(e1)) == 1 && e1@.col.data_type == "array" &&
                 length(names(e2)) == 1 && e2@.col.data_type == "array") {
                 res@.col.data_type <- "array"
