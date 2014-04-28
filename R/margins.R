@@ -10,9 +10,10 @@ margins <- function (model, dydx = ~ Vars(model), newdata = model$data,
 .prepare.ind.vars <- function(ind.vars)
 {
     vars <- gsub("::[\\w\\s]+", "", ind.vars, perl = T)
-    vars <- gsub("\"", "`", vars)
-    vars <- gsub("\\(`([^\\[\\]]*?)`\\)\\[(\\d+?)\\]", "`\"\\1\"[\\2]`", vars)
-    vars <- gsub("\\s", "", vars)
+    vars <- gsub("\"", "`", vars, perl = T)
+    vars <- gsub("\\(`([^\\[\\]]*?)`\\)\\[(\\d+?)\\]", "`\"\\1\"[\\2]`",
+                 vars, perl = T)
+    vars <- gsub("\\s", "", vars, perl = T)
     vars <- .reverse.consistent.func(vars)
     vars
 }
@@ -93,7 +94,6 @@ Vars <- function(model)
         select.vars <- c(select.vars, idx)
     }
     select.vars <- unique(select.vars)
-
     f.vars <- unique(c(select.vars, f.vars[!is.vars]))
 
     is.ind <- rep(FALSE, length(f.vars))

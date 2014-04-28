@@ -443,7 +443,7 @@ db.array <- function (x, ...)
     if (!all(base@.col.data_type %in% .num.types) &&
         !all(base@.col.data_type %in% .txt.types) &&
         !all(base@.col.data_type %in% c('boolean')))
-        stop("columns cannot be put into the same array!")
+        stop("columns may have different types and cannot be put into the same array!")
 
     if (base@.col.data_type[1] %in% .num.types)
         udt.name <- "_float8"
@@ -556,7 +556,7 @@ db.array <- function (x, ...)
         if (!all(data.types %in% .num.types) &&
             !all(data.types %in% .txt.types) &&
             !all(data.types %in% c('boolean')))
-            stop("columns cannot be put into the same array!")
+            stop("columns may have different types and cannot be put into the same array!")
     } else {
         if (udt.name == "_float") x <- as.numeric(x)
         else if (udt.name == "_text") x <- as.character(x)
