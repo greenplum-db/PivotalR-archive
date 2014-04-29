@@ -272,6 +272,10 @@ fit
 
 lk(mean((z$y - predict(fit, z))^2)) # mean square error
 
+fit <- madlib.elnet(y ~ ., data = z, alpha = 0.2, lambda = 0.05, method = "cd")
+
+fit
+
 db.disconnect(cid, verbose = FALSE)
 }
 }
