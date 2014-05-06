@@ -141,7 +141,7 @@ export("array.len")
 
 exportMethods("na.omit")
 
-export("db.q", "db")
+export("db.q", "db", ".db")
 
 export("vcov.lm.madlib", "vcov.lm.madlib.grps",
        "vcov.logregr.madlib.grps", "vcov.logregr.madlib")

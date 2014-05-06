@@ -2,8 +2,8 @@
 ## directly execute SQL
 ## ----------------------------------------------------------------------
 
-db <- db.q <- function(..., nrows = 100, conn.id = 1, sep = " ",
-                       verbose = TRUE)
+.db <- db <- db.q <- function(..., nrows = 100, conn.id = 1,
+                              sep = " ", verbose = TRUE)
 {
     if (!.is.conn.id.valid(conn.id))
         stop(conn.id, " is not a valid connection ID. ",

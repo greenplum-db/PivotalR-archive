@@ -1,5 +1,6 @@
 \name{db.q}
 \alias{db}
+\alias{.db}
 \alias{db.q}
 
 \title{
@@ -10,6 +11,8 @@
 }
 \usage{
 db(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
+
+.db(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 
 db.q(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 }
@@ -59,11 +62,11 @@ db.q(..., nrows = 100, conn.id = 1, sep = " ", verbose = TRUE)
 ## Assume that .port is port number and .dbname is the database name
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-db.q("show search_path", conn.id = cid)
-db.q("drop table if exists tr;",
-      "create temp table tr (idx integer,
-                            val double precision);",
-      "insert into tr values (1, 2.3), (2, 3.4)", conn.id = cid)
+db("show search_path", conn.id = cid)
+.db("drop table if exists tr;",
+    "create temp table tr (idx integer,
+                           val double precision);",
+    "insert into tr values (1, 2.3), (2, 3.4)", conn.id = cid)
 db.q("select * from tr", conn.id = cid)
 
 db.disconnect(cid, verbose = FALSE)
