@@ -31,6 +31,8 @@ setMethod (
                 ",]")))
         }
 
+        by.name <- NULL
+
         use <- get.piece(data, as.character(indx), v)
         fit0 <- FUN(use, ...)
         if (!is(fit0, "db.obj")) {
@@ -118,7 +120,7 @@ setMethod (
                                    collapse = ", "),
                              " from ", parent, where.str, sep = "")
 
-            new("db.Rquery",
+            result <- new("db.Rquery",
                 .content = content,
                 .expr = expr,
                 .source = src,
@@ -134,5 +136,7 @@ setMethod (
                 .factor.suffix = rep("", length(names(data)) + length(by.name)),
                 .sort = list(by = "", order = "", str = ""),
                 .dist.by = data@.dist.by)
+            attr(result, "grp") <- by.name
+            result
         }
     })

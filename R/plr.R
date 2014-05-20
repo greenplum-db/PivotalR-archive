@@ -60,35 +60,34 @@ declare <- function(...) return (invisible(..1))
 
 ## ------------------------------------------------------------
 
-## Map function
-plr.chunkmap <- function(data, INDICES, FUN, ...)
-{
-    parse <- .plr.parser(FUN)
-    fun.body <- parse$fun.str
-    fun.types <- parse$types
-
-    ## function arguments and return types
-    arg.types <- fun.types[Filter(function(s) s != "", names(fun.types))]
-    ret.type <- fun.types[which(names(fun.types) == "")[1]][[1]]
-
-    ## grouped intermediate table
-    if (is.null(attr(data, "grouped.data")))
-        grp.data <- as.db.data.frame(by(data[,names(arg.types)], INDICES, colAgg))
-    else
-        ## Already done that, no need to do it any more
-        grp.data <- attr(data, "grouped.data")
-
-    ## Create return compisite type
-    db.rettype <- .create_plr_rettype(ret.type) # name of return type in database
-
-    ## Create a temporary PL/R function
-    plr.func <- .plr(fun.body, arg.types, db.rettype)
-
-    ## Execute the PL/R function and create the result table
-    models <- as.db.data.frame(plr.func(grp.data), .unique.string())
-    attr(models, "group.data") <- grp.data
-    models
-}
+## ## Map function
+## plr.chunkmap <- function(grp.data, INDICES, FUN, ...)
+## {
+##     parse <- .plr.parser(FUN)
+##     fun.body <- parse$fun.str
+##     fun.types <- parse$types
+##
+##     ## function arguments and return types
+##     arg.types <- fun.types[Filter(function(s) s != "", names(fun.types))]
+##     ret.type <- fun.types[which(names(fun.types) == "")[1]][[1]]
+##
+##     ## grouped intermediate table
+##     if (is.null(attr(data, "grouped.data")))
+##         grp.data <- as.db.data.frame(by(data[,names(arg.types)], INDICES, colAgg))
+##     else
+##         ## Already done that, no need to do it any more
+##         grp.data <- attr(data, "grouped.data")
+##
+##     ## Create return compisite type
+##     db.rettype <- .create_plr_rettype(ret.type) # name of return type in database
+##
+##     ## Create a temporary PL/R function
+##     plr.func <- .plr(fun.body, arg.types, db.rettype)
+##
+##     ## Execute the PL/R function and create the result table
+##     models <- as.db.data.frame(plr.func(grp.data), .unique.string())
+##     models
+## }
 
 ## ------------------------------------------------------------
 
@@ -102,7 +101,7 @@ plr.reduce <- function(data, FUN, ...)
 ## ------------------------------------------------------------
 
 ## Create a PL/R function
-plr <- function(FUN)
+plr <- function(FUN, conn.id = 1)
 {
     parse <- .plr.parser(FUN)
     fun.body <- parse$fun.str
@@ -112,17 +111,63 @@ plr <- function(FUN)
     arg.types <- fun.types[Filter(function(s) s != "", names(fun.types))]
     ret.type <- fun.types[which(names(fun.types) == "")[1]][[1]]
 
-    db.rettype <- .create_plr_rettype(ret.type) # name of return type in database
+    db.rettype <- .create_plr_rettype(ret.type, conn.id = conn.id) # name of return type in database
 
     ## Create a temporary PL/R function
-    .plr(fun.body, arg.types, db.rettype)
+    db.func <- .unique.string()
+    .db("
+        create function ", db.func, "(",
+        paste(paste(names(arg.types), as.character(as.vector(arg,types))), collapse = ", "),
+        ") returns ", db.rettype, " as $$ ", fun.body, "$$ language plr",
+        conn.id = conn.id, verbose = FALSE, sep = "")
+
+    func <- function(data) {
+        by.names <- attr(data, "grp")
+
+        if (is(data, db.Rquery)) {
+            data <- as.db.data.frame(data)
+            is.temp <- TRUE
+        } else
+            is.temp  <- FALSE
+
+        by.str <- if (is.null(by.name)) "" else paste(paste(by.name, collapse = ", "), ", ", sep = "")
+        func.str <- paste(db.func, "(", paste(names(arg.types), collapse = ", "), ") as result", sep = "")
+        func.str <- paste(by.str, func.str, sep = "")
+
+        sql <- paste("select ", func.str, " from ", content(data), sep = "")
+
+        if (grepl(.unique.pattern, db.rettype))
+            sql <- paste("select ", by.str, "(result).* from (", sql, ") s", sep = "")
+
+        result.table <- .unique.string()
+        .db("create table ", result.table, " as ", sql,
+            conn.id = conn.id, verbose = FALSE, sep = "")
+
+        if (is.temp) delete(data)
+
+        db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+    }
+
+    attr(func, "plr") <- db.func # can be used for deletion of the function
+    attr(func, "plr.ret") <- db.rettype
+    return (func)
 }
 
 ## ------------------------------------------------------------
 
-.create_plr_rettype <- function(ret.type)
+.create_plr_rettype <- function(ret.type, conn.id)
 {
-
+    if (is(ret.type, "list")) {
+        args <- names(ret.type)[-1] # argument names
+        types <- sapply(2:length(ret.type), function(i) as.character(ret.type[[i]]))
+        type.name <- .unique.string()
+        .db("create type ", type.name, " as (",
+            paste(paste(args, types), collapse = ", "), ")",
+            conn.id = conn.id, verbose = FALSE, sep = "")
+        return (type.name)
+    } else {
+        return (as.character(ret.type))
+    }
 }
 
 ## ------------------------------------------------------------
@@ -133,9 +178,4 @@ plr.agg <- function(FUN)
 
 }
 
-## ------------------------------------------------------------
 
-.plr <- function()
-{
-
-}
