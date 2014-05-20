@@ -72,7 +72,11 @@ plr.chunkmap <- function(data, INDICES, FUN, ...)
     ret.type <- fun.types[which(names(fun.types) == "")[1]][[1]]
 
     ## grouped intermediate table
-    grp.data <- as.db.data.frame(by(data[,names(arg.types)], INDICES, colAgg))
+    if (is.null(attr(data, "grouped.data")))
+        grp.data <- as.db.data.frame(by(data[,names(arg.types)], INDICES, colAgg))
+    else
+        ## Already done that, no need to do it any more
+        grp.data <- attr(data, "grouped.data")
 
     ## Create return compisite type
     db.rettype <- .create_plr_rettype(ret.type) # name of return type in database
@@ -81,7 +85,9 @@ plr.chunkmap <- function(data, INDICES, FUN, ...)
     plr.func <- .plr(fun.body, arg.types, db.rettype)
 
     ## Execute the PL/R function and create the result table
-    as.db.data.frame(plr.func(grp.data), .unique.string())
+    models <- as.db.data.frame(plr.func(grp.data), .unique.string())
+    attr(models, "group.data") <- grp.data
+    models
 }
 
 ## ------------------------------------------------------------
