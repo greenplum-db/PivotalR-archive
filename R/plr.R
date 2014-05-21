@@ -33,7 +33,7 @@
     a <- sapply(2:length(declare), function (i) {
                 dec <- paste("[\"']*", declare[i], "[\"']*", sep = "")
                 #dec <- declare[i]
-                if (names(declare)[i] == "")
+                if (names(declare)[i] == ""  || is.null(names(declare)[i]))
                     dec
                 else
                     paste(names(declare)[i],
@@ -125,6 +125,7 @@ plr <- function(FUN, conn.id = 1)
 
 ## ------------------------------------------------------------
 
+## Create the return type
 .create_plr_rettype <- function(ret.type, conn.id)
 {
     if (is(ret.type, "list")) {
