@@ -155,4 +155,4 @@ export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
 
 export("Vars", "Terms")
 
-export("plr", "plr.reduce", "plr.agg")
+export("plr", "plr.reduce", "plr.agg", "declare")
