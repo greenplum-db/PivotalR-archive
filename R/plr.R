@@ -19,6 +19,8 @@
 ## Extract types and the function body
 .plr.parser <- function(fun) {
     s <- as.list(as.list(fun)[[2]])
+    args <- names(s)
+    args <- args[args != ""]
     str <- paste(as.character(s[[length(s)]]), collapse = "\n")
     w <- .ras(as.list(fun)[[2]])
     w <- w[[length(w)]]
@@ -49,7 +51,8 @@
     declare[[1]] <- NULL
     list(fun.str = gsub("^\\{|\\}$", "",
                         gsub("\\s*declare\\s*\\(.*\\)\\n", "", str, perl = T)),
-         types = declare)
+         types = declare,
+         args = args)
 }
 
 ## ------------------------------------------------------------
@@ -74,6 +77,7 @@ plr <- function(FUN, conn.id = 1)
     parse <- .plr.parser(enquote(FUN))
     fun.body <- parse$fun.str
     fun.types <- parse$types
+    args <- parse$args
 
     ## function arguments and return types
     arg.types <- fun.types[Filter(function(s) s != "", names(fun.types))]
@@ -81,12 +85,16 @@ plr <- function(FUN, conn.id = 1)
 
     db.rettype <- .create_plr_rettype(ret.type, conn.id = conn.id) # name of return type in database
 
+    if (identical(arg.types, list()))
+        args.types <- rep(gsub("setof ", "", db.rettype), length(args))
+    else
+        arg.types <- as.character(as.vector(arg.types))
+
     ## Create a temporary PL/R function
     db.func <- .unique.string()
     .db("
         create function ", db.func, "(",
-        paste(paste(names(arg.types), ' ', as.character(as.vector(arg.types))),
-              '[]', sep = '', collapse = ", "),
+        paste(paste(args, ' ', arg.types, '[]', sep = ''), collapse = ", "),
         ") returns ", db.rettype, " as $$ ", fun.body, "$$ language plr",
         conn.id = conn.id, verbose = FALSE, sep = "")
 
@@ -100,7 +108,7 @@ plr <- function(FUN, conn.id = 1)
             is.temp  <- FALSE
 
         by.str <- if (is.null(by.names)) "" else paste(paste(by.names, collapse = ", "), ", ", sep = "")
-        func.str <- paste(db.func, "(", paste(names(arg.types), '_array_agg', collapse = ", ", sep = ''),
+        func.str <- paste(db.func, "(", paste(args, '_array_agg', collapse = ", ", sep = ''),
                           ") as result", sep = "")
         func.str <- paste(by.str, func.str, sep = "")
 
