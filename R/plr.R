@@ -10,7 +10,7 @@
     if (identical(res[[1]], x)) return (x)
     for (i in 1:length(res))
         if (is.language(res[[i]]))
-            res[[i]] <- ras(res[[i]])
+            res[[i]] <- .ras(res[[i]])
     res
 }
 
@@ -18,10 +18,9 @@
 
 ## Extract types and the function body
 .plr.parser <- function(fun) {
-    str <- as.character(enquote(
-        as.list(substitute(fun))[[3]]))[[2]]
-    ## str <- as.character(enquote(fun))[2]
-    w <- ras(fun)
+    s <- as.list(as.list(fun)[[2]])
+    str <- paste(as.character(s[[length(s)]]), collapse = "\n")
+    w <- .ras(as.list(fun)[[2]])
     w <- w[[length(w)]]
     declare <- Filter(function(s)
                       {
@@ -103,7 +102,7 @@ plr.reduce <- function(data, FUN, ...)
 ## Create a PL/R function
 plr <- function(FUN, conn.id = 1)
 {
-    parse <- .plr.parser(FUN)
+    parse <- .plr.parser(enquote(FUN))
     fun.body <- parse$fun.str
     fun.types <- parse$types
 
@@ -117,26 +116,28 @@ plr <- function(FUN, conn.id = 1)
     db.func <- .unique.string()
     .db("
         create function ", db.func, "(",
-        paste(paste(names(arg.types), as.character(as.vector(arg,types))), collapse = ", "),
+        paste(paste(names(arg.types), ' ', as.character(as.vector(arg.types))),
+              '[]', sep = '', collapse = ", "),
         ") returns ", db.rettype, " as $$ ", fun.body, "$$ language plr",
         conn.id = conn.id, verbose = FALSE, sep = "")
 
     func <- function(data) {
         by.names <- attr(data, "grp")
 
-        if (is(data, db.Rquery)) {
+        if (is(data, "db.Rquery")) {
             data <- as.db.data.frame(data)
             is.temp <- TRUE
         } else
             is.temp  <- FALSE
 
-        by.str <- if (is.null(by.name)) "" else paste(paste(by.name, collapse = ", "), ", ", sep = "")
-        func.str <- paste(db.func, "(", paste(names(arg.types), collapse = ", "), ") as result", sep = "")
+        by.str <- if (is.null(by.names)) "" else paste(paste(by.names, collapse = ", "), ", ", sep = "")
+        func.str <- paste(db.func, "(", paste(names(arg.types), '_array_agg', collapse = ", ", sep = ''),
+                          ") as result", sep = "")
         func.str <- paste(by.str, func.str, sep = "")
 
         sql <- paste("select ", func.str, " from ", content(data), sep = "")
 
-        if (grepl(.unique.pattern, db.rettype))
+        if (grepl(.unique.pattern(), db.rettype, perl = T))
             sql <- paste("select ", by.str, "(result).* from (", sql, ") s", sep = "")
 
         result.table <- .unique.string()
@@ -164,7 +165,7 @@ plr <- function(FUN, conn.id = 1)
         .db("create type ", type.name, " as (",
             paste(paste(args, types), collapse = ", "), ")",
             conn.id = conn.id, verbose = FALSE, sep = "")
-        return (type.name)
+        return (paste("setof", type.name))
     } else {
         return (as.character(ret.type))
     }
