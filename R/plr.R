@@ -99,6 +99,9 @@ plr <- function(FUN, conn.id = 1)
         conn.id = conn.id, verbose = FALSE, sep = "")
 
     func <- function(data) {
+        if (conn.id(data) != conn.id)
+            stop("This function can only be run in connection ", conn.id)
+
         by.names <- attr(data, "grp")
 
         if (is(data, "db.Rquery")) {
@@ -127,8 +130,9 @@ plr <- function(FUN, conn.id = 1)
     }
 
     attr(func, "plr") <- db.func # can be used for deletion of the function
-    attr(func, "plr.ret") <- db.rettype
-    return (func)
+    attr(func, "plr.ret") <- gsub("setof", "", db.rettype)
+    attr(func, "plr.args") <- args
+    func
 }
 
 ## ------------------------------------------------------------
@@ -152,9 +156,50 @@ plr <- function(FUN, conn.id = 1)
 ## ------------------------------------------------------------
 
 ## Create a PL/R aggregate
-plr.agg <- function(FUN)
+plr.agg <- function(FUN, conn.id = 1)
 {
+    plr.fun <- plr(FUN, conn.id = conn.id) # R function
+    plr.db.fun <- attr(plr.fun, "plr") # PL/R function in database
+    plr.rettype <- attr(plr.fun, "plr.ret") # return type
+    plr.args <- attr(plr.fun, "plr.args")
 
+    agg_name = .unique.string()
+    .db("
+        create aggregate ", agg_name, " (
+            SType = ", plr.rettype, ",
+            SFunc = ", plr.db.fun, "
+        )",
+        conn.id = conn.id, verbose = FALSE, sep = "")
+
+    func <- function(data) {
+        if (conn.id(data) != conn.id)
+            stop("This function can only be run in connection ", conn.id)
+
+        if (is(data, "db.Rquery")) {
+            data <- as.db.data.frame(data)
+            is.temp <- TRUE
+        } else
+            is.temp  <- FALSE
+
+        func.str <- paste(db.func, "(", paste(plr.args, collapse = ", ", sep = ''),
+                          ") as result", sep = "")
+
+        sql <- paste("select ", func.str, " from ", content(data), sep = "")
+
+        if (grepl(.unique.pattern(), db.rettype, perl = T))
+            sql <- paste("select (result).* from (", sql, ") s", sep = "")
+
+        result.table <- .unique.string()
+        .db("create table ", result.table, " as ", sql,
+            conn.id = conn.id, verbose = FALSE, sep = "")
+
+        if (is.temp) delete(data)
+
+        db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+    }
+
+    attr(func, "plr") <- agg_name
+    func
 }
 
 
