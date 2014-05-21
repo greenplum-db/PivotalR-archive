@@ -94,7 +94,7 @@ plr <- function(FUN, conn.id = 1)
     db.func <- .unique.string()
     .db("
         create function ", db.func, "(",
-        paste(paste(args, ' ', arg.types, '[]', sep = ''), collapse = ", "),
+        paste(paste(args, ' ', arg.types, sep = ''), collapse = ", "),
         ") returns ", db.rettype, " as $$ ", fun.body, "$$ language plr",
         conn.id = conn.id, verbose = FALSE, sep = "")
 
@@ -105,13 +105,14 @@ plr <- function(FUN, conn.id = 1)
         by.names <- attr(data, "grp")
 
         if (is(data, "db.Rquery")) {
-            data <- as.db.data.frame(data)
+            data <- as.db.data.frame(data, verbose = FALSE)
             is.temp <- TRUE
         } else
             is.temp  <- FALSE
 
-        by.str <- if (is.null(by.names)) "" else paste(paste(by.names, collapse = ", "), ", ", sep = "")
-        func.str <- paste(db.func, "(", paste(args, '_array_agg', collapse = ", ", sep = ''),
+        by.str <- if (is.null(by.names)) "" else paste(paste(names(data)[1:length(by.names)], collapse = ", "), ", ", sep = "")
+        args <- sapply(args, function(s) if (! (s %in% names(data))) paste(s, "_array_agg", sep = '') else s)
+        func.str <- paste(db.func, "(", paste(args, collapse = ", ", sep = ''),
                           ") as result", sep = "")
         func.str <- paste(by.str, func.str, sep = "")
 
