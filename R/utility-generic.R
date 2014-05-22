@@ -30,9 +30,10 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
         elm[elm == "NULL"] <- NA
         if (type == "integer")
             class(elm) <- "integer"
-        else if (type == "logical")
+        else if (type == "logical") {
+            elm <- toupper(elm)
             class(elm) <- "logical"
-        else
+        } else
             class(elm) <- "numeric"
     }
 

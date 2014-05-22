@@ -7,13 +7,13 @@
 {
     if (!conn.eql(conn.id(x), conn.id(value)))
         stop("Both sides must be derived from objects in the same connection!")
-        
+
     ## One cannot do this without any restrictions
     if ((is(x, "db.data.frame") && content(x) != value@.parent) ||
         (is(x, "db.Rquery") && x@.parent != value@.parent))
         stop(paste("This operation can only be done if both sides",
                    "are derived from the same database object!"))
-    
+
     ## value cannot have multiple columns
     if (length(name) != length(value@.expr))
         stop(paste("The value on the right cannot be",
@@ -24,7 +24,7 @@
         (is(x, "db.Rquery") && !.eql.where(.strip(x@.where), .strip(value@.where)))))
         || (!is.null(left.where) && !.eql.where(.strip(left.where), .strip(value@.where))))
         stop("The where parts that do not match!")
-    
+
     if (is(x, "db.data.frame")) {
         x.expr <- paste("\"", names(x), "\"", sep = "")
         x.names <- x.expr
@@ -76,12 +76,12 @@
 
     expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
                   sep = " as ", collapse = ", ")
-        
-    if (value@.parent != value@.source) 
+
+    if (value@.parent != value@.source)
         tbl <- paste("(", value@.parent, ") s", sep = "")
     else
         tbl <- value@.parent
-    
+
     if (is(x, "db.Rquery") && x@.where != "") {
         where.str <- paste(" where", x@.where)
         where <- x@.where
@@ -162,7 +162,7 @@
             factor.suffix[idx] <- ""
         }
     }
-    
+
     expr <- paste(x.names, paste("\"", x.col.name, "\"", sep = ""),
                   sep = " as ", collapse = ", ")
 
@@ -179,7 +179,7 @@
         parent <- x@.parent
         src <- x@.source
     }
-    
+
     if (is(x, "db.Rquery") && x@.where != "") {
         where.str <- paste(" where", x@.where)
         where <- x@.where
@@ -189,7 +189,7 @@
     }
 
     sort <- .generate.sort(x)
-    
+
     new("db.Rquery",
         .content = paste("select ", expr, " from ",
         tbl, where.str, sort$str, sep = ""),
@@ -358,7 +358,7 @@ setMethod (
 ## the condition expression in case
 .case.condition <- function (x, i)
 {
-    if (is(i, "db.Rquery")) {          
+    if (is(i, "db.Rquery")) {
         str <- i@.expr
         if (length(str) != 1)
             stop("More than 2 boolean expressions in selecting row!")
@@ -368,7 +368,7 @@ setMethod (
                     " with each row of the table!")
             stop()
         }
-        
+
         ## where.str <- paste(x@.key, "=", i, collapse = " or ")
         str <- paste("\"", x@.key, "\" in (", paste(i, collapse = ","),
                      ")", sep = "")
@@ -425,7 +425,7 @@ setMethod (
         x[i,j] <- value
         return (x)
     }
-    
+
     if (length(x@.col.name) == 1 && x@.col.data_type == "array") {
         x <- .expand.array(x)
         if (n == 3)
@@ -437,7 +437,7 @@ setMethod (
             else x[i,j] <- value
         return (db.array(x))
     }
-    
+
     if (n == 4) {
         if (missing(i) && missing(j))
             .replacement(x, names(x), value)
@@ -455,11 +455,14 @@ setMethod (
                 .replacement(x, names(x[i,j]), value, str, where.str)
         }
     } else if (n == 3) {
-        if (is(i, "db.Rquery")) {
-            str <- .case.condition(x, i)
-            .replacement(x, names(x[i]), value, str)
+        if (missing(j)) {
+           if (is(i, "db.Rquery")) {
+                str <- .case.condition(x, i)
+                .replacement(x, names(x[i]), value, str)
+           } else
+                .replacement(x, names(x[i]), value)
         } else
-            .replacement(x, names(x[i]), value)
+            .replacement(x, names(x[j]), value)
     }
 }
 
@@ -480,7 +483,7 @@ setMethod (
             else x[i,j] <- value
         return (db.array(x))
     }
-    
+
     if (n == 4) {
         if (missing(i) && missing(j))
             .replace.single(x, names(x), value, "text", "text")
@@ -494,15 +497,20 @@ setMethod (
                                     i@.expr)
                 else
                     .replace.single(x, names(x), value, "text", "text", str)
-            else 
+            else
                 .replace.single(x, names(x[i,j]), value,
                                 "text", "text", str)
         }
     } else if (n == 3) {
-        if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
-            .replace.single(x, names(x), value, "text", "text",
-                            i@.expr)
-        .replace.single(x, names(x[i]), value, "text", "text")
+        if (missing(j)) {
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "text", "text",
+                                i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "text", "text",
+                                i@.expr)
+        } else
+            .replace.single(x, names(x[j]), value, "text", "text")
     }
 }
 
@@ -538,11 +546,14 @@ setMethod (
             .replace.single(x, names(x[i,j]), value, "integer",
                             "int4", .case.condition(x, i))
     } else if (n == 3) {
-        if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
-            .replace.single(x, names(x), value, "integer", "int4",
-                            i@.expr)
-        else
-            .replace.single(x, names(x[i]), value, "integer", "int4")
+        if (missing(j)) {
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "integer", "int4",
+                                i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "integer", "int4")
+        } else
+            .replace.single(x, names(x[j]), value, "integer", "int4")
     }
 }
 
@@ -581,15 +592,18 @@ setMethod (
                             "float8", .case.condition(x, i))
         }
     } else if (n == 3) {
-        if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
-            .replace.single(x, names(x), value, "double precision",
-                            "float8", i@.expr)
-        else
-            .replace.single(x, names(x[i]), value, "double precision",
+        if (missing(j)) {
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "double precision",
+                                "float8", i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "double precision",
+                                "float8")
+        } else
+            .replace.single(x, names(x[j]), value, "double precision",
                             "float8")
     }
 }
-
 
 ## -----------------------------------------------------------------------
 
@@ -623,10 +637,13 @@ setMethod (
             .replace.single(x, names(x[i,j]), value, "boolean", "bool",
                             .case.condition(x, i))
     } else if (n == 3) {
-        if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
-            .replace.single(x, names(x), value, "boolean", "bool",
-                            i@.expr)
-        else
+        if (missing(j)) {
+            if (is(i, "db.Rquery") && all(i@.col.data_type == "boolean"))
+                .replace.single(x, names(x), value, "boolean", "bool",
+                                i@.expr)
+            else
+                .replace.single(x, names(x[i]), value, "boolean", "bool")
+        } else
             .replace.single(x, names(x[i]), value, "boolean", "bool")
     }
 }

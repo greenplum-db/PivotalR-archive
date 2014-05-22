@@ -412,6 +412,7 @@ colAgg <- function (x)
     res <- .aggregate(x, "array_agg", FALSE, NULL, FALSE, "array",
                       paste("_", x@.col.udt_name, sep = ""))
     res@.is.agg <- TRUE
+    res
 }
 
 ## -----------------------------------------------------------------------
