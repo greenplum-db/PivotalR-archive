@@ -28,7 +28,7 @@ setMethod (
                 .key = x@.key,
                 .where = x@.where,
                 .is.factor = TRUE,
-                .factor.suffix = .unique.string(),
+                .factor.suffix = .unique.string.short(),
                 .sort = x@.sort,
                 .dist.by = x@.dist.by)
         } else {
@@ -45,7 +45,7 @@ setMethod (
                 .where = x@.where,
                 .is.factor = TRUE,
                 .factor.ref = as.character(NA),
-                .factor.suffix = .unique.string(),
+                .factor.suffix = .unique.string.short(),
                 .sort = x@.sort,
                 .dist.by = x@.dist.by)
         }

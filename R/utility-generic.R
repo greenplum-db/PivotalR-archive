@@ -181,6 +181,16 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 .unique.pattern <- function()
     "madlib_temp_[a-f\\d]{8}_[a-f\\d]{4}_[a-f\\d]{6}_[a-f\\d]{12}"
 
+.unique.string.short <- function ()
+{
+    hex_digits <- c(as.character(0:9), letters[1:6])
+    s <- paste(sample(hex_digits, 4), collapse='')
+    paste("_mad", s, "_", sep = "")
+}
+
+.unique.pattern.short <- function()
+    "_mad[a-f\\d]{4}_"
+
 ## -----------------------------------------------------------------------
 
 ## strip the leading and trailing white spaces
@@ -265,7 +275,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                 new.col <- gsub(paste("^", col, sep = ""), "",
                                 names(data)[grep(paste(col, suffix[i],
                                                        sep=""),
-                                                 names(data))])
+                                                 names(data))],
+                                perl = TRUE)
                 distinct[[col]] <- new.col
                 ref[[col]] <- paste(suffix[i], the.refs[i], sep = "")
                 if (length(new.col) > max.level)
