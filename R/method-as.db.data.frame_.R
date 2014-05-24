@@ -268,7 +268,7 @@ setMethod (
             cats <- x@.expr[x@.is.factor]
             for (i in seq_len(length(x@.is.factor))) {
                 if (x@.is.factor[i]) {
-                    distinct <- lk(by(x[[i]], x[[i]], identity))[,1]
+                    distinct <- lk(by(x[[i]], x[[i]], identity), -1)[,1]
                     if (na.as.level)
                         distinct[is.na(distinct)] <- .null.string
                     else

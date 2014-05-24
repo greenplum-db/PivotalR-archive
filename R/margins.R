@@ -154,7 +154,7 @@ Vars <- function(model)
             function(i) {
                 sub <- factors[factors[,1] == factors[i,1],]
                 paste("\"", factors[i,1],
-                      gsub(paste(".*(", .unique.pattern(), ").*", sep = ""),
+                      gsub(paste(".*(", .unique.pattern.short(), ").*", sep = ""),
                            "\\1", factors[i,3], perl = TRUE),
                       factors[i,4], "\"", sep = "")
             }))
@@ -243,7 +243,7 @@ margins.lm.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
-        vars <- unique(gsub(paste(.unique.pattern(),
+        vars <- unique(gsub(paste(.unique.pattern.short(),
                                   ".*$", sep = ""), "",
                             Vars(model), perl = T))
         newdata <- na.action(
@@ -353,7 +353,7 @@ margins.logregr.madlib <- function(model, dydx = ~ Vars(model),
     if (!is.null(model$na.action)) na.action <- model$na.action
     if (model$num_missing_rows_skipped > 0) na.action <- na.omit
     if (!is.null(na.action)) {
-        vars <- unique(gsub(paste(.unique.pattern(),
+        vars <- unique(gsub(paste(.unique.pattern.short(),
                                   ".*$", sep = ""), "",
                             Vars(model), perl = T))
         newdata <- na.action(
@@ -1026,7 +1026,7 @@ margins.logregr.madlib.grps <- function(model, dydx = ~ Vars(model),
 ## extract factor column name and its value
 .extract.factor.info <- function(var)
 {
-    unique.string <- .unique.pattern()
+    unique.string <- .unique.pattern.short()
     if (grepl(unique.string, var, perl = TRUE)) {
         res1 <- gsub(paste("^(.*)", unique.string, ".*$", sep = ""), "\\1",
                      var, perl = TRUE)

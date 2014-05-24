@@ -67,7 +67,7 @@ setMethod (
             }
             factor.suffix <- rep("", length(is.factor))
             for (i in seq_len(length(factor.suffix))) # create new suffix
-                if (is.factor[i]) factor.suffix[i] <- .unique.string()
+                if (is.factor[i]) factor.suffix[i] <- .unique.string.short()
         }
 
         parent <- paste(x.content, join.str, y.content, on.str)

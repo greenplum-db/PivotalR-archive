@@ -258,16 +258,17 @@ test_that("Skip some tests", {
 
 ## directly test SQL
 test_that("Test MADlib SQL", {
+    table <- content(dat)
     madsch <- schema.madlib(conn.id = cid)
     res <- db.q(
         "
         drop table if exists lin_out, lin_out_summary;
-        select ", madsch, ".linregr_train('madlibtestdata.dt_abalone',
+        select ", madsch, ".linregr_train('", table, "',
         'lin_out', 'rings', 'array[1, length, diameter, shell]');
         select coef from lin_out;
         ", conn.id = cid, verbose = FALSE, nrows = -1)
     res <- as.numeric(arraydb.to.arrayr(res))
-    fit <- lm(rings ~ length + diameter + shell, data = lk("madlibtestdata.dt_abalone", -1))
+    fit <- lm(rings ~ length + diameter + shell, data = lk(table, -1))
     expect_that(res, equals(as.numeric(fit$coefficients)))
 })
 
