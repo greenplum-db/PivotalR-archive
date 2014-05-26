@@ -54,7 +54,7 @@ madlib.glm <- function (formula, data,
 ## -----------------------------------------------------------------------
 
 .madlib.logregr <- function (formula, data, na.action = NULL, method = "irls",
-                             max.iter = 10000, tolerance = 1e-5,
+                             max.iter = 10000, tolerance = 1e-5, verbose = FALSE,
                              na.as.level = FALSE)
 {
     ## make sure fitting to db.obj
@@ -94,7 +94,8 @@ madlib.glm <- function (formula, data,
                      ".logregr('", tbl.source, "', '",
                      gsub("'", "''", params$dep.str),
                      "', '", params$ind.str, "', ", max.iter,
-                     ", '", method, "', ", tolerance, ") as f) s",
+                     ", '", method, "', ", tolerance, ",",
+                     verbose, ") as f) s",
                      sep = "")
     } else {
         tbl.output <- .unique.string()
@@ -103,7 +104,7 @@ madlib.glm <- function (formula, data,
                      gsub("'", "''", params$dep.str),
                      "', '", params$ind.str, "', ",
                      grp, ", ", max.iter, ", '", method, "', ",
-                     tolerance, ")", sep = "")
+                     tolerance, ", ", verbose, ")", sep = "")
     }
 
     ## execute the logistic regression and get the result
