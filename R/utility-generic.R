@@ -278,7 +278,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                                                  names(data))],
                                 perl = TRUE)
                 distinct[[col]] <- new.col
-                ref[[col]] <- paste(suffix[i], the.refs[i], sep = "")
+                ref[[col]] <- paste("`", suffix[i], the.refs[i], "`", sep = "")
                 if (length(new.col) > max.level)
                     max.level <- length(new.col)
             }
@@ -288,7 +288,8 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             names(fake) <- names(data)
             for (i in seq_len(l)) {
                 if (data@.is.factor[i]) {
-                    fake[,i] <- array(distinct[[data@.col.name[i]]], dim = c(max.level, 1))
+                    fake[,i] <- array(paste("`", distinct[[data@.col.name[i]]], "`",
+                                            sep = ""), dim = c(max.level, 1))
                     fake[,i] <- as.factor(fake[,i])
                     fake[,i] <- relevel(fake[,i],
                                         ref = ref[[data@.col.name[i]]])
@@ -467,7 +468,14 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     mf <- eval(mf, parent.frame())
     mt <- attr(mf, "terms")
     x <- model.matrix(mt, mf, contrasts)
-    colnames(x)
+    res <- colnames(x)
+    for (s in names(data)) {
+        if (all(!grepl(paste("`", s, "`", sep = ""), res, fixed = TRUE)))
+            res <- gsub(paste(s, "`", sep = ""),
+                        paste("`", s, sep = ""),
+                        res, perl = T, fixed = TRUE)
+    }
+    res
 }
 
 ## ----------------------------------------------------------------------
