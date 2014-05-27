@@ -56,7 +56,7 @@ setMethod (
         if (l == 0)
             stop("The length of value is not correct!")
         select <- seq_len(l)
-            
+
         if (is(x, "db.data.frame")) {
             expr <- x@.col.name[select]
             where <- ""
@@ -72,7 +72,8 @@ setMethod (
             src <- x@.source
         }
         sort <- .generate.sort(x)
-        sql <- paste("select ", paste(expr, value[select], sep = " as ",
+        sql <- paste("select ", paste(expr, paste("\"", value[select], "\"", sep = ""),
+                                      sep = " as ",
                                       collapse = ", "),
                      " from ", parent, where.str, sort$str, sep = "")
         new("db.Rquery",
