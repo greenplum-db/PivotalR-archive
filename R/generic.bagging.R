@@ -41,14 +41,27 @@ predict.bagging.model <- function (object, newdata, combine = "mean",
     for (i in seq_len(l))
         pred[[i]] <- predict(object[[i]], newdata)
 
+    if (typeof(pred[[1]]) == 'logical' || pred[[1]]@.col.data_type == "boolean")
+        is.bool <- TRUE
+    else
+        is.bool <- FALSE
+
     if (combine == "mean") {
         for (i in seq_len(l)) {
-            if (i == 1)
+            if (i == 1) {
                 res <- pred[[i]]
-            else
-                res <- res + pred[[i]]
+                if (is.bool) res <- as.integer(res)
+            } else {
+                if (is.bool)
+                    res <- res + as.integer(pred[[i]])
+                else
+                    res <- res + pred[[i]]
+            }
         }
-        res / l
+        if (is.bool)
+            res / l > 0.5
+        else
+            res / l
     } else if (combine == "vote") {
         res.type <- pred[[1]]@.col.data_type
         res.udt.name <- pred[[1]]@.col.udt_name
