@@ -392,7 +392,7 @@ setMethod (
     ">",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " > ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " > ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
@@ -416,7 +416,7 @@ setMethod (
     "<",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " < ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " < ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
@@ -440,7 +440,7 @@ setMethod (
     ">=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " >= ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " >= ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
@@ -464,7 +464,7 @@ setMethod (
     "<=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " <= ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " <= ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
@@ -488,7 +488,7 @@ setMethod (
     "==",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " = ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " = ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
@@ -512,7 +512,7 @@ setMethod (
     "!=",
     signature(e1 = "db.obj", e2 = "character"),
     function (e1, e2) {
-        e2 <- paste("'", .strip(e2, "'"), "'", sep = "")
+        e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " <> ", .txt.types, cast = "")
         res <- .replace.timestamp(e1, res, e2, " <> ")
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
