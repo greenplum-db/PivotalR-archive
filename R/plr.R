@@ -74,18 +74,18 @@ plr.map <- function(fun, data, ...)
 
 ## Reduce function, an action, also a db.Rquery object
 ## Not evaluated
-plr.reduce <- function(fun, data, ...)
+plr.reduce <- function(fun, data, init = NA, ...)
 {
-    agg <- plr.agg(fun, conn.id = conn.id(data))
+    agg <- plr.agg(fun, conn.id = conn.id(data), init = init)
     agg(data)
 }
 
 ## ------------------------------------------------------------
 
 ## Create a PL/R function
-plr <- function(FUN, conn.id = 1)
+plr <- function(fun, conn.id = 1)
 {
-    parse <- .plr.parser(enquote(FUN))
+    parse <- .plr.parser(enquote(fun))
     fun.body <- parse$fun.str
     fun.types <- parse$types
     args <- parse$args
@@ -170,18 +170,28 @@ plr <- function(FUN, conn.id = 1)
 ## ------------------------------------------------------------
 
 ## Create a PL/R aggregate
-plr.agg <- function(FUN, conn.id = 1)
+plr.agg <- function(fun, conn.id = 1, init = NA)
 {
-    plr.fun <- plr(FUN, conn.id = conn.id) # R function
+    plr.fun <- plr(fun, conn.id = conn.id) # R function
     plr.db.fun <- attr(plr.fun, "plr") # PL/R function in database
     plr.rettype <- attr(plr.fun, "plr.ret") # return type
     plr.args <- attr(plr.fun, "plr.args")
 
     agg_name = .unique.string()
+    if (is.na(init))
+        init.str <- ""
+    else {
+        if (length(init) == 1)
+            init.str <- paste(", InitCond =", init)
+        else
+            init.str <- paste(", InitCond = '{",
+                              paste(init, collapse = ", "),
+                              "}'", sep = "")
+    }
     .db("
         create aggregate ", agg_name, " (
             SType = ", plr.rettype, ",
-            SFunc = ", plr.db.fun, "
+            SFunc = ", plr.db.fun, init.str, "
         )",
         conn.id = conn.id, verbose = FALSE, sep = "")
 

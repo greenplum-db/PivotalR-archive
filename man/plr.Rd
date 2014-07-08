@@ -18,11 +18,15 @@
 \usage{
 plr.map(fun, data, ...)
 
-plr.reduce(fun, data, ...)
+plr.reduce(fun, data, init = NA, ...)
 
-plr(FUN, conn.id = 1)
+plr(fun, conn.id = 1)
 
-plr.agg(FUN, conn.id = 1)
+plr.agg(fun, conn.id = 1, init = NA)
 
 declare(...)
+}
+
+\arguments{
+    \item{fun}
 }
