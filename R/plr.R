@@ -62,10 +62,21 @@ declare <- function(...) return (invisible(..1))
 
 ## ------------------------------------------------------------
 
-## Reduce function
-plr.reduce <- function(data, FUN, ...)
+## Map function, a transformation, db.Rquery
+## Not evaluated
+plr.map <- function(fun, data, ...)
 {
-    agg <- plr.agg(FUN)
+    map <- plr(fun, conn.id = conn.id(data))
+    map(data)
+}
+
+## ------------------------------------------------------------
+
+## Reduce function, an action, also a db.Rquery object
+## Not evaluated
+plr.reduce <- function(fun, data, ...)
+{
+    agg <- plr.agg(fun, conn.id = conn.id(data))
     agg(data)
 }
 
@@ -121,13 +132,15 @@ plr <- function(FUN, conn.id = 1)
         if (grepl(.unique.pattern(), db.rettype, perl = T))
             sql <- paste("select ", by.str, "(result).* from (", sql, ") s", sep = "")
 
-        result.table <- .unique.string()
-        .db("create table ", result.table, " as ", sql,
-            conn.id = conn.id, verbose = FALSE, sep = "")
+        ## result.table <- .unique.string()
+        ## .db("create table ", result.table, " as ", sql,
+        ##     conn.id = conn.id, verbose = FALSE, sep = "")
 
-        if (is.temp) delete(data)
+        ## if (is.temp) delete(data)
 
-        db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+        ## db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+
+        sql
     }
 
     attr(func, "plr") <- db.func # can be used for deletion of the function
@@ -182,21 +195,23 @@ plr.agg <- function(FUN, conn.id = 1)
         } else
             is.temp  <- FALSE
 
-        func.str <- paste(db.func, "(", paste(plr.args, collapse = ", ", sep = ''),
+        func.str <- paste(plr.db.fun, "(", paste(plr.args, collapse = ", ", sep = ''),
                           ") as result", sep = "")
 
         sql <- paste("select ", func.str, " from ", content(data), sep = "")
 
-        if (grepl(.unique.pattern(), db.rettype, perl = T))
+        if (grepl(.unique.pattern(), plr.rettype, perl = T))
             sql <- paste("select (result).* from (", sql, ") s", sep = "")
 
-        result.table <- .unique.string()
-        .db("create table ", result.table, " as ", sql,
-            conn.id = conn.id, verbose = FALSE, sep = "")
+        ## result.table <- .unique.string()
+        ## .db("create table ", result.table, " as ", sql,
+        ##     conn.id = conn.id, verbose = FALSE, sep = "")
 
-        if (is.temp) delete(data)
+        ## if (is.temp) delete(data)
 
-        db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+        ## db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
+
+        sql
     }
 
     attr(func, "plr") <- agg_name
