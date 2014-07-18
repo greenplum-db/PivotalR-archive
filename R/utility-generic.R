@@ -470,10 +470,11 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     x <- model.matrix(mt, mf, contrasts)
     res <- colnames(x)
     for (s in names(data)) {
-        if (all(!grepl(paste("`", s, "`", sep = ""), res, fixed = TRUE)))
-            res <- gsub(paste(s, "`", sep = ""),
-                        paste("`", s, sep = ""),
-                        res, perl = T, fixed = TRUE)
+        if (all(!grepl(paste("`", s, "`", sep = ""), res, fixed = TRUE))) {
+            res <- gsub(paste(s, "`(.+)$", sep = ""),
+                        paste("`", s, "\\1", sep = ""),
+                        res, perl = T)
+        }
     }
     res
 }
