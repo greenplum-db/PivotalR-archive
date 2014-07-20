@@ -28,5 +28,51 @@ declare(...)
 }
 
 \arguments{
-    \item{fun}
+    \item{fun}{
+
+    }
+
+    \item{data}{
+
+    }
+
+    \item{init}{
+
+    }
+
+    \item{conn.id}{
+
+    }
+
+    \item{...}{
+
+    }
+}
+
+\value{
+
+}
+
+\author{
+    Author: Predictive Analytics Team at Pivotal Inc.
+
+    Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+}
+
+\seealso{
+
+}
+
+\examples{
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+
+
+db.disconnect(cid, verbose = FALSE)
+}
 }
