@@ -29,16 +29,17 @@ setMethod (
                 by <- c(by, INDICES[[i]]@.expr)
             }
             by <- unique(by)
-            
-            if (decreasing)
-                order <- "desc"
-            else
-                order <- ""
+
+            if (length(by) > 1 && (length(decreasing) != 1 && length(decreasing) != length(by)))
+                stop("How do you want to order each column? Specify 'decreasing'.")
+
+            if (length(decreasing) == 1) decreasing <- rep(decreasing, length(by))
+            order <- sapply(decreasing, function(b) if (b) "desc" else "asc")
 
             sort <- list(by = by, order = order,
                          str = paste(" order by ",
-                         paste("(", by, ")", collapse = ", ",
-                               sep = ""), order, sep = ""))
+                         paste("(", by, ") ", order, collapse = ", ",
+                               sep = ""), sep = ""))
         }
 
         if (is(x, "db.data.frame")) {
@@ -55,7 +56,7 @@ setMethod (
             parent <- x@.parent
             where <- x@.where
         }
-        
+
         new("db.Rquery",
             .content = content,
             .expr = expr,
