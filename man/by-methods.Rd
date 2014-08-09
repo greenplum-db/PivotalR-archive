@@ -54,7 +54,7 @@ If the return type of \code{FUN} is a \code{\linkS4class{db.obj}} object, then t
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
 }
 
 \seealso{

@@ -37,9 +37,9 @@
   models.
 }
 
-\author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@gopivotal.com}
+\author{ Author: Hong Ooi, Pivotal Inc. \email{hooi@pivotal.io}
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
 }
 
 \seealso{

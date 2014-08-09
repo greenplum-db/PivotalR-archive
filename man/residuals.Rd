@@ -40,7 +40,7 @@
 \author{
   Author: Predictive Analytics Team, Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
 }
 
 \seealso{

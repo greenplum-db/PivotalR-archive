@@ -207,7 +207,7 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, na.as.level = FALSE, 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@gopivotal.com}
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
 }
 \references{
   [1] Wikipedia: Breusch-Pagan test,
