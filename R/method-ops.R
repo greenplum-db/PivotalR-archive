@@ -353,7 +353,8 @@ setMethod (
 
 ## convert string to time types
 .replace.timestamp <- function (e1, res, s, op, res.type.change = FALSE,
-                                inverse = FALSE, always.interval = FALSE)
+                                inverse = FALSE, always.interval = FALSE,
+                                is.bool = FALSE)
 {
     types <- ifelse(e1@.col.data_type == "array",
                     .strip(e1@.col.udt_name, "_"), e1@.col.udt_name)
@@ -374,7 +375,10 @@ setMethod (
                                  paste(res@.expr[i], " as \"",
                                        res@.col.name[i], "\"", sep = ""),
                                  res@.content)
-            if (res.type.change) {
+            if (is.bool) {
+                res@.col.data_type[i] <- 'boolean'
+                res@.col.udt_name[i] <- 'bool'
+            } else if (res.type.change) {
                 res@.col.data_type[i] <- .time.change[idx[i]]
                 res@.col.udt_name[i] <- .time.change[idx[i]]
             } else {
@@ -394,7 +398,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " > ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " > ")
+        res <- .replace.timestamp(e1, res, e2, " > ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -418,7 +422,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " < ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " < ")
+        res <- .replace.timestamp(e1, res, e2, " < ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -442,7 +446,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " >= ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " >= ")
+        res <- .replace.timestamp(e1, res, e2, " >= ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -466,7 +470,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " <= ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " <= ")
+        res <- .replace.timestamp(e1, res, e2, " <= ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -490,7 +494,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " = ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " = ")
+        res <- .replace.timestamp(e1, res, e2, " = ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
@@ -514,7 +518,7 @@ setMethod (
     function (e1, e2) {
         e2 <- paste("$$", .strip(e2, "'"), "$$", sep = "")
         res <- .compare(e1, e2, " <> ", .txt.types, cast = "")
-        res <- .replace.timestamp(e1, res, e2, " <> ")
+        res <- .replace.timestamp(e1, res, e2, " <> ", is.bool = TRUE)
         if (is(e1, "db.Rquery")) res@.is.agg <- e1@.is.agg
         res
     },
