@@ -97,7 +97,7 @@ plr <- function(fun, conn.id = 1)
     db.rettype <- .create_plr_rettype(ret.type, conn.id = conn.id) # name of return type in database
 
     if (identical(arg.types, list()))
-        args.types <- rep(gsub("setof ", "", db.rettype), length(args))
+        args.types <- rep(gsub("setof ", "", db.rettype$ret), length(args))
     else
         arg.types <- as.character(as.vector(arg.types))
 
@@ -106,7 +106,7 @@ plr <- function(fun, conn.id = 1)
     .db("
         create function ", db.func, "(",
         paste(paste(args, ' ', arg.types, sep = ''), collapse = ", "),
-        ") returns ", db.rettype, " as $$ ", fun.body, "$$ language plr",
+        ") returns ", db.rettype$ret, " as $$ ", fun.body, "$$ language plr",
         conn.id = conn.id, verbose = FALSE, sep = "")
 
     func <- function(data) {
@@ -123,14 +123,21 @@ plr <- function(fun, conn.id = 1)
 
         by.str <- if (is.null(by.names)) "" else paste(paste(names(data)[1:length(by.names)], collapse = ", "), ", ", sep = "")
         args <- sapply(args, function(s) if (! (s %in% names(data))) paste(s, "_array_agg", sep = '') else s)
-        func.str <- paste(db.func, "(", paste(args, collapse = ", ", sep = ''),
-                          ") as result", sep = "")
-        func.str <- paste(by.str, func.str, sep = "")
+        func.expr <- paste(db.func, "(", paste(args, collapse = ", ", sep = ''), ")", sep = "")
+        result <- .unique.string()
+        func.str <- paste(by.str, func.expr, " as ", result, sep = "")
 
         sql <- paste("select ", func.str, " from ", content(data), sep = "")
+        expr <- c(by.names, func.expr)
+        col.name <- c(by.name, result)
+        parent <- content(data)
 
-        if (grepl(.unique.pattern(), db.rettype, perl = T))
-            sql <- paste("select ", by.str, "(result).* from (", sql, ") s", sep = "")
+        if (grepl(.unique.pattern(), db.rettype, perl = T)) {
+            parent <- sql
+            sql <- paste("select ", by.str, "(", result, ").* from (", sql, ") s", sep = "")
+            expr <- c(by.names, db.rettype$items)
+            col.name <- expr
+        }
 
         ## result.table <- .unique.string()
         ## .db("create table ", result.table, " as ", sql,
@@ -140,7 +147,17 @@ plr <- function(fun, conn.id = 1)
 
         ## db.data.frame(result.table, conn.id = conn.id, verbose = FALSE)
 
-        sql
+        #sql
+        new("db.Rquery",
+            .content = sql,
+            .expr = expr,
+            .source = content(data),
+            .parent = parent,
+            .conn.id = conn.id,
+            .col.name = col.name,
+            .key = character(0),
+            .col.data_type =
+            )
     }
 
     attr(func, "plr") <- db.func # can be used for deletion of the function
@@ -161,9 +178,9 @@ plr <- function(fun, conn.id = 1)
         .db("create type ", type.name, " as (",
             paste(paste(args, types), collapse = ", "), ")",
             conn.id = conn.id, verbose = FALSE, sep = "")
-        return (paste("setof", type.name))
+        return (list(ret=paste("setof", type.name), items=args))
     } else {
-        return (as.character(ret.type))
+        return (list(ret=as.character(ret.type), items=ret.type))
     }
 }
 
