@@ -241,10 +241,11 @@ print.logregr.madlib.grps <- function (x,
     if (i == n.grps + 1) stop("All models' coefficients are NAs!")
 
     if (x[[i]]$has.intercept)
-        rows <- c("(Intercept)", x[[i]]$origin.ind)
+        rows <- c("(Intercept)", x[[i]]$ind.vars)
     else
         rows <- x[[i]]$ind.vars
     rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
     for (j in seq_len(length(x[[i]]$col.name)))
         if (x[[i]]$col.name[j] != x[[i]]$appear[j])
             rows <- gsub(x[[i]]$col.name[j], x[[i]]$appear[j], rows)
@@ -315,7 +316,6 @@ print.logregr.madlib <- function (x,
     rows <- .reverse.consistent.func(rows)
     rows <- gsub("\\s", "", rows)
     ind.width <- .max.width(rows)
-
     cat("\nMADlib Logistic Regression Result\n")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n", sep = "")

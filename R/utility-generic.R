@@ -262,7 +262,6 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
         right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*?)\\)", "(\\1)", right.hand, perl = T)
-
         if (sum(data@.is.factor) > 0) {
             distinct <- list()
             ref <- list()
@@ -283,9 +282,16 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
                     max.level <- length(new.col)
             }
 
+            right.hand1 <- right.hand
+            for (col in names(data)) {
+                right.hand1 <- gsub(paste("(", col, "\\s*\\[.*\\])", sep=""),
+                                    "`\\1`", right.hand1, perl = T)
+            }
+            vars <- all.vars(parse(text = right.hand1))
+            vars <- setdiff(vars, names(data))
             l <- length(names(data))
-            fake <- as.data.frame(array(1, dim = c(max.level, l)))
-            names(fake) <- names(data)
+            fake <- as.data.frame(array(1, dim = c(max.level, l + length(vars))))
+            names(fake) <- c(names(data), vars)
             for (i in seq_len(l)) {
                 if (data@.is.factor[i]) {
                     fake[,i] <- array(paste("`", distinct[[data@.col.name[i]]], "`",
@@ -297,7 +303,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
             }
             if (attr(f.terms, "intercept") == 0) inter.str <- "-1"
             else inter.str <- ""
-            fterm <- .modeling.formula(formula(paste("~", right.hand, inter.str)), fake)
+            fterm <- .modeling.formula(formula(paste("~", right.hand1, inter.str)), fake)
             if (fterm[1] == "(Intercept)") fterm <- fterm[-1]
             right.hand <- paste(fterm, collapse = " + ")
         }
@@ -359,6 +365,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     else
         intercept.str <- "1,"
 
+    labels <- gsub("`([^`]*\\[.*\\])`", "\\1", labels, perl = T)
     labels <- .is.array(labels, data)
     orig.labels <- labels
 
@@ -585,15 +592,15 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 
     for (i in seq_len(length(labels))) {
         if (labels[i] %in% names(data) &&
-            data@.col.data_type[i] == "array") {
-            n <- .db.getQuery(paste("select array_upper(\"", labels[i],
-                                    "\",1) from ",
-                                    tbl, where.str, " limit 1", sep = ""),
-                              conn.id)[[1]]
-            n0 <- .db.getQuery(paste("select array_lower(\"", labels[i],
-                                    "\",1) from ",
-                                    tbl, where.str, " limit 1", sep = ""),
-                              conn.id)[[1]]
+            data@.col.data_type[which(names(data) == labels[i])] == "array") {
+            n <- .db("select array_upper(\"", labels[i],
+                     "\",1) from ",
+                     tbl, where.str, " limit 1", sep = "",
+                     conn.id = conn.id, verbose = F)[[1]]
+            n0 <- .db("select array_lower(\"", labels[i],
+                      "\",1) from ",
+                      tbl, where.str, " limit 1", sep = "",
+                      conn.id = conn.id, verbose = F)[[1]]
             nlabels <- c(nlabels, paste(labels[i], "[",
                                         seq_len(n-n0+1) -1 + n0,
                                         "]", sep = ""))
