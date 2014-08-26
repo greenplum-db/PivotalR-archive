@@ -1,17 +1,21 @@
 ## Wrapper function for MADlib's decision tree
 
-madlib.rpart <- function(formula, data, weights, subset,
-                      na.action = na.rpart, method, parms,
-                      control, na.as.level = FALSE, ...)
+madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
+                         na.action = NULL, parms,
+                         control, na.as.level = FALSE, 
+                         verbose = FALSE, ...)
 {
     ## Some validations
     if ( ! is( data, "db.obj" ) )
         stop( "madlib.dt can only be used on a db.obj object, ",
              "and ", deparse( substitute( data ) ), " is not!")
 
+    if (missing(parms)) parms <- NULL
+    if (missing(control)) control <- NULL
+
     ## Only newer versions of MADlib are supported for
     ## this function
-    .check.madlib.data( data )
+    .check.madlib.version( data )
 
     origin.data <- data # needed in the result report
 
@@ -26,7 +30,7 @@ madlib.rpart <- function(formula, data, weights, subset,
 
     ## analyze the formula
     formula <- update(formula, ~ . - 1) # exclude constant
-    analyzer <- .get.param(formula, data, na.action, na.as.level)
+    analyzer <- .get.params(formula, data, na.action, na.as.level)
 
     ## If data is db.view or db.Rquery, create a temporary table
     ## otherwise, use the original data
@@ -49,11 +53,36 @@ madlib.rpart <- function(formula, data, weights, subset,
     ## Extract other parameters
     params2 <- .extract.dt.params(parms, control)
 
+    weight.col <- if (is.null(weights)) "NULL" else paste("'", weights, "'", sep = "")
+    if (is.null(id) && identical(key(data), character(0)))
+        stop("MADlib decision tree: you must specify an ID column!")
+    else
+        id.col <- if (is.null(id)) key(data) else id
+
     ## Construct SQL string
     tbl.source <- content(data) # data table name
     madlib <- schema.madlib(conn.id) # MADlib schema
     tbl.output <- .unique.string()
-    sql <- paste()
+    sql <- paste("select ", madlib, ".tree_train('", tbl.source, 
+                 "', '",  tbl.output, "', '", id.col, "', '",
+                 params1$dep.str, "', '", 
+                 gsub("(^array\\[|\\]$|\")", "", params1$ind.str), "', NULL, '",
+                 params2$split, "', ", grp, ", ", weight.col, ", ",
+                 params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket, 
+                 ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
+    res <- .db(sql, conn.id = conn.id, verbose = FALSE)
+
+    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""), 
+                                   conn.id = conn.id, verbose = FALSE)
+
+    .restore.warnings(warnings)
+
+    if (is.tbl.temp) delete(tbl.source, conn.id)
+
+    rst <- list(model = model, model.summary = model.summary)
+    class(rst) <- "dt.madlib"
+    rst
 }
 
 ## ------------------------------------------------------------
@@ -68,7 +97,7 @@ madlib.rpart <- function(formula, data, weights, subset,
 {
     default <- list(split = 'gini', minsplit = 20, 
                     minbucket = round(20/3), maxdepth = 30,
-                    cp = 0.01)
+                    cp = 0.01, nbins = 100)
 
     if ('split' %in% names(parms)) default$split <- parms$split
     if ('minsplit' %in% names(control)) default$minsplit <- control$minsplit
@@ -78,5 +107,20 @@ madlib.rpart <- function(formula, data, weights, subset,
         default$minbucket <- round(default$minsplit / 3)
     if ('maxdepth' %in% names(control)) default$maxdepth <- control$maxdepth
     if ('cp' %in% names(control)) default$cp <- control$cp
+    if ('nbins' %in% names(control)) default$nbins <- control$nbins
     default
+}
+
+## ------------------------------------------------------------
+
+print.dt.madlib <- function(x,
+                            digits = max(3L, getOption("digits") - 3L),
+                            ...) 
+{
+    tbl.model <- content(x$model)
+    conn.id <- conn.id(x$model)
+    madlib <- schema.madlib(conn.id)
+    sql <- paste("select ", madlib, ".tree_display('", 
+                 gsub("\"", "", tbl.model), "', FALSE)", sep = "")
+    cat(.db(sql, conn.id = conn.id, verbose = FALSE)[1,1], '\n')
 }

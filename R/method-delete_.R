@@ -232,3 +232,13 @@ setMethod (
         }
         list(res = d1, conn.id = conn.id)
     })
+
+## ------------------------------------------------------------
+
+setMethod("delete",
+          signature(x = "dt.madlib"),
+          def = function (x) {
+              conn.id <- conn.id(x$model)
+              success <- delete(x$model) && delete(x$model.summary)
+              list(res = success, conn.id = conn.id)
+          })
