@@ -20,7 +20,8 @@
 ## -----------------------------------------------------------------------
 
 ## Analyze the formula and get each terms
-.get.params <- function (formula, data, na.action = NULL, na.as.level = FALSE)
+.get.params <- function (formula, data, na.action = NULL, na.as.level = FALSE,
+                         create.dummy = TRUE)
 {
     n <- ncol(data)
     params <- .analyze.formula(formula, data)
@@ -36,14 +37,25 @@
     is.tbl.source.temp <- FALSE
     tbl.source <- character(0)
     if (is(params$data, "db.Rquery")) {
-        tbl.source <- .unique.string()
-        is.tbl.source.temp <- TRUE
-        data <- as.db.data.frame(x = params$data,
-                                 table.name = tbl.source,
-                                 is.temp = FALSE, verbose = FALSE,
-                                 distributed.by = params$data@.dist.by,
-                                 factor.full = params$factor.full,
-                                 na.as.level = na.as.level)
+        if (create.dummy) {
+            tbl.source <- .unique.string()
+            is.tbl.source.temp <- TRUE
+            data <- as.db.data.frame(x = params$data,
+                                     table.name = tbl.source,
+                                     is.temp = FALSE, verbose = FALSE,
+                                     distributed.by = params$data@.dist.by,
+                                     factor.full = params$factor.full,
+                                     na.as.level = na.as.level)
+        } else {
+            if (! is(data, "db.table")) {
+                data <- as.db.data.frame(x = params$data,
+                                         table.name = tbl.source,
+                                         is.temp = FALSE, verbose = FALSE,
+                                         distributed.by = params$data@.dist.by,
+                                         factor.full = params$factor.full,
+                                         na.as.level = na.as.level, pivot = FALSE)
+            }
+        }
     } else if (is(params$data, "db.view")) {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE

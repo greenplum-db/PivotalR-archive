@@ -30,7 +30,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     ## analyze the formula
     formula <- update(formula, ~ . - 1) # exclude constant
-    analyzer <- .get.params(formula, data, na.action, na.as.level)
+    analyzer <- .get.params(formula, data, na.action, na.as.level, FALSE)
 
     ## If data is db.view or db.Rquery, create a temporary table
     ## otherwise, use the original data
