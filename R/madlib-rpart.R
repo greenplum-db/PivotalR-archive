@@ -66,7 +66,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     sql <- paste("select ", madlib, ".tree_train('", tbl.source, 
                  "', '",  tbl.output, "', '", id.col, "', '",
                  params1$dep.str, "', '", 
-                 gsub("(^array\\[|\\]$|\")", "", params1$ind.str), "', NULL, '",
+                 gsub("(^array\\[|\\]$)", "", params1$ind.str), "', NULL, '",
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket, 
                  ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
