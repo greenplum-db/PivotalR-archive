@@ -36,7 +36,6 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     ## otherwise, use the original data
     data <- analyzer$data
     is.tbl.temp <- analyzer$is.tbl.source.temp
-
     ## dependent, independent and grouping variables
     ## and has.intercept flag
     params1 <- analyzer$params
@@ -49,6 +48,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     {
         grp <- paste("'", params1$grp.str, "'", sep = "")
     }
+
 
     ## Extract other parameters
     params2 <- .extract.dt.params(parms, control)
@@ -75,12 +75,15 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
     model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""), 
                                    conn.id = conn.id, verbose = FALSE)
+    method <- if (lk(model.summary$is_classification)) "class" else "anova"
+    functions <- .assign.functions(method)
 
     .restore.warnings(warnings)
 
     if (is.tbl.temp) delete(tbl.source, conn.id)
 
-    rst <- list(model = model, model.summary = model.summary)
+    rst <- list(model = model, model.summary = model.summary,
+                method=method, functions = functions)
     class(rst) <- "dt.madlib"
     rst
 }
@@ -123,4 +126,25 @@ print.dt.madlib <- function(x,
     sql <- paste("select ", madlib, ".tree_display('", 
                  gsub("\"", "", tbl.model), "', FALSE)", sep = "")
     cat(.db(sql, conn.id = conn.id, verbose = FALSE)[1,1], '\n')
+}
+
+.assign.functions <- function(method) 
+{
+    if (method=="anova") {
+        list(summary.dt.madlib = function (yval, dev, wt, ylevel, digits) 
+        {
+            paste0("  mean=", formatg(yval, digits), ", MSE=", formatg(dev/wt, 
+                digits))
+            },
+
+            text.dt.madlib = function (yval, dev, wt, ylevel, digits, n, use.n) 
+            {
+                if (use.n) 
+                paste0(formatg(yval, digits), "\nn=", n)
+                else formatg(yval, digits)
+                })
+        } else {
+            list()
+        }
+
 }
