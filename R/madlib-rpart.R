@@ -172,8 +172,8 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
 {
     library(rpart)
     class(x) <- "rpart"
-    if (missing(label)) label <- NULL
-    text(x, splits=splits, label=label, FUN=FUN, all=all, pretty=pretty, digits=digits,
+    #if (missing(label)) label <- NULL
+    text(x, splits=splits, FUN=FUN, all=all, pretty=pretty, digits=digits,
          use.n=use.n, fancy=fancy, fwidth=fwidth, fheight=fheight, bg=bg,
          minlength=minlength, ...)
 }
@@ -243,6 +243,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
                      nclass <- (ncol(yval) - 2L)/2L
                      group <- yval[, 1L]
                      counts <- yval[, 1L + (1L:nclass)]
+                     #counts <- as.matrix(counts)
                      if (!is.null(ylevel))
                          group <- ylevel[group]
                      temp1 <- formatg(counts, digits)
@@ -283,6 +284,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
                 frame[[i]]$yval2 <- cbind(frame[[i]]$yval2, frame[[i]][j])
             }
             colnames(frame[[i]]$yval2) <- c(paste("V", 1:(ncl-9), sep = ""), "nodeprob")
+            frame[[i]]$yval2 <- as.matrix(frame[[i]]$yval2)
             frame[[i]] <- frame[[i]][c(1:8, ncol(frame[[i]]))]
         }
     } else {
