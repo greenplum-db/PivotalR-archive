@@ -303,7 +303,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
     features <- .strip(.strip(strsplit(lk(model.summary$independent_varnames), ",")[[1]]), "\"")
     for (i in seq_len(length(frame))) {
         for (j in 1:nrow(frame[[i]])) {
-            frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]]
+            frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
         }
     }
     frame
