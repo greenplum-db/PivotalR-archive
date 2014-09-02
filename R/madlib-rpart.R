@@ -80,7 +80,8 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     .restore.warnings(warnings)
 
-    frame <- .db("select ", madlib, "._convert_to_rpart_format(tree) as frame from ",
+    n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
+    frame <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame from ",
                  tbl.output, conn.id = conn.id, verbose = FALSE)
     n.grps <- nrow(frame) # how many groups
     frame.ncol <- .get.rpart.frame.ncol(model.summary)
