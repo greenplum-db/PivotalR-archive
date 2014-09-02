@@ -88,14 +88,17 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                            data.frame(matrix(arraydb.to.arrayr(frame[row,], "numeric"),
                                              ncol = frame.ncol)))
     frame.matrix <- .change.rpart.frame.colnames(frame.matrix, model.summary)
+    frame.matrix <- .change.frame.rownames(frame.matrix)
     frame.matrix <- .replace.rpart.first.col(frame.matrix, model.summary)
 
     if (is.tbl.temp) delete(tbl.source, conn.id)
 
+    splits <- .construct.splits(frame.matrix, model)
+
     if (n.grps == 1) {
         rst <- list(model = model, model.summary = model.summary,
                     method=method, functions = functions,
-                    frame = frame.matrix[[1]])
+                    frame = frame.matrix[[1]], splits = splits[[1]])
         class(rst) <- "dt.madlib"
         if (lk(model.summary$is_classification)) {
             attr(rst, 'ylevels') <- .strip(.strip(strsplit(lk(model.summary$dependent_var_levels), ",")[[1]]), "\"")
@@ -104,7 +107,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
         rst <- lapply(seq_len(n.grps), function(i)
                       list(model = model, model.summary = model.summary,
                            method = method, functions = functions,
-                           frame = frame.matrix[[i]]))
+                           frame = frame.matrix[[i]], splits = splits[[i]]))
         for (i in seq_len(n.grps)) class(rst[[i]]) <- "dt.madlib"
         class(rst) <- "dt.madlib.grp"
         if (lk(model.summary$is_classification)) {
@@ -149,7 +152,8 @@ print.dt.madlib <- function(x,
 {
     library(rpart)
     class(x) <- "rpart"
-    print(x)
+    out <- capture.output(print(x))
+    cat(paste(gsub(">=", ">", gsub("<", "<=", out)), collapse = "\n"), "\n")
 }
 
 ## ------------------------------------------------------------
@@ -161,21 +165,6 @@ plot.dt.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE, nsp
     class(x) <- "rpart"
     plot(x, uniform=uniform, branch=branch, compress=compress, nspace=nspace,
          margin=margin, minbranch=minbranch, ...)
-}
-
-## ------------------------------------------------------------
-
-text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
-                           pretty = NULL, digits = getOption("digits") - 3, use.n = FALSE,
-                           fancy = FALSE, fwidth = 0.8, fheight = 0.8, bg = par("bg"),
-                           minlength = 1L, ...)
-{
-    library(rpart)
-    class(x) <- "rpart"
-    #if (missing(label)) label <- NULL
-    text(x, splits=splits, FUN=FUN, all=all, pretty=pretty, digits=digits,
-         use.n=use.n, fancy=fancy, fwidth=fwidth, fheight=fheight, bg=bg,
-         minlength=minlength, ...)
 }
 
 ## ------------------------------------------------------------
@@ -302,9 +291,12 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
 {
     features <- .strip(.strip(strsplit(lk(model.summary$independent_varnames), ",")[[1]]), "\"")
     for (i in seq_len(length(frame))) {
-        for (j in 1:nrow(frame[[i]])) {
-            frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
-        }
+        ## for (j in 1:nrow(frame[[i]])) {
+        ##     frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
+        ## }
+        frame[[i]][ , 1] <- sapply(frame[[i]][, 1], function(x) if (x < 0) "<leaf>" else features[x+1])
+        frame[[i]]$ncompete <- as.integer(frame[[i]][,1] != "<leaf>")
+        frame[[i]]$nsurrogate <- frame[[i]]$ncompete
     }
     frame
 }
@@ -322,3 +314,262 @@ formatg <- function (x, digits = getOption("digits"),
         matrix(temp, nrow = nrow(x))
     else temp
 }
+
+## ------------------------------------------------------------
+
+## Compute the correct row names of the frame
+.change.frame.rownames <- function(frames)
+{
+    for (i in seq_len(length(frames))) {
+        var <- frames[[i]]$var # the first column
+        row <- rep(0, length(var))
+
+        ## i - row index
+        ## r - row name
+        compute.rowname <- function(i, r) {
+            row[i] <<- r
+            if (i > length(var) || var[i] < 0) return (i+1)
+            left <- compute.rowname(i+1, 2*r)
+            right <- compute.rowname(left, 2*r+1)
+        }
+
+        compute.rowname(1, 1)
+        row.names(frames[[i]]) <- as.character(row)
+    }
+    frames
+}
+
+## ------------------------------------------------------------
+
+.get.splits.index <- function(frame)
+{
+    ff <- frame
+    n <- nrow(ff)
+    is.leaf <- (ff$var == "<leaf>")
+    whichrow <- !is.leaf
+    vnames <- ff$var[whichrow]
+    index <- cumsum(c(1, ff$ncompete + ff$nsurrogate + (!is.leaf)))
+    index
+}
+
+## ------------------------------------------------------------
+
+.construct.splits <- function(frames, model)
+{
+    conn.id <- conn.id(model)
+    madlib <- schema.madlib(conn.id)
+    thresholds <- .db("select ", madlib, "._get_split_thresholds(tree) from ",
+                      content(model), sep = "", conn.id = conn.id,
+                      verbose = FALSE)
+    splits.list <- list()
+    for (i in seq_len(length(frames))) {
+        index <- .get.splits.index(frames[[i]])
+        splits <- matrix(0, nrow=max(index)-1, ncol=4)
+        splits[,2] <- 1
+        is.leaf <- frames[[i]]$var == "<leaf>"
+        meaningful <- index[-length(index)][!is.leaf]
+        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double"))
+        splits.list[[i]] <- splits
+    }
+    splits.list
+}
+
+## ------------------------------------------------------------
+
+## borrow from rpart code
+
+text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
+                           pretty = NULL, digits = getOption("digits") - 3L,
+                           use.n = FALSE, fancy = FALSE, fwidth = 0.8, fheight = 0.8,
+                           bg = par("bg"), minlength = 1L, ...)
+{
+    #if (!inherits(x, "rpart")) stop("Not a legitimate \"rpart\" object")
+    if (nrow(x$frame) <= 1L) stop("fit is not a tree, just a root")
+
+    frame <- x$frame
+    if (!missing(label)) warning("argument 'label' is no longer used")
+    col <- names(frame)
+    ylevels <- attr(x, "ylevels")
+    if (!is.null(ylevels <- attr(x, "ylevels"))) col <- c(col, ylevels)
+    cxy <- par("cxy")                   # character width and height
+    if (!is.null(srt <- list(...)$srt) && srt == 90) cxy <- rev(cxy)
+    xy <- rpart:::rpartco(x)
+
+    node <- as.numeric(row.names(frame))
+    is.left <- (node %% 2L == 0L)            # left hand sons
+    node.left <- node[is.left]
+    parent <- match(node.left/2L, node)
+
+    ## Put left splits at the parent node
+    if (splits) {
+        left.child <- match(2L * node, node)
+        right.child <- match(node * 2L + 1L, node)
+        rows <- if (!missing(pretty) && missing(minlength))
+            labels(x, pretty = pretty) else labels(x, minlength = minlength)
+        if (fancy) {
+            ## put split labels on branches instead of nodes
+            xytmp <- rpart.branch(x = xy$x, y = xy$y, node = node)
+            leftptx <- (xytmp$x[2L, ] + xytmp$x[1L, ])/2
+            leftpty <- (xytmp$y[2L, ] + xytmp$y[1L, ])/2
+            rightptx <- (xytmp$x[3L, ] + xytmp$x[4L, ])/2
+            rightpty <- (xytmp$y[3L, ] + xytmp$y[4L, ])/2
+
+            FUN(leftptx, leftpty + 0.52 * cxy[2L],
+                rows[left.child[!is.na(left.child)]], ...)
+            FUN(rightptx, rightpty - 0.52 * cxy[2L],
+                rows[right.child[!is.na(right.child)]], ...)
+        } else
+            FUN(xy$x, xy$y + 0.5 * cxy[2L], rows[left.child], ...)
+    }
+
+    leaves <- if (all) rep(TRUE, nrow(frame)) else frame$var == "<leaf>"
+
+    stat <-
+        x$functions$text(yval = if (is.null(frame$yval2)) frame$yval[leaves]
+                         else frame$yval2[leaves, ],
+                         dev = frame$dev[leaves], wt = frame$wt[leaves],
+                         ylevel = ylevels, digits = digits,
+                         n = frame$n[leaves], use.n = use.n)
+
+    if (fancy) {
+        if (col2rgb(bg, alpha = TRUE)[4L, 1L] < 255) bg <- "white"
+        oval <- function(middlex, middley, a, b)
+        {
+            theta <- seq(0, 2 * pi, pi/30)
+            newx <- middlex + a * cos(theta)
+            newy <- middley + b * sin(theta)
+            polygon(newx, newy, border = TRUE, col = bg)
+        }
+
+        ## FIXME: use rect()
+        rectangle <- function(middlex, middley, a, b)
+        {
+            newx <- middlex + c(a, a, -a, -a)
+            newy <- middley + c(b, -b, -b, b)
+            polygon(newx, newy, border = TRUE, col = bg)
+        }
+
+        ## find maximum length of stat
+        maxlen <- max(string.bounding.box(stat)$columns) + 1L
+        maxht <- max(string.bounding.box(stat)$rows) + 1L
+
+        a.length <- if (fwidth < 1)  fwidth * cxy[1L] * maxlen else fwidth * cxy[1L]
+
+        b.length <- if (fheight < 1) fheight * cxy[2L] * maxht else fheight * cxy[2L]
+
+        ## create ovals and rectangles here
+        ## sqrt(2) creates the smallest oval that fits around the
+        ## best fitting rectangle
+        for (i in parent)
+            oval(xy$x[i], xy$y[i], sqrt(2) * a.length/2, sqrt(2) * b.length/2)
+        child <- match(node[frame$var == "<leaf>"], node)
+        for (i in child)
+            rectangle(xy$x[i], xy$y[i], a.length/2, b.length/2)
+    }
+
+    ##if FUN=text then adj=1 puts the split label to the left of the
+    ##    split rather than centered
+    ##Allow labels at all or just leaf nodes
+
+    ## stick values on nodes
+    if (fancy) FUN(xy$x[leaves], xy$y[leaves] + 0.5 * cxy[2L], stat, ...)
+    else FUN(xy$x[leaves], xy$y[leaves] - 0.5 * cxy[2L], stat, adj = 0.5, ...)
+
+    invisible()
+}
+
+labels.dt.madlib <- function(object, digits = 4, minlength = 1L, pretty,
+                         collapse = TRUE, ...)
+{
+    if (missing(minlength) && !missing(pretty)) {
+    minlength <- if (is.null(pretty)) 1L
+    else if (is.logical(pretty)) {
+        if (pretty) 4L else 0L
+        } else 0L
+    }
+
+    ff <- object$frame
+    n <- nrow(ff)
+    if (n == 1L) return("root")            # special case of no splits
+
+    is.leaf <- (ff$var == "<leaf>")
+    whichrow <- !is.leaf
+    vnames <- ff$var[whichrow] # the variable names for the primary splits
+
+    index <- cumsum(c(1, ff$ncompete + ff$nsurrogate + !is.leaf))
+    irow <- index[c(whichrow, FALSE)] # we only care about the primary split
+    ncat <- object$splits[irow, 2L]
+
+    ## Now to work: first create labels for the left and right splits,
+    ##  but not for leaves of course
+    ##
+    lsplit <- rsplit <- character(length(irow))
+
+    if (any(ncat < 2L)) {               # any continuous vars ?
+    jrow <- irow[ncat < 2L]
+    cutpoint <- formatg(object$splits[jrow, 4L], digits)
+    temp1 <- (ifelse(ncat < 0, "<=", "> "))[ncat < 2L]
+    temp2 <- (ifelse(ncat < 0, "> ", "<="))[ncat < 2L]
+    lsplit[ncat<2L] <- paste0(temp1, cutpoint)
+    rsplit[ncat<2L] <- paste0(temp2, cutpoint)
+    }
+
+    if (any(ncat > 1L)) {               # any categorical variables ?
+    xlevels <- attr(object, "xlevels")
+    ##
+    ## jrow will be the row numbers of factors within lsplit and rsplit
+    ## crow the row number in "csplit"
+    ## and cindex the index on the "xlevels" list
+    ##
+    jrow <- seq_along(ncat)[ncat > 1L]
+    crow <- object$splits[irow[ncat > 1L], 4L] #row number in csplit
+    cindex <- (match(vnames, names(xlevels)))[ncat > 1L]
+
+    ## Now, abbreviate the levels
+    if (minlength == 1L) {
+        if (any(ncat > 52L))
+        warning("more than 52 levels in a predicting factor, truncated for printout",
+                        domain = NA)
+        xlevels <- lapply(xlevels, function(z) c(letters, LETTERS)[pmin(seq_along(z), 52L)])
+        } else if (minlength > 1L)
+        xlevels <- lapply(xlevels, abbreviate, minlength, ...)
+
+    ## Now tuck in the labels
+    ## I'll let some other clever person vectorize this
+    for (i in seq_along(jrow)) {
+        j <- jrow[i]
+        splits <- object$csplit[crow[i], ]
+        ## splits will contain 1=left, 3=right, 2= neither
+            cl <- if (minlength == 1L) "" else ","
+            lsplit[j] <-
+                paste((xlevels[[cindex[i]]])[splits == 1L], collapse = cl)
+            rsplit[j] <-
+                paste((xlevels[[cindex[i]]])[splits == 3L], collapse = cl)
+        }
+    }
+
+    if (!collapse) {  # called by no routines that I know of
+    ltemp <- rtemp <- rep("<leaf>", n)
+    ltemp[whichrow] <- lsplit
+    rtemp[whichrow] <- rsplit
+    return(cbind(ltemp, rtemp))
+    }
+
+    lsplit <- paste0(ifelse(ncat < 2L, "", "="), lsplit)
+    rsplit <- paste0(ifelse(ncat < 2L, "", "="), rsplit)
+
+    ## Now match them up to node numbers
+    ##   The output will have one label per row of object$frame, each
+    ##   corresponding the the line segement joining this node to its parent
+    varname <- (as.character(vnames))
+    node <- as.numeric(row.names(ff))
+    parent <- match(node %/% 2L, node[whichrow])
+    odd <- (as.logical(node %% 2L))
+
+    labels <- character(n)
+    labels[odd] <- paste0(varname[parent[odd]], rsplit[parent[odd]])
+    labels[!odd] <- paste0(varname[parent[!odd]], lsplit[parent[!odd]])
+    labels[1L] <- "root"
+    labels
+}
+
