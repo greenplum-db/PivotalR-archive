@@ -29,7 +29,11 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     warnings <- .suppress.warnings(conn.id) # suppress SQL/R warnings
 
     ## analyze the formula
-    formula <- update(formula, ~ . - 1) # exclude constant
+    #formula <- update(formula, ~ . - 1) # exclude constant
+    f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
+    f.str <- paste(c(paste(deparse(update(formula(f.str[1]), ~ . - 1)), collapse = ""),
+                     f.str[2]), collapse = " | ")
+    formula <- formula(f.str)
     analyzer <- .get.params(formula, data, na.action, na.as.level, FALSE)
 
     ## If data is db.view or db.Rquery, create a temporary table
@@ -73,6 +77,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    return (model)
     model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
     method <- if (lk(model.summary$is_classification)) "class" else "anova"
@@ -81,8 +86,15 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     .restore.warnings(warnings)
 
     n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
-    frame <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame from ",
+    tree.info <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame, ",
+                 "cat_levels_in_text, cat_n_levels, ", madlib,
+                 "._get_split_thresholds(tree) as thresholds from ",
                  tbl.output, conn.id = conn.id, verbose = FALSE)
+    cat_levels_in_text <- tree.info$cat_levels_in_text
+    cat_n_levels <- tree.info$cat_n_levels
+    thresholds <- tree.info$thresholds
+    frame <- tree.info$frame
+
     n.grps <- nrow(frame) # how many groups
     frame.ncol <- .get.rpart.frame.ncol(model.summary)
     frame.matrix <- lapply(seq_len(n.grps), function(row)
@@ -94,21 +106,27 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     if (is.tbl.temp) delete(tbl.source, conn.id)
 
-    splits <- .construct.splits(frame.matrix, model)
+    splits <- .construct.splits(frame.matrix, model, model.summary, thresholds,
+                                cat_levels_in_text, cat_n_levels)
 
     if (n.grps == 1) {
         rst <- list(model = model, model.summary = model.summary,
                     method=method, functions = functions,
-                    frame = frame.matrix[[1]], splits = splits[[1]])
+                    frame = frame.matrix[[1]], splits = splits$splits.list[[1]],
+                    csplit = splits$csplit.list[[1]])
+        attr(rst, "xlevels") <- xlevels[[1]]
         class(rst) <- "dt.madlib"
         if (lk(model.summary$is_classification)) {
             attr(rst, 'ylevels') <- .strip(.strip(strsplit(lk(model.summary$dependent_var_levels), ",")[[1]]), "\"")
         }
     } else {
-        rst <- lapply(seq_len(n.grps), function(i)
-                      list(model = model, model.summary = model.summary,
+        rst <- lapply(seq_len(n.grps), function(i) {
+                      r <- list(model = model, model.summary = model.summary,
                            method = method, functions = functions,
-                           frame = frame.matrix[[i]], splits = splits[[i]]))
+                           frame = frame.matrix[[i]], splits = splits$splits.list[[i]],
+                           csplit = splits$csplit.list[[i]])
+                      attr(r, "xlevels") <- xlevels[[i]]
+                    })
         for (i in seq_len(n.grps)) class(rst[[i]]) <- "dt.madlib"
         class(rst) <- "dt.madlib.grp"
         if (lk(model.summary$is_classification)) {
@@ -355,14 +373,18 @@ formatg <- function (x, digits = getOption("digits"),
 
 ## ------------------------------------------------------------
 
-.construct.splits <- function(frames, model)
+## Construct the split matrix
+.construct.splits <- function(frames, model, model.summary,
+                              thresholds, cat.levels, cat.n)
 {
     conn.id <- conn.id(model)
     madlib <- schema.madlib(conn.id)
-    thresholds <- .db("select ", madlib, "._get_split_thresholds(tree) from ",
-                      content(model), sep = "", conn.id = conn.id,
-                      verbose = FALSE)
+
+    cat.features <- .strip(.strip(strsplit(lk(model.summary$cat_features), ",")[[1]], " "), "\"")
+
     splits.list <- list()
+    csplit.list <- list()
+    xlevels <- list()
     for (i in seq_len(length(frames))) {
         index <- .get.splits.index(frames[[i]])
         splits <- matrix(0, nrow=max(index)-1, ncol=4)
@@ -370,9 +392,39 @@ formatg <- function (x, digits = getOption("digits"),
         is.leaf <- frames[[i]]$var == "<leaf>"
         meaningful <- index[-length(index)][!is.leaf]
         splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double"))
-        splits.list[[i]] <- splits
+
+        catn <- arraydb.to.arrayr(cat.n[i], "integer")
+        cat.node <- frames[[i]]$var %in% cat.features
+        if (sum(cat.node) > 0) {
+            meaningful.cat <- index[-length(index)][!is.leaf & cat.node]
+            splits[meaningful.cat, 2] <- cat.n[sapply(frames[[i]]$var[cat.node],
+                                                      function(x) which(x == cat.features))]
+            cat.thresh <- splits[meaningful.cat, 4] + 1
+            splits[meaningful.cat, 4] <- seq_len(sum(cat.node))
+
+            splits.list[[i]] <- splits
+
+            csplit <- matrix(2, nrow = sum(cat.node), ncol = max(splits[meaningful.cat, 2]))
+            for (j in seq_len(nrow(csplit))) {
+                csplit[j, 1:splits[meaningful.cat,2][j]] <- 1
+                csplit[j, cat.thresh[j]] <- 3
+            }
+
+            csplit.list[[i]] <- csplit
+        } else {
+            csplit.list[[i]] <- NA
+        }
+
+        all.levels <- .strip(strsplit(cat.levels[i], ",")[[1]], " ")
+        levels <- list()
+        count <- 0
+        for (j in seq_along(cat.features)) {
+            levels[[cat.features[j]]] <- all.levels[1:catn[j] + count]
+            count <- count + catn[j]
+        }
+        xlevels[[i]] <- levels
     }
-    splits.list
+    list(splits.list=splits.list, csplit.list=csplit.list, xlevels=xlevels)
 }
 
 ## ------------------------------------------------------------
@@ -409,7 +461,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
             labels(x, pretty = pretty) else labels(x, minlength = minlength)
         if (fancy) {
             ## put split labels on branches instead of nodes
-            xytmp <- rpart.branch(x = xy$x, y = xy$y, node = node)
+            xytmp <- rpart:::rpart.branch(x = xy$x, y = xy$y, node = node)
             leftptx <- (xytmp$x[2L, ] + xytmp$x[1L, ])/2
             leftpty <- (xytmp$y[2L, ] + xytmp$y[1L, ])/2
             rightptx <- (xytmp$x[3L, ] + xytmp$x[4L, ])/2

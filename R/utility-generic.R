@@ -205,7 +205,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
 ## analyze formula
 .analyze.formula <- function (formula, data, fdata = data, refresh = FALSE,
                               is.factor = NA, cols = NA, suffix = NA,
-                              grp.vars = NULL, grp.expr = NULL)
+                              grp.vars = NULL, grp.expr = NULL, no.factor = FALSE)
 {
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     ## f.str <- .replace.array(f.str, data)
@@ -262,7 +262,7 @@ arraydb.to.arrayr <- function (str, type = "double", n = 1)
     right.hand <- paste(f.labels, collapse = "+")
     if (refresh) { # second pass
         right.hand <- gsub("as\\.factor\\((((?!as\\.factor).)*?)\\)", "(\\1)", right.hand, perl = T)
-        if (sum(data@.is.factor) > 0) {
+        if (sum(data@.is.factor) > 0 && !no.factor) {
             distinct <- list()
             ref <- list()
             replace.cols <- cols[is.factor]

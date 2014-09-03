@@ -36,6 +36,7 @@
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
     tbl.source <- character(0)
+    no.factor <- FALSE
     if (is(params$data, "db.Rquery")) {
         if (create.dummy) {
             tbl.source <- .unique.string()
@@ -48,12 +49,14 @@
                                      na.as.level = na.as.level)
         } else {
             if (! is(data, "db.table")) {
+                tbl.source <- .unique.string()
                 data <- as.db.data.frame(x = params$data,
                                          table.name = tbl.source,
                                          is.temp = FALSE, verbose = FALSE,
                                          distributed.by = params$data@.dist.by,
                                          factor.full = params$factor.full,
                                          na.as.level = na.as.level, pivot = FALSE)
+                no.factor <- TRUE
             }
         }
     } else if (is(params$data, "db.view")) {
@@ -71,7 +74,7 @@
                                is.factor = is.factor, cols = cols,
                                suffix = data@.factor.suffix,
                                grp.vars = params$grp.vars,
-                               grp.expr = params$grp.expr)
+                               grp.expr = params$grp.expr, no.factor = no.factor)
 
     list(data = data, params = params,
          is.tbl.source.temp = is.tbl.source.temp,
