@@ -151,8 +151,8 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"))
     conn.id <- conn.id(newdata)
     tbl.predict <- .unique.string()
     madlib <- schema.madlib(conn.id)
-    sql = paste("select ", madlib, ".tree_predict('", content(object),
-                "', '", content(newdata), "', '", tbl.predict, "'",
+    sql = paste("select ", madlib, ".tree_predict('", .strip(content(object$model), "\""),
+                "', '", .strip(content(newdata), "\""), "', '", tbl.predict, "', '",
                 type, "')", sep = "")
     .db(sql, conn.id = conn.id, verbose = FALSE)
     if (is.temp) delete(newdata)

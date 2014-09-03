@@ -2,7 +2,7 @@
 \alias{predict.dt.madlib}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+    Compute the predictions of the model produced by madlib.rpart
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
