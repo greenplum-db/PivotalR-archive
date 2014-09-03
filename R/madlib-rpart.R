@@ -424,8 +424,6 @@ formatg <- function (x, digits = getOption("digits"),
             cat.thresh <- splits[meaningful.cat, 4] + 1
             splits[meaningful.cat, 4] <- seq_len(sum(cat.node))
 
-            splits.list[[i]] <- splits
-
             csplit <- matrix(2, nrow = sum(cat.node), ncol = max(splits[meaningful.cat, 2]))
             for (j in seq_len(nrow(csplit))) {
                 csplit[j, 1:splits[meaningful.cat,2][j]] <- 1
@@ -433,18 +431,21 @@ formatg <- function (x, digits = getOption("digits"),
             }
 
             csplit.list[[i]] <- csplit
+
+            all.levels <- arraydb.to.arrayr(cat.levels[i], "character")
+            levels <- list()
+            count <- 0
+            for (j in seq_along(cat.features)) {
+                levels[[cat.features[j]]] <- all.levels[1:catn[j] + count]
+                count <- count + catn[j]
+            }
+            xlevels[[i]] <- levels
         } else {
             csplit.list[[i]] <- NA
+            xlevels[[i]] <- NA
         }
 
-        all.levels <- arraydb.to.arrayr(cat.levels[i], "character")
-        levels <- list()
-        count <- 0
-        for (j in seq_along(cat.features)) {
-            levels[[cat.features[j]]] <- all.levels[1:catn[j] + count]
-            count <- count + catn[j]
-        }
-        xlevels[[i]] <- levels
+        splits.list[[i]] <- splits
     }
     list(splits.list=splits.list, csplit.list=csplit.list, xlevels=xlevels)
 }
