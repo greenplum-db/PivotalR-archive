@@ -32,7 +32,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     #formula <- update(formula, ~ . - 1) # exclude constant
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
     f.str <- paste(c(paste(deparse(update(formula(f.str[1]), ~ . - 1)), collapse = ""),
-                     f.str[2]), collapse = " | ")
+                     if (is.na(f.str[2])) NULL else f.str[2]), collapse = " | ")
     formula <- formula(f.str)
     analyzer <- .get.params(formula, data, na.action, na.as.level, FALSE)
 
@@ -77,7 +77,6 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
-    return (model)
     model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
     method <- if (lk(model.summary$is_classification)) "class" else "anova"
@@ -95,10 +94,10 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     thresholds <- tree.info$thresholds
     frame <- tree.info$frame
 
-    n.grps <- nrow(frame) # how many groups
+    n.grps <- nrow(tree.info) # how many groups
     frame.ncol <- .get.rpart.frame.ncol(model.summary)
     frame.matrix <- lapply(seq_len(n.grps), function(row)
-                           data.frame(matrix(arraydb.to.arrayr(frame[row,], "numeric"),
+                           data.frame(matrix(arraydb.to.arrayr(frame[row], "numeric"),
                                              ncol = frame.ncol)))
     frame.matrix <- .change.rpart.frame.colnames(frame.matrix, model.summary)
     frame.matrix <- .change.frame.rownames(frame.matrix)
@@ -114,7 +113,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                     method=method, functions = functions,
                     frame = frame.matrix[[1]], splits = splits$splits.list[[1]],
                     csplit = splits$csplit.list[[1]])
-        attr(rst, "xlevels") <- xlevels[[1]]
+        attr(rst, "xlevels") <- splits$xlevels[[1]]
         class(rst) <- "dt.madlib"
         if (lk(model.summary$is_classification)) {
             attr(rst, 'ylevels') <- .strip(.strip(strsplit(lk(model.summary$dependent_var_levels), ",")[[1]]), "\"")
@@ -125,7 +124,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                            method = method, functions = functions,
                            frame = frame.matrix[[i]], splits = splits$splits.list[[i]],
                            csplit = splits$csplit.list[[i]])
-                      attr(r, "xlevels") <- xlevels[[i]]
+                      attr(r, "xlevels") <- splits$xlevels[[i]]
                     })
         for (i in seq_len(n.grps)) class(rst[[i]]) <- "dt.madlib"
         class(rst) <- "dt.madlib.grp"
@@ -397,7 +396,7 @@ formatg <- function (x, digits = getOption("digits"),
         cat.node <- frames[[i]]$var %in% cat.features
         if (sum(cat.node) > 0) {
             meaningful.cat <- index[-length(index)][!is.leaf & cat.node]
-            splits[meaningful.cat, 2] <- cat.n[sapply(frames[[i]]$var[cat.node],
+            splits[meaningful.cat, 2] <- catn[sapply(frames[[i]]$var[cat.node],
                                                       function(x) which(x == cat.features))]
             cat.thresh <- splits[meaningful.cat, 4] + 1
             splits[meaningful.cat, 4] <- seq_len(sum(cat.node))
@@ -415,7 +414,7 @@ formatg <- function (x, digits = getOption("digits"),
             csplit.list[[i]] <- NA
         }
 
-        all.levels <- .strip(strsplit(cat.levels[i], ",")[[1]], " ")
+        all.levels <- arraydb.to.arrayr(cat.levels[i], "character")
         levels <- list()
         count <- 0
         for (j in seq_along(cat.features)) {
