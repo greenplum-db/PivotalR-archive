@@ -110,7 +110,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     if (n.grps == 1) {
         rst <- list(model = model, model.summary = model.summary,
-                    method=method, functions = functions,
+                    method=method, functions = functions, data = origin.data,
                     frame = frame.matrix[[1]], splits = splits$splits.list[[1]],
                     csplit = splits$csplit.list[[1]])
         attr(rst, "xlevels") <- splits$xlevels[[1]]
@@ -121,7 +121,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     } else {
         rst <- lapply(seq_len(n.grps), function(i) {
                       r <- list(model = model, model.summary = model.summary,
-                           method = method, functions = functions,
+                           method = method, functions = functions, data = origin.data,
                            frame = frame.matrix[[i]], splits = splits$splits.list[[i]],
                            csplit = splits$csplit.list[[i]])
                       attr(r, "xlevels") <- splits$xlevels[[i]]
@@ -134,6 +134,29 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
         }
     }
     rst
+}
+
+## ------------------------------------------------------------
+
+predict.dt.madlib <- function(object, newdata, type = c("response", "prob"))
+{
+    type <- match.arg(type)
+    if (missing(newdata)) newdata <- object$data
+    if (is(newdata, "db.Rquery")) {
+        newdata <- as.db.data.frame(newdata)
+        is.temp <- TRUE
+    } else {
+        is.temp <- FALSE
+    }
+    conn.id <- conn.id(newdata)
+    tbl.predict <- .unique.string()
+    madlib <- schema.madlib(conn.id)
+    sql = paste("select ", madlib, ".tree_predict('", content(object),
+                "', '", content(newdata), "', '", tbl.predict, "'",
+                type, "')", sep = "")
+    .db(sql, conn.id = conn.id, verbose = FALSE)
+    if (is.temp) delete(newdata)
+    db.data.frame(tbl.predict, conn.id = conn.id, verbose = FALSE)
 }
 
 ## ------------------------------------------------------------
