@@ -5,7 +5,10 @@
 MADlib wrapper functino for Decision Tree
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+    This function is a wrapper of MADlib's decision tree model training
+    function. The resulting tree is stored in a table in the database, and one
+    can also view the result from R using \code{\link{plot.dt.madlib}},
+    \code{\link{text.dt.madlib}} and \code{\link{print.dt.madlib}}.
 }
 \usage{
 madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms, control, na.as.level = FALSE, verbose = FALSE, ...)
@@ -13,22 +16,27 @@ madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms, 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{
-%%     ~~Describe \code{formula} here~~
+      A formula object, intercept term will automatically be removed. Factors will
+      not be expanded to their dummy variables. Grouping syntax is also supported,
+      see \code{\link{madlib.lm}} and \code{\link{madlib.glm}} for more details.
 }
   \item{data}{
-%%     ~~Describe \code{data} here~~
+    A \code{\linkS4class{db.obj}} object, which wraps the data in the database.
 }
   \item{weights}{
-%%     ~~Describe \code{weights} here~~
+    A string, the column name for the weights.
 }
   \item{id}{
-%%     ~~Describe \code{id} here~~
+    A string, the index for each row. If \code{\link{key}} has been specified for
+    \code{data}, teh key will be used as the ID unless this argument is also specified.
+    We have to have this specified so that \code{\link{predict.dt.madlib}}'s result can
+    be compared with the original data.
 }
   \item{na.action}{
-%%     ~~Describe \code{na.action} here~~
+    A function, which filters the \code{NULL} values from the data. Not implemented yet.
 }
   \item{parms}{
-%%     ~~Describe \code{parms} here~~
+    A list, which includes
 }
   \item{control}{
 %%     ~~Describe \code{control} here~~
