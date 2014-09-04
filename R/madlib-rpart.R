@@ -1,5 +1,6 @@
 ## Wrapper function for MADlib's decision tree
 
+setClass("dt.madlib")
 madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                          na.action = NULL, parms,
                          control, na.as.level = FALSE,
@@ -159,7 +160,7 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"))
     tbl.predict <- .unique.string()
     madlib <- schema.madlib(conn.id)
     sql = paste("select ", madlib, ".tree_predict('", .strip(content(object$model), "\""),
-                "', '", .strip(content(newdata), "\""), "', '", tbl.predict, "', '",
+                "', '", sub("\".\"",".",.strip(content(newdata), "\"")), "', '", tbl.predict, "', '",
                 type, "')", sep = "")
     .db(sql, conn.id = conn.id, verbose = FALSE)
     if (is.temp) delete(newdata)

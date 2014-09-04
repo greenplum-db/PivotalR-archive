@@ -65,6 +65,7 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
+key(x) <- "id"
 fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell,
        data=x, parms = list(split='gini'), control = list(cp=0.005))
 
