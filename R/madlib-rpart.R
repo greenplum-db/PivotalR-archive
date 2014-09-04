@@ -368,6 +368,16 @@ formatg <- function (x, digits = getOption("digits"),
 
 ## ------------------------------------------------------------
 
+string.bounding.box <- function(s)
+{
+    s2 <- strsplit(s, "\n")
+    rows <- sapply(s2, length)
+    columns <- sapply(s2, function(x) max(nchar(x, "w")))
+    list(columns = columns, rows = rows)
+}
+
+## ------------------------------------------------------------
+
 ## Compute the correct row names of the frame
 .change.frame.rownames <- function(frames)
 {
