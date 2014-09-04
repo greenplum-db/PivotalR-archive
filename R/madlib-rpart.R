@@ -53,8 +53,6 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
         grp <- paste("'", params1$grp.str, "'", sep = "")
     }
 
-    print(grp)
-
     ## Extract other parameters
     params2 <- .extract.dt.params(parms, control)
 
@@ -75,9 +73,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
                  ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
-    
-    print(sql)
-    
+
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
