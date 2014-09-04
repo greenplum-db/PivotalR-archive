@@ -1,83 +1,77 @@
 \name{predict.dt.madlib}
 \alias{predict.dt.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
     Compute the predictions of the model produced by madlib.rpart
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+    This is actually a wrapper for MADlib's predict function of
+    decision tree. It accepts the result of \code{\link{madlib.rpart}},
+    which is a representation of decision tree, and compute the
+    predictions for new data sets.
 }
 \usage{
 predict.dt.madlib(object, newdata, type = c("response", "prob"))
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{object}{
-%%     ~~Describe \code{object} here~~
+    A \code{dt.madlib} object, which is the result of \code{\link{madlib.rpart}}.
 }
   \item{newdata}{
-%%     ~~Describe \code{newdata} here~~
+    A \code{\linkS4class{db.obj}} object, which contains the data used for prediction.
+    If it is not given, then the data set used to train the model will be used.
 }
   \item{type}{
-%%     ~~Describe \code{type} here~~
+    A string, default is "response". For regessions, this will generate the fitting
+    values. For classification, this will generate the predicted class values. There
+    is an extra option "prob" for classification tree, which computes the probabilities
+    of each class.
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    A \code{\linkS4class{db.obj}} object, which wraps a table that contains the predicted
+    values and also a valid ID column. For \code{type='response'}, the predicted column
+    has the fitted value (regression tree) or the predicted classes (classification tree).
+    For \code{type='prob'}, there are one column for each class, which contains the probabilities
+    for that class.
 }
 \references{
-%% ~put references to the literature/web site here ~
+[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
 }
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
+  Author: Predictive Analytics Team at Pivotal Inc.
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+}
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.rpart}},
+    \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
+    are all MADlib wrapper functions.
+
+    \code{\link{predict.lm.madlib}}, \code{\link{predict.logregr.madlib}},
+    \code{\link{predict.elnet.madlib}}, \code{\link{predict.arima.css.madlib}} are all predict functions
+    related to MADlib wrapper functions.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## The function is currently defined as
-function (object, newdata, type = c("response", "prob")) 
-{
-    type <- match.arg(type)
-    if (missing(newdata)) 
-        newdata <- object$data
-    if (is(newdata, "db.Rquery")) {
-        newdata <- as.db.data.frame(newdata)
-        is.temp <- TRUE
-    }
-    else {
-        is.temp <- FALSE
-    }
-    conn.id <- conn.id(newdata)
-    tbl.predict <- .unique.string()
-    madlib <- schema.madlib(conn.id)
-    sql = paste("select ", madlib, ".tree_predict('", content(object), 
-        "', '", content(newdata), "', '", tbl.predict, "'", type, 
-        "')", sep = "")
-    .db(sql, conn.id = conn.id, verbose = FALSE)
-    if (is.temp) 
-        delete(newdata)
-    db.data.frame(tbl.predict, conn.id = conn.id, verbose = FALSE)
-  }
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+
+
+
+db.disconnect(cid)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ madlib }
+\keyword{ stats }
+\keyword{math}

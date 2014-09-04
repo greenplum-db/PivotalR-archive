@@ -53,6 +53,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
         grp <- paste("'", params1$grp.str, "'", sep = "")
     }
 
+    print(grp)
 
     ## Extract other parameters
     params2 <- .extract.dt.params(parms, control)
@@ -74,6 +75,9 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
                  ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
+    
+    print(sql)
+    
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
@@ -84,11 +88,17 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     .restore.warnings(warnings)
 
+    grouping.cols <- setdiff(names(model), c('tree', 'cat_levels_in_text', 'cat_n_levels', 'tree_depth'))
+    if (length(grouping.cols) == 0)
+        grouping.str <- ''
+    else
+        grouping.str <- paste(", ", paste(grouping.cols, collapse = ','))
+
     n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
     tree.info <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame, ",
                  "cat_levels_in_text, cat_n_levels, ", madlib,
-                 "._get_split_thresholds(tree) as thresholds from ",
-                 tbl.output, conn.id = conn.id, verbose = FALSE)
+                 "._get_split_thresholds(tree) as thresholds", grouping.str,
+                 " from ", sep = "", tbl.output, conn.id = conn.id, verbose = FALSE)
     cat_levels_in_text <- tree.info$cat_levels_in_text
     cat_n_levels <- tree.info$cat_n_levels
     thresholds <- tree.info$thresholds
@@ -123,8 +133,9 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                       r <- list(model = model, model.summary = model.summary,
                            method = method, functions = functions, data = origin.data,
                            frame = frame.matrix[[i]], splits = splits$splits.list[[i]],
-                           csplit = splits$csplit.list[[i]])
+                           csplit = splits$csplit.list[[i]], grp = tree.info[i, grouping.cols, drop=FALSE])
                       attr(r, "xlevels") <- splits$xlevels[[i]]
+                      r
                     })
         for (i in seq_len(n.grps)) class(rst[[i]]) <- "dt.madlib"
         class(rst) <- "dt.madlib.grp"
@@ -194,6 +205,9 @@ print.dt.madlib <- function(x,
     library(rpart)
     class(x) <- "rpart"
     out <- capture.output(print(x))
+    if (!is.null(x$grp)) {
+        cat(paste(names(x$grp), "=", as.vector(x$grp), collapse = ', '), '\n\n')
+    }
     cat(paste(gsub(">=", ">", gsub("<", "<=", out)), collapse = "\n"), "\n")
 }
 
