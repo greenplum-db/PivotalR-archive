@@ -17,15 +17,15 @@ plot.dt.madlib(x, uniform = FALSE, branch = 1, compress = FALSE, nspace, margin 
     The fitted tree from the result of \code{\link{madlib.rpart}}
 }
   \item{uniform}{
-    A boolean, if True, uses uniform vertical spacing of the nodes. 
+    A boolean, if TRUE, uses uniform vertical spacing of the nodes. 
 }
   \item{branch}{
     A double value, between 0 and 1, to control the shape of the branches 
     from parent to child. 
 }
   \item{compress}{
-    A boolean, if False, the leaf nodes will be at the horizontal plot coordinate of 
-    1:nleaves. Use True for a more compact arrangement.
+    A boolean, if FALSE, the leaf nodes will be at the horizontal plot coordinate of 
+    1:nleaves. Use TRUE for a more compact arrangement.
 }
   \item{nspace}{
     A double value, indicating the amount of extra space between a node with children
@@ -57,7 +57,7 @@ plot.dt.madlib(x, uniform = FALSE, branch = 1, compress = FALSE, nspace, margin 
 
 \seealso{
   \code{\link{madlib.rpart}} is the wrapper for MADlib's tree_train function for decision trees.
-  \code{\link{madlib.text}}, \code{\link{madlib.print}} are other visualization functions.
+  \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are other visualization functions.
   
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.rpart}},
   \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
@@ -87,18 +87,8 @@ text(fit)
 
 db.disconnect(cid)
 }
-
-## The function is currently defined as
-function (x, uniform = FALSE, branch = 1, compress = FALSE, nspace, 
-    margin = 0, minbranch = 0.3, ...) 
-{
-    library(rpart)
-    class(x) <- "rpart"
-    plot(x, uniform = uniform, branch = branch, compress = compress, 
-        nspace = nspace, margin = margin, minbranch = minbranch, 
-        ...)
-  }
 }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

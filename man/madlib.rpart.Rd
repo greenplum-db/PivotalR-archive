@@ -83,7 +83,7 @@ madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms, 
 }
 
 \seealso{ 
-  \code{\link{madlib.plot}}, \code{\link{madlib.text}}, \code{\link{madlib.print}} are 
+  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are 
   visualization functions for a model fitted through madlib.rpart 
   
   \code{\link{predict.dt.madlib}} is a wrapper for MADlib's predict function for 
@@ -120,6 +120,7 @@ fit
 db.disconnect(cid)
 }
 }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

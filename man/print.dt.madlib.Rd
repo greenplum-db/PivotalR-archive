@@ -33,7 +33,7 @@ print.dt.madlib(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 \seealso{
   \code{\link{madlib.rpart}} is the wrapper for MADlib's tree_train function for decision trees.
-  \code{\link{madlib.plot}}, \code{\link{madlib.text}} are other visualization functions.
+  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}} are other visualization functions.
   
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.rpart}},
   \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
@@ -61,16 +61,6 @@ print(fit)
 
 db.disconnect(cid)   
 }
-
-## The function is currently defined as
-function (x, digits = max(3L, getOption("digits") - 3L), ...) 
-{
-    library(rpart)
-    class(x) <- "rpart"
-    out <- capture.output(print(x))
-    cat(paste(gsub(">=", ">", gsub("<", "<=", out)), collapse = "\n"), 
-        "\n")
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
