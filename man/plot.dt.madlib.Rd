@@ -1,83 +1,94 @@
 \name{plot.dt.madlib}
 \alias{plot.dt.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
     Plot the result of madlib.rpart
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  This is a visualization function which plots the result of \code{\link{madlib.rpart}}. This 
+  function internally calls R's \code{\link{plot.rpart}} function.
 }
 \usage{
 plot.dt.madlib(x, uniform = FALSE, branch = 1, compress = FALSE, nspace, margin = 0, minbranch = 0.3, ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{x}{
-%%     ~~Describe \code{x} here~~
+    The fitted tree from the result of \code{\link{madlib.rpart}}
 }
   \item{uniform}{
-%%     ~~Describe \code{uniform} here~~
+    A boolean, if TRUE, uses uniform vertical spacing of the nodes. 
 }
   \item{branch}{
-%%     ~~Describe \code{branch} here~~
+    A double value, between 0 and 1, to control the shape of the branches 
+    from parent to child. 
 }
   \item{compress}{
-%%     ~~Describe \code{compress} here~~
+    A boolean, if FALSE, the leaf nodes will be at the horizontal plot coordinate of 
+    1:nleaves. Use TRUE for a more compact arrangement.
 }
   \item{nspace}{
-%%     ~~Describe \code{nspace} here~~
+    A double value, indicating the amount of extra space between a node with children
+    and a leaf. default is \code{branch}
 }
   \item{margin}{
-%%     ~~Describe \code{margin} here~~
+    A double value, indicating the amount of extra space to leave around the borders of 
+    the tree.
 }
   \item{minbranch}{
-%%     ~~Describe \code{minbranch} here~~
+    A double value, specifying the minimum length for a branch. 
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+    Arguments to be passed to or from other methods.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  The coordinates of the nodes are returned as a list, with components x and y.
 }
 \references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
+[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\author{
+  Author: Predictive Analytics Team at Pivotal Inc.
+
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io} 
+}
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{madlib.rpart}} is the wrapper for MADlib's tree_train function for decision trees.
+  \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are other visualization functions.
+  
+  \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.rpart}},
+  \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
+  are all MADlib wrapper functions.
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (x, uniform = FALSE, branch = 1, compress = FALSE, nspace, 
-    margin = 0, minbranch = 0.3, ...) 
-{
-    library(rpart)
-    class(x) <- "rpart"
-    plot(x, uniform = uniform, branch = branch, compress = compress, 
-        nspace = nspace, margin = margin, minbranch = minbranch, 
-        ...)
-  }
+\examples{
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
+
+## decision tree using abalone data, using default values of minsplit, 
+## maxdepth etc.
+key(x)<-"id"
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell, 
+       data=x, parms = list(split='gini'), control = list(cp=0.005))
+fit
+
+plot(fit, uniform =TRUE)
+text(fit)
+
+db.disconnect(cid)
 }
+}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

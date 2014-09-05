@@ -1,66 +1,66 @@
 \name{print.dt.madlib}
 \alias{print.dt.madlib}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
     Print the result of madlib.rpart
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+    This function prints the result of \code{\link{madlib.rpart}} to the screen. It
+    internally calls R's \code{\link{print.rpart}} function.
 }
 \usage{
 print.dt.madlib(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-%%     ~~Describe \code{x} here~~
+    The fitted tree from the result of \code{\link{madlib.rpart}}
 }
   \item{digits}{
-%%     ~~Describe \code{digits} here~~
+    The number of digits to print for numerical values.
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+    Arguments to be passed to or from other methods.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
 }
 \author{
-%%  ~~who you are~~
+  Author: Predictive Analytics Team at Pivotal Inc.
+  
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{madlib.rpart}} is the wrapper for MADlib's tree_train function for decision trees.
+  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}} are other visualization functions.
+  
+  \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.rpart}},
+  \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
+  are all MADlib wrapper functions.
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (x, digits = max(3L, getOption("digits") - 3L), ...) 
-{
-    library(rpart)
-    class(x) <- "rpart"
-    out <- capture.output(print(x))
-    cat(paste(gsub(">=", ">", gsub("<", "<=", out)), collapse = "\n"), 
-        "\n")
-  }
+\examples{
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
+
+## decision tree using abalone data, using default values of minsplit, 
+## maxdepth etc.
+key(x)<-"id"
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell, 
+       data=x, parms = list(split='gini'), control = list(cp=0.005))
+
+print(fit)
+
+db.disconnect(cid)   
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

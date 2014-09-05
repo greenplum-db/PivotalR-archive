@@ -2,7 +2,7 @@
 \alias{madlib.rpart}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-MADlib wrapper functino for Decision Tree
+MADlib wrapper function for Decision Tree
 }
 \description{
     This function is a wrapper of MADlib's decision tree model training
@@ -36,52 +36,91 @@ madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms, 
     A function, which filters the \code{NULL} values from the data. Not implemented yet.
 }
   \item{parms}{
-    A list, which includes
+    A list, which includes parameters for the splitting function. Supported parameters 
+    include:
+    'split' specifying which split function to use. Options are 'gini', 'misclssification'
+    and 'entropy' for classification, and 'mse' for regression. Default is 'gini' for
+    classification and 'mse' for regression.
 }
   \item{control}{
-%%     ~~Describe \code{control} here~~
+    A list, which includes parameters for the fit. Supported parameters include:
+    'minsplit' - minimum number of observations that must be present in a node for a 
+    split to be attempted. default is minsplit=20
+    
+    'minbucket' - Minimum number of observations in any terminal node, 
+    default is min_split/3
+    
+    'maxdepth' - Maximum depth of any node, default is maxdepth=10 
+    
+    'n_bins' - Number of bins to find possible node split threshold values for continuous                   
+               variables, default is 100 (Must be greater than 1) 
+    
+    'cp' - Cost complexity parameter, default is cp=0.01
+    
 }
   \item{na.as.level}{
-%%     ~~Describe \code{na.as.level} here~~
+    A boolean, indicating if NULL value for a categorical variable is treated as a 
+    distinct level, default is na.as.level=false
 }
   \item{verbose}{
-%%     ~~Describe \code{verbose} here~~
+    A boolean, indicating whether or not to print more info, default is verbose=false
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+    Arguments to be passed to or from other methods.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  An S3 object of type dt.madlib in the case of non-grouping, and of type
+  dt.madlib.grp in the case of grouping.
 }
 \references{
-%% ~put references to the literature/web site here ~
+[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
 }
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
+  Author: Predictive Analytics Team at Pivotal Inc.
+
+  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}  
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\seealso{ 
+  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are 
+  visualization functions for a model fitted through madlib.rpart 
+  
+  \code{\link{predict.dt.madlib}} is a wrapper for MADlib's predict function for 
+  decision trees.
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
+        \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
+            are all MADlib wrapper functions.
 }
+
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
+x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
+lk(x, 10)
+
+## decision tree using abalone data, using default values of minsplit, 
+## maxdepth etc.
+key(x) <- "id"
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell, 
+       data=x, parms = list(split='gini'), control = list(cp=0.005))
+fit
+
+## Another example, using grouping  
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell | sex, 
+       data=x, parms = list(split='gini'), control = list(cp=0.005))
+fit
+
+db.disconnect(cid)
 }
+}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }
