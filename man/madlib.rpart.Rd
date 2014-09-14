@@ -11,8 +11,8 @@ MADlib wrapper function for Decision Tree
     \code{\link{text.dt.madlib}} and \code{\link{print.dt.madlib}}.
 }
 \usage{
-madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms, control, na.as.level = FALSE, verbose = FALSE, ...)
-}
+madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms,
+control, na.as.level = FALSE, verbose = FALSE, ...) }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{

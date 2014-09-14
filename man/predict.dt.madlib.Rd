@@ -10,8 +10,12 @@
     which is a representation of decision tree, and compute the
     predictions for new data sets.
 }
+
 \usage{
-predict.dt.madlib(object, newdata, type = c("response", "prob"))
+
+    \method{predict}{dt.madlib}(object, newdata, type = c("response", "prob"),
+    ...)
+
 }
 
 \arguments{
@@ -28,6 +32,13 @@ predict.dt.madlib(object, newdata, type = c("response", "prob"))
     is an extra option "prob" for classification tree, which computes the probabilities
     of each class.
 }
+
+\item{...}{
+
+    Other arguments. Not implemented yet.
+
+}
+
 }
 
 \value{

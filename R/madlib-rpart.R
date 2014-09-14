@@ -1,6 +1,9 @@
 ## Wrapper function for MADlib's decision tree
 
 setClass("dt.madlib")
+
+setClass("dt.madlib.grps")
+
 madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                          na.action = NULL, parms,
                          control, na.as.level = FALSE,
@@ -135,7 +138,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                       r
                     })
         for (i in seq_len(n.grps)) class(rst[[i]]) <- "dt.madlib"
-        class(rst) <- "dt.madlib.grp"
+        class(rst) <- "dt.madlib.grps"
         if (lk(model.summary$is_classification)) {
             for (i in 1:n.grps)
                 attr(rst[[i]], "ylevels") <- .strip(.strip(strsplit(lk(model.summary$dependent_var_levels), ",")[[1]]), "\"")
@@ -146,7 +149,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
 ## ------------------------------------------------------------
 
-predict.dt.madlib <- function(object, newdata, type = c("response", "prob"))
+predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...)
 {
     type <- match.arg(type)
     if (missing(newdata)) newdata <- object$data
@@ -490,7 +493,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
     if (!is.null(ylevels <- attr(x, "ylevels"))) col <- c(col, ylevels)
     cxy <- par("cxy")                   # character width and height
     if (!is.null(srt <- list(...)$srt) && srt == 90) cxy <- rev(cxy)
-    xy <- rpart:::rpartco(x)
+    xy <- eval(parse(text = "rpart:::rpartco(x)"))
 
     node <- as.numeric(row.names(frame))
     is.left <- (node %% 2L == 0L)            # left hand sons
@@ -505,7 +508,7 @@ text.dt.madlib <- function(x, splits = TRUE, label, FUN = text, all = FALSE,
             labels(x, pretty = pretty) else labels(x, minlength = minlength)
         if (fancy) {
             ## put split labels on branches instead of nodes
-            xytmp <- rpart:::rpart.branch(x = xy$x, y = xy$y, node = node)
+            xytmp <- eval(parse(text = "rpart:::rpart.branch(x = xy$x, y = xy$y, node = node)"))
             leftptx <- (xytmp$x[2L, ] + xytmp$x[1L, ])/2
             leftpty <- (xytmp$y[2L, ] + xytmp$y[1L, ])/2
             rightptx <- (xytmp$x[3L, ] + xytmp$x[4L, ])/2
