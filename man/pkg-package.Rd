@@ -20,12 +20,19 @@ available at \url{http://zimmeee.github.io/gp-r/#pivotalr}.
 
 \details{
 \tabular{ll}{
+
 Package: \tab PivotalR\cr
+
 Type: \tab Package\cr
-Version: \tab 0.1.16\cr
-Date: \tab 2014-04-29\cr
+
+Version: \tab 0.1.17\cr
+
+Date: \tab 2014-09-15\cr
+
 License: \tab GPL (>= 2)\cr
+
 Depends: \tab methods, DBI, RPostgreSQL\cr
+
 }
 
 This package enables R users to easily develop, refine and deploy R
