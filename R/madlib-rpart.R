@@ -16,7 +16,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 
     ## Only newer versions of MADlib are supported for
     ## this function
-    .check.madlib.version( data )
+    .check.madlib.version( data, allowed.version = 1.7)
 
     origin.data <- data # needed in the result report
 
