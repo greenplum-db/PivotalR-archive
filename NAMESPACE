@@ -154,3 +154,6 @@ export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
        "print.margins")
 
 export("Vars", "Terms")
+
+export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib", 
+        "predict.dt.madlib")

@@ -37,7 +37,7 @@ setMethod (
             tbl <- content(x)
         s <- delete(tbl, conn.id(x), x@.table.type == "LOCAL TEMPORARY",
                     cascade)
-        list(res=s, conn.id=conn.id(x)) 
+        list(res=s, conn.id=conn.id(x))
     })
 
 ## -----------------------------------------------------------------------
@@ -116,10 +116,10 @@ setMethod (
         res <- tryCatch(.db.getQuery(sql, conn.id),
                         error = function(e) { success <<- FALSE })
         exists <- db.existsObject(origin.x, conn.id, is.temp)
-        
+
         options(warn = warn.r) # reset R warning level
         if (length(exists) == 2)
-            if (! exists[[1]]) 
+            if (! exists[[1]])
                 return (list(res=TRUE, conn.id=conn.id))
             else
                 return (list(res=FALSE, conn.id=conn.id))
@@ -232,3 +232,21 @@ setMethod (
         }
         list(res = d1, conn.id = conn.id)
     })
+
+## ------------------------------------------------------------
+
+setMethod("delete",
+          signature(x = "dt.madlib"),
+          def = function (x) {
+              conn.id <- conn.id(x$model)
+              success <- delete(x$model) && delete(x$model.summary)
+              list(res = success, conn.id = conn.id)
+          })
+
+setMethod("delete",
+          signature(x = "dt.madlib.grps"),
+          def = function (x) {
+              conn.id <- conn.id(x[[1]]$model)
+              success <- delete(x[[1]]$model) && delete(x[[1]]$model.summary)
+              list(res = success, conn.id = conn.id)
+          })

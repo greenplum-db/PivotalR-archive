@@ -10,8 +10,14 @@
 \alias{delete,lm.madlib.grps-method}
 \alias{delete,logregr.madlib-method}
 \alias{delete,logregr.madlib.grps-method}
+
 \alias{delete,bagging.model-method}
+
 \alias{delete,elnet.madlib-method}
+
+\alias{delete,dt.madlib-method}
+
+\alias{delete,dt.madlib.grps-method}
 
 \title{ Safely delete a \code{db.obj} object or a table/view in the database }
 
@@ -24,6 +30,7 @@
 }
 
 \usage{
+
 \S4method{delete}{db.data.frame}(x, cascade = FALSE)
 
 \S4method{delete}{db.Rquery}(x)
@@ -46,6 +53,11 @@ FALSE)
 \S4method{delete}{bagging.model}(x)
 
 \S4method{delete}{elnet.madlib}(x)
+
+\S4method{delete}{dt.madlib}(x)
+
+\S4method{delete}{dt.madlib.grps}(x)
+
 }
 
 \arguments{
@@ -84,6 +96,10 @@ FALSE)
     Or an object which is the result of \code{\link{generic.bagging}}.         In this case, all result model tables will be deleted.
 
 Or an object which is the result of \code{\link{madlib.elnet}}. In this casem all result model tables will be deleted.
+
+Or an object which is the result of \code{\link{madlib.rpart}}. All result
+tables will be deleted.
+
 }
 
 \item{conn.id}{
