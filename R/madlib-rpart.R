@@ -154,7 +154,7 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...
     type <- match.arg(type)
     if (missing(newdata)) newdata <- object$data
     if (is(newdata, "db.Rquery")) {
-        newdata <- as.db.data.frame(newdata)
+        newdata <- as.db.data.frame(newdata, verbose = FALSE)
         is.temp <- TRUE
     } else {
         is.temp <- FALSE
