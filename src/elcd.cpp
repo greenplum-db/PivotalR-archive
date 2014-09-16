@@ -15,6 +15,12 @@
 using adp::Rvector;
 using adp::Rmatrix;
 
+// ------------------------------------------------------------
+
+int myrandom(int i) {
+    return (int)(unif_rand() * RAND_MAX) % i;
+}
+
 // ----------------------------------------------------------------------
 
 double soft_thresh (double z, double lambda)
@@ -30,7 +36,7 @@ std::vector<int> random_index(int n)
 {
     std::vector<int> res(n,0);
     for (int i = 0; i < n; i++) res[i] = i;
-    std::random_shuffle(res.begin(), res.end());
+    std::random_shuffle(res.begin(), res.end(), myrandom);
     return res;
 }
 
@@ -41,6 +47,8 @@ SEXP elcd1(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
         SEXP rmaxit, SEXP rtol, SEXP rN, SEXP rcoef, SEXP riter,
         SEXP rloglik)
 {
+    GetRNGstate();
+
     Rmatrix<double> xx(rxx);
     Rvector<double> xy(rxy);
     Rvector<double> mx(rmx);
@@ -70,7 +78,7 @@ SEXP elcd1(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
 
     int count = 0;
     do {
-        std::random_shuffle(idx.begin(), idx.end());
+        std::random_shuffle(idx.begin(), idx.end(), myrandom);
         for (int id = 0; id < n; id++) {
             int i = idx[id];
             if (active_set && active_now && coef(i) == 0) continue;
@@ -145,6 +153,7 @@ SEXP elcd1(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
     *iter = count; // number of iterations
 
     delete [] prev;
+    PutRNGstate();
     return R_NilValue;
 }
 
@@ -183,7 +192,7 @@ SEXP elcd_binom1(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx,
 
     int count = 0;
     do {
-        std::random_shuffle(idx.begin(), idx.end());
+        std::random_shuffle(idx.begin(), idx.end(), myrandom);
         for (int id = 0; id < n; id++) {
             int i = idx[id];
             if (active_set && active_now && coef(i) == 0) continue;
