@@ -57,8 +57,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
                  "in linear regression.")
         } else if (.madlib.version.number(conn.id) > 0.7)
             grp <- paste("'", params$grp.str, "'", sep = "")
-        else
+        else {
             grp <- paste("'{", params$grp.str, "}'::text[]")
+        }
 
     tmp <- eval(parse(text = paste("with(data, ",
                       params$origin.dep, ")", sep = "")))
@@ -70,6 +71,11 @@ madlib.lm <- function (formula, data, na.action = NULL,
     ## construct SQL string
     ## tbl.source <- gsub("\"", "", content(data))
     tbl.source <- content(data)
+
+    if (.madlib.version.number(conn.id) <= 0.7) {
+        tbl.source <- gsub("\"", "", tbl.source)
+    }
+
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
         tbl.output <- NULL

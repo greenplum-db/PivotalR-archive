@@ -87,6 +87,11 @@ madlib.glm <- function (formula, data,
     conn.id <- conn.id(data)
     ## tbl.source <- gsub("\"", "", content(data))
     tbl.source <- content(data)
+
+    if (.madlib.version.number(conn.id) <= 0.7) {
+        tbl.source <- gsub("\"", "", tbl.source)
+    }
+    
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
         tbl.output <- NULL
