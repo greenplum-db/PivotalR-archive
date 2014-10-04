@@ -156,7 +156,14 @@ plr <- function(fun, conn.id = 1)
             .conn.id = conn.id,
             .col.name = col.name,
             .key = character(0),
-            .col.data_type =
+            .col.data_type = "composite type",
+            .col.udt_name = "composite",
+            .where = character(0),
+            .is.factor = FALSE,
+            .factor.ref = rep("", length(col.name)),
+            .sort = NA,
+            .is.agg = FALSE,
+            .dist.by = data@.dist.by
             )
     }
 
