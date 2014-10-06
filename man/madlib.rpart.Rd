@@ -52,7 +52,7 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
     
     'maxdepth' - Maximum depth of any node, default is maxdepth=10 
     
-    'n_bins' - Number of bins to find possible node split threshold values for continuous                   
+    'nbins' - Number of bins to find possible node split threshold values for continuous                   
                variables, default is 100 (Must be greater than 1) 
     
     'cp' - Cost complexity parameter, default is cp=0.01
