@@ -17,15 +17,21 @@
 }
 
 \usage{
-## S4 method for signature 'db.obj'
-! x
-\S4method{&}{db.obj,db.obj}(e1, e2)
-\S4method{|}{db.obj,db.obj}(e1, e2)
-\S4method{&}{db.obj,logical}(e1, e2)
-\S4method{|}{db.obj,logical}(e1, e2)
-\S4method{&}{logical,db.obj}(e1, e2)
-\S4method{|}{logical,db.obj}(e1, e2)
-}
+## S4 method for signature 'db.obj' 
+
+\S4method{!}{db.obj}(x) 
+
+\S4method{&}{db.obj,db.obj}(e1, e2) 
+
+\S4method{|}{db.obj,db.obj}(e1, e2) 
+
+\S4method{&}{db.obj,logical}(e1, e2) 
+
+\S4method{|}{db.obj,logical}(e1, e2) 
+
+\S4method{&}{logical,db.obj}(e1, e2) 
+
+\S4method{|}{logical,db.obj}(e1, e2) }
 
 \arguments{
   \item{e1, e2}{
