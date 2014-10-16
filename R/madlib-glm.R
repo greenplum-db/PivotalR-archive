@@ -342,7 +342,7 @@ print.logregr.madlib <- function (x,
                                   getOption("digits") - 3L),
                                   ...)
 {
-    if (all(is.na(x$coef))) stop("Coefficients are NAs!")
+    if (all(is.na(x$coef))) stop("Coefficients are all NAs!")
     if (x$has.intercept)
         rows <- c("(Intercept)", x$ind.vars)
     else
@@ -425,7 +425,8 @@ show.logregr.madlib <- function (object)
 
     madlib <- schema.madlib(conn.id) # Schema name for MADlib functions
 
-    grp <- if (is.null(params$grp.str)) "NULL::text" else paste("'", params$grp.str, "'", sep = "")
+    grp <- if (is.null(params$grp.str)) "NULL::text"
+        else paste("'", params$grp.str, "'", sep = "")
 
     tbl.output <- .unique.string()
 
@@ -535,7 +536,118 @@ show.logregr.madlib <- function (object)
     }
 
     class(rst) <- 'glm.madlib.grps'
-    
+
     if (n.grps == 1) return (rst[[1]])
     else return (rst)
+}
+
+## ------------------------------------------------------------
+
+## Print the GLM results
+
+show.glm.madlib <- function(object)
+{
+    print(object)
+}
+
+show.glm.madlib.grps <- function(object)
+{
+    print(object)
+}
+
+## ------------------------------------------------------------
+
+.extract.rows <- function(x)
+{
+    if (x$has.intercept) {
+        rows <- c("(Intercept", x$ind.vars)
+    } else {
+        rows <- x$ind.vars
+    }
+
+    rows <- gsub("\"", "", rows)
+    rows <- gsub("::[\\w\\s]+", "", rows, perl = T)
+
+    for (i in seq_len(length(x$col.name))) {
+        if (x$col.name[i] != x$appear[i]) {
+            rows <- gsub(x$col.name[i], x$appear[i], rows)
+        }
+    }
+
+    rows <- gsub("\\(([^\\[\\]]*?)\\)\\[(\\d+?)\\]", "\\1[\\2]", rows)
+    rows <- .reverse.consistent.func(rows)
+    gsub("\\s", "", rows)
+}
+
+## ------------------------------------------------------------
+
+.print.coefs <- function(x, rows, digits)
+{
+    cat("Coefficients:\n")
+    coef.fmat <- data.frame(cbind(x$coef, x$std_err, x$stats, x$p_values)))
+    stats <- if ('t_stats' %in% names(x)) "t value" else "z value"
+    pvalue <- if ('t_stats' %in% names(x)) "Pr(>|t|)" else "Pr(>|z|)"
+    names(coef.fmat) <- c("Estimate", "Std. Error", stats, pvalue)
+    row.names(coef.fmat) <- rows
+
+    printCoefmat(coef.fmat, digits = digits, signif.stars = TRUE)
+
+    cat("Log likelihood:", x$log_likelihood, "\n")
+    cat("Dispersion:", x$dispersion, "\n")
+    cat("Number of iterations:", x$num_iterations, "\n")
+}
+
+## ------------------------------------------------------------
+
+print.glm.madlib <- function(x,
+                             digits = max(3L, getOption('digits') - 3L),
+                             ...)
+{
+    if (all(is.na(x$coef))) stop("Coefficients are all NAs!")
+
+    rows <- .extract.rows(x)
+
+    cat("\nMADlib Generalized Linear Regression Result\n")
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n", sep = "")
+
+    cat("\n ---------------------------------------\n\n")
+    .print.coefs(x, rows, digits)
+
+    cat("\n")
+}
+
+## ------------------------------------------------------------
+
+print.glm.madlib.grps <- function(x,
+                                  digits = max(3L, getOption('digits') - 3L),
+                                  ...)
+{
+    n.grps <- length(x)
+
+    i <- 1
+    while (i <= n.grps) if (!all(is.na(x[[i]]$coef))) break
+    if (i == n.grps + 1) stop("All models' coefficients are NAs!")
+
+    rows <- .extract.rows(x[[1]])
+
+    cat("\nMADlib Generalized Linear Regression Result\n")
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n", sep = "")
+    if (n.grps > 1) {
+        cat("\nThe data is divided into", x$grps, "groups\n")
+    }
+
+    for (i in seq_len(n.grps)) {
+        cat("\n ---------------------------------------\n\n")
+        if (length(x[[i]]$grp.cols) != 0) {
+            cat("Group", i, "when\n")
+            for (col in seq_len(length(x[[i]]$grp.expr)))
+                cat(x[[i]]$grp.expr[col], ": ",
+                    x[[i]][[x[[i]]$grp.cols[col]]], "\n", sep = "")
+            cat("\n")
+        }
+
+        .print.coefs(x[[i]], rows, digits)
+    }
+
+    cat("\n")
 }
