@@ -5,6 +5,19 @@
 
 setClass("logregr.madlib")
 setClass("logregr.madlib.grps")
+setClass('glm.madlib')
+
+## ------------------------------------------------------------
+
+## define a new family function
+## whose only use is to specify multinomial
+## No other uses
+multinomial <- function(link = 'logit')
+{
+    return (list(family = 'multinomial', link = 'logit'))
+}
+
+## ------------------------------------------------------------
 
 ## na.action is a place holder
 ## family specific parameters are in control, which
@@ -22,13 +35,20 @@ madlib.glm <- function (formula, data,
         stop("'family' not recognized")
     }
 
+    family.name <- family$family
+    link.name <- family$link
+
     args <- control
     args$formula <- formula
     args$data <- data
     args$na.action <- na.action
     call <- match.call()
 
-    if (tolower(family) == "gaussian" || tolower(family) == "linear")
+    ## must use GLM function
+    use.glm <- !is.null(control$use.glm) && control$use.glm == TRUE
+
+    ## linear regression
+    if (family.name == "gaussian" && link.name == 'identity' && !use.glm)
     {
         fit <- do.call(madlib.lm, args)
         if (is(fit, "lm.madlib")) fit$call <- call
@@ -37,7 +57,8 @@ madlib.glm <- function (formula, data,
         return (fit)
     }
 
-    if (tolower(family) == "binomial" || tolower(family) == "logistic")
+    ## logistic regression
+    if (family.name == "binomial" && link.name == "logit" && !use.glm)
     {
         fit <- do.call(.madlib.logregr, args)
         if (is(fit, "logregr.madlib")) fit$call <- call
@@ -46,7 +67,8 @@ madlib.glm <- function (formula, data,
         return (fit)
     }
 
-    if (family == "multinomial")
+    ## multinomial logistic
+    if (family.name == "multinomial" && link.name == 'logit' && !use.glm)
     {
         fit <- do.call(.madlib.mlogregr, args)
         if (is(fit, "mlogregr.madlib")) fit$call <- call
@@ -55,8 +77,13 @@ madlib.glm <- function (formula, data,
         return (fit)
     }
 
-    cat("\nThe family", family, "is not supported!\n")
-    return
+    ## All other cases are handled by MADlib's GLM function
+    fit <- do.call(.madlib.glm, args)
+    if (is(fit, 'glm.madlib')) fit$call <- call
+    else
+        for (i in seq_len(length(fit))) fit[[i]]$call <- call
+
+    return (fit)
 }
 
 ## -----------------------------------------------------------------------
@@ -67,7 +94,7 @@ madlib.glm <- function (formula, data,
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
-        stop("madlib.lm can only be used on a db.obj object, and ",
+        stop("madlib.glm can only be used on a db.obj object, and ",
              deparse(substitute(data)), " is not!")
     origin.data <- data
 
@@ -89,7 +116,7 @@ madlib.glm <- function (formula, data,
             stop("MADlib on HAWQ 1.1 does not support grouping ",
                  "in logistic regression !")
         else
-            grp <- paste("'", params$grp.str, "'")
+            grp <- paste("'", params$grp.str, "'", sep = "")
 
     ## construct SQL string
     conn.id <- conn.id(data)
@@ -99,7 +126,7 @@ madlib.glm <- function (formula, data,
     if (.madlib.version.number(conn.id) <= 0.7) {
         tbl.source <- gsub("\"", "", tbl.source)
     }
-    
+
     madlib <- schema.madlib(conn.id) # MADlib schema name
     if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)) {
         tbl.output <- NULL
@@ -370,4 +397,145 @@ show.logregr.madlib <- function (object)
                               max.iter = 10000, tolerance = 1e-5, call)
 {
     stop("To be implemented!")
+}
+
+## ------------------------------------------------------------
+
+.madlib.glm <- function(formula, data, na.action, max.iter = 10000,
+                        tolerance = 1e-5, call, na.as.level = FALSE,
+                        verbose = FALSE)
+{
+    if (!is(data, 'db.obj')) {
+        stop('madlib.glm can only be used on a db.obj object, and ',
+             deparse(substitute(data)), ' is not!')
+    }
+    origin.data <- data
+    conn.id <- conn.id(data)
+
+    ## Only MADlib 1.7 and newer are supported
+    .check.madlib.version(data, allowed.version = 1.7)
+
+    warnings <- .suppress.warnings(conn.id) # turn off warning messages
+
+    analyzer <- .get.params(formula, data, na.action, na.as.level)
+    data <- analyzer$data
+    params <- analyzer$params
+    is.tbl.source.temp <- analyzer$is.tbl.source.temp
+    tbl.source <- content(data)
+
+    madlib <- schema.madlib(conn.id) # Schema name for MADlib functions
+
+    grp <- if (is.null(params$grp.str)) "NULL::text" else paste("'", params$grp.str, "'", sep = "")
+
+    tbl.output <- .unique.string()
+
+    sql <- paste("select ", madlib, ".glm('",
+                 tbl.source, "', '",
+                 tbl.output, "', '",
+                 gsub("'", "''", params$dep.str), "', '",
+                 params$ind.str, "', 'family=",
+                 family.name, ", link=", link.name, "',",
+                 grp, "'max_iter=", max.iter, ", optimizer=irls, tolerance=",
+                 tolerance, "', ", verbose, ")", sep = "")
+
+    res <- .db(sql, "; select * from ", tbl.output, nrows = -1,
+               conn.id = conn.id, verbose = FALSE)
+
+    if (is.tbl.source.temp) delete(tbl.source, conn.id)
+
+    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+
+    .restore.warnings(warnings) # turn on warning messages
+
+    ## Organize the result ---------------------------------------------
+    n <- length(params$ind.vars)
+    res.names <- names(res)
+    rst <- list()
+    r.coef <- arraydb.to.arrayr(res$coef, 'double', n)
+    r.std_err <- arraydb.to.arrayr(res$std_err, 'double', n)
+    stats <- grpl("^(t|z)_stats$", res.names)
+    r.stats <- arraydb.to.arrayr(res[, stats], 'double', n)
+    r.p_values <- arraydb.to.arrayr(res$p_values, 'double', n)
+    r.dispersion <- arraydb.to.arrayr(res$dispersion, 'double', n)
+    n.grps <- dim(r.coef)[1] # how many groups
+    r.ind.str <- params$ind.str
+    r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str, 'character', n))
+    r.grp.expr <- params$grp.expr
+    r.has.intercept <- params$has.intercept
+    r.ind.vars <- params$ind.vars
+    r.origin.ind <- params$origin.ind
+    r.col.name <- gsub("\"", "", data@.col.name)
+    r.appear <- data@.appear.name
+    r.call <- call
+    r.dummy <- data@.dummy
+    r.dummy.expr <- data@.dummy.expr
+    term.names <- .term.names(r.has.intercept, r.ind.vars, r.col.name, r.appear)
+
+    for (i in seq_len(n.grps)) {
+        rst[[i]] <- list()
+        for (j in seq(res.names)) {
+            rst[[i]][res.names[j]] <- res[[res.names[j]]][[i]]
+        }
+        rst[[i]]$coef <- r.coef[i, ]
+        if (all(is.na(rst[[i]]$coef))) {
+            warning('NA in the result !')
+            class(rst[[i]]) <- 'glm.madlib'
+            next
+        }
+
+        names(rst[[i]]$coef) <- term.names
+        rst[[i]]$std_err <- r.std_err[i, ]
+        names(rst[[i]]$std_err) <- term.names
+        rst[[i]][res.names[stats]] <- r.stats[i,]
+        names(rst[[i]][res.names[stats]]) <- term.names
+        rst[[i]]$p_values <- r.p_values[i,]
+        names(rst[[i]]$p_values) <- term.names
+        rst[[i]]$dispersion <- r.dispersion
+        rst[[i]]$grp.cols <- r.grp.cols
+        rst[[i]]$grp.expr <- r.grp.expr
+        rst[[i]]$has.intercept <- r.has.intercept
+        rst[[i]]$ind.vars <- r.ind.vars
+        rst[[i]]$origin.ind <- r.origin.ind
+        rst[[i]]$ind.str <- r.ind.str
+        rst[[i]]$col.name <- r.col.name
+        rst[[i]]$appear <- r.appear
+        rst[[i]]$call <- r.call
+        rst[[i]]$dummy <- r.dummy
+        rst[[i]]$dummy.expr <- r.dummy.expr
+        rst[[i]]$model <- model
+        rst[[i]]$terms <- params$terms
+        rst[[i]]$factor.ref <- data@.factor.ref
+        rst[[i]]$na.action <- na.action
+
+        if (length(r.grp.cols) != 0) {
+            ## cond <- Reduce(function(l, r) l & r,
+            cond <- .row.action(.combine.list(Map(function(x) {
+                if (is.na(rst[[i]][[r.grp.cols[x]]]))
+                    ## is.na(origin.data[,x])
+                    eval(parse(text = paste("with(origin.data, is.na(",
+                               r.grp.expr[x], "))", sep = "")))
+                else
+                    ## origin.data[,x] == rst[[i]][[x]]
+                    if (is.character(rst[[i]][[r.grp.cols[x]]]))
+                        use <- "\"" %+% rst[[i]][[r.grp.cols[x]]] %+% "\""
+                    else
+                        use <- rst[[i]][[r.grp.cols[x]]]
+                eval(parse(text = paste("with(origin.data, (",
+                           r.grp.expr[x], ") ==",
+                           use, ")", sep = "")))
+            }, seq_len(length(r.grp.expr)))), " and ")
+            rst[[i]]$data <- origin.data[cond,]
+        } else
+            rst[[i]]$data <- origin.data
+
+        rst[[i]]$origin.data <- origin.data
+        rst[[i]]$nobs <- nrow(rst[[i]]$data)
+
+        class(rst[[i]]) <- "glm.madlib"
+    }
+
+    class(rst) <- 'glm.madlib.grps'
+    
+    if (n.grps == 1) return (rst[[1]])
+    else return (rst)
 }
