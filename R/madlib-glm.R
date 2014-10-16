@@ -10,10 +10,18 @@ setClass("logregr.madlib.grps")
 ## family specific parameters are in control, which
 ## is a list of parameters
 madlib.glm <- function (formula, data,
-                        family = c("gaussian", "linear", "binomial", "logistic"),
+                        family = gaussian,
                         na.action = NULL, control = list(), ...)
 {
-    family <- match.arg(family)
+    if (is.character(family))
+        family <- get(family, mode = "function", envir = parent.frame())
+    if (is.function(family))
+        family <- family()
+    if (is.null(family$family)) {
+        print(family)
+        stop("'family' not recognized")
+    }
+
     args <- control
     args$formula <- formula
     args$data <- data
