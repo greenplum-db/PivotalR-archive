@@ -6,6 +6,7 @@
 setClass("logregr.madlib")
 setClass("logregr.madlib.grps")
 setClass('glm.madlib')
+setClass('glm.madlib.grps')
 
 ## ------------------------------------------------------------
 
@@ -553,6 +554,16 @@ show.glm.madlib <- function(object)
 show.glm.madlib.grps <- function(object)
 {
     print(object)
+}
+
+summary.glm.madlib <- function(object)
+{
+    object
+}
+
+summary.glm.madlib.grps <- function(object)
+{
+    object
 }
 
 ## ------------------------------------------------------------
