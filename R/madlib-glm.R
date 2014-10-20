@@ -508,6 +508,8 @@ show.logregr.madlib <- function (object)
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
         rst[[i]]$na.action <- na.action
+        rst[[i]]$family <- family.name
+        rst[[i]]$link <- link.name
 
         if (length(r.grp.cols) != 0) {
             ## cond <- Reduce(function(l, r) l & r,

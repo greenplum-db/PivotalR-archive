@@ -35,7 +35,8 @@ export ("madlib.glm", "summary.logregr.madlib",
         "summary.glm.madlib.grps", "print.glm.madlib.grps", "show.glm.madlib.grps")
 
 export("predict.lm.madlib", "predict.logregr.madlib",
-       "predict.lm.madlib.grps", "predict.logregr.madlib.grps")
+       "predict.lm.madlib.grps", "predict.logregr.madlib.grps",
+       "predict.glm.madlib", "predict.glm.madlib.grps")
 
 # export sample in the future
 # export ("sample")

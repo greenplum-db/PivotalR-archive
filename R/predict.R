@@ -28,6 +28,8 @@ predict.logregr.madlib <- function (object, newdata,
     }
 }
 
+## ------------------------------------------------------------
+
 predict.logregr.madlib.grps <- function (object, newdata,
                                          type = c("response", "prob"), ...)
 {
@@ -40,10 +42,84 @@ predict.logregr.madlib.grps <- function (object, newdata,
     }
 }
 
+## ------------------------------------------------------------
+
+## predict function for all GLM functions
+
+predict.glm.madlib <- function(object, newdata,
+                               type = c('response', 'prob'), ...)
+{
+    type <- match.arg(type)
+    family.name <- object$family
+    link.name <- object$link
+
+    if (family.name == 'binomial') {
+        if (type == 'response') { # TRUE or FALSE
+            .predict(object, newdata, 'glm_predict_binomial', 'boolean', 'bool',
+                     extra = paste(",", "'", link.name, "'", sep = ''))
+        } else { # type == 'prob'
+            .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        }
+    } else if (family.name == 'poisson') {
+        if (type == 'response') {
+            .predict(object, newdata, 'glm_predict_poisson', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        } else {
+            stop("Family poisson does not support the prediction of prob type!")
+        }
+    } else {
+        if (type == 'response') {
+            .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        } else {
+            stop("Family ", family.name, " does not support the prediction of prob type!")
+        }
+    }
+}
+
+## ------------------------------------------------------------
+
+predict.glm.madlib.grps <- function(object, newdata,
+                                    type = c('response', 'prob'), ...)
+{
+    type <- match.arg(type)
+    family.name <- objecti[[1]]$family
+    link.name <- object[[1]]$link
+
+    if (family.name == 'binomial') {
+        if (type == 'response') { # TRUE or FALSE
+            .predict(object, newdata, 'glm_predict_binomial', 'boolean', 'bool',
+                     extra = paste(",", "'", link.name, "'", sep = ''))
+        } else { # type == 'prob'
+            .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        }
+    } else if (family.name == 'poisson') {
+        if (type == 'response') {
+            .predict(object, newdata, 'glm_predict_poisson', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        } else {
+            stop("Family poisson does not support the prediction of prob type!")
+        }
+    } else {
+        if (type == 'response') {
+            .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
+                     extra = paste(", '", link.name, "'", sep = ''))
+        } else {
+            stop("Family ", family.name, " does not support the prediction of prob type!")
+        }
+    }
+}
+
+
+
 ## ----------------------------------------------------------------------
 
 ## predict probability only for binomial models
-.predict.prob <- function(object, newdata)
+.predict.prob <- function(object, newdata,
+                          func.str = "elastic_net_binomial_prob",
+                          extra = "")
 {
     if (is(object, "logregr.madlib")) object <- list(object)
     if (!is(newdata, "db.obj"))
@@ -61,7 +137,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
     sort <- strs$sort
     src <- strs$src
     parent <- strs$parent
-    func.str <- paste(madlib, ".", "elastic_net_binomial_prob", sep = "")
+    func.str <- paste(madlib, ".", func.str, sep = "")
 
     if (!is(newdata, "db.data.frame")) {
         ## ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
@@ -89,7 +165,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
         }
         coef <- paste("array[", paste(coef, collapse = ", "), "]", sep = "")
         expr <- paste(func.str, "(", coef, ", ", intercept, ", ",
-                      ind.str, ")", sep = "")
+                      ind.str, extra, ")", sep = "")
     } else {
         l <- length(object[[1]]$grp.cols)
         expr <- "case when "
@@ -124,7 +200,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
             coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
                             sep = "")
             expr <- paste(expr, func.str, "(", coef.i, ", ", intercept, ", ",
-                          ind.str, ")", sep = "")
+                          ind.str, extra, ")", sep = "")
 
             if (i < n)
                 expr <- paste(expr, " when ", sep = "")
@@ -167,7 +243,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
 
 ## -----------------------------------------------------------------------
 
-.predict <- function (object, newdata, func.str, data.type, udt.name)
+.predict <- function (object, newdata, func.str, data.type, udt.name, extra = "")
 {
     if (is(object, "lm.madlib") || is(object, "logregr.madlib"))
         object <- list(object)
@@ -223,7 +299,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
             coef <- paste("array[", paste(coef, collapse = ", "), "]",
                           sep = "")
             expr <- paste(madlib, ".", func.str, "(", coef, ", ", intercept,
-                          ", ", ind.str, ")", sep = "")
+                          ", ", ind.str, extra, ")", sep = "")
             ## coef <- paste("array[", paste(object[[1]]$coef,
             ##                               collapse = ", "), "]",
             ##               sep = "")
