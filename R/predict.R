@@ -46,7 +46,7 @@ predict.logregr.madlib.grps <- function (object, newdata,
 
 ## predict function for all GLM functions
 
-predict.glm.madlib <- function(object, newdata,
+predict.glm.madlib <- function(object, newdata = object$data,
                                type = c('response', 'prob'), ...)
 {
     type <- match.arg(type)
@@ -80,7 +80,7 @@ predict.glm.madlib <- function(object, newdata,
 
 ## ------------------------------------------------------------
 
-predict.glm.madlib.grps <- function(object, newdata,
+predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
                                     type = c('response', 'prob'), ...)
 {
     type <- match.arg(type)

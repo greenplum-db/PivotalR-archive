@@ -93,7 +93,7 @@ madlib.glm <- function (formula, data,
 
 .madlib.logregr <- function (formula, data, na.action = NULL, method = "irls",
                              max.iter = 10000, tolerance = 1e-5, verbose = FALSE,
-                             na.as.level = FALSE)
+                             na.as.level = FALSE, ...)
 {
     ## make sure fitting to db.obj
     if (! is(data, "db.obj"))
@@ -404,9 +404,9 @@ show.logregr.madlib <- function (object)
 
 ## ------------------------------------------------------------
 
-.madlib.glm <- function(formula, data, na.action, max.iter = 10000,
-                        tolerance = 1e-5, call, family.name, link.name,
-                        na.as.level = FALSE, verbose = FALSE)
+.madlib.glm <- function(formula, data, na.action = NULL, max.iter = 10000,
+                        tolerance = 1e-5, family.name, link.name,
+                        na.as.level = FALSE, verbose = FALSE, ...)
 {
     if (!is(data, 'db.obj')) {
         stop('madlib.glm can only be used on a db.obj object, and ',
@@ -416,7 +416,7 @@ show.logregr.madlib <- function (object)
     conn.id <- conn.id(data)
 
     ## Only MADlib 1.7 and newer are supported
-    .check.madlib.version(data, allowed.version = 1.7)
+    .check.madlib.version(data, allowed.version = 1.6)
 
     warnings <- .suppress.warnings(conn.id) # turn off warning messages
 
@@ -439,7 +439,7 @@ show.logregr.madlib <- function (object)
                  gsub("'", "''", params$dep.str), "', '",
                  params$ind.str, "', 'family=",
                  family.name, ", link=", link.name, "',",
-                 grp, "'max_iter=", max.iter, ", optimizer=irls, tolerance=",
+                 grp, ", 'max_iter=", max.iter, ", optimizer=irls, tolerance=",
                  tolerance, "', ", verbose, ")", sep = "")
 
     res <- .db(sql, "; select * from ", tbl.output, nrows = -1,
@@ -490,11 +490,11 @@ show.logregr.madlib <- function (object)
         names(rst[[i]]$coef) <- term.names
         rst[[i]]$std_err <- r.std_err[i, ]
         names(rst[[i]]$std_err) <- term.names
-        rst[[i]][res.names[stats]] <- r.stats[i,]
-        names(rst[[i]][res.names[stats]]) <- term.names
+        rst[[i]][[res.names[stats]]] <- r.stats[i,]
+        names(rst[[i]][[res.names[stats]]]) <- term.names
         rst[[i]]$p_values <- r.p_values[i,]
         names(rst[[i]]$p_values) <- term.names
-        rst[[i]]$dispersion <- r.dispersion
+        rst[[i]]$dispersion <- r.dispersion[i]
         rst[[i]]$grp.cols <- r.grp.cols
         rst[[i]]$grp.expr <- r.grp.expr
         rst[[i]]$has.intercept <- r.has.intercept
@@ -599,7 +599,8 @@ summary.glm.madlib.grps <- function(object, ...)
 .print.coefs <- function(x, rows, digits)
 {
     cat("Coefficients:\n")
-    coef.fmat <- data.frame(cbind(x$coef, x$std_err, x$stats, x$p_values))
+    stats <- names(x)[grepl("^(t|z)_stats", names(x))]
+    coef.fmat <- data.frame(cbind(x$coef, x$std_err, x[[stats]], x$p_values))
     stats <- if ('t_stats' %in% names(x)) "t value" else "z value"
     pvalue <- if ('t_stats' %in% names(x)) "Pr(>|t|)" else "Pr(>|z|)"
     names(coef.fmat) <- c("Estimate", "Std. Error", stats, pvalue)
@@ -609,7 +610,7 @@ summary.glm.madlib.grps <- function(object, ...)
 
     cat("Log likelihood:", x$log_likelihood, "\n")
     cat("Dispersion:", x$dispersion, "\n")
-    cat("Number of iterations:", x$num_iterations, "\n")
+    cat("Number of iterations:", x$iteration, "\n")
 }
 
 ## ------------------------------------------------------------
