@@ -84,7 +84,7 @@ predict.glm.madlib.grps <- function(object, newdata,
                                     type = c('response', 'prob'), ...)
 {
     type <- match.arg(type)
-    family.name <- objecti[[1]]$family
+    family.name <- object[[1]]$family
     link.name <- object[[1]]$link
 
     if (family.name == 'binomial') {
