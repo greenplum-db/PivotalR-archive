@@ -558,12 +558,12 @@ show.glm.madlib.grps <- function(object)
     print(object)
 }
 
-summary.glm.madlib <- function(object)
+summary.glm.madlib <- function(object, ...)
 {
     object
 }
 
-summary.glm.madlib.grps <- function(object)
+summary.glm.madlib.grps <- function(object, ...)
 {
     object
 }
@@ -597,7 +597,7 @@ summary.glm.madlib.grps <- function(object)
 .print.coefs <- function(x, rows, digits)
 {
     cat("Coefficients:\n")
-    coef.fmat <- data.frame(cbind(x$coef, x$std_err, x$stats, x$p_values)))
+    coef.fmat <- data.frame(cbind(x$coef, x$std_err, x$stats, x$p_values))
     stats <- if ('t_stats' %in% names(x)) "t value" else "z value"
     pvalue <- if ('t_stats' %in% names(x)) "Pr(>|t|)" else "Pr(>|z|)"
     names(coef.fmat) <- c("Estimate", "Std. Error", stats, pvalue)

@@ -16,10 +16,8 @@
   column that is an array in the data table.
 }
 
-\usage{
-madlib.glm(formula, data, family = c("gaussian", "linear", "binomial",
-"logistic"), na.action = NULL, control = list(), ...)
-}
+\usage{ madlib.glm(formula, data, family = gaussian, na.action = NULL,
+control = list(), ...) }
 
 \arguments{
     \item{formula}{
