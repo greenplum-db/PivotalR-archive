@@ -43,6 +43,8 @@ madlib.glm <- function (formula, data,
     args$formula <- formula
     args$data <- data
     args$na.action <- na.action
+    args$family.name <- family.name
+    args$link.name <- link.name
     call <- match.call()
 
     ## must use GLM function
@@ -403,8 +405,8 @@ show.logregr.madlib <- function (object)
 ## ------------------------------------------------------------
 
 .madlib.glm <- function(formula, data, na.action, max.iter = 10000,
-                        tolerance = 1e-5, call, na.as.level = FALSE,
-                        verbose = FALSE)
+                        tolerance = 1e-5, call, family.name, link.name,
+                        na.as.level = FALSE, verbose = FALSE)
 {
     if (!is(data, 'db.obj')) {
         stop('madlib.glm can only be used on a db.obj object, and ',
