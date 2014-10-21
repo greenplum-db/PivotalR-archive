@@ -148,9 +148,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
     func.str <- paste(madlib, ".", func.str, sep = "")
 
     if (!is(newdata, "db.data.frame")) {
-        ## ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
-        ##                                    names(newdata),
-        ##                                    newdata@.expr)
         if (length(object[[1]]$dummy) != 0) {
             l <- length(names(newdata))
             for (i in seq_len(length(object[[1]]$dummy))) {
@@ -179,21 +176,8 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
         expr <- "case when "
         n <- length(object)
         for (i in seq_len(n)) {
-            ## tmp <- ""
-            ## for (j in seq_len(l)) {
-            ##     ## tmp <- paste(tmp, object[[i]]$grp.expr[j], " = '",
-            ##     ##              object[[i]][[object[[i]]$grp.cols[j]]],
-            ##     ##              "'::",
-            ##     ##              newdata@.col.data_type[which(
-            ##     ##                  names(newdata) == object[[i]]$grp.cols[j])],
-            ##     ##              sep = "")
-            ##     tmp <- object[[i]]$data@.where
-            ##     if (j != l) tmp <- paste(tmp, " and ", sep = "")
-            ## }
             tmp <- object[[i]]$data@.where
             if (!is(newdata, "db.data.frame"))
-                ## tmp <- .replace.col.with.expr(tmp, names(newdata),
-                ##                               newdata@.expr)
                 tmp <- .replace.col.with.expr1(gsub(" = ", " == ", tmp),
                                                newdata)
             expr <- paste(expr, tmp, " then ", sep = "")
@@ -272,9 +256,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
     parent <- strs$parent
 
     if (!is(newdata, "db.data.frame")) {
-        ## ind.vars <- .replace.col.with.expr(object[[1]]$ind.vars,
-        ##                                    names(newdata),
-        ##                                    newdata@.expr)
         if (length(object[[1]]$dummy) != 0) {
             l <- length(names(newdata))
             for (i in seq_len(length(object[[1]]$dummy))) {
@@ -296,10 +277,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
         if (object[[1]]$has.intercept) ind.vars <- c(1, ind.vars)
     }
 
-    ## deal with groups
-    ## coef.i <- which(names(object[[1]]) == "coef")
-    ## grp.col <- names(object[[1]])[seq_len(coef.i - 1)]
-
     if (length(object) == 1) {
         if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
             if (object[[1]]$has.intercept && with.intercept) {
@@ -313,11 +290,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
                           sep = "")
             expr <- paste(madlib, ".", func.str, "(", coef, ", ", intercept,
                           ind.str, extra, ")", sep = "")
-            ## coef <- paste("array[", paste(object[[1]]$coef,
-            ##                               collapse = ", "), "]",
-            ##               sep = "")
-            ## expr <- paste(madlib, ".", func.str, "(", coef, ", ",
-            ##               ind.str, ")", sep = "")
         } else {
             expr <- paste(object[[1]]$coef, ind.vars, sep = "*",
                           collapse = " + ")
@@ -330,20 +302,8 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
         n <- length(object)
         for (i in seq_len(n)) {
             tmp <- ""
-            ## for (j in seq_len(l)) {
-            ##     ## tmp <- paste(tmp, object[[i]]$grp.cols[j], " = '",
-            ##     ##              object[[i]][[object[[i]]$grp.cols[j]]],
-            ##     ##              "'::",
-            ##     ##              newdata@.col.data_type[which(
-            ##     ##                  names(newdata) == object[[i]]$grp.cols[j])],
-            ##     ##              sep = "")
-            ##     tmp <- object[[i]]$data@.where
-            ##     if (j != l) tmp <- paste(tmp, " and ", sep = "")
-            ## }
             tmp <- object[[i]]$data@.where
             if (!is(newdata, "db.data.frame"))
-                ## tmp <- .replace.col.with.expr(tmp, names(newdata),
-                ##                               newdata@.expr)
                 tmp <- .replace.col.with.expr1(gsub(" = ", " == ", tmp),
                                                newdata)
             expr <- paste(expr, tmp, " then ", sep = "")
@@ -360,11 +320,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
                                 sep = "")
                 expr <- paste(expr, madlib, ".", func.str, "(", coef.i, ", ",
                               intercept, ind.str, extra, ")", sep = "")
-                ## coef.i <- paste("array[", paste(object[[i]]$coef,
-                ##                                 collapse = ", "),
-                ##                 "]", sep = "")
-                ## expr <- paste(expr, madlib, ".", func.str, "(", coef.i,
-                ##               ", ", ind.str, ")", sep = "")
             } else {
                 expr <- paste(expr, paste(object[[1]]$coef, ind.vars,
                                           sep = "*", collapse = " + "), sep = "")
@@ -432,7 +387,6 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
 {
     vars <- gsub("::[\\w\\s]+", "", str, perl = T)
     vars <- gsub("\"", "`", vars)
-    ## vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`(\\1)[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
     vars <- .reverse.consistent.func(vars)
     vars <- gsub("\\$\\$", "\"", vars)
