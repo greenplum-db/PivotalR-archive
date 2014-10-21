@@ -96,20 +96,26 @@ export("clean.madlib.temp")
 export("db.default.schemas", "db.search.path")
 
 export("residuals.lm.madlib", "residuals.lm.madlib.grps",
-       "residuals.logregr.madlib", "residuals.logregr.madlib.grps")
+       "residuals.logregr.madlib", "residuals.logregr.madlib.grps",
+       "residuals.glm.madlib", "residuals.glm.madlib.grps")
 
 S3method(logLik, logregr.madlib)
 S3method(logLik, logregr.madlib.grps)
 S3method(logLik, lm.madlib)
 S3method(logLik, lm.madlib.grps)
+S3method(logLik, glm.madlib)
+S3method(logLik, glm.madlib.grps)
 
 S3method(extractAIC, logregr.madlib)
 S3method(extractAIC, logregr.madlib.grps)
 S3method(extractAIC, lm.madlib)
 S3method(extractAIC, lm.madlib.grps)
+S3method(extractAIC, glm.madlib)
+S3method(extractAIC, glm.madlib.grps)
 
 S3method(AIC, lm.madlib.grps)
 S3method(AIC, logregr.madlib.grps)
+S3method(AIC, glm.madlib.grps)
 
 S3method(as.data.frame, db.table)
 S3method(as.data.frame, db.view)
