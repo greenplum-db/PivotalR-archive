@@ -94,22 +94,26 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
     if (family.name == 'binomial') {
         if (type == 'response') { # TRUE or FALSE
             .predict(object, newdata, 'glm_predict_binomial', 'boolean', 'bool',
-                     extra = paste(",", "'", link.name, "'", sep = ''))
+                     extra = paste(",", "'", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else { # type == 'prob'
             .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         }
     } else if (family.name == 'poisson') {
         if (type == 'response') {
             .predict(object, newdata, 'glm_predict_poisson', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else {
             stop("Family poisson does not support the prediction of prob type!")
         }
     } else {
         if (type == 'response') {
             .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else {
             stop("Family ", family.name, " does not support the prediction of prob type!")
         }
@@ -355,7 +359,7 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
                 coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
                                 sep = "")
                 expr <- paste(expr, madlib, ".", func.str, "(", coef.i, ", ",
-                              intercept, ind.str, ")", sep = "")
+                              intercept, ind.str, extra, ")", sep = "")
                 ## coef.i <- paste("array[", paste(object[[i]]$coef,
                 ##                                 collapse = ", "),
                 ##                 "]", sep = "")
@@ -431,6 +435,7 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
     ## vars <- gsub("\\(`([^\\[\\]]*)`\\)\\[(\\d+)\\]", "`(\\1)[\\2]`", vars)
     vars <- gsub("\\s", "", vars)
     vars <- .reverse.consistent.func(vars)
+    vars <- gsub("\\$\\$", "\"", vars)
     as.vector(sapply(
         vars,
         function(s) {
