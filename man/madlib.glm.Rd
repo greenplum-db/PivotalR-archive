@@ -53,7 +53,7 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
     \item{family}{
 
         A string which indicates which form of regression to apply. Default
-        value is ``gaussian''. The accepted values are:
+        value is ``\code{gaussian}''. The accepted values are:
         \code{gaussian(identity)} (default for \code{gaussian} family),
         \code{gaussian(log)}, \code{gaussian(inverse)}, \code{binomial(logit)}
         (default for \code{binomial} family), \code{binomial(probit)},
