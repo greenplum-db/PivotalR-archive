@@ -53,12 +53,15 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
     \item{family}{
 
         A string which indicates which form of regression to apply. Default
-        value is ``gaussian''. The accepted values are: ``gaussian'' or
-        ``linear'': Linear regression ``binomial'' or ``logistic'': Logistic
-        regression ``multinomial'': Multinomical logistic regression (This is
-        currently not implemented)
-
-    }
+        value is ``gaussian''. The accepted values are:
+        \code{gaussian(identity)}, \code{gaussian(log)},
+        \code{gaussian(inverse)}, \code{binomial(logit)},
+        \code{binomial(probit)}, \code{poisson(log)}, \code{poisson(identity)},
+        \code{poisson(sqrt)}, \code{Gamma(inverse)},
+        \code{Gamma(identity)}, \code{Gamma(log)},
+        \code{inverse.gaussian(1/mu^2)}, \code{inverse.gaussian(log)},
+        \code{inverse.gaussian(identity)},
+        \code{inverse.gaussian(inverse)}.}
 
     \item{na.action}{
 

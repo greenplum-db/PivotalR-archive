@@ -36,8 +36,8 @@ madlib.glm <- function (formula, data,
         stop("'family' not recognized")
     }
 
-    family.name <- family$family
-    link.name <- family$link
+    family.name <- tolower(family$family)
+    link.name <- if (family$link == "1/mu^2") "sqr_inverse" else family$link
 
     args <- control
     args$formula <- formula
