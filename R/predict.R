@@ -56,22 +56,26 @@ predict.glm.madlib <- function(object, newdata = object$data,
     if (family.name == 'binomial') {
         if (type == 'response') { # TRUE or FALSE
             .predict(object, newdata, 'glm_predict_binomial', 'boolean', 'bool',
-                     extra = paste(",", "'", link.name, "'", sep = ''))
+                     extra = paste(",", "'", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else { # type == 'prob'
             .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         }
     } else if (family.name == 'poisson') {
         if (type == 'response') {
             .predict(object, newdata, 'glm_predict_poisson', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else {
             stop("Family poisson does not support the prediction of prob type!")
         }
     } else {
         if (type == 'response') {
             .predict(object, newdata, 'glm_predict', 'double precision', 'float8',
-                     extra = paste(", '", link.name, "'", sep = ''))
+                     extra = paste(", '", link.name, "'", sep = ''),
+                     with.intercept = FALSE)
         } else {
             stop("Family ", family.name, " does not support the prediction of prob type!")
         }
@@ -243,9 +247,10 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
 
 ## -----------------------------------------------------------------------
 
-.predict <- function (object, newdata, func.str, data.type, udt.name, extra = "")
+.predict <- function (object, newdata, func.str, data.type, udt.name, extra = "",
+                      with.intercept = TRUE)
 {
-    if (is(object, "lm.madlib") || is(object, "logregr.madlib"))
+    if (is(object, "lm.madlib") || is(object, "logregr.madlib") || is(object, 'glm.madlib'))
         object <- list(object)
 
     if (!is(newdata, "db.obj"))
@@ -276,9 +281,13 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
         ind.vars <- .replace.col.with.expr1(object[[1]]$ind.vars, newdata)
     } else
         ind.vars <- object[[1]]$ind.vars
+
+    if (object[[1]]$has.intercept && !with.intercept) ind.vars <- c(1, ind.vars)
+
     if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
         ind.str <- paste("array[", paste(ind.vars, collapse = ","), "]",
                          sep = "")
+
     } else {
         if (object[[1]]$has.intercept) ind.vars <- c(1, ind.vars)
     }
@@ -289,17 +298,17 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
 
     if (length(object) == 1) {
         if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
-            if (object[[1]]$has.intercept) {
+            if (object[[1]]$has.intercept && with.intercept) {
                 coef <- object[[1]]$coef[-1]
-                intercept <- object[[1]]$coef[1]
+                intercept <- paste(object[[1]]$coef[1], ",", sep = "")
             } else {
                 coef <- object[[1]]$coef
-                intercept <- 0
+                intercept <- if (with.intercept) "0, " else ""
             }
             coef <- paste("array[", paste(coef, collapse = ", "), "]",
                           sep = "")
             expr <- paste(madlib, ".", func.str, "(", coef, ", ", intercept,
-                          ", ", ind.str, extra, ")", sep = "")
+                          ind.str, extra, ")", sep = "")
             ## coef <- paste("array[", paste(object[[1]]$coef,
             ##                               collapse = ", "), "]",
             ##               sep = "")
@@ -336,17 +345,17 @@ predict.glm.madlib.grps <- function(object, newdata = object[[1]]$data,
             expr <- paste(expr, tmp, " then ", sep = "")
 
             if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
-                if (object[[i]]$has.intercept) {
+                if (object[[i]]$has.intercept && with.intercept) {
                     coef <- object[[i]]$coef[-1]
-                    intercept <- object[[i]]$coef[1]
+                    intercept <- paste(object[[i]]$coef[1], ",", sep = "")
                 } else {
                     coef <- object[[i]]$coef
-                    intercept <- 0
+                    intercept <- if (with.intercept) "0, " else ""
                 }
                 coef.i <- paste("array[", paste(coef, collapse = ", "), "]",
                                 sep = "")
                 expr <- paste(expr, madlib, ".", func.str, "(", coef.i, ", ",
-                              intercept, ", ", ind.str, ")", sep = "")
+                              intercept, ind.str, ")", sep = "")
                 ## coef.i <- paste("array[", paste(object[[i]]$coef,
                 ##                                 collapse = ", "),
                 ##                 "]", sep = "")

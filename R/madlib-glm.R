@@ -5,8 +5,8 @@
 
 setClass("logregr.madlib")
 setClass("logregr.madlib.grps")
-setClass('glm.madlib')
-setClass('glm.madlib.grps')
+setClass("glm.madlib")
+setClass("glm.madlib.grps")
 
 ## ------------------------------------------------------------
 
