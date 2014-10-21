@@ -1,6 +1,12 @@
-\name{summary.logregr.madlib}
+\name{summary}
+
 \alias{summary.logregr.madlib}
+
 \alias{summary.logregr.madlib.grps}
+
+\alias{summary.glm.madlib}
+
+\alias{summary.glm.madlib.grps}
 
 \title{Summary information for Logistic Regression output}
 \description{
@@ -8,9 +14,15 @@
     Regression output object.}
 
 \usage{
+
 \method{summary}{logregr.madlib}(object, ...)
 
 \method{summary}{logregr.madlib.grps}(object, ...)
+
+\method{summary}{glm.madlib}(object, ...)
+
+\method{summary}{glm.madlib.grps}(object, ...)
+
 }
 
 \arguments{
