@@ -181,7 +181,8 @@ plot(random.sample)
 ## ------------------------------------------------------------
 ## GLM prediction
 
-fit <- madlib.glm(rings ~ . - id | sex, data = x, family = poisson(log), control = list(max.iter = 20))
+fit <- madlib.glm(rings ~ . - id | sex, data = x, family = poisson(log),
+                  control = list(max.iter = 20))
 
 p <- predict(f)
 

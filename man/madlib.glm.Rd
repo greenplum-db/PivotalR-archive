@@ -416,11 +416,14 @@ start <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = "bin
 ## ------------------------------------------------------------
 ## Examples for using GLM model
 
-fit <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = binomial(probit), control = list(max.iter = 10))
+fit <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = binomial(probit),
+                  control = list(max.iter = 10))
 
-fit <- madlib.glm(rings ~ . - id | sex, data = source_data, family = poisson(log), control = list(max.iter = 10))
+fit <- madlib.glm(rings ~ . - id | sex, data = source_data, family = poisson(log),
+                  control = list(max.iter = 10))
 
-fit <- madlib.glm(rings ~ . - id, data = source_data, family = Gamma(inverse), control = list(max.iter = 10))
+fit <- madlib.glm(rings ~ . - id, data = source_data, family = Gamma(inverse),
+                  control = list(max.iter = 10))
 
 db.disconnect(cid, verbose = FALSE)
 }
