@@ -178,6 +178,15 @@ random.sample <- lk(sort(ap, FALSE, NULL), 1000) # sort randomly
 
 plot(random.sample)
 
+## ------------------------------------------------------------
+## GLM prediction
+
+fit <- madlib.glm(rings ~ . - id | sex, data = x, family = poisson(log), control = list(max.iter = 20))
+
+p <- predict(f)
+
+lk(p, 10)
+
 db.disconnect(cid, verbose = FALSE)
 }
 }

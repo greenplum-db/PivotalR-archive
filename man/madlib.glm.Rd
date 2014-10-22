@@ -9,17 +9,17 @@
 
 \description{
 
-    The wrapper function for MADlib's generzlized linear regression
+    The wrapper function for MADlib's generzlized linear regression [7]
     including the support for multple families and link functions.
     Heteroskedasticity test is implemented for linear regression. One or
-    multiple columns of data can be used to separate the data set into
-    multiple groups according to the values of the grouping columns. The
-    requested regression method is applied onto each group,  which has
-    fixed values of the grouping columns. Multinomial logistic regression
-    is not implemented yet. Categorical variables are supported. The
-    computation is parallelized by MADlib if the connected database is
-    Greenplum/HAWQ database. The regression computation can also be done
-    on a column which contains an array as its value in the data table.
+    multiple columns of data can be used to separate the data set into multiple
+    groups according to the values of the grouping columns. The requested
+    regression method is applied onto each group,  which has fixed values of
+    the grouping columns. Multinomial logistic regression is not implemented
+    yet. Categorical variables are supported. The computation is parallelized
+    by MADlib if the connected database is Greenplum/HAWQ database. The
+    regression computation can also be done on a column which contains an array
+    as its value in the data table.
 
 }
 
@@ -330,11 +330,11 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
 
 \references{
 
-    [1] Documentation of linear regression in MADlib v0.6,
-    \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}
+    [1] Documentation of linear regression in lastest MADlib,
+    \url{http://doc.madlib.net/latest/group__grp__linreg.html}
 
-    [2] Documentation of logistic regression in MADlib v0.6,
-    \url{http://doc.madlib.net/v0.6/group__grp__logreg.html}
+    [2] Documentation of logistic regression in latest MADlib,
+    \url{http://doc.madlib.net/latest/group__grp__logreg.html}
 
     [3] Wikipedia: Iteratively reweighted least squares,
     \url{http://en.wikipedia.org/wiki/IRLS}
@@ -345,8 +345,10 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
     [5] Wikipedia: Stochastic gradient descent,
     \url{http://en.wikipedia.org/wiki/Stochastic_gradient_descent}
 
-    [6] Wikipedia: Odds ratio,
-    \url{http://en.wikipedia.org/wiki/Odds_ratio}
+    [6] Wikipedia: Odds ratio, \url{http://en.wikipedia.org/wiki/Odds_ratio}
+
+    [7] Documentation of geberalized linear regression in latest MADlib,
+    \url{http://doc.madlib.net/latest/group__grp__glm.html}
 
 }
 
@@ -366,7 +368,6 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
 \dontrun{
 
 %% @test .port Database port number
-
 %% @test .dbname Database name
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
@@ -386,7 +387,7 @@ fit
 ## logistic regression
 ## The dependent variable must be a logical variable
 ## Here it is y < 10.
-fit <- madlib.glm(rings < 10 ~ . - id - 1 , data = source_data, family = "binomial")
+fit <- madlib.glm(rings < 10 ~ . - id - 1 , data = source_data, family = binomial)
 
 fit <- madlib.glm(rings < 10 ~ sex + length + diameter,
 data = source_data, family = "logistic")
@@ -399,18 +400,27 @@ array.data <- as.db.data.frame(dat)
 
 ## Fit to y using every element of x
 ## This does not work in R's lm, but works in madlib.lm
-fit <- madlib.glm(rings < 10 ~ arr, data = array.data, family = "binomial")
+fit <- madlib.glm(rings < 10 ~ arr, data = array.data, family = binomial)
 
-fit <- madlib.glm(rings < 10 ~ arr - arr[1:2], data = array.data, family = "binomial")
+fit <- madlib.glm(rings < 10 ~ arr - arr[1:2], data = array.data, family = binomial)
 
-fit <- madlib.glm(rings < 10 ~ arr[1:7] + sex | id %% 3, data = array.data, family = 'b')
+fit <- madlib.glm(rings < 10 ~ arr[1:7] + sex | id %% 3, data = array.data, family = 'binomial')
 
-fit <- madlib.glm(rings < 10 ~ arr - arr[8] + sex | id %% 3, data = array.data, family = 'b')
+fit <- madlib.glm(rings < 10 ~ arr - arr[8] + sex | id %% 3, data = array.data, family = 'binomial')
 
 ## 4th example
 ## Step-wise feature selection
 start <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = "binomial")
 ## step(start)
+
+## ------------------------------------------------------------
+## Examples for using GLM model
+
+fit <- madlib.glm(rings < 10 ~ . - id - sex, data = source_data, family = binomial(probit), control = list(max.iter = 10))
+
+fit <- madlib.glm(rings ~ . - id | sex, data = source_data, family = poisson(log), control = list(max.iter = 10))
+
+fit <- madlib.glm(rings ~ . - id, data = source_data, family = Gamma(inverse), control = list(max.iter = 10))
 
 db.disconnect(cid, verbose = FALSE)
 }
