@@ -24,7 +24,7 @@ test_that("Examples of speed test",
           ## takes les than 2 seconds
           ## 1
           expect_that(madlib.lm(rings ~ . - id - sex, data = dat),
-                      takes_less_than(3)))
+                      takes_less_than(5)))
 
 ## ----------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ test_that("Examples of using multiple loops", {
         fit.this <- paste(fit.this, "+", var)
         for (n in rows)
             expect_that(madlib.lm(formula(fit.this), data = dat[dat$id < n, ]),
-                        takes_less_than(3))
+                        takes_less_than(5))
     }
 })
 
