@@ -36,7 +36,7 @@ madlib.glm <- function (formula, data,
         stop("'family' not recognized")
     }
 
-    family.name <- tolower(family$family)
+    family.name <- gsub("\\.", "_", tolower(family$family))
     link.name <- if (family$link == "1/mu^2") "sqr_inverse" else family$link
 
     args <- control
@@ -575,7 +575,7 @@ summary.glm.madlib.grps <- function(object, ...)
 .extract.rows <- function(x)
 {
     if (x$has.intercept) {
-        rows <- c("(Intercept", x$ind.vars)
+        rows <- c("(Intercept)", x$ind.vars)
     } else {
         rows <- x$ind.vars
     }
