@@ -85,10 +85,10 @@ test_that("Examples of testing string existence", {
 
 ## ----------------------------------------------------------------------
 
-test_that("Examples of testing errors",
-          ## 12
-          expect_that(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
-                      throws_error("syntax error")))
+# test_that("Examples of testing errors",
+#           ## 12
+#           expect_that(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
+#                       throws_error("syntax error")))
 
 ## ----------------------------------------------------------------------
 
@@ -239,11 +239,11 @@ skip_if(TRUE, {
 
 db <- .get.dbms.str(cid)
 
-skip_if(db$db.str %in% c("HAWQ", "PostgreSQL"),
-        test_that("Skip this on HAWQ",
-                  ## 37
-                  expect_that(db.q("\\dn", verbose = FALSE),
-                              throws_error("syntax error"))))
+# skip_if(db$db.str %in% c("HAWQ", "PostgreSQL"),
+#         test_that("Skip this on HAWQ",
+#                   ## 37
+#                   expect_that(db.q("\\dn", verbose = FALSE),
+#                               throws_error("syntax error"))))
 
 test_that("Skip some tests", {
     tmp <- dat

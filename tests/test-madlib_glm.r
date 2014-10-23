@@ -4,7 +4,7 @@ context("Test cases for madlib.glm and its helper functions")
 ## Test preparations
 
 .get.param.inputs(c(".port", ".dbname"))
-cid <- as.db.data.frame(port = .port, dbname = .dbname, verbose = FALSE)
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 dat.r <- abalone
 
@@ -13,23 +13,23 @@ dat.r <- abalone
 
 test_that("Test gaussian(identity)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = gaussian(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = gaussian(identity))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = gaussian(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(identity) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = gaussian(identity))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = gaussian(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(identity) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(identity)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(identity))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -43,23 +43,23 @@ test_that("Test gaussian(identity) with grouping", {
 
 test_that("Test gaussian(log)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = gaussian(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = gaussian(log))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = gaussian(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(log) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = gaussian(log))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = gaussian(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(log) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(log)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(log))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -73,23 +73,23 @@ test_that("Test gaussian(log) with grouping", {
 
 test_that("Test gaussian(inverse)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = gaussian(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = gaussian(inverse))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = gaussian(inverse)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(inverse) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = gaussian(inverse))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(inverse), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = gaussian(inverse)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test gaussian(inverse) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = gaussian(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(inverse)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = gaussian(inverse), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = gaussian(inverse))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -103,23 +103,23 @@ test_that("Test gaussian(inverse) with grouping", {
 
 test_that("Test binomial(logit)", {
           fit.db <- madlib.glm(rings < 10 ~ . - id - sex, data = dat, family = binomial(logit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings < 10 ~ . - id - sex, data = dat.r, family = binomial(logit))
+          fit.r <- summary(glm(rings < 10 ~ . - id - sex, data = dat.r, family = binomial(logit)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test binomial(logit) with categorical features", {
-          fit.db <- madlib.glm(rings < 10 ~ . - id | sex, data = dat, family = binomial(logit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings < 10 ~ . - id | sex, data = dat.r, family = binomial(logit))
+          fit.db <- madlib.glm(rings < 10 ~ . - id, data = dat, family = binomial(logit), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings < 10 ~ . - id, data = dat.r, family = binomial(logit)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test binomial(logit) with grouping", {
-          fit.db <- madlib.glm(rings < 10 ~ . - id, data = dat, family = binomial(logit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings < 10 ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = binomial(logit)))
+          fit.db <- madlib.glm(rings < 10 ~ . - id | sex, data = dat, family = binomial(logit), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings < 10 ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = binomial(logit))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -133,23 +133,23 @@ test_that("Test binomial(logit) with grouping", {
 
 test_that("Test binomial(probit)", {
           fit.db <- madlib.glm(rings < 10 ~ . - id - sex, data = dat, family = binomial(probit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings < 10 ~ . - id - sex, data = dat.r, family = binomial(probit))
+          fit.r <- summary(glm(rings < 10 ~ . - id - sex, data = dat.r, family = binomial(probit)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test binomial(probit) with categorical features", {
-          fit.db <- madlib.glm(rings < 10 ~ . - id | sex, data = dat, family = binomial(probit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings < 10 ~ . - id | sex, data = dat.r, family = binomial(probit))
+          fit.db <- madlib.glm(rings < 10 ~ . - id, data = dat, family = binomial(probit), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings < 10 ~ . - id, data = dat.r, family = binomial(probit)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test binomial(probit) with grouping", {
-          fit.db <- madlib.glm(rings < 10 ~ . - id, data = dat, family = binomial(probit), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings < 10 ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = binomial(probit)))
+          fit.db <- madlib.glm(rings < 10 ~ . - id | sex, data = dat, family = binomial(probit), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings < 10 ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = binomial(probit))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -163,23 +163,23 @@ test_that("Test binomial(probit) with grouping", {
 
 test_that("Test poisson(log)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = poisson(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = poisson(log))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = poisson(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(log) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = poisson(log))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = poisson(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(log) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(log)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(log))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -193,23 +193,23 @@ test_that("Test poisson(log) with grouping", {
 
 test_that("Test poisson(identity)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = poisson(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = poisson(identity))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = poisson(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(identity) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = poisson(identity))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = poisson(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(identity) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(identity)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(identity))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -223,23 +223,23 @@ test_that("Test poisson(identity) with grouping", {
 
 test_that("Test poisson(sqrt)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = poisson(sqrt), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = poisson(sqrt))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = poisson(sqrt)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(sqrt) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(sqrt), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = poisson(sqrt))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(sqrt), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = poisson(sqrt)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
           expect_that(fit.db$std_err, is_equivalent_to(fit.r$coefficients[ , 2]))
 })
 
 test_that("Test poisson(sqrt) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = poisson(sqrt), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(sqrt)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = poisson(sqrt), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = poisson(sqrt))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[1]]$std_err, is_equivalent_to(fit.r[[1]]$coefficients[ , 2]))
@@ -253,21 +253,21 @@ test_that("Test poisson(sqrt) with grouping", {
 
 test_that("Test Gamma(inverse)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = Gamma(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = Gamma(inverse))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = Gamma(inverse)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(inverse) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = Gamma(inverse))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(inverse), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = Gamma(inverse)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(inverse) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(inverse), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(inverse)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(inverse), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(inverse))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[2]]$coef, is_equivalent_to(fit.r[[2]]$coefficients[ , 1]))
@@ -278,21 +278,21 @@ test_that("Test Gamma(inverse) with grouping", {
 
 test_that("Test Gamma(identity)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = Gamma(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = Gamma(identity))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = Gamma(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(identity) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = Gamma(identity))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = Gamma(identity)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(identity) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(identity), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(identity)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(identity), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(identity))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[2]]$coef, is_equivalent_to(fit.r[[2]]$coefficients[ , 1]))
@@ -303,21 +303,21 @@ test_that("Test Gamma(identity) with grouping", {
 
 test_that("Test Gamma(log)", {
           fit.db <- madlib.glm(rings ~ . - id - sex, data = dat, family = Gamma(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id - sex, data = dat.r, family = Gamma(log))
+          fit.r <- summary(glm(rings ~ . - id - sex, data = dat.r, family = Gamma(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(log) with categorical features", {
-          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- glm(rings ~ . - id | sex, data = dat.r, family = Gamma(log))
+          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- summary(glm(rings ~ . - id, data = dat.r, family = Gamma(log)))
 
           expect_that(fit.db$coef, is_equivalent_to(fit.r$coefficients[ , 1]))
 })
 
 test_that("Test Gamma(log) with grouping", {
-          fit.db <- madlib.glm(rings ~ . - id, data = dat, family = Gamma(log), control = list(max.iter = 20, use.glm = T))
-          fit.r <- lapply(1:3, function(i) glm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(log)))
+          fit.db <- madlib.glm(rings ~ . - id | sex, data = dat, family = Gamma(log), control = list(max.iter = 20, use.glm = T))
+          fit.r <- lapply(1:3, function(i) summary(glm(rings ~ . - id - sex, data = dat.r[dat.r$sex == fit.db[[i]]$sex, ], family = Gamma(log))))
 
           expect_that(fit.db[[1]]$coef, is_equivalent_to(fit.r[[1]]$coefficients[ , 1]))
           expect_that(fit.db[[2]]$coef, is_equivalent_to(fit.r[[2]]$coefficients[ , 1]))
