@@ -1,57 +1,100 @@
 \name{predict}
+
 \alias{predict.lm.madlib}
+
 \alias{predict.logregr.madlib}
+
 \alias{predict.lm.madlib.grps}
+
 \alias{predict.logregr.madlib.grps}
 
+\alias{predict.glm.madlib}
+
+\alias{predict.glm.madlib.grps}
+
 \title{
+
   Generate the \code{db.Rquery} object that can calculate the predictions
+
 }
 
 \description{
-  Generate the \code{db.Rquery} object that can calculate the
-  predictions for linear/logistic regressions. The actual result can be
-  viewed using \code{\link{lk}}.
+
+    Generate the \code{db.Rquery} object that can calculate the
+    predictions for linear/logistic regressions. The actual result can be
+    viewed using \code{\link{lk}}.
+
 }
+
 \usage{
+
 \method{predict}{lm.madlib}(object, newdata, ...)
 
 \method{predict}{lm.madlib.grps}(object, newdata, ...)
 
-\method{predict}{logregr.madlib}(object, newdata, type = c("response", "prob"), ...)
+\method{predict}{logregr.madlib}(object, newdata, type = c("response",
+                                  "prob"), ...)
 
-\method{predict}{logregr.madlib.grps}(object, newdata, type = c("response", "prob"), ...)
+\method{predict}{logregr.madlib.grps}(object, newdata, type
+= c("response", "prob"), ...)
+
+\method{predict}{glm.madlib}(object, newdata, type = c("response",
+                                  "prob"), ...)
+
+\method{predict}{glm.madlib.grps}(object, newdata, type = c("response",
+                                  "prob"), ...)
+
 }
 
 \arguments{
+
   \item{object}{
-    The
-  result of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}.
+
+    The result of \code{\link{madlib.lm}} and \code{\link{madlib.glm}}.
+
   }
 
   \item{newdata}{
-    A \code{db.obj} object, which contains the information about the
-    real data in the database.
+
+      A \code{db.obj} object, which contains the information about the
+      real data in the database.
+
   }
 
   \item{type}{
-    A string, default is \code{"response"}, which produces the \code{TRUE} or \code{FALSE} prediction. If it is \code{"prob"}, this function computes the probabilities for \code{TRUE} cases.
+
+      A string, default is \code{"response"}. It produces the predicted
+      results for the \code{newdata}. The alternative value is
+      \code{"prob"}, which is only used for \code{binomial{logit}} to
+      compute the probabilities.
+
+      A string, default is \code{"response"}, which produces the \code{TRUE}
+      or \code{FALSE} prediction. If it is \code{"prob"}, this function
+      computes the probabilities for \code{TRUE} cases.
+
   }
 
   \item{\dots}{
-    Extra parameters. Not implemented yet.
+
+      Extra parameters. Not implemented yet.
+
   }
+
 }
 
 \value{
-  A \code{\linkS4class{db.Rquery}} object, which contains the SQL query to compute the
-    predictions.
+
+    A \code{\linkS4class{db.Rquery}} object, which contains the SQL query to
+    compute the predictions.
+
 }
 
 \author{
- Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+    Author: Predictive Analytics Team at Pivotal Inc.
+
+    Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+
 }
 
 \seealso{
@@ -66,9 +109,12 @@
   \code{\link{groups.logregr.madlib.grps}} extract grouping column
   information from the fitted model(s).
 }
+
 \examples{
+
 \dontrun{
 %% @test .port Database port number
+
 %% @test .dbname Database name
 ## set up the database connection
 ## Assume that .port is port number and .dbname is the database name
@@ -131,6 +177,16 @@ ap$pred <- pred # add a column which is the predicted values
 random.sample <- lk(sort(ap, FALSE, NULL), 1000) # sort randomly
 
 plot(random.sample)
+
+## ------------------------------------------------------------
+## GLM prediction
+
+fit <- madlib.glm(rings ~ . - id | sex, data = x, family = poisson(log),
+                  control = list(max.iter = 20))
+
+p <- predict(f)
+
+lk(p, 10)
 
 db.disconnect(cid, verbose = FALSE)
 }

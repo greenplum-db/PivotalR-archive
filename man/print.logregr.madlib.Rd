@@ -1,8 +1,20 @@
-\name{print.logregr.madlib}
+\name{print}
+
 \alias{print.logregr.madlib}
+
 \alias{show.logregr.madlib}
+
 \alias{print.logregr.madlib.grps}
+
 \alias{show.logregr.madlib.grps}
+
+\alias{print.glm.madlib}
+
+\alias{print.glm.madlib.grps}
+
+\alias{show.glm.madlib}
+
+\alias{show.glm.madlib.grps}
 
 \title{Display results of logistic regression}
 
@@ -11,15 +23,26 @@
 }
 
 \usage{
-\method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits") -
-3L), ...)
 
-\method{print}{logregr.madlib.grps}(x, digits = max(3L,
-getOption("digits") - 3L), ...)
+\method{print}{logregr.madlib}(x, digits = max(3L, getOption("digits")
+- 3L), ...)
+
+\method{print}{logregr.madlib.grps}(x, digits = max(3L, getOption("digits")
+- 3L), ...)
 
 \method{show}{logregr.madlib}(object)
 
 \method{show}{logregr.madlib.grps}(object)
+
+\method{print}{glm.madlib}(x, digits = max(3L, getOption("digits") - 3L), ...)
+
+\method{print}{glm.madlib.grps}(x, digits = max(3L, getOption("digits") - 3L),
+      ...)
+
+\method{show}{glm.madlib}(object)
+
+\method{show}{glm.madlib.grps}(object)
+
 }
 
 \arguments{

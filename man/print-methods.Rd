@@ -1,4 +1,4 @@
-\name{print}
+\name{print-methods}
 
 \alias{print,db.data.frame-method}
 \alias{print,db.Rquery-method}

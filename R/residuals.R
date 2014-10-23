@@ -9,20 +9,16 @@
      - predict(object, object$data))
 }
 
-residuals.lm.madlib <- function(object, ...)
+## ----------------------------------------------------------------------
+
+residuals.glm.madlib <-
+    residuals.lm.madlib <-
+        residuals.logregr.madlib <- function(object, ...)
     .compute.resid(object)
 
 ## ----------------------------------------------------------------------
 
-residuals.logregr.madlib <- function(object, ...)
-    .compute.resid(object)
-
-## ----------------------------------------------------------------------
-
-residuals.lm.madlib.grps <- function(object, ...)
-    lapply(object, residuals)
-
-## ----------------------------------------------------------------------
-
-residuals.logregr.madlib.grps <- function(object, ...)
+residuals.glm.madlib.grps <-
+    residuals.lm.madlib.grps <-
+        residuals.logregr.madlib.grps <- function(object, ...)
     lapply(object, residuals)

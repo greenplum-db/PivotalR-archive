@@ -24,7 +24,7 @@ test_that("Examples of speed test",
           ## takes les than 2 seconds
           ## 1
           expect_that(madlib.lm(rings ~ . - id - sex, data = dat),
-                      takes_less_than(3)))
+                      takes_less_than(5)))
 
 ## ----------------------------------------------------------------------
 
@@ -85,10 +85,10 @@ test_that("Examples of testing string existence", {
 
 ## ----------------------------------------------------------------------
 
-test_that("Examples of testing errors",
-          ## 12
-          expect_that(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
-                      throws_error("syntax error")))
+# test_that("Examples of testing errors",
+#           ## 12
+#           expect_that(db.q("\\dn", verbose = FALSE, conn.id = cid), # prevent printing un-needed info
+#                       throws_error("syntax error")))
 
 ## ----------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ test_that("Examples of using multiple loops", {
         fit.this <- paste(fit.this, "+", var)
         for (n in rows)
             expect_that(madlib.lm(formula(fit.this), data = dat[dat$id < n, ]),
-                        takes_less_than(3))
+                        takes_less_than(5))
     }
 })
 
@@ -239,11 +239,11 @@ skip_if(TRUE, {
 
 db <- .get.dbms.str(cid)
 
-skip_if(db$db.str %in% c("HAWQ", "PostgreSQL"),
-        test_that("Skip this on HAWQ",
-                  ## 37
-                  expect_that(db.q("\\dn", verbose = FALSE),
-                              throws_error("syntax error"))))
+# skip_if(db$db.str %in% c("HAWQ", "PostgreSQL"),
+#         test_that("Skip this on HAWQ",
+#                   ## 37
+#                   expect_that(db.q("\\dn", verbose = FALSE),
+#                               throws_error("syntax error"))))
 
 test_that("Skip some tests", {
     tmp <- dat

@@ -30,10 +30,13 @@ export ("madlib.lm", "summary.lm.madlib",
 export ("madlib.glm", "summary.logregr.madlib",
         "print.logregr.madlib", "show.logregr.madlib",
         "summary.logregr.madlib.grps",
-        "print.logregr.madlib.grps", "show.logregr.madlib.grps")
+        "print.logregr.madlib.grps", "show.logregr.madlib.grps",
+        "summary.glm.madlib", "print.glm.madlib", "show.glm.madlib",
+        "summary.glm.madlib.grps", "print.glm.madlib.grps", "show.glm.madlib.grps")
 
 export("predict.lm.madlib", "predict.logregr.madlib",
-       "predict.lm.madlib.grps", "predict.logregr.madlib.grps")
+       "predict.lm.madlib.grps", "predict.logregr.madlib.grps",
+       "predict.glm.madlib", "predict.glm.madlib.grps")
 
 # export sample in the future
 # export ("sample")
@@ -93,20 +96,26 @@ export("clean.madlib.temp")
 export("db.default.schemas", "db.search.path")
 
 export("residuals.lm.madlib", "residuals.lm.madlib.grps",
-       "residuals.logregr.madlib", "residuals.logregr.madlib.grps")
+       "residuals.logregr.madlib", "residuals.logregr.madlib.grps",
+       "residuals.glm.madlib", "residuals.glm.madlib.grps")
 
 S3method(logLik, logregr.madlib)
 S3method(logLik, logregr.madlib.grps)
 S3method(logLik, lm.madlib)
 S3method(logLik, lm.madlib.grps)
+S3method(logLik, glm.madlib)
+S3method(logLik, glm.madlib.grps)
 
 S3method(extractAIC, logregr.madlib)
 S3method(extractAIC, logregr.madlib.grps)
 S3method(extractAIC, lm.madlib)
 S3method(extractAIC, lm.madlib.grps)
+S3method(extractAIC, glm.madlib)
+S3method(extractAIC, glm.madlib.grps)
 
 S3method(AIC, lm.madlib.grps)
 S3method(AIC, logregr.madlib.grps)
+S3method(AIC, glm.madlib.grps)
 
 S3method(as.data.frame, db.table)
 S3method(as.data.frame, db.view)
@@ -155,5 +164,5 @@ export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
 
 export("Vars", "Terms")
 
-export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib", 
+export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib",
         "predict.dt.madlib")
