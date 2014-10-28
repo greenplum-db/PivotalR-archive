@@ -644,10 +644,10 @@ print.glm.madlib.grps <- function(x,
     while (i <= n.grps) if (!all(is.na(x[[i]]$coef))) break
     if (i == n.grps + 1) stop("All models' coefficients are NAs!")
 
-    rows <- .extract.rows(x[[1]])
+    rows <- .extract.rows(x[[i]])
 
     cat("\nMADlib Generalized Linear Regression Result\n")
-    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), "\n", sep = "")
+    cat("\nCall:\n", paste(deparse(x[[i]]$call), sep = "\n", collapse = "\n"), "\n", sep = "")
     if (n.grps > 1) {
         cat("\nThe data is divided into", x$grps, "groups\n")
     }
