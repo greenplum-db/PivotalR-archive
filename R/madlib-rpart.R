@@ -11,7 +11,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
 {
     ## Some validations
     if ( ! is( data, "db.obj" ) )
-        stop( "madlib.dt can only be used on a db.obj object, ",
+        stop( "madlib.rpart can only be used on a db.obj object, ",
              "and ", deparse( substitute( data ) ), " is not!")
 
     if (missing(parms)) parms <- NULL

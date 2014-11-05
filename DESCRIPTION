@@ -2,7 +2,7 @@ Package: PivotalR
 Type: Package
 Title: A Fast, Easy-to-use Tool for Manipulating Tables in Databases
         and A Wrapper of MADlib
-Version: 0.1.17.42
+Version: 0.1.17.43
 Date: 2014-09-15
 Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>,
         with contributions from Data Scientist Team at Pivotal Inc.
