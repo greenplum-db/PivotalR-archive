@@ -2,8 +2,8 @@
 
 setClass("randomForest.madlib")
 
-madlib.randomForest <- function(formula, data, ntree = 100,
-                                sampsize = ceiling(.632*nrow(x)),
+madlib.randomForest <- function(formula, data, id = NULL, ntree = 100,
+                                mtry = ceiling(.632*nrow(x)),
                                 importance = FALSE, nPerm = 1,
                                 na.action = NULL, na.as.level = FALSE,
                                 control, verbose = FALSE, ...)
@@ -50,6 +50,31 @@ madlib.randomForest <- function(formula, data, ntree = 100,
 
     ## Extract other parameters that control the decision tree
     params2 <- .extract.dt.params.rf(control)
+
+    if (is.null(id) && identical(key(data), character(0)))
+        stop("MADlib random forest: you must specify an ID column!")
+    else
+        id.col <- if (is.null(id)) key(data) else id
+
+    ## Construct SQL string
+    tbl.source <- content(data)
+    madlib <- schema.madlib(conn.id)
+    tbl.output <- .unique.string()
+    sql <- paste("select ", madlib, ".forest_train('", tbl.source,
+                 "', '", tbl.output, "', '", id.col, "', '",
+                 params1$dep.str, "', '",
+                 gsub("(^array\\[|\\]$)", "", params1$ind.str), "', NULL,",
+                 grp, ", ", ntree, ", ", mtry, ", ", params2$maxdepth, ", ",
+                 params2$minsplit, ", ", params2$minbucket, ", ", params$nbins,
+                 ", ", verbose, ", ", importance, ", ", nPerm, ")", sep = "")
+
+    res <- .db(sql, conn.id = conn.id, verbose = FALSE)
+
+    model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
+                                   conn.id = conn.id, verbose = FALSE)
+    model.group <- db.data.frame(paste(tbl.output, "_group", sep = ""),
+                                 conn.id = conn.id, verbose = FALSE)
 
     .restore.warnings(warnings)
 }
