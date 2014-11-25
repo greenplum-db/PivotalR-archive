@@ -32,6 +32,6 @@ learning package [MADlib](http://madlib.net/) directly from R.
 3. To get started:
     * [Read the wiki](https://github.com/pivotalsoftware/PivotalR/wiki)
     * [Look at some demo code](https://github.com/pivotalsoftware/PivotalR/wiki/Example)
-    * [Watch a training video](https://docs.google.com/file/d/0B9bfZ-YiuzxQc1RWTEJJZ2V1TWc/edit?usp=sharing)
+    * [Watch a training video](https://www.youtube.com/watch?v=6cmyRCMY6j0)
     * [Read the quick-start guide](https://github.com/wjjung317/gp-r/blob/master/docs/PivotalR-quick-start%20v2.pdf)
     * [View the pivotal demo slides](https://docs.google.com/presentation/d/103dv1h4VBCBAixqpezJzWmffyrcRR2h9MCJBTfMOBIM/edit?usp=sharing)
