@@ -43,7 +43,7 @@ Class \code{"\linkS4class{db.obj}"}, by class "db.data.frame", distance 2.
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
 
 \seealso{

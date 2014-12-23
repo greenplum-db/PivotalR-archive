@@ -31,7 +31,7 @@ conn.eql(conn.id1, conn.id2)
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
 
 \seealso{

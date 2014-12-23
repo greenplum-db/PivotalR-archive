@@ -35,7 +35,7 @@
 \author{
   Author: Hong Ooi, Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
 
 \seealso{
