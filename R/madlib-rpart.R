@@ -85,7 +85,8 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  gsub("(^array\\[|\\]$)", "", params1$ind.str), "', NULL, '",
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
-                 ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
+                 ", ", params2$nbins, ", 'cp=", params2$cp, ", n_folds=", params2$n_folds, 
+                 "', 'max_surrogates=", params$max_surrogates, "', ", verbose, ")", sep = "")
 
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
