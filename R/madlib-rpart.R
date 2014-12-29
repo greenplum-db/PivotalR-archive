@@ -33,16 +33,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     warnings <- .suppress.warnings(conn.id) # suppress SQL/R warnings
 
     ## analyze the formula
-    #formula <- update(formula, ~ . - 1) # exclude constant
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
-
-    ## In order to deal with formula like " ~ . - id", we need a fake data
-    ## frame with the same column names
-    # fake.data <- as.data.frame(array(1, dim = c(1, length(names(data)))))
-    # names(fake.data) <- names(data)
-    #
-    # f.str <- paste(c(paste(deparse(update(formula(f.str[1]), ~ . - 1)), collapse = ""),
-    #                  if (is.na(f.str[2])) NULL else f.str[2]), collapse = " | ")
 
     f.str <- paste(c(paste(f.str[1], "- 1"),
                    if (is.na(f.str[2])) NULL else f.str[2]), collapse = " | ")
@@ -85,8 +76,8 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  gsub("(^array\\[|\\]$)", "", params1$ind.str), "', NULL, '",
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
-                 ", ", params2$nbins, ", 'cp=", params2$cp, ", n_folds=", params2$n_folds, 
-                 "', 'max_surrogates=", params$max_surrogates, "', ", verbose, ")", sep = "")
+                 ", ", params2$nbins, ", 'cp=", params2$cp, ", n_folds=", params2$n_folds,
+                 "', 'max_surrogates=", params2$max_surrogates, "', ", verbose, ")", sep = "")
 
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
@@ -192,7 +183,8 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...
 {
     default <- list(split = 'gini', minsplit = 20,
                     minbucket = round(20/3), maxdepth = 30,
-                    cp = 0.01, nbins = 100)
+                    cp = 0.01, nbins = 100, max_surrogates = 0,
+                    n_folds = 0)
 
     if ('split' %in% names(parms)) default$split <- parms$split
     if ('minsplit' %in% names(control)) default$minsplit <- control$minsplit
@@ -203,6 +195,8 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...
     if ('maxdepth' %in% names(control)) default$maxdepth <- control$maxdepth
     if ('cp' %in% names(control)) default$cp <- control$cp
     if ('nbins' %in% names(control)) default$nbins <- control$nbins
+    if ('max_surrogates' %in% names(control)) default$max_surrogates <- control$max_surrogates
+    if ('n_folds' %in% names(control)) default$n_folds <- control$n_folds
     default
 }
 
