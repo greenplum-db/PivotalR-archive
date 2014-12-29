@@ -98,7 +98,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
     tree.info <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame, ",
                  "cat_levels_in_text, cat_n_levels, ", madlib,
-                 "._get_split_thresholds(tree) as thresholds", grouping.str,
+                 "._get_split_thresholds(tree, ", n_cats, ") as thresholds", grouping.str,
                  " from ", sep = "", tbl.output, conn.id = conn.id, verbose = FALSE)
     cat_levels_in_text <- tree.info$cat_levels_in_text
     cat_n_levels <- tree.info$cat_n_levels
@@ -441,7 +441,7 @@ string.bounding.box <- function(s)
         splits[,2] <- 1
         is.leaf <- frames[[i]]$var == "<leaf>"
         meaningful <- index[-length(index)][!is.leaf]
-        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double"))
+        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double")[,2])
 
         catn <- arraydb.to.arrayr(cat.n[i], "integer")
         cat.node <- frames[[i]]$var %in% cat.features
