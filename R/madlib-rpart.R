@@ -78,7 +78,6 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
                  ", ", params2$nbins, ", 'cp=", params2$cp, ", n_folds=", params2$n_folds,
                  "', 'max_surrogates=", params2$max_surrogates, "', ", verbose, ")", sep = "")
-
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
@@ -350,12 +349,9 @@ plot.dt.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE, nsp
 {
     features <- .strip(.strip(strsplit(lk(model.summary$independent_varnames), ",")[[1]]), "\"")
     for (i in seq_len(length(frame))) {
-        ## for (j in 1:nrow(frame[[i]])) {
-        ##     frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
-        ## }
         frame[[i]][ , 1] <- sapply(frame[[i]][, 1], function(x) if (x < 0) "<leaf>" else features[x+1])
-        frame[[i]]$ncompete <- as.integer(frame[[i]][,1] != "<leaf>")
-        frame[[i]]$nsurrogate <- frame[[i]]$ncompete
+        frame[[i]]$ncompete <- 0
+        frame[[i]]$nsurrogate[frame[[i]][,1] == "<leaf>"] <- 0
     }
     frame
 }
@@ -409,7 +405,7 @@ string.bounding.box <- function(s)
 }
 
 ## ------------------------------------------------------------
-
+## The index of split node in splits matrix
 .get.splits.index <- function(frame)
 {
     ff <- frame
@@ -440,8 +436,7 @@ string.bounding.box <- function(s)
         splits <- matrix(0, nrow=max(index)-1, ncol=4)
         splits[,2] <- 1
         is.leaf <- frames[[i]]$var == "<leaf>"
-        meaningful <- index[-length(index)][!is.leaf]
-        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double")[,2])
+        splits[,4] <- matrix(arraydb.to.arrayr(thresholds[i], "double"), ncol=2)[,2]
 
         catn <- arraydb.to.arrayr(cat.n[i], "integer")
         cat.node <- frames[[i]]$var %in% cat.features
