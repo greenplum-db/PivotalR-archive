@@ -41,7 +41,7 @@ For \code{lm.madlib.grps} and \code{logregr.madlib.grps} objects, which are a li
 \author{
   Author: Hong Ooi, Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
 
 \seealso{

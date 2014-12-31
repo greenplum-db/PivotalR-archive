@@ -100,7 +100,7 @@ include
   Inc. \email{user@madlib.net},  with contributions
   from Data Scientist Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
 \references{
   [1] MADlib website, \url{http://madlib.net}
