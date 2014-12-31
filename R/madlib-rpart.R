@@ -33,16 +33,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     warnings <- .suppress.warnings(conn.id) # suppress SQL/R warnings
 
     ## analyze the formula
-    #formula <- update(formula, ~ . - 1) # exclude constant
     f.str <- strsplit(paste(deparse(formula), collapse = ""), "\\|")[[1]]
-
-    ## In order to deal with formula like " ~ . - id", we need a fake data
-    ## frame with the same column names
-    # fake.data <- as.data.frame(array(1, dim = c(1, length(names(data)))))
-    # names(fake.data) <- names(data)
-    #
-    # f.str <- paste(c(paste(deparse(update(formula(f.str[1]), ~ . - 1)), collapse = ""),
-    #                  if (is.na(f.str[2])) NULL else f.str[2]), collapse = " | ")
 
     f.str <- paste(c(paste(f.str[1], "- 1"),
                    if (is.na(f.str[2])) NULL else f.str[2]), collapse = " | ")
@@ -85,8 +76,8 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
                  gsub("(^array\\[|\\]$)", "", params1$ind.str), "', NULL, '",
                  params2$split, "', ", grp, ", ", weight.col, ", ",
                  params2$maxdepth, ", ", params2$minsplit, ", ", params2$minbucket,
-                 ", ", params2$nbins, ", 'cp=", params2$cp, "', ", verbose, ")", sep = "")
-
+                 ", ", params2$nbins, ", 'cp=", params2$cp, ", n_folds=", params2$n_folds,
+                 "', 'max_surrogates=", params2$max_surrogates, "', ", verbose, ")", sep = "")
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
@@ -106,7 +97,7 @@ madlib.rpart <- function(formula, data, weights = NULL, id = NULL,
     n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
     tree.info <- .db("select ", madlib, "._convert_to_rpart_format(tree, ", n_cats, ") as frame, ",
                  "cat_levels_in_text, cat_n_levels, ", madlib,
-                 "._get_split_thresholds(tree) as thresholds", grouping.str,
+                 "._get_split_thresholds(tree, ", n_cats, ") as thresholds", grouping.str,
                  " from ", sep = "", tbl.output, conn.id = conn.id, verbose = FALSE)
     cat_levels_in_text <- tree.info$cat_levels_in_text
     cat_n_levels <- tree.info$cat_n_levels
@@ -191,7 +182,8 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...
 {
     default <- list(split = 'gini', minsplit = 20,
                     minbucket = round(20/3), maxdepth = 30,
-                    cp = 0.01, nbins = 100)
+                    cp = 0.01, nbins = 100, max_surrogates = 0,
+                    n_folds = 0)
 
     if ('split' %in% names(parms)) default$split <- parms$split
     if ('minsplit' %in% names(control)) default$minsplit <- control$minsplit
@@ -202,6 +194,8 @@ predict.dt.madlib <- function(object, newdata, type = c("response", "prob"), ...
     if ('maxdepth' %in% names(control)) default$maxdepth <- control$maxdepth
     if ('cp' %in% names(control)) default$cp <- control$cp
     if ('nbins' %in% names(control)) default$nbins <- control$nbins
+    if ('max_surrogates' %in% names(control)) default$max_surrogates <- control$max_surrogates
+    if ('n_folds' %in% names(control)) default$n_folds <- control$n_folds
     default
 }
 
@@ -355,12 +349,9 @@ plot.dt.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE, nsp
 {
     features <- .strip(.strip(strsplit(lk(model.summary$independent_varnames), ",")[[1]]), "\"")
     for (i in seq_len(length(frame))) {
-        ## for (j in 1:nrow(frame[[i]])) {
-        ##     frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
-        ## }
         frame[[i]][ , 1] <- sapply(frame[[i]][, 1], function(x) if (x < 0) "<leaf>" else features[x+1])
-        frame[[i]]$ncompete <- as.integer(frame[[i]][,1] != "<leaf>")
-        frame[[i]]$nsurrogate <- frame[[i]]$ncompete
+        frame[[i]]$ncompete <- 0
+        frame[[i]]$nsurrogate[frame[[i]][,1] == "<leaf>"] <- 0
     }
     frame
 }
@@ -414,7 +405,7 @@ string.bounding.box <- function(s)
 }
 
 ## ------------------------------------------------------------
-
+## The index of split node in splits matrix
 .get.splits.index <- function(frame)
 {
     ff <- frame
@@ -445,8 +436,7 @@ string.bounding.box <- function(s)
         splits <- matrix(0, nrow=max(index)-1, ncol=4)
         splits[,2] <- 1
         is.leaf <- frames[[i]]$var == "<leaf>"
-        meaningful <- index[-length(index)][!is.leaf]
-        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double"))
+        splits[,4] <- matrix(arraydb.to.arrayr(thresholds[i], "double"), ncol=2)[,2]
 
         catn <- arraydb.to.arrayr(cat.n[i], "integer")
         cat.node <- frames[[i]]$var %in% cat.features

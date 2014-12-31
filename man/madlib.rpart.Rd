@@ -36,7 +36,7 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
     A function, which filters the \code{NULL} values from the data. Not implemented yet.
 }
   \item{parms}{
-    A list, which includes parameters for the splitting function. Supported parameters 
+    A list, which includes parameters for the splitting function. Supported parameters
     include:
     'split' specifying which split function to use. Options are 'gini', 'misclssification'
     and 'entropy' for classification, and 'mse' for regression. Default is 'gini' for
@@ -44,22 +44,26 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
 }
   \item{control}{
     A list, which includes parameters for the fit. Supported parameters include:
-    'minsplit' - minimum number of observations that must be present in a node for a 
+    'minsplit' - minimum number of observations that must be present in a node for a
     split to be attempted. default is minsplit=20
-    
-    'minbucket' - Minimum number of observations in any terminal node, 
+
+    'minbucket' - Minimum number of observations in any terminal node,
     default is min_split/3
-    
-    'maxdepth' - Maximum depth of any node, default is maxdepth=10 
-    
-    'nbins' - Number of bins to find possible node split threshold values for continuous                   
-               variables, default is 100 (Must be greater than 1) 
-    
+
+    'maxdepth' - Maximum depth of any node, default is maxdepth=10
+
+    'nbins' - Number of bins to find possible node split threshold values for continuous
+               variables, default is 100 (Must be greater than 1)
+
     'cp' - Cost complexity parameter, default is cp=0.01
-    
+
+    'n_folds' - Number of cross-validation folds
+
+    'max_surrogates' - The number of surrogates number
+
 }
   \item{na.as.level}{
-    A boolean, indicating if NULL value for a categorical variable is treated as a 
+    A boolean, indicating if NULL value for a categorical variable is treated as a
     distinct level, default is na.as.level=false
 }
   \item{verbose}{
@@ -82,11 +86,11 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
   Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}  
 }
 
-\seealso{ 
-  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are 
-  visualization functions for a model fitted through madlib.rpart 
-  
-  \code{\link{predict.dt.madlib}} is a wrapper for MADlib's predict function for 
+\seealso{
+  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are
+  visualization functions for a model fitted through madlib.rpart
+
+  \code{\link{predict.dt.madlib}} is a wrapper for MADlib's predict function for
   decision trees.
 
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
@@ -105,15 +109,15 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 lk(x, 10)
 
-## decision tree using abalone data, using default values of minsplit, 
+## decision tree using abalone data, using default values of minsplit,
 ## maxdepth etc.
 key(x) <- "id"
-fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell, 
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell,
        data=x, parms = list(split='gini'), control = list(cp=0.005))
 fit
 
-## Another example, using grouping  
-fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell | sex, 
+## Another example, using grouping
+fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell | sex,
        data=x, parms = list(split='gini'), control = list(cp=0.005))
 fit
 
