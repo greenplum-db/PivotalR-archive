@@ -234,11 +234,11 @@ setGeneric("rowSums")
 .row.action <- function (x, action)
 {
     x <- db.array(x)[,]
-    ## Reduce(function(l,r) l+r, as.list(x))
     res <- x[,1]
     res@.expr <- paste(x@.expr, collapse = action)
-    res@.content <- gsub("^select 1 as", paste("select", res@.expr, "as"),
-                         res@.content)
+    ## Use the non-greedy regular expression '?'
+    res@.content <- gsub("^select .*? as", paste("select", res@.expr, "as"),
+                         res@.content, perl=T)
     res
 }
 
