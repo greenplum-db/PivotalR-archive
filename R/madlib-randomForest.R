@@ -72,14 +72,10 @@ madlib.randomForest <- function(formula, data, id = NULL,
     else
         id.col <- if (is.null(id)) key(data) else id
 
-    print(id.col)
     ## Construct SQL string
     tbl.source <- content(data) # data table name
     madlib <- schema.madlib(conn.id) # MADlib schema
-    print(madlib)
     tbl.output <- .unique.string()
-    print(tbl.output)
-    print(data['id'])
     sql <- paste("select ", madlib, ".forest_train('", 
                  tbl.source, 
                  "', '", 
@@ -118,14 +114,11 @@ madlib.randomForest <- function(formula, data, id = NULL,
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
-    print(model)
     model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
-    print(model.summary)
+    model.group <- db.data.frame(paste(tbl.output, "_group", sep = ""),
+                                   conn.id = conn.id, verbose = FALSE)
     method <- if (lk(model.summary$is_classification)) "classification" else "regression"
-    print(method)
-    functions <- .assign.functions(method)
-
     
     .restore.warnings(warnings)
 
@@ -136,18 +129,57 @@ madlib.randomForest <- function(formula, data, id = NULL,
         grouping.str <- paste(", ", paste(grouping.cols, collapse = ','))
 
     n_cats <- length(strsplit(lk(model.summary$cat_features), ",")[[1]])
-    print("about to print some stuff")
     num_random_features <- lk(model.summary$num_random_features)
     ntrees <- lk(model.summary$num_trees)
-    print(num_random_features)
-    print(ntrees)
+    func_name <- paste(madlib, ".forest_train", sep = "")
+    #create variable importance matrix
+    cat_features  <- strsplit(lk(model.summary$cat_features),",")[[1]]
+    con_features  <- strsplit(lk(model.summary$con_features),",")[[1]]
+    cat_var_imp <- c(lk(model.group$cat_var_importance)[1,])
+    con_var_imp  <- c(lk(model.group$con_var_importance)[1,])
+    
+    len_cat_features <- length(cat_features)
+    len_con_features <- length(con_features)
+   
+    len_cat_var_imp <- length(cat_var_imp)
+    len_con_var_imp <- length(con_var_imp)
+   
+    cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
+    if (is.na(cat_var_imp[1])) {
+        len_cat_var_imp <- 0
+        cat_con_combined_var_imp <- con_var_imp
+    }
+    if (is.na(con_var_imp[1])) {
+        len_con_var_imp <- 0
+        cat_con_combined_var_imp <- cat_var_imp
+    }
+    if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
+        len_cat_var_imp <- 0
+        len_con_var_imp <- 0
+        cat_con_combined_var_imp <- NA
+    }
+ 
+   
+    var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
+    rownames(var_imp)  <- c(cat_features, con_features)
+    if (method == "classification") {
+        colnames(var_imp) <- c('MeanDecreaseAccuracy')
+    } else {
+        colnames(var_imp) <- c('MeanIncreaseMSE')
+    }
+    if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
+        var_imp[,1] <- cat_con_combined_var_imp
+    }
     rst <- list(model = model, model.summary = model.summary,
-                type = method, functions = functions, data = origin.data,
+                type = method, data = origin.data,
                 mtry = num_random_features, 
-                ntree = ntrees, call = madlib + ".forest_train" )
+                ntree = ntrees, call = func_name,
+                importance = var_imp)
+    
     class(rst) <- "rf.madlib"
     rst
 }
+
 
 ## ------------------------------------------------------------
 
@@ -164,7 +196,7 @@ predict.rf.madlib <- function(object, newdata, type = c("response", "prob"), ...
     conn.id <- conn.id(newdata)
     tbl.predict <- .unique.string()
     madlib <- schema.madlib(conn.id)
-    sql = paste("select ", madlib, ".tree_predict('", .strip(content(object$model), "\""),
+    sql = paste("select ", madlib, ".forest_predict('", .strip(content(object$model), "\""),
                 "', '", sub("\".\"",".",.strip(content(newdata), "\"")), "', '", tbl.predict, "', '",
                 type, "')", sep = "")
     .db(sql, conn.id = conn.id, verbose = FALSE)
@@ -206,98 +238,6 @@ print.rf.madlib <- function(x,
     out <- capture.output(print(x))
     writeLines(out)
 }
-
-## ------------------------------------------------------------
-
-plot.rf.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE, nspace,
-                           margin = 0, minbranch = 0.3, ...)
-{
-    library(rpart)
-    class(x) <- "rpart"
-    plot(x, uniform=uniform, branch=branch, compress=compress, nspace=nspace,
-         margin=margin, minbranch=minbranch, ...)
-}
-
-## ------------------------------------------------------------
-
-.assign.functions <- function(method)
-{
-    if (method=="anova") {
-        list(summary = function (yval, dev, wt, ylevel, digits)
-        {
-            paste0("  mean=", formatg(yval, digits), ", MSE=", formatg(dev/wt,
-                digits))
-            },
-
-            text = function (yval, dev, wt, ylevel, digits, n, use.n)
-            {
-                if (use.n)
-                paste0(formatg(yval, digits), "\nn=", n)
-                else formatg(yval, digits)
-                })
-        } else {
-            list(
-                 summary = function (yval, dev, wt, ylevel, digits)
-                 {
-                     nclass <- (ncol(yval) - 2L)/2L
-                     group <- yval[, 1L]
-                     counts <- yval[, 1L + (1L:nclass)]
-                     yprob <- yval[, 1L + nclass + 1L:nclass]
-                     nodeprob <- yval[, 2L * nclass + 2L]
-                     if (!is.null(ylevel))
-                         group <- ylevel[group]
-                     temp1 <- formatg(counts, format = "%5g")
-                     temp2 <- formatg(yprob, format = "%5.3f")
-                     if (nclass > 1) {
-                         temp1 <- apply(matrix(temp1, ncol = nclass), 1L, paste,
-                                        collapse = " ")
-                         temp2 <- apply(matrix(temp2, ncol = nclass), 1L, paste,
-                                        collapse = " ")
-                     }
-                     dev <- dev/(wt[1L] * nodeprob)
-                     paste0("  predicted class=", format(group, justify = "left"),
-                            "  expected loss=", formatg(dev, digits), "  P(node) =",
-                            formatg(nodeprob, digits), "\n", "    class counts: ",
-                            temp1, "\n", "   probabilities: ", temp2)
-                 },
-                 print = function (yval, ylevel, digits)
-                 {
-                     temp <- if (is.null(ylevel))
-                         as.character(yval[, 1L])
-                     else ylevel[yval[, 1L]]
-                     nclass <- (ncol(yval) - 2L)/2L
-                     yprob <- if (nclass < 5L)
-                         format(yval[, 1L + nclass + 1L:nclass], digits = digits,
-                                nsmall = digits)
-                     else formatg(yval[, 1L + nclass + 1L:nclass], digits = 2L)
-                     if (!is.matrix(yprob))
-                         yprob <- matrix(yprob, nrow = 1L)
-                     temp <- paste0(temp, " (", yprob[, 1L])
-                     for (i in 2L:ncol(yprob)) temp <- paste(temp, yprob[, i],
-                                                             sep = " ")
-                     temp <- paste0(temp, ")")
-                     temp
-                 },
-                 text = function (yval, dev, wt, ylevel, digits, n, use.n)
-                 {
-                     nclass <- (ncol(yval) - 2L)/2L
-                     group <- yval[, 1L]
-                     counts <- yval[, 1L + (1L:nclass)]
-                     #counts <- as.matrix(counts)
-                     if (!is.null(ylevel))
-                         group <- ylevel[group]
-                     temp1 <- formatg(counts, digits)
-                     if (nclass > 1L)
-                         temp1 <- apply(matrix(temp1, ncol = nclass), 1L, paste,
-                                        collapse = "/")
-                     if (use.n)
-                         paste0(format(group, justify = "left"), "\n", temp1)
-                     else format(group, justify = "left")
-                 })
-    }
-}
-
-## ------------------------------------------------------------
 
 ## get the dimension of the raprt frame matrix
 .get.rpart.frame.ncol <- function(model.summary)
