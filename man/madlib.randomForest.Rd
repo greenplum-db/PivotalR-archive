@@ -2,17 +2,16 @@
 \alias{madlib.randomForest}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-MADlib wrapper function for Decision Tree
+MADlib wrapper function for Random Forest
 }
 \description{
-    This function is a wrapper of MADlib's decision tree model training
-    function. The resulting tree is stored in a table in the database, and one
-    can also view the result from R using \code{\link{plot.dt.madlib}},
-    \code{\link{text.dt.madlib}} and \code{\link{print.dt.madlib}}.
+    This function is a wrapper of MADlib's random forest model training
+    function. The resulting forest is stored in a table in the database, and one
+    can also view the result from R using \code{\link{text.dt.madlib}}.
 }
 \usage{
-madlib.rpart(formula, data, weights = NULL, id = NULL, na.action = NULL, parms,
-control, na.as.level = FALSE, verbose = FALSE, ...) }
+madlib.randomForest(formula, data, id = NULL, na.action = NULL, nTree = 100,
+importance = FALSE, nPerm = 1, control, na.as.level = FALSE, verbose = FALSE, ...) }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{
@@ -23,24 +22,25 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
   \item{data}{
     A \code{\linkS4class{db.obj}} object, which wraps the data in the database.
 }
-  \item{weights}{
-    A string, the column name for the weights.
-}
   \item{id}{
     A string, the index for each row. If \code{\link{key}} has been specified for
     \code{data}, teh key will be used as the ID unless this argument is also specified.
     We have to have this specified so that \code{\link{predict.dt.madlib}}'s result can
     be compared with the original data.
 }
+  \item{nTree}{
+    An integer, maximum number of trees to grow in the random forest model, default is 
+    100.
+}
+  \item{importance}{
+    A boolean, whether or not to calculate variable importance, default is FALSE.
+}
+  \item{nPerm}{
+    An integer, number of times to permute each feature value while calculating 
+    variable importance, default is 1.
+}
   \item{na.action}{
     A function, which filters the \code{NULL} values from the data. Not implemented yet.
-}
-  \item{parms}{
-    A list, which includes parameters for the splitting function. Supported parameters 
-    include:
-    'split' specifying which split function to use. Options are 'gini', 'misclssification'
-    and 'entropy' for classification, and 'mse' for regression. Default is 'gini' for
-    classification and 'mse' for regression.
 }
   \item{control}{
     A list, which includes parameters for the fit. Supported parameters include:
@@ -55,7 +55,7 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
     'nbins' - Number of bins to find possible node split threshold values for continuous                   
                variables, default is 100 (Must be greater than 1) 
     
-    'cp' - Cost complexity parameter, default is cp=0.01
+    'max_surrogates' - Number of surrogate splits at each node in the trees constructed.
     
 }
   \item{na.as.level}{
@@ -70,28 +70,28 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
 }
 }
 \value{
-  An S3 object of type dt.madlib in the case of non-grouping, and of type
-  dt.madlib.grp in the case of grouping.
+  An S3 object of type rf.madlib in the case of non-grouping, and of type
+  rf.madlib.grp in the case of grouping.
 }
 \references{
-[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
+[1] Documentation of random forest in MADlib 1.7, \url{http://doc.madlib.net/latest/}
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Hai Qian, Pivotal Inc. \email{hqian@pivotal.io}  
+  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}  
 }
 
 \seealso{ 
-  \code{\link{plot.dt.madlib}}, \code{\link{text.dt.madlib}}, \code{\link{print.dt.madlib}} are 
-  visualization functions for a model fitted through madlib.rpart 
+  \code{\link{print.rf.madlib}} function to print summary of a model fitted 
+  through madlib.randomForest
   
-  \code{\link{predict.dt.madlib}} is a wrapper for MADlib's predict function for 
-  decision trees.
+  \code{\link{predict.rf.madlib}} is a wrapper for MADlib's predict function for 
+  random forests.
 
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
-        \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}
-            are all MADlib wrapper functions.
+        \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}, 
+        \code{\link{madlib.rpart}} are all MADlib wrapper functions.
 }
 
 \examples{
@@ -108,13 +108,13 @@ lk(x, 10)
 ## decision tree using abalone data, using default values of minsplit, 
 ## maxdepth etc.
 key(x) <- "id"
-fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell, 
-       data=x, parms = list(split='gini'), control = list(cp=0.005))
+fit <- madlib.randomForest(rings < 10 ~ length + diameter + height + whole + shell, 
+       data=x)
 fit
 
 ## Another example, using grouping  
-fit <- madlib.rpart(rings < 10 ~ length + diameter + height + whole + shell | sex, 
-       data=x, parms = list(split='gini'), control = list(cp=0.005))
+fit <- madlib.ramdomForest(rings < 10 ~ length + diameter + height + whole + shell | sex, 
+       data=x) 
 fit
 
 db.disconnect(cid)
