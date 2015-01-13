@@ -135,48 +135,93 @@ madlib.randomForest <- function(formula, data, id = NULL,
     #create variable importance matrix
     cat_features  <- strsplit(lk(model.summary$cat_features),",")[[1]]
     con_features  <- strsplit(lk(model.summary$con_features),",")[[1]]
-    cat_var_imp <- c(lk(model.group$cat_var_importance)[1,])
-    con_var_imp  <- c(lk(model.group$con_var_importance)[1,])
+    cat_var_imp <- lk(model.group$cat_var_importance)
+    con_var_imp  <- lk(model.group$con_var_importance)
     
     len_cat_features <- length(cat_features)
     len_con_features <- length(con_features)
-   
-    len_cat_var_imp <- length(cat_var_imp)
-    len_con_var_imp <- length(con_var_imp)
-   
-    cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
-    if (is.na(cat_var_imp[1])) {
-        len_cat_var_imp <- 0
-        cat_con_combined_var_imp <- con_var_imp
-    }
-    if (is.na(con_var_imp[1])) {
-        len_con_var_imp <- 0
-        cat_con_combined_var_imp <- cat_var_imp
-    }
-    if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
-        len_cat_var_imp <- 0
-        len_con_var_imp <- 0
-        cat_con_combined_var_imp <- NA
-    }
- 
-   
-    var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
-    rownames(var_imp)  <- c(cat_features, con_features)
-    if (method == "classification") {
-        colnames(var_imp) <- c('MeanDecreaseAccuracy')
-    } else {
-        colnames(var_imp) <- c('MeanIncreaseMSE')
-    }
-    if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
-        var_imp[,1] <- cat_con_combined_var_imp
-    }
-    rst <- list(model = model, model.summary = model.summary,
-                type = method, data = origin.data,
-                mtry = num_random_features, 
-                ntree = ntrees, call = func_name,
-                importance = var_imp)
     
-    class(rst) <- "rf.madlib"
+    #populate result matrix for grouping vs non-grouping cases
+    ngrps <- lk(model.summary$num_all_groups)
+    if (ngrps == 1) { #no grouping
+        cat_var_imp <- c(cat_var_imp[1,])
+        con_var_imp <- c(con_var_imp[1,])
+
+        len_cat_var_imp <- length(cat_var_imp)
+        len_con_var_imp <- length(con_var_imp)
+       
+        cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
+        if (is.na(cat_var_imp[1])) {
+            len_cat_var_imp <- 0
+            cat_con_combined_var_imp <- con_var_imp
+        }
+        if (is.na(con_var_imp[1])) {
+            len_con_var_imp <- 0
+            cat_con_combined_var_imp <- cat_var_imp
+        }
+        if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
+            len_cat_var_imp <- 0
+            len_con_var_imp <- 0
+            cat_con_combined_var_imp <- NA
+        }
+     
+        var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
+        rownames(var_imp)  <- c(cat_features, con_features)
+        if (method == "classification") {
+            colnames(var_imp) <- c('MeanDecreaseAccuracy')
+        } else {
+            colnames(var_imp) <- c('MeanIncreaseMSE')
+        }
+        if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
+            var_imp[,1] <- cat_con_combined_var_imp
+        }
+        rst <- list(model = model, model.summary = model.summary,
+                    type = method, data = origin.data,
+                    mtry = num_random_features, 
+                    ntree = ntrees, call = func_name,
+                    importance = var_imp)
+        class(rst) <- "rf.madlib"
+    } else { #grouping
+        rst <- lapply(seq_len(ngrps), function(i) {
+                    cat_var_imp <- c(cat_var_imp[i,])
+                    con_var_imp <- c(con_var_imp[i,])
+                    len_cat_var_imp <- length(cat_var_imp)
+                    len_con_var_imp <- length(con_var_imp)
+                   
+                    cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
+                    if (is.na(cat_var_imp[1])) {
+                        len_cat_var_imp <- 0
+                        cat_con_combined_var_imp <- con_var_imp
+                    }
+                    if (is.na(con_var_imp[1])) {
+                        len_con_var_imp <- 0
+                        cat_con_combined_var_imp <- cat_var_imp
+                    }
+                    if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
+                        len_cat_var_imp <- 0
+                        len_con_var_imp <- 0
+                        cat_con_combined_var_imp <- NA
+                    }
+                 
+                    var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
+                    rownames(var_imp)  <- c(cat_features, con_features)
+                    if (method == "classification") {
+                        colnames(var_imp) <- c('MeanDecreaseAccuracy')
+                    } else {
+                        colnames(var_imp) <- c('MeanIncreaseMSE')
+                    }
+                    if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
+                        var_imp[,1] <- cat_con_combined_var_imp
+                    }
+                     r <- list(model = model, model.summary = model.summary,
+                               type = method, data = origin.data,
+                               mtry = num_random_features, ntree = ntrees,
+                               call = func_name,
+                               importance = var_imp)
+                    })
+        for (i in seq_len(ngrps)) class(rst[[i]])  <- "rf.madlib"
+        class(rst)  <- "rf.madlib.grps"
+    }
     rst
 }
 
