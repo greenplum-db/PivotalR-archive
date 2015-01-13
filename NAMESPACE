@@ -168,4 +168,4 @@ export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib",
         "predict.dt.madlib")
 
 export("madlib.randomForest", "print.rf.madlib", "text.rf.madlib", 
-        "predict.rf.madlib")
+        "predict.rf.madlib", "getTree.rf.madlib")

@@ -206,6 +206,21 @@ predict.rf.madlib <- function(object, newdata, type = c("response", "prob"), ...
 
 ## ------------------------------------------------------------
 
+getTree.rf.madlib <- function (object, k=1, tbl.output, ...)
+{
+    #output matrix similar to R's randomForest
+    n_cats <- 1
+    #print(tbl.output)
+    print(madlib)
+    sql <- paste("select ", "madlib", "._convert_to_random_forest_format(tree, ", n_cats, " ) as frame ",
+                 "from (select tree, row_number() OVER () as rnum from ", tbl.output, 
+                 ")subq where subq.rnum = ", k, sep="")
+    print(sql)
+    tree.info <- .db(sql)
+    print(tree.info)
+}
+## ------------------------------------------------------------
+
 ## Extract other parameters
 ## control - a list, right now support "minsplit", "minbucket",
 ## "maxdepth" and "cp"
