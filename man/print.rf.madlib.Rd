@@ -6,7 +6,7 @@
 }
 \description{
     This function prints the result of \code{\link{madlib.randomForest}} to the screen. It
-    internally calls R's \code{\link{print.randomForest}} function.
+    internally calls R's print function for random forests.
 }
 
 \usage{
@@ -16,12 +16,21 @@
 
 }
 
-\references{ [1] Documentation of decision
-    tree in MADlib 1.6, \url{http://doc.madlib.net/latest/} } \author{ Author:
+\arguments{ 
+    \item{x}{ The fitted forest from the result of
+        \code{\link{madlib.randomForest}} } 
+    \item{digits}{ The number of digits to
+        print for numerical values. } 
+    \item{\dots}{ Arguments to be passed to
+        or from other methods. } } 
+\references{ [1] Documentation of random
+    forest in MADlib 1.7, \url{http://doc.madlib.net/latest/} } 
+\author{ Author:
     Predictive Analytics Team at Pivotal Inc.
 
   Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
 }
+
 
 \seealso{
   \code{\link{madlib.randomForest}} is the wrapper for MADlib's forest_train function for random forests.

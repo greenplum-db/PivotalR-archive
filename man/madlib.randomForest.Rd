@@ -7,11 +7,12 @@ MADlib wrapper function for Random Forest
 \description{
     This function is a wrapper of MADlib's random forest model training
     function. The resulting forest is stored in a table in the database, and one
-    can also view the result from R using \code{\link{text.dt.madlib}}.
+    can also view the result from R using \code{\link{print.rf.madlib}}.
 }
 \usage{
-madlib.randomForest(formula, data, id = NULL, na.action = NULL, nTree = 100,
-importance = FALSE, nPerm = 1, control, na.as.level = FALSE, verbose = FALSE, ...) }
+madlib.randomForest(formula, data, id = NULL, ntree = 100,
+importance = FALSE, nPerm = 1, na.action = NULL, control, 
+na.as.level = FALSE, verbose = FALSE, ...) }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{
@@ -24,11 +25,11 @@ importance = FALSE, nPerm = 1, control, na.as.level = FALSE, verbose = FALSE, ..
 }
   \item{id}{
     A string, the index for each row. If \code{\link{key}} has been specified for
-    \code{data}, teh key will be used as the ID unless this argument is also specified.
-    We have to have this specified so that \code{\link{predict.dt.madlib}}'s result can
+    \code{data}, the key will be used as the ID unless this argument is also specified.
+    We have to have this specified so that \code{\link{predict.rf.madlib}}'s result can
     be compared with the original data.
 }
-  \item{nTree}{
+  \item{ntree}{
     An integer, maximum number of trees to grow in the random forest model, default is 
     100.
 }

@@ -167,5 +167,5 @@ export("Vars", "Terms")
 export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib",
         "predict.dt.madlib")
 
-export("madlib.randomForest", "print.rf.madlib", "text.rf.madlib", 
+export("madlib.randomForest", "print.rf.madlib",  
         "predict.rf.madlib", "getTree.rf.madlib")

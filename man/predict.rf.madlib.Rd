@@ -65,8 +65,8 @@
 
     \code{\link{predict.lm.madlib}}, \code{\link{predict.logregr.madlib}},
     \code{\link{predict.elnet.madlib}}, \code{\link{predict.arima.css.madlib}}, 
-    \code{\link{predict.dt.malib}} are all predict functions related to 
-    MADlib wrapper functions.
+    \code{\link{predict.dt.madlib}}, \code{\link{predict.rf.madlib}} 
+    are all predict functions related to MADlib wrapper functions.
 }
 \examples{
 \dontrun{

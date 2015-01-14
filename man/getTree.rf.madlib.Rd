@@ -20,6 +20,9 @@ getTree.rf.madlib(object, k=1, ...) }
     Id of the tree to be retrieved. Can range between 1 and maximum number of trees
     in the forest. default is 1.
 }
+  \item{\dots}{
+      Arguments to be passed to or from other methods.
+}
 }
 \value{
   A data frame object similar to R's getTree result.
