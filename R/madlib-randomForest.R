@@ -251,18 +251,23 @@ predict.rf.madlib <- function(object, newdata, type = c("response", "prob"), ...
 
 ## ------------------------------------------------------------
 
-getTree.rf.madlib <- function (object, k=1, tbl.output, ...)
+getTree.rf.madlib <- function (object, k=1, ...)
 {
-    #output matrix similar to R's randomForest
-    n_cats <- 1
-    #print(tbl.output)
-    print(madlib)
-    sql <- paste("select ", "madlib", "._convert_to_random_forest_format(tree, ", n_cats, " ) as frame ",
+    tbl.output  <- attr(object$model, ".name")
+    ntrees <- lk(object$model.summary$num_trees)
+    if (k <= 0 || k > ntrees) {
+        stop(paste("tree not found. maximum number of trees in forest is ",ntrees))
+    }
+    sql <- paste("select ", "madlib", "._convert_to_random_forest_format(tree ", " ) as frame ",
                  "from (select tree, row_number() OVER () as rnum from ", tbl.output, 
                  ")subq where subq.rnum = ", k, sep="")
-    print(sql)
     tree.info <- .db(sql)
-    print(tree.info)
+    frame  <- tree.info$frame
+    frame.matrix <- data.frame(matrix(arraydb.to.arrayr(frame,"numeric"),ncol=6))
+    colnames(frame.matrix) <- c('left daughter','right daughter',
+                         'split var','split point',
+                         'status','prediction')
+    frame.matrix
 }
 ## ------------------------------------------------------------
 
@@ -273,7 +278,7 @@ getTree.rf.madlib <- function (object, k=1, tbl.output, ...)
 ## are not given, default values are returned
 .extract.rf.params <- function(control)
 {
-    default <- list( minsplit = 20, minbucket = round(20/3), maxdepth = 1,
+    default <- list( minsplit = 20, minbucket = round(20/3), maxdepth = 3,
                      max_surrogates = 0, nbins = 100)
 
     if ('minsplit' %in% names(control)) default$minsplit <- control$minsplit
@@ -297,59 +302,6 @@ print.rf.madlib <- function(x,
     class(x) <- "randomForest"
     out <- capture.output(print(x))
     writeLines(out)
-}
-
-## get the dimension of the raprt frame matrix
-.get.rpart.frame.ncol <- function(model.summary)
-{
-    if (lk(model.summary$is_classification))
-        10 + 2 * length(strsplit(lk(model.summary$dependent_var_levels), ",")[[1]])
-    else
-        8
-}
-
-## ------------------------------------------------------------
-
-## Change the column names of the frame data.frame
-.change.rpart.frame.colnames <- function(frame, model.summary)
-{
-    col.names <- c('var', 'n', 'wt', 'dev', 'yval',
-                   'complexity', 'ncompete', 'nsurrogate')
-    if (lk(model.summary$is_classification)) {
-        for (i in seq_len(length(frame))) {
-            names(frame[[i]])[1:8] <- col.names
-            ncl <- ncol(frame[[i]])
-            frame[[i]]$yval2 <- frame[[i]][9]
-            for (j in 10:ncl) {
-                frame[[i]]$yval2 <- cbind(frame[[i]]$yval2, frame[[i]][j])
-            }
-            colnames(frame[[i]]$yval2) <- c(paste("V", 1:(ncl-9), sep = ""), "nodeprob")
-            frame[[i]]$yval2 <- as.matrix(frame[[i]]$yval2)
-            frame[[i]] <- frame[[i]][c(1:8, ncol(frame[[i]]))]
-        }
-    } else {
-        for (i in seq_len(length(frame))) {
-            names(frame[[i]]) <- col.names
-        }
-    }
-    frame
-}
-
-## ------------------------------------------------------------
-
-## Replace the first column values to be the split variable names
-.replace.rpart.first.col <- function(frame, model.summary)
-{
-    features <- .strip(.strip(strsplit(lk(model.summary$independent_varnames), ",")[[1]]), "\"")
-    for (i in seq_len(length(frame))) {
-        ## for (j in 1:nrow(frame[[i]])) {
-        ##     frame[[i]][j, 1] <- if (frame[[i]][j,1] < 0) "<leaf>" else features[frame[[i]][j,1]+1]
-        ## }
-        frame[[i]][ , 1] <- sapply(frame[[i]][, 1], function(x) if (x < 0) "<leaf>" else features[x+1])
-        frame[[i]]$ncompete <- as.integer(frame[[i]][,1] != "<leaf>")
-        frame[[i]]$nsurrogate <- frame[[i]]$ncompete
-    }
-    frame
 }
 
 ## ------------------------------------------------------------
@@ -377,98 +329,6 @@ string.bounding.box <- function(s)
 }
 
 ## ------------------------------------------------------------
-
-## Compute the correct row names of the frame
-.change.frame.rownames <- function(frames)
-{
-    for (i in seq_len(length(frames))) {
-        var <- frames[[i]]$var # the first column
-        row <- rep(0, length(var))
-
-        ## i - row index
-        ## r - row name
-        compute.rowname <- function(i, r) {
-            row[i] <<- r
-            if (i > length(var) || var[i] < 0) return (i+1)
-            left <- compute.rowname(i+1, 2*r)
-            right <- compute.rowname(left, 2*r+1)
-        }
-
-        compute.rowname(1, 1)
-        row.names(frames[[i]]) <- as.character(row)
-    }
-    frames
-}
-
-## ------------------------------------------------------------
-
-.get.splits.index <- function(frame)
-{
-    ff <- frame
-    n <- nrow(ff)
-    is.leaf <- (ff$var == "<leaf>")
-    whichrow <- !is.leaf
-    vnames <- ff$var[whichrow]
-    index <- cumsum(c(1, ff$ncompete + ff$nsurrogate + (!is.leaf)))
-    index
-}
-
-## ------------------------------------------------------------
-
-## Construct the split matrix
-.construct.splits <- function(frames, model, model.summary,
-                              thresholds, cat.levels, cat.n)
-{
-    conn.id <- conn.id(model)
-    madlib <- schema.madlib(conn.id)
-
-    cat.features <- .strip(.strip(strsplit(lk(model.summary$cat_features), ",")[[1]], " "), "\"")
-
-    splits.list <- list()
-    csplit.list <- list()
-    xlevels <- list()
-    for (i in seq_len(length(frames))) {
-        index <- .get.splits.index(frames[[i]])
-        splits <- matrix(0, nrow=max(index)-1, ncol=4)
-        splits[,2] <- 1
-        is.leaf <- frames[[i]]$var == "<leaf>"
-        meaningful <- index[-length(index)][!is.leaf]
-        splits[meaningful,4] <- as.vector(arraydb.to.arrayr(thresholds[i], "double"))
-
-        catn <- arraydb.to.arrayr(cat.n[i], "integer")
-        cat.node <- frames[[i]]$var %in% cat.features
-        if (sum(cat.node) > 0) {
-            meaningful.cat <- index[-length(index)][!is.leaf & cat.node]
-            splits[meaningful.cat, 2] <- catn[sapply(frames[[i]]$var[cat.node],
-                                                      function(x) which(x == cat.features))]
-            cat.thresh <- splits[meaningful.cat, 4] + 1
-            splits[meaningful.cat, 4] <- seq_len(sum(cat.node))
-
-            csplit <- matrix(2, nrow = sum(cat.node), ncol = max(splits[meaningful.cat, 2]))
-            for (j in seq_len(nrow(csplit))) {
-                csplit[j, 1:splits[meaningful.cat,2][j]] <- 1
-                csplit[j, cat.thresh[j]] <- 3
-            }
-
-            csplit.list[[i]] <- csplit
-
-            all.levels <- arraydb.to.arrayr(cat.levels[i], "character")
-            levels <- list()
-            count <- 0
-            for (j in seq_along(cat.features)) {
-                levels[[cat.features[j]]] <- all.levels[1:catn[j] + count]
-                count <- count + catn[j]
-            }
-            xlevels[[i]] <- levels
-        } else {
-            csplit.list[[i]] <- NA
-            xlevels[[i]] <- NA
-        }
-
-        splits.list[[i]] <- splits
-    }
-    list(splits.list=splits.list, csplit.list=csplit.list, xlevels=xlevels)
-}
 
 ## ------------------------------------------------------------
 
