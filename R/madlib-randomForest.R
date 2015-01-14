@@ -110,7 +110,6 @@ madlib.randomForest <- function(formula, data, id = NULL,
                  ")", 
                  sep = "")
 
-    print(sql)
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
