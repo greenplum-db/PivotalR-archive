@@ -249,6 +249,9 @@ predict.rf.madlib <- function(object, newdata, type = c("response", "prob"), ...
 }
 
 ## ------------------------------------------------------------
+## Function to retrieve a tree from the forest
+## Result format is the same as R's randomForest 
+## ------------------------------------------------------------
 
 getTree.rf.madlib <- function (object, k=1, ...)
 {
