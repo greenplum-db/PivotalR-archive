@@ -9,7 +9,7 @@ Author: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>,
 Maintainer: Caleb Welton <cwelton@pivotal.io>
 Contact: Predictive Analytics Team at Pivotal Inc. <user@madlib.net>
 Depends: R (>= 2.14.0), methods, Matrix
-Enhances: DBI, RPostgreSQL, shiny, testthat, tools, rpart
+Enhances: DBI, RPostgreSQL, shiny, testthat, tools, rpart, randomForest
 Description: R interface of Pivotal Data Fabrics running on PostgreSQL
         or Pivotal (Greenplum and HAWQ) database with parallel and
         distributed computation ability for big data analytics.
