@@ -158,10 +158,13 @@ madlib.glm <- function (formula, data,
     ## if (!is.null(tbl.output)) .db.removeTable(tbl.output, conn.id)
     if (is.tbl.source.temp) delete(tbl.source, conn.id)
 
-    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)){
         model <- NULL
-    else
+    } else{
         model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+        model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
+                                       conn.id = conn.id, verbose = FALSE)
+    }
 
     .restore.warnings(warnings)
 
@@ -220,6 +223,7 @@ madlib.glm <- function (formula, data,
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$model.summary <- model.summary
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
         rst[[i]]$na.action <- na.action
@@ -448,6 +452,8 @@ show.logregr.madlib <- function (object)
     if (is.tbl.source.temp) delete(tbl.source, conn.id)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
+                           conn.id = conn.id, verbose = FALSE)
 
     .restore.warnings(warnings) # turn on warning messages
 
@@ -507,6 +513,7 @@ show.logregr.madlib <- function (object)
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$model.summary <- model.summary
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
         rst[[i]]$na.action <- na.action

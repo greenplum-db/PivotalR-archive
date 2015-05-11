@@ -176,15 +176,13 @@ groups.logregr.madlib.grps <- function (x)
 ## delete all __madlib_temp_* tables from a database
 clean.madlib.temp <- function(conn.id = 1)
 {
-    for (tbl in db.objects(
-        .unique.pattern(),
-        conn.id=conn.id))
+    for (tbl in db.objects(.unique.pattern(), conn.id=conn.id))
         delete(tbl, conn.id=conn.id, cascade = TRUE)
 }
 
 ## ----------------------------------------------------------------------
 
-## Compute the first-derivative of any functino analytically
+## Compute the first-derivative of any function analytically
 ## And return the result as a string
 ## Will be used in computing margins
 .parse.deriv <- function (expr.str, var)

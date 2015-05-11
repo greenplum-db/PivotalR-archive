@@ -94,10 +94,13 @@ madlib.lm <- function (formula, data, na.action = NULL,
     res <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
                 conn.id = conn.id, verbose = FALSE)
 
-    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str))
+    if (db$db.str == "HAWQ" && grepl("^1\\.1", db$version.str)){
         model <- NULL
-    else
+    } else {
         model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+        model.summary <- db.data.frame(paste(tbl.output, "_summary", sep = ""),
+                                       conn.id = conn.id, verbose = FALSE)
+    }
 
     ## reset SQL and R warning levels
     .restore.warnings(warnings)
@@ -156,6 +159,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
         rst[[i]]$dummy <- r.dummy
         rst[[i]]$dummy.expr <- r.dummy.expr
         rst[[i]]$model <- model
+        rst[[i]]$model.summary <- model.summary
         rst[[i]]$terms <- params$terms
         rst[[i]]$factor.ref <- data@.factor.ref
         rst[[i]]$na.action <- na.action

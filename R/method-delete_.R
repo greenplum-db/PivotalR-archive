@@ -166,7 +166,7 @@ setMethod (
     def = function (x) {
         if (is.null(x$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x$model)
-        d1 <- delete(x$model)
+        d1 <- delete(x$model) && delete(x$model.summary)
         list(res=d1, conn.id=conn.id)
     })
 
@@ -178,7 +178,7 @@ setMethod (
     def = function (x) {
         if (is.null(x[[1]]$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x[[1]]$model)
-        d1 <- delete(x[[1]]$model)
+        d1 <- delete(x[[1]]$model) && delete(x[[1]]$model.summary)
         list(res=d1, conn.id=conn.id)
     })
 
@@ -190,7 +190,7 @@ setMethod (
     def = function (x) {
         if (is.null(x$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x$model)
-        d1 <- delete(x$model)
+        d1 <- delete(x$model) && delete(x$model.summary)
         list(res=d1, conn.id=conn.id)
     })
 
@@ -202,7 +202,7 @@ setMethod (
     def = function (x) {
         if (is.null(x[[1]]$model)) return (list(res=TRUE, conn.id=NULL))
         conn.id <- conn.id(x[[1]]$model)
-        d1 <- delete(x[[1]]$model)
+        d1 <- delete(x[[1]]$model) && delete(x[[1]]$model.summary)
         list(res=d1, conn.id=conn.id)
     })
 

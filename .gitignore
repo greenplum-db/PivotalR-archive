@@ -5,3 +5,4 @@
 eproject.cfg
 *.bak
 tags
+libadp.a
