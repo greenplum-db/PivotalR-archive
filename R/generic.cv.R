@@ -91,6 +91,7 @@ generic.cv <- function (train, predict, metric, data,
                 fits <- do.call(train, arg.list)
                 pred <- predict(fits, cuts$valid[[i]])
                 err.k <- c(err.k, as.numeric(metric(pred, cuts$valid[[i]])))
+                if(is.na(err.k)) cat("Warning: metric is returning NA. Consider modifying metric function.")
                 if (is(data, "db.obj")) delete(fits)
             }
             err <- rbind(err, err.k)
