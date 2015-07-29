@@ -25,7 +25,7 @@ test_that("Test with categorical features", {
           expect_equal(fit.db$std_err, fit.r$coefficients[ , 2], tolerance=1e-2, check.attributes=FALSE)
 })
 
-test_that("Test gaussian(identity) with grouping", {
+test_that("Test with grouping", {
           fit.db <- madlib.lm(rings ~ . - id | sex, data = dat, control = list(max.iter = 20, use.lm = T))
           fit.r <- lapply(1:3, function(i) summary(lm(rings ~ . - id, data = dat.r[dat.r$sex == fit.db[[i]]$sex, -2])))
 

@@ -36,6 +36,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
     ## analyze the formula
     analyzer <- .get.params(formula, data, na.action, na.as.level)
 
+
+
+
     ## For db.view or db.R.query, create a temporary table
     ## For pivoted db.Rquery, realize the pivoting
     ## Else: just return the original data table
