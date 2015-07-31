@@ -23,6 +23,8 @@ exportMethods ("print", "show")
 
 export ("is.db.data.frame", "arraydb.to.arrayr")
 
+export("madlib.lda")
+
 export ("madlib.lm", "summary.lm.madlib",
         "print.lm.madlib", "show.lm.madlib", "summary.lm.madlib.grps",
         "print.lm.madlib.grps", "show.lm.madlib.grps")
