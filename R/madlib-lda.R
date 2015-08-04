@@ -23,18 +23,9 @@ madlib.lda <- function (data, docid, words, topic_num,
     sql_tf <- paste("select ", madlib, ".term_frequency('",
                 tbl.source, "','", docid, "','", words, "','", tbl.tf, "',", TRUE,")",sep="")
     
-    #print for debugging
-    #print(sql_tf)
-
-    #do we actually want all rows here? is it too big?
+    
     db.q(sql_tf, nrows = 1,
                 conn.id = conn.id, verbose = FALSE)
-
-    
-
-
-    
-    
 
     #compute vocabulary size
     sql_voc_size <- paste("select count(*) from ", tbl.tf, "_vocabulary", sep="")
@@ -45,24 +36,18 @@ madlib.lda <- function (data, docid, words, topic_num,
     vocabulary <- db.q(sql_voc, nrows = -1,conn.id = conn.id, verbose = FALSE)
     vocabulary <- t(vocabulary)
 
-    #vocabulary <- arraydb.to.arrayr(vocabulary, "character", voc_size)
-
-    #print(voc_size)
-
-
-
+    
     sql <- paste("select ", madlib, ".lda_train('",
                  tbl.tf, "', '", tbl.model, "', '",
                  tbl.output, "',", voc_size, ", ",
                  topic_num, ",", iter_num, ",", alpha, 
                  ",", eta, ")", sep = "")
 
-    #print(sql)
+  
     
     res_out <- db.q(sql, "; select topic_count, topic_assignment from ", tbl.output, nrows = -1,
                  conn.id = conn.id, verbose = FALSE)
-    
-    #print(res_out)
+   
 
 
     sql_parse_model <- paste("select (", madlib,
@@ -86,14 +71,9 @@ madlib.lda <- function (data, docid, words, topic_num,
 
     topics<- cbind(model1,model2)
 
-    # print(dim(topics))
-    # return (vocabulary)
-
+   
     colnames(topics) <- vocabulary
-    
-    # print(res_model_tuple)
-    # print(topics)
-    # print(topic_sums)
+
 
     document_sums <- arraydb.to.arrayr(res_out$topic_count)
     document_sums <- t(document_sums)
@@ -119,11 +99,7 @@ madlib.lda <- function (data, docid, words, topic_num,
 
     return (rst)
 
-    #Goal: output an object of class "lda.madlib" which has attributes:
-    #assignments: a list length D of topic assignments for each word (in output table)
-    #topics: a K x V matrix where a_ij is number of times word j is assigned to topic i
-    #topic_sums: length K vector, topic distribution for corpus 
-    #document_sums: K x D matrix, breaking down topic distribution into documents
+   
 }
 
 #If the user wants to compute perplexity from prediction output, he can enter it
@@ -145,6 +121,7 @@ perplexity.lda.madlib <- function(object, predict_output_table = NULL,...){
     sql <- paste("select ", madlib, ".lda_get_perplexity('", tbl.model, "','", tbl.output, "')", sep="")
 
     perplexity <- db.q(sql, conn.id = conn.id, verbose = FALSE)
+    perplexity <- as.numeric(perplexity)
 
     return (perplexity)
 
