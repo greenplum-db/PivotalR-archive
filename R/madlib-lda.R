@@ -27,7 +27,7 @@ madlib.lda <- function (data, docid, words, topic_num,
     #print(sql_tf)
 
     #do we actually want all rows here? is it too big?
-    db.q(sql_tf, "; select * from ", tbl.tf, nrows = 1,
+    db.q(sql_tf, nrows = 1,
                 conn.id = conn.id, verbose = FALSE)
 
     
@@ -42,7 +42,7 @@ madlib.lda <- function (data, docid, words, topic_num,
 
 
     sql_voc <- paste("select word from ", tbl.tf, "_vocabulary", sep="")
-    vocabulary <- db.q(sql_voc, conn.id = conn.id, verbose = FALSE)
+    vocabulary <- db.q(sql_voc, nrows = -1,conn.id = conn.id, verbose = FALSE)
     vocabulary <- t(vocabulary)
 
     #vocabulary <- arraydb.to.arrayr(vocabulary, "character", voc_size)
@@ -59,7 +59,7 @@ madlib.lda <- function (data, docid, words, topic_num,
 
     #print(sql)
     
-    res_out <- db.q(sql, "; select * from ", tbl.output, nrows = -1,
+    res_out <- db.q(sql, "; select topic_count, topic_assignment from ", tbl.output, nrows = -1,
                  conn.id = conn.id, verbose = FALSE)
     
     #print(res_out)
@@ -71,6 +71,10 @@ madlib.lda <- function (data, docid, words, topic_num,
     res_model_tuple <- db.q(sql_parse_model, nrows = -1,
                  conn.id = conn.id, verbose = FALSE)
 
+    model_table <- db.data.frame(tbl.model, conn.id = conn.id, verbose = FALSE)
+    output_table <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+    tf_table <- db.data.frame(tbl.tf, conn.id = conn.id, verbose = FALSE)
+
 
     half_voc <- as.numeric(floor(voc_size/2))
     model1_flatten <- arraydb.to.arrayr(res_model_tuple[[1]], "integer")#, half_voc*topic_num)
@@ -81,6 +85,10 @@ madlib.lda <- function (data, docid, words, topic_num,
     topic_sums <- t(topic_sums) # to match lda package
 
     topics<- cbind(model1,model2)
+
+    # print(dim(topics))
+    # return (vocabulary)
+
     colnames(topics) <- vocabulary
     
     # print(res_model_tuple)
@@ -101,6 +109,9 @@ madlib.lda <- function (data, docid, words, topic_num,
     rst$topics <- topics
     rst$topic_sums <- topic_sums
     rst$document_sums <- document_sums
+    rst$model_table <- model_table
+    rst$output_table <- output_table
+    rst$tf_table <- tf_table
 
     class(rst) <- "lda.madlib"
 
@@ -108,19 +119,68 @@ madlib.lda <- function (data, docid, words, topic_num,
 
     return (rst)
 
-    
-
-   
-    
-
-
-
-    #model <- db.data.frame(tbl.model, conn.id = conn.id, verbose = FALSE)
-    #output <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
-
     #Goal: output an object of class "lda.madlib" which has attributes:
     #assignments: a list length D of topic assignments for each word (in output table)
     #topics: a K x V matrix where a_ij is number of times word j is assigned to topic i
     #topic_sums: length K vector, topic distribution for corpus 
     #document_sums: K x D matrix, breaking down topic distribution into documents
+}
+
+#If the user wants to compute perplexity from prediction output, he can enter it
+#as a second parameter; otherwise the output table from madlib.lda_train will
+#be used.
+perplexity.lda.madlib <- function(object, predict_output_table = NULL,...){
+    model_table <- object$model_table
+    if (is.null(predict_output_table)){ output_table <- object$output_table}
+    else {output_table <- predict_output_table}
+
+    conn.id <- conn.id(model_table)
+    db <- .get.dbms.str(conn.id)
+    madlib <- schema.madlib(conn.id)
+
+    tbl.model <- content(model_table)
+    tbl.output <- content(output_table)
+
+
+    sql <- paste("select ", madlib, ".lda_get_perplexity('", tbl.model, "','", tbl.output, "')", sep="")
+
+    perplexity <- db.q(sql, conn.id = conn.id, verbose = FALSE)
+
+    return (perplexity)
+
+
+}
+
+
+#Object parameter is the output of the training function
+predict.lda.madlib <- function(object,data,docid, words, alpha, eta, iter_num=20,...){
+    conn.id <- conn.id(data)
+    db <- .get.dbms.str(conn.id)
+    madlib <- schema.madlib(conn.id)
+
+
+
+
+    model_table <- object$model_table
+    tbl.source <- content(data)
+    tbl.output <- .unique.string()
+    tbl.model <- content(model_table)
+    tbl.tf <- .unique.string()
+
+    sql_tf <- paste("select ", madlib, ".term_frequency('",
+                tbl.source, "','", docid, "','", words, "','", tbl.tf, "',", TRUE,")",sep="")
+
+    db.q(sql_tf, nrows = 1,
+                conn.id = conn.id, verbose = FALSE)
+    
+
+    sql <- paste("select ", madlib, ".lda_predict('", tbl.tf,
+                "', '", tbl.model, "', '", tbl.output, "')", sep = "")
+
+    .db(sql, conn.id = conn.id, verbose = FALSE)
+    #if (is.temp) delete(newdata)
+    db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
+
+
+
 }

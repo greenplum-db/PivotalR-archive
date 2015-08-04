@@ -3,18 +3,47 @@ context("Test cases for madlib.lda and its helper functions")
 ## ------------------------------------------------------------
 ## Test preparations
 
-.get.param.inputs(c(".port", ".dbname"))
-cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
-dat <- as.db.data.frame(documents, conn.id = cid, verbose = FALSE)
-dat.r <- documents
+#.get.param.inputs(c(".port", ".dbname"))
+cid <- db.connect(port = 5431, dbname = "madlib-pg93", verbose = FALSE)
+db <- .get.dbms.str(cid)
 
-# test_that("Test voc_size", {
-#           fit.db <- madlib.lm(rings ~ . - id - sex, data = dat, control = list(max.iter = 20, use.lm = T))
-#           fit.r <- summary(lm(rings ~ . - id - sex, data = dat.r))
+library(topicmodels)
+data("AssociatedPress", package = "topicmodels")
+temp_dat <- AssociatedPress
+dat1 <- cbind(temp_dat$i,temp_dat$j,temp_dat$v)
+dat1 <- as.data.frame(dat1)
+colnames(dat1) <- c("docid", "wordid", "count")
+dat2 <- as.data.frame(temp_dat$dimnames[2]$Terms)
+dat2 <- cbind(1:nrow(dat2),dat2)
+colnames(dat2) <- c("wordid", "word")
 
-#           expect_equal(fit.db$coef, fit.r$coefficients[ , 1], tolerance=1e-2, check.attributes=FALSE)
-#           expect_equal(fit.db$std_err, fit.r$coefficients[ , 2], tolerance=1e-2, check.attributes=FALSE)
-# })
+termfreq <- .unique.string()
+vocab <- .unique.string()
+newdata <- .unique.string()
+
+dat1 <- as.db.data.frame(dat1, conn.id=cid, verbose=FALSE, is.temp=FALSE, table.name=termfreq)
+dat2 <- as.db.data.frame(dat2, conn.id=cid, verbose=FALSE, is.temp=FALSE, table.name=vocab)
+
+sql <- paste("DROP TABLE IF EXISTS ", newdata, "; CREATE TABLE ", newdata, 
+    " AS SELECT docid, array_agg(word) AS words FROM (SELECT *, generate_series(1,count::int) FROM ",
+        termfreq,  " JOIN ", vocab, " USING (wordid)) subq GROUP BY docid;", sep="")
+db.q(sql, verbose=FALSE)
+
+dat.r <- AssociatedPress
+
+dat <- db.data.frame(newdata, conn.id=cid)
+
+test_that("Test perplexity", {
+           output.db <- madlib.lda(dat, "docid","words",10,0.1,0.1, 10)
+           output.r <- LDA(AssociatedPress, k=10,
+           control=list(iter=10, alpha=0.1, delta=0.1),method="Gibbs")
+
+           perplexity.db <- perplexity.lda.madlib(output.db)
+           perplexity.r <- perplexity(output.r, newdata=AssociatedPress)
+
+           expect_equal(perplexity.db, perplexity.r, tolerance=1e-2, check.attributes=FALSE)
+           
+ })
 
 ## Fit a model (from demo(lda)).
 # data(cora.documents)
