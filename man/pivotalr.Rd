@@ -26,13 +26,13 @@ pivotalr()
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
-} 
+
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
+}
 
 \references{
   [1] RStudio and Inc. (2013). shiny: Web Application Framework for R. R
-  package version 0.6.0. \url{http://CRAN.R-project.org/package=shiny}
+  package version 0.6.0. \url{http://cran.r-project.org/package=shiny}
 
   [2] shiny website, \url{http://www.rstudio.com/shiny/}
 }

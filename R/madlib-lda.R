@@ -1,19 +1,18 @@
 
-
 setClass("lda.madlib")
 
 madlib.lda <- function (data, docid, words, topic_num,
-                        alpha, eta, iter_num = 20,
+                        alpha, beta, iter_num = 20,
                        ...) {
     if ( ! is( data, "db.obj" ) )
         stop( "madlib.lda can only be used on a db.obj object, ",
              "and ", deparse( substitute( documents ) ), " is not!")
-    
+
     conn.id <- conn.id(data)
     warnings <- .suppress.warnings(conn.id)
     db <- .get.dbms.str(conn.id)
     madlib <- schema.madlib(conn.id) # MADlib schema name
-    
+
     tbl.model <- .unique.string()
     tbl.output <- .unique.string()
     tbl.tf <- .unique.string()
@@ -22,8 +21,7 @@ madlib.lda <- function (data, docid, words, topic_num,
     ##query to get the data in appropriate format for lda_train
     sql_tf <- paste("select ", madlib, ".term_frequency('",
                 tbl.source, "','", docid, "','", words, "','", tbl.tf, "',", TRUE,")",sep="")
-    
-    
+
     db.q(sql_tf, nrows = 1,
                 conn.id = conn.id, verbose = FALSE)
 
@@ -31,24 +29,18 @@ madlib.lda <- function (data, docid, words, topic_num,
     sql_voc_size <- paste("select count(*) from ", tbl.tf, "_vocabulary", sep="")
     voc_size <- as.numeric(db.q(sql_voc_size, ";", conn.id = conn.id, verbose= FALSE))
 
-
     sql_voc <- paste("select word from ", tbl.tf, "_vocabulary", sep="")
     vocabulary <- db.q(sql_voc, nrows = -1,conn.id = conn.id, verbose = FALSE)
     vocabulary <- t(vocabulary)
 
-    
     sql <- paste("select ", madlib, ".lda_train('",
                  tbl.tf, "', '", tbl.model, "', '",
                  tbl.output, "',", voc_size, ", ",
-                 topic_num, ",", iter_num, ",", alpha, 
-                 ",", eta, ")", sep = "")
+                 topic_num, ",", iter_num, ",", alpha,
+                 ",", beta, ")", sep = "")
 
-  
-    
     res_out <- db.q(sql, "; select topic_count, topic_assignment from ", tbl.output, nrows = -1,
                  conn.id = conn.id, verbose = FALSE)
-   
-
 
     sql_parse_model <- paste("select (", madlib,
         ".lda_parse_model(model, voc_size, topic_num)).* from ", tbl.model, sep="")
@@ -60,7 +52,6 @@ madlib.lda <- function (data, docid, words, topic_num,
     output_table <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
     tf_table <- db.data.frame(tbl.tf, conn.id = conn.id, verbose = FALSE)
 
-
     half_voc <- as.numeric(floor(voc_size/2))
     model1_flatten <- arraydb.to.arrayr(res_model_tuple[[1]], "integer")#, half_voc*topic_num)
     model1 <- matrix(model1_flatten, nrow=topic_num, ncol=half_voc)
@@ -68,12 +59,8 @@ madlib.lda <- function (data, docid, words, topic_num,
     model2 <- matrix(model2_flatten, nrow=topic_num, ncol=voc_size-half_voc)
     topic_sums <- arraydb.to.arrayr(res_model_tuple[[3]], "integer", topic_num)
     topic_sums <- t(topic_sums) # to match lda package
-
     topics<- cbind(model1,model2)
-
-   
     colnames(topics) <- vocabulary
-
 
     document_sums <- arraydb.to.arrayr(res_out$topic_count)
     document_sums <- t(document_sums)
@@ -81,10 +68,7 @@ madlib.lda <- function (data, docid, words, topic_num,
     assignments <- res_out$topic_assignment
     assignments <- lapply(assignments, arraydb.to.arrayr)
 
-    #####
-
     rst <- list()
-
     rst$assignments <- assignments
     rst$topics <- topics
     rst$topic_sums <- topic_sums
@@ -94,12 +78,8 @@ madlib.lda <- function (data, docid, words, topic_num,
     rst$tf_table <- tf_table
 
     class(rst) <- "lda.madlib"
-
     .restore.warnings(warnings)
-
     return (rst)
-
-   
 }
 
 #If the user wants to compute perplexity from prediction output, he can enter it
@@ -117,26 +97,21 @@ perplexity.lda.madlib <- function(object, predict_output_table = NULL,...){
     tbl.model <- content(model_table)
     tbl.output <- content(output_table)
 
-
-    sql <- paste("select ", madlib, ".lda_get_perplexity('", tbl.model, "','", tbl.output, "')", sep="")
+    sql <- paste("select ", madlib,
+                 ".lda_get_perplexity('", tbl.model,
+                 "','", tbl.output, "')", sep="")
 
     perplexity <- db.q(sql, conn.id = conn.id, verbose = FALSE)
     perplexity <- as.numeric(perplexity)
 
     return (perplexity)
-
-
 }
 
-
 #Object parameter is the output of the training function
-predict.lda.madlib <- function(object,data,docid, words, alpha, eta, iter_num=20,...){
+predict.lda.madlib <- function(object, data, docid, words, ...){
     conn.id <- conn.id(data)
     db <- .get.dbms.str(conn.id)
     madlib <- schema.madlib(conn.id)
-
-
-
 
     model_table <- object$model_table
     tbl.source <- content(data)
@@ -147,17 +122,11 @@ predict.lda.madlib <- function(object,data,docid, words, alpha, eta, iter_num=20
     sql_tf <- paste("select ", madlib, ".term_frequency('",
                 tbl.source, "','", docid, "','", words, "','", tbl.tf, "',", TRUE,")",sep="")
 
-    db.q(sql_tf, nrows = 1,
-                conn.id = conn.id, verbose = FALSE)
-    
-
-    sql <- paste("select ", madlib, ".lda_predict('", tbl.tf,
-                "', '", tbl.model, "', '", tbl.output, "')", sep = "")
-
+    db.q(sql_tf, nrows = 1, conn.id = conn.id, verbose = FALSE)
+    sql <- paste("select ", madlib,
+                 ".lda_predict('", tbl.tf, "', '", tbl.model,
+                 "', '", tbl.output, "')", sep = "")
     .db(sql, conn.id = conn.id, verbose = FALSE)
     #if (is.temp) delete(newdata)
     db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
-
-
-
 }

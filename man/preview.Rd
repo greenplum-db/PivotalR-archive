@@ -102,7 +102,7 @@ When \code{x} is a \code{\linkS4class{db.data.frame}} object, this
   Hong Ooi, Pivotal Inc. \email{hooi@pivotal.io} wrote the
   \code{as.data.frame} methods.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

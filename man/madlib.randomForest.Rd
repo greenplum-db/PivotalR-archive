@@ -11,7 +11,7 @@ MADlib wrapper function for Random Forest
 }
 \usage{
 madlib.randomForest(formula, data, id = NULL, ntree = 100,
-importance = FALSE, nPerm = 1, na.action = NULL, control, 
+importance = FALSE, nPerm = 1, na.action = NULL, control,
 na.as.level = FALSE, verbose = FALSE, ...) }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,14 +30,14 @@ na.as.level = FALSE, verbose = FALSE, ...) }
     be compared with the original data.
 }
   \item{ntree}{
-    An integer, maximum number of trees to grow in the random forest model, default is 
+    An integer, maximum number of trees to grow in the random forest model, default is
     100.
 }
   \item{importance}{
     A boolean, whether or not to calculate variable importance, default is FALSE.
 }
   \item{nPerm}{
-    An integer, number of times to permute each feature value while calculating 
+    An integer, number of times to permute each feature value while calculating
     variable importance, default is 1.
 }
   \item{na.action}{
@@ -45,22 +45,22 @@ na.as.level = FALSE, verbose = FALSE, ...) }
 }
   \item{control}{
     A list, which includes parameters for the fit. Supported parameters include:
-    'minsplit' - minimum number of observations that must be present in a node for a 
+    'minsplit' - minimum number of observations that must be present in a node for a
     split to be attempted. default is minsplit=20
-    
-    'minbucket' - Minimum number of observations in any terminal node, 
+
+    'minbucket' - Minimum number of observations in any terminal node,
     default is min_split/3
-    
-    'maxdepth' - Maximum depth of any node, default is maxdepth=10 
-    
-    'nbins' - Number of bins to find possible node split threshold values for continuous                   
-               variables, default is 100 (Must be greater than 1) 
-    
+
+    'maxdepth' - Maximum depth of any node, default is maxdepth=10
+
+    'nbins' - Number of bins to find possible node split threshold values for continuous
+               variables, default is 100 (Must be greater than 1)
+
     'max_surrogates' - Number of surrogate splits at each node in the trees constructed.
-    
+
 }
   \item{na.as.level}{
-    A boolean, indicating if NULL value for a categorical variable is treated as a 
+    A boolean, indicating if NULL value for a categorical variable is treated as a
     distinct level, default is na.as.level=false
 }
   \item{verbose}{
@@ -80,18 +80,18 @@ na.as.level = FALSE, verbose = FALSE, ...) }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}  
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
-\seealso{ 
-  \code{\link{print.rf.madlib}} function to print summary of a model fitted 
+\seealso{
+  \code{\link{print.rf.madlib}} function to print summary of a model fitted
   through madlib.randomForest
-  
-  \code{\link{predict.rf.madlib}} is a wrapper for MADlib's predict function for 
+
+  \code{\link{predict.rf.madlib}} is a wrapper for MADlib's predict function for
   random forests.
 
   \code{\link{madlib.lm}}, \code{\link{madlib.glm}},
-        \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}}, 
+        \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, \code{\link{madlib.elnet}},
         \code{\link{madlib.rpart}} are all MADlib wrapper functions.
 }
 
@@ -106,16 +106,16 @@ cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 x <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 lk(x, 10)
 
-## decision tree using abalone data, using default values of minsplit, 
+## decision tree using abalone data, using default values of minsplit,
 ## maxdepth etc.
 key(x) <- "id"
-fit <- madlib.randomForest(rings < 10 ~ length + diameter + height + whole + shell, 
+fit <- madlib.randomForest(rings < 10 ~ length + diameter + height + whole + shell,
        data=x)
 fit
 
-## Another example, using grouping  
-fit <- madlib.ramdomForest(rings < 10 ~ length + diameter + height + whole + shell | sex, 
-       data=x) 
+## Another example, using grouping
+fit <- madlib.randomForest(rings < 10 ~ length + diameter + height + whole + shell | sex,
+       data=x)
 fit
 
 db.disconnect(cid)

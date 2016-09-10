@@ -33,7 +33,7 @@ conn.id(x) <- value
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

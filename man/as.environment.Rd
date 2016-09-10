@@ -37,7 +37,7 @@ representing the expression. Use \code{\link{lk}}, \code{\link{lookat}} or \code
 \author{
   Author: Hong Ooi, Pivotal Inc. \email{hooi@pivotal.io}
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

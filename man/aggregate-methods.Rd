@@ -115,7 +115,7 @@ db.array(x, ...)
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

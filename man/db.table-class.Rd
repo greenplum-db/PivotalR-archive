@@ -47,7 +47,7 @@ See \code{\linkS4class{db.data.frame}} for all the methods that can take
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

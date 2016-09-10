@@ -12,7 +12,7 @@
 
 \alias{residuals.glm.madlib.grps}
 
-\title{residuals methods for Madlib regression objects}
+\title{Residuals methods for Madlib regression objects}
 
 \description{
     Functions to extract the residuals for regression models fit in Madlib.
@@ -56,7 +56,7 @@
 \author{
   Author: Predictive Analytics Team, Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \seealso{

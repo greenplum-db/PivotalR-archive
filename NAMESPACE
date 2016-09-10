@@ -2,6 +2,15 @@
 useDynLib(PivotalR)
 import(methods, Matrix)
 
+importFrom("grDevices", "col2rgb")
+importFrom("graphics", "par", "plot", "polygon", "text")
+importFrom("stats", "AIC", "coef", "contrasts", "deriv", "extractAIC",
+           "formula", "gaussian", "logLik", "model.matrix", "pnorm",
+           "predict", "printCoefmat", "pt", "resid", "residuals",
+           "setNames", "terms", "vcov")
+importFrom("utils", "capture.output", "count.fields",
+           "install.packages", "installed.packages", "read.table")
+
 export("db.connect", "db.disconnect", "db.list")
 
 export ("conn.pkg", "host", "dbname", "user", "dbms",
@@ -23,22 +32,37 @@ exportMethods ("print", "show")
 
 export ("is.db.data.frame", "arraydb.to.arrayr")
 
-export("madlib.lda", "perplexity.lda.madlib", "predict.lda.madlib")
+export("madlib.lda", "perplexity.lda.madlib")
+S3method(predict, lda.madlib)
 
-export ("madlib.lm", "summary.lm.madlib",
-        "print.lm.madlib", "show.lm.madlib", "summary.lm.madlib.grps",
-        "print.lm.madlib.grps", "show.lm.madlib.grps")
+export ("madlib.lm")
+S3method(summary, lm.madlib)
+S3method(print, lm.madlib)
+S3method(show, lm.madlib)
+S3method(summary, lm.madlib.grps)
+S3method(print, lm.madlib.grps)
+S3method(show, lm.madlib.grps)
 
-export ("madlib.glm", "summary.logregr.madlib",
-        "print.logregr.madlib", "show.logregr.madlib",
-        "summary.logregr.madlib.grps",
-        "print.logregr.madlib.grps", "show.logregr.madlib.grps",
-        "summary.glm.madlib", "print.glm.madlib", "show.glm.madlib",
-        "summary.glm.madlib.grps", "print.glm.madlib.grps", "show.glm.madlib.grps")
+export ("madlib.glm")
+S3method(summary, logregr.madlib)
+S3method(print, logregr.madlib)
+S3method(show, logregr.madlib)
+S3method(summary, logregr.madlib.grps)
+S3method(print, logregr.madlib.grps)
+S3method(show, logregr.madlib.grps)
+S3method(summary, glm.madlib)
+S3method(print, glm.madlib)
+S3method(show, glm.madlib)
+S3method(summary, glm.madlib.grps)
+S3method(print, glm.madlib.grps)
+S3method(show, glm.madlib.grps)
 
-export("predict.lm.madlib", "predict.logregr.madlib",
-       "predict.lm.madlib.grps", "predict.logregr.madlib.grps",
-       "predict.glm.madlib", "predict.glm.madlib.grps")
+S3method(predict, lm.madlib)
+S3method(predict, logregr.madlib)
+S3method(predict, lm.madlib.grps)
+S3method(predict, logregr.madlib.grps)
+S3method(predict, glm.madlib)
+S3method(predict, glm.madlib.grps)
 
 # export sample in the future
 # export ("sample")
@@ -63,7 +87,9 @@ export("conn.eql")
 
 export("eql")
 
-export("madlib.summary", "print.summary.madlib", "show.summary.madlib")
+export("madlib.summary")
+S3method(print, summary.madlib)
+S3method(show, summary.madlib)
 
 export("db.objects", "db.existsObject")
 
@@ -73,33 +99,44 @@ export("sd", "var")
 
 exportMethods("sample")
 
-export("generic.cv", "generic.bagging", "predict.bagging.model")
+export("generic.cv", "generic.bagging")
+S3method(predict, bagging.model)
+
 exportMethods("colMeans", "colSums")
 export("colAgg", "db.array")
 export("crossprod", "unique")
 export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
-export ("PivotalR", "pivotalr", "print.none.obj")
+export ("PivotalR", "pivotalr")
+S3method(print, none.obj)
 
 exportMethods("scale")
-export("groups", "groups.lm.madlib", "groups.logregr.madlib",
-      "groups.lm.madlib.grps", "groups.logregr.madlib.grps")
+
+export("groups")
+S3method(groups, lm.madlib)
+S3method(groups, logregr.madlib)
+S3method(groups, lm.madlib.grps)
+S3method(groups, logregr.madlib.grps)
 
 exportMethods("cbind2")
 
 export("cbind")
 
 export("madlib.arima")
-
-export("summary.arima.css.madlib", "print.arima.css.madlib",
-       "predict.arima.css.madlib", "show.arima.css.madlib")
+S3method(print, arima.css.madlib)
+S3method(predict, arima.css.madlib)
+S3method(summary, arima.css.madlib)
+S3method(show, arima.css.madlib)
 
 export("clean.madlib.temp")
 
 export("db.default.schemas", "db.search.path")
 
-export("residuals.lm.madlib", "residuals.lm.madlib.grps",
-       "residuals.logregr.madlib", "residuals.logregr.madlib.grps",
-       "residuals.glm.madlib", "residuals.glm.madlib.grps")
+S3method(residuals, logregr.madlib)
+S3method(residuals, logregr.madlib.grps)
+S3method(residuals, lm.madlib)
+S3method(residuals, lm.madlib.grps)
+S3method(residuals, glm.madlib)
+S3method(residuals, glm.madlib.grps)
 
 S3method(logLik, logregr.madlib)
 S3method(logLik, logregr.madlib.grps)
@@ -131,6 +168,16 @@ S3method(coef, logregr.madlib.grps)
 S3method(coef, lm.madlib)
 S3method(coef, lm.madlib.grps)
 
+S3method(print, logregr.madlib)
+S3method(print, logregr.madlib.grps)
+S3method(print, lm.madlib)
+S3method(print, lm.madlib.grps)
+
+S3method(predict, logregr.madlib)
+S3method(predict, logregr.madlib.grps)
+S3method(predict, lm.madlib)
+S3method(predict, lm.madlib.grps)
+
 exportMethods("as.integer", "as.character",
               "as.logical", "as.numeric", "as.Date")
 
@@ -138,8 +185,10 @@ export("as.double", "as.time", "as.timestamp", "as.interval", "db.date.style")
 
 export("lk", "col.types")
 
-export("madlib.elnet", "summary.elnet.madlib",
-       "print.elnet.madlib", "predict.elnet.madlib")
+export("madlib.elnet")
+S3method(summary, elnet.madlib)
+S3method(print, elnet.madlib)
+S3method(predict, elnet.madlib)
 
 exportMethods("sin", "cos", "tan", "asin", "acos", "atan",
               "atan2")
@@ -154,20 +203,30 @@ exportMethods("na.omit")
 
 export("db.q", "db", ".db")
 
-export("vcov.lm.madlib", "vcov.lm.madlib.grps",
-       "vcov.logregr.madlib.grps", "vcov.logregr.madlib")
+S3method(vcov, lm.madlib)
+S3method(vcov, lm.madlib.grps)
+S3method(vcov, logregr.madlib.grps)
+S3method(vcov, logregr.madlib)
 
 exportMethods("ifelse", "rowSums", "rowMeans")
 
 exportMethods("relevel")
-export("margins", "margins.lm.madlib", "margins.lm.madlib.grps",
-       "margins.logregr.madlib", "margins.logregr.madlib.grps",
-       "print.margins")
+
+export("margins")
+S3method(margins, lm.madlib)
+S3method(margins, lm.madlib.grps)
+S3method(margins, logregr.madlib)
+S3method(margins, logregr.madlib.grps)
+S3method(print, margins)
 
 export("Vars", "Terms")
 
-export("madlib.rpart", "print.dt.madlib", "plot.dt.madlib", "text.dt.madlib",
-        "predict.dt.madlib")
+export("madlib.rpart")
+S3method(print, dt.madlib)
+S3method(plot, dt.madlib)
+S3method(predict, dt.madlib)
+S3method(text, dt.madlib)
 
-export("madlib.randomForest", "print.rf.madlib",  
-        "predict.rf.madlib", "getTree.rf.madlib")
+export("madlib.randomForest", "getTree.rf.madlib")
+S3method(print, rf.madlib)
+S3method(predict, rf.madlib)

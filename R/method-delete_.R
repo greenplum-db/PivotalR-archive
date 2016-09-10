@@ -113,6 +113,7 @@ setMethod (
         else
             type.str <- "table "
         sql <- paste("drop ", type.str, table, cascade.str, sep = "")
+        success  <- NULL   # we add this solely to appease R CMD check
         res <- tryCatch(.db.getQuery(sql, conn.id),
                         error = function(e) { success <<- FALSE })
         exists <- db.existsObject(origin.x, conn.id, is.temp)

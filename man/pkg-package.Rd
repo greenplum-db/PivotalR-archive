@@ -12,10 +12,9 @@ Database as well as Pivotal HD/HAWQ for Big Data analytics. It does so
 by providing an interface to the operations on tables/views in the
 database. These operations are almost the same as those of
 data.frame. Thus the users of R do not need to learn SQL when they
-operate on the objects in the database. The latest code is available at
-\url{https://github.com/madlib-internal/PivotalR}. A training video and
-a quick-start guide are
-available at \url{http://zimmeee.github.io/gp-r/#pivotalr}.
+operate on the objects in the database. The latest code, along with a
+training video and a quick-start guide, are available at
+\url{https://github.com/pivotalsoftware/PivotalR}.
 }
 
 \details{
@@ -25,9 +24,9 @@ Package: \tab PivotalR\cr
 
 Type: \tab Package\cr
 
-Version: \tab 0.1.17\cr
+Version: \tab 0.1.18\cr
 
-Date: \tab 2014-09-15\cr
+Date: \tab 2016-09-15\cr
 
 License: \tab GPL (>= 2)\cr
 
@@ -35,17 +34,17 @@ Depends: \tab methods, DBI, RPostgreSQL\cr
 
 }
 
-This package enables R users to easily develop, refine and deploy R
-scripts that leverage the
-parallelism and scalability of the database as well as in-database analytics libraries to
-operate on big data sets that would otherwise not fit in R memory - all this without
-having to learn SQL because the package provides an interface that they are familiar with.
+This package enables R users to easily develop, refine and deploy R scripts that
+leverage the parallelism and scalability of the database as well as in-database
+analytics libraries to operate on big data sets that would otherwise not fit in
+R memory - all this without having to learn SQL because the package provides an
+interface that they are familiar with.
 
-  The package also provides a wrapper for MADlib. MADlib is an open-source
-  library for scalable in-database analytics. It provides data-parallel
-  implementations of mathematical, statistical and machine-learning
-  algorithms for structured and unstructured data. The number of machine
-  learning algorithms that MADlib covers is quickly increasing.
+The package also provides a wrapper for MADlib. MADlib is an open-source
+library for scalable in-database analytics. It provides data-parallel
+implementations of mathematical, statistical and machine-learning
+algorithms for structured and unstructured data. The number of machine
+learning algorithms that MADlib covers is quickly increasing.
 
 As an R front-end to the PostgreSQL-like databases, this package
 minimizes the amount of data transferred between the database and R. All
@@ -61,9 +60,9 @@ access of utilizing the powerful analytics and graphics functionalities
 of R. Although the database itself has difficulty in plotting, the
 result can be analyzed and presented beautifully with R.
 
-This current version of PivotalR provides the core R infrastructure and data frame functions
-as well as over 50 analytical functions in R that leverage in-database execution. These
-include
+This current version of PivotalR provides the core R infrastructure and data
+frame functions as well as over 50 analytical functions in R that leverage in-
+database execution. These include
 
 * Data Connectivity - db.connect, db.disconnect, db.Rquery
 
@@ -96,23 +95,23 @@ include
 }
 
 \author{
-  Author: Predictive Analytics Team at Pivotal
-  Inc. \email{user@madlib.net},  with contributions
+  Author: Predictive Analytics Team at Pivotal Inc.
+  \email{user@madlib.incubator.apache.org},  with contributions
   from Data Scientist Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 \references{
-  [1] MADlib website, \url{http://madlib.net}
+  [1] MADlib website, \url{http://madlib.incubator.apache.org}
 
-  [2] MADlib user docs, \url{http://doc.madlib.net/master}
+  [2] MADlib user docs, \url{http://madlib.incubator.apache.org/docs/latest/}
 
-  [3] MADlib Wiki page, \url{http://github.com/madlib/madlib/wiki}
+  [3] MADlib Wiki page, \url{ https://cwiki.apache.org/confluence/display/MADLIB}
 
   [4] MADlib contribution guide,
-  \url{https://github.com/madlib/madlib/wiki/Contribution-Guide}
+  \url{https://cwiki.apache.org/confluence/display/MADLIB/Contribution+Guidelines}
 
-  [5] MADlib on GitHub, \url{https://github.com/madlib/madlib}
+  [5] MADlib on GitHub, \url{https://github.com/apache/incubator-madlib}
 }
 
 \seealso{

@@ -17,7 +17,8 @@
                          host=host, user=user,
                          dbname=dbname,
                          password=password,
-                         port = port)
+                         port = port,
+                         max.con=50)
     if (length(.localVars$conn.id) == 0)
         conn.id <- 1
     else

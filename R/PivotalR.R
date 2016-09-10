@@ -9,7 +9,7 @@ PivotalR <- function ()
         stop("No database connections! ",
              "You need at least one database connection before launching",
              " the graphical interface!")
-    
+
     if (!("shiny" %in% .get.installed.pkgs())) {
         message(paste("Package shiny",
                       " is going to be installed so that ",
@@ -19,15 +19,12 @@ PivotalR <- function ()
         if (!("shiny" %in% .get.installed.pkgs()))
             stop("The package shiny could not be installed!")
     }
-
-    library(shiny)
-    
     ## PivotalR's installation path
     ## .localVars$pkg.path <- path.package(.this.pkg.name)
     ## gui folder installation path
     gui.dir <- paste(.localVars$pkg.path, "/gui", sep = "")
 
-    message("\nWelcome to PivotalR GUI. It is free and a beta version ...\n")
+    message("\nWelcome to PivotalR GUI ...\n")
     message("Press Ctrl + c to stop.")
     shiny::runApp(gui.dir)
 }

@@ -89,8 +89,8 @@ test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
         if (! "testthat" %in% .get.installed.pkgs())
             stop("The package 'testthat' could not be installed!")
     }
-    library(testthat)
 
+    loadNamespace('testthat')
     reporter <- eval(parse(text = "testthat:::find_reporter(reporter)"))
 
     if (!is.null(env.file))
@@ -177,7 +177,7 @@ has_no_error <- function ()
 ## run doc example
 .run.doc.example <- function(reporter, filter, r_root = NULL)
 {
-    library(tools)
+    loadNamespace('tools')
     if (is.null(r_root))
         x <- tools::Rd_db(.this.pkg.name)
     else
@@ -214,7 +214,6 @@ has_no_error <- function ()
             close(con)
         }
     }
-
     testthat::test_dir(outpath, reporter = reporter,
                        env = .testing.env, filter = filter)
 

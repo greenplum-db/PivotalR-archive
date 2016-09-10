@@ -205,7 +205,6 @@ print.dt.madlib <- function(x,
                             digits = max(3L, getOption("digits") - 3L),
                             ...)
 {
-    library(rpart)
     class(x) <- "rpart"
     out <- capture.output(print(x))
     if (!is.null(x$grp)) {
@@ -216,13 +215,17 @@ print.dt.madlib <- function(x,
 
 ## ------------------------------------------------------------
 
-plot.dt.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE, nspace,
-                           margin = 0, minbranch = 0.3, ...)
+plot.dt.madlib <- function(x, uniform = FALSE, branch = 1, compress = FALSE,
+                           nspace, margin = 0, minbranch = 0.3, ...)
 {
-    library(rpart)
-    class(x) <- "rpart"
-    plot(x, uniform=uniform, branch=branch, compress=compress, nspace=nspace,
-         margin=margin, minbranch=minbranch, ...)
+    if (requireNamespace("rpart", quietly = TRUE)) {
+        class(x) <- "rpart"
+        plot(x, uniform=uniform, branch=branch, compress=compress,
+             nspace=nspace, margin=margin, minbranch=minbranch, ...)
+    } else {
+        message("Error : Package rpart needs to be installed for plot")
+        stop()
+    }
 }
 
 ## ------------------------------------------------------------

@@ -76,38 +76,38 @@ madlib.randomForest <- function(formula, data, id = NULL,
     tbl.source <- content(data) # data table name
     madlib <- schema.madlib(conn.id) # MADlib schema
     tbl.output <- .unique.string()
-    sql <- paste("select ", madlib, ".forest_train('", 
-                 tbl.source, 
-                 "', '", 
-                 tbl.output, 
-                 "' , '", 
-                 id.col, 
-                 "', '", 
-                 params1$dep.str, 
-                 "', '", 
-                 gsub("(^array\\[|\\]$)", "", params1$ind.str), 
-                 "', NULL,", 
-                 grp, 
-                 ", ", 
+    sql <- paste("select ", madlib, ".forest_train('",
+                 tbl.source,
+                 "', '",
+                 tbl.output,
+                 "' , '",
+                 id.col,
+                 "', '",
+                 params1$dep.str,
+                 "', '",
+                 gsub("(^array\\[|\\]$)", "", params1$ind.str),
+                 "', NULL,",
+                 grp,
+                 ", ",
                  ntree,
                  ",NULL",
-                 ", ", 
-                 importance, 
-                 ", ", 
-                 nPerm, 
-                 ",", 
-                 params2$maxdepth, 
-                 ", ", 
-                 params2$minsplit, 
-                 ", ", 
-                 params2$minbucket, 
-                 ", ", 
-                 params2$nbins, 
-                 ", 'max_surrogates=", 
-                 params2$max_surrogates, 
-                 "', ", 
-                 verbose, 
-                 ")", 
+                 ", ",
+                 importance,
+                 ", ",
+                 nPerm,
+                 ",",
+                 params2$maxdepth,
+                 ", ",
+                 params2$minsplit,
+                 ", ",
+                 params2$minbucket,
+                 ", ",
+                 params2$nbins,
+                 ", 'max_surrogates=",
+                 params2$max_surrogates,
+                 "', ",
+                 verbose,
+                 ")",
                  sep = "")
 
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
@@ -118,7 +118,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
     model.group <- db.data.frame(paste(tbl.output, "_group", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
     method <- if (lk(model.summary$is_classification)) "classification" else "regression"
-    
+
     .restore.warnings(warnings)
 
     grouping.cols <- setdiff(names(model), c('tree', 'cat_levels_in_text', 'cat_n_levels', 'tree_depth'))
@@ -136,10 +136,10 @@ madlib.randomForest <- function(formula, data, id = NULL,
     con_features  <- strsplit(lk(model.summary$con_features),",")[[1]]
     cat_var_imp <- lk(model.group$cat_var_importance)
     con_var_imp  <- lk(model.group$con_var_importance)
-    
+
     len_cat_features <- length(cat_features)
     len_con_features <- length(con_features)
-    
+
     #populate result matrix for grouping vs non-grouping cases
     ngrps <- lk(model.summary$num_all_groups)
     if (ngrps == 1) { #no grouping
@@ -148,7 +148,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
 
         len_cat_var_imp <- length(cat_var_imp)
         len_con_var_imp <- length(con_var_imp)
-       
+
         cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
         if (is.na(cat_var_imp[1])) {
             len_cat_var_imp <- 0
@@ -163,7 +163,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
             len_con_var_imp <- 0
             cat_con_combined_var_imp <- NA
         }
-     
+
         var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
         rownames(var_imp)  <- c(cat_features, con_features)
         if (method == "classification") {
@@ -176,7 +176,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
         }
         rst <- list(model = model, model.summary = model.summary,
                     type = method, data = origin.data,
-                    mtry = num_random_features, 
+                    mtry = num_random_features,
                     ntree = ntrees, call = func_name,
                     importance = var_imp)
         class(rst) <- "rf.madlib"
@@ -186,7 +186,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
                     con_var_imp <- c(con_var_imp[i,])
                     len_cat_var_imp <- length(cat_var_imp)
                     len_con_var_imp <- length(con_var_imp)
-                   
+
                     cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
                     if (is.na(cat_var_imp[1])) {
                         len_cat_var_imp <- 0
@@ -201,7 +201,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
                         len_con_var_imp <- 0
                         cat_con_combined_var_imp <- NA
                     }
-                 
+
                     var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
                     rownames(var_imp)  <- c(cat_features, con_features)
                     if (method == "classification") {
@@ -250,7 +250,7 @@ predict.rf.madlib <- function(object, newdata, type = c("response", "prob"), ...
 
 ## ------------------------------------------------------------
 ## Function to retrieve a tree from the forest
-## Result format is the same as R's randomForest 
+## Result format is the same as R's randomForest
 ## ------------------------------------------------------------
 
 getTree.rf.madlib <- function (object, k=1, ...)
@@ -261,7 +261,7 @@ getTree.rf.madlib <- function (object, k=1, ...)
         stop(paste("tree not found. maximum number of trees in forest is ",ntrees))
     }
     sql <- paste("select ", "madlib", "._convert_to_random_forest_format(tree ", " ) as frame ",
-                 "from (select tree, row_number() OVER () as rnum from ", tbl.output, 
+                 "from (select tree, row_number() OVER () as rnum from ", tbl.output,
                  ")subq where subq.rnum = ", k, sep="")
     tree.info <- .db(sql)
     frame  <- tree.info$frame
@@ -299,12 +299,14 @@ getTree.rf.madlib <- function (object, k=1, ...)
 print.rf.madlib <- function(x,
                             digits = max(3L, getOption("digits") - 3L),
                             ...)
-{
-    library(randomForest)
-    class(x) <- "randomForest"
-    out <- capture.output(print(x))
-    writeLines(out)
-}
+    if (requireNamespace("randomForest", quietly = TRUE)) {
+        class(x) <- "randomForest"
+        out <- capture.output(print(x))
+        writeLines(out)
+    } else {
+        message("Error : Package randomForest needs to be installed for print")
+        stop()
+    }
 
 ## ------------------------------------------------------------
 

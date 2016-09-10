@@ -182,11 +182,11 @@ and it defaults to 0.
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
 
-  Maintainer: Caleb Welton, Pivotal Inc. \email{cwelton@pivotal.io}
+  Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
 \references{
-  [1] Greenplum database, \url{http://www.greenplum.com/products/greenplum-database}
+  [1] Greenplum database, \url{http://www.greenplum.org}
 }
 
 \seealso{
