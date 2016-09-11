@@ -7,8 +7,9 @@
 .db.connect.rpostgresql <- function(host, user, dbname, password,
                                     port, madlib)
 {
-    if (is.null(.localVars$drv$rpostgresql))
-        .localVars$drv$rpostgresql <- DBI::dbDriver("PostgreSQL")
+    if (is.null(.localVars$drv$rpostgresql)){
+      .localVars$drv$rpostgresql <- DBI::dbDriver("PostgreSQL", max.con=50)
+    }
 
     n.db <- length(.localVars$db)
     func <- getMethod("dbConnect", signature="PostgreSQLDriver",
@@ -17,8 +18,7 @@
                          host=host, user=user,
                          dbname=dbname,
                          password=password,
-                         port = port,
-                         max.con=50)
+                         port = port)
     if (length(.localVars$conn.id) == 0)
         conn.id <- 1
     else
