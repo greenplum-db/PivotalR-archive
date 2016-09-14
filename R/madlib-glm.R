@@ -419,13 +419,13 @@ show.logregr.madlib <- function (object)
     }
     origin.data <- data
     conn.id <- conn.id(data)
-
     ## Only MADlib 1.7 and newer are supported
     .check.madlib.version(data, allowed.version = 1.6)
 
     warnings <- .suppress.warnings(conn.id) # turn off warning messages
 
     analyzer <- .get.params(formula, data, na.action, na.as.level)
+
     data <- analyzer$data
     params <- analyzer$params
     is.tbl.source.temp <- analyzer$is.tbl.source.temp
@@ -544,13 +544,12 @@ show.logregr.madlib <- function (object)
             rst[[i]]$data <- origin.data
 
         rst[[i]]$origin.data <- origin.data
-        rst[[i]]$tbl <- r.nobs[i]
+        rst[[i]]$nobs <- r.nobs[i]
 
         class(rst[[i]]) <- "glm.madlib"
     }
 
     class(rst) <- 'glm.madlib.grps'
-
     if (n.grps == 1) return (rst[[1]])
     else return (rst)
 }

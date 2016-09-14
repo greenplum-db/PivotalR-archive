@@ -25,7 +25,6 @@
 {
     n <- ncol(data)
     params <- .analyze.formula(formula, data)
-
     if (!is.null(na.action)) {
         params$data <- na.action(params$data, vars =
                                  with(params, c(origin.dep, grp.vars,
@@ -40,10 +39,10 @@
     if (is(params$data, "db.Rquery")) {
         if (create.dummy) {
             tbl.source <- .unique.string()
-            is.tbl.source.temp <- TRUE
+            is.tbl.source.temp <- FALSE
             data <- as.db.data.frame(x = params$data,
                                      table.name = tbl.source,
-                                     is.temp = FALSE, verbose = FALSE,
+                                     is.temp = TRUE, verbose = FALSE,
                                      distributed.by = params$data@.dist.by,
                                      factor.full = params$factor.full,
                                      na.as.level = na.as.level)
@@ -52,7 +51,7 @@
                 tbl.source <- .unique.string()
                 data <- as.db.data.frame(x = params$data,
                                          table.name = tbl.source,
-                                         is.temp = FALSE, verbose = FALSE,
+                                         is.temp = TRUE, verbose = FALSE,
                                          distributed.by = params$data@.dist.by,
                                          factor.full = params$factor.full,
                                          na.as.level = na.as.level, pivot = FALSE)
@@ -64,7 +63,7 @@
         is.tbl.source.temp <- TRUE
         data <- as.db.data.frame(x = params$data,
                                  table.name = tbl.source,
-                                 is.temp = FALSE, verbose = FALSE)
+                                 is.temp = TRUE, verbose = FALSE)
     }
 
     is.factor <- data@.is.factor
@@ -178,6 +177,7 @@ clean.madlib.temp <- function(conn.id = 1)
 {
     for (tbl in db.objects(.unique.pattern(), conn.id=conn.id))
         delete(tbl, conn.id=conn.id, cascade = TRUE)
+    
 }
 
 ## ----------------------------------------------------------------------

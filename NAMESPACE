@@ -107,7 +107,7 @@ S3method(predict, bagging.model)
 exportMethods("colMeans", "colSums")
 export("colAgg", "db.array")
 export("crossprod", "unique")
-export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
+# export("exp", "log", "log10", "abs", "factorial", "sign", "sqrt")
 export ("PivotalR", "pivotalr")
 S3method(print, none.obj)
 
@@ -183,7 +183,7 @@ S3method(predict, lm.madlib.grps)
 exportMethods("as.integer", "as.character",
               "as.logical", "as.numeric", "as.Date")
 
-export("as.double", "as.time", "as.timestamp", "as.interval", "db.date.style")
+export("as.time", "as.timestamp", "as.interval", "db.date.style")
 
 export("lk", "col.types")
 
