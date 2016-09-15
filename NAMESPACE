@@ -64,6 +64,8 @@ S3method(predict, logregr.madlib.grps)
 S3method(predict, glm.madlib)
 S3method(predict, glm.madlib.grps)
 
+export("madlib.kmeans")
+
 # export sample in the future
 # export ("sample")
 

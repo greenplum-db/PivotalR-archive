@@ -347,7 +347,7 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
 
     [6] Wikipedia: Odds ratio, \url{http://en.wikipedia.org/wiki/Odds_ratio}
 
-    [7] Documentation of geberalized linear regression in latest MADlib,
+    [7] Documentation of generalized linear regression in latest MADlib,
     \url{http://doc.madlib.net/latest/group__grp__glm.html}
 
 }

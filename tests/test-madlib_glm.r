@@ -3,7 +3,7 @@ context("Test cases for madlib.glm and its helper functions")
 ## ------------------------------------------------------------
 ## Test preparations
 
-get.param.inputs(c(".port", ".dbname"))
+.get.param.inputs(c(".port", ".dbname"))
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 dat.r <- abalone
