@@ -31,12 +31,6 @@ arraydb.to.arrayr(str, type = "double", n = 1)
   \code{"logical"} and
   \code{"integer"} will be treated as \code{"numeric"}.
   }
-  \item{n}{
-    An integer, default is 1. If the input has \code{NA} instead of a string as
-   one element of a string array, how many \code{NA}'s should be returned so that
-    a valid array can be returned. There should be as many \code{NA} as the number
-  of elements in other output rows without \code{NA}.
-  }
 }
 
 \details{

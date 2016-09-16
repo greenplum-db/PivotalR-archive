@@ -6,7 +6,7 @@
 ## -----------------------------------------------------------------------
 
 ## convert {...} string into an arrayparams$grp.str
-arraydb.to.arrayr <- function (str, type = "double", n = 1)
+arraydb.to.arrayr <- function (str, type = "double", ...)
 {
     if (is.null(str)) return (NULL)
 
