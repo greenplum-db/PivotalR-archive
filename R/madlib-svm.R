@@ -280,7 +280,7 @@ show.svm.madlib.grps <- function (object)
 
 ## -----------------------------------------------------------------------
 
-## Pretty format of linear regression result
+## Pretty format of svm result
 ## Print a list of models
 print.svm.madlib.grps <- function (x, ...)
 {
