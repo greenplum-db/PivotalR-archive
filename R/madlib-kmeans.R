@@ -12,11 +12,9 @@ madlib.kmeans <- function(
 {
     .validate.input(x, iter.max, nstart, algorithm)
 
-    # MADlib version should be 1.9.2 but that format is not supported yet
-    # .check.madlib.version(x, allowed.version=1.9.2)
-
     conn.id <- conn.id(x) # connection ID
     warnings <- .suppress.warnings(conn.id)
+    madlib.ver <- .madlib.version.number(conn.id)
 
     db <- .get.dbms.str(conn.id)
     madlib <- schema.madlib(conn.id) # MADlib schema name
@@ -30,6 +28,7 @@ madlib.kmeans <- function(
 
     if(class(centers) == "numeric") { # just the number of centroids
 
+        center.count <- centers
         if (kmeanspp){
             km.func <- "kmeanspp"
         }else{
@@ -84,9 +83,15 @@ madlib.kmeans <- function(
 
     }else{
         if (!is.null(expr.centroid)){
+            center.count <- db.q(
+                paste("SELECT count(*) FROM ", centers, sep=""),
+                nrows = -1, conn.id = conn.id, verbose = FALSE)$count
+
             centers <- paste(centers,"','",expr.centroid)
+            print(center.count)
         } else if (class(centers) == "matrix"){
 
+            center.count <- nrow(centers)
             # Matrix to 2d array conversion
             # y<-apply(centers, 1, paste, collapse =",", sep="")
             # z<-paste("{",y,"}")
@@ -126,22 +131,27 @@ madlib.kmeans <- function(
     # MADlib cluster ids start from 0, R start from 1
     res.cluster <- cluster$cluster_id+1
 
-    res.withinss <- as.vector(arraydb.to.arrayr(res.raw$cluster_variance))
+
  	res.tot.withinss <- res.raw$objective_fn
  	res.size <- as.vector(table(res.cluster))
     res.iter <- res.raw$num_iterations
 
     res.centers <- matrix(arraydb.to.arrayr(res.raw$centroids),
-        nrow=length(res.withinss), byrow=TRUE)
+        nrow=center.count, byrow=TRUE)
 
     rownames(res.centers) <- names(table(res.cluster))
 
-    .restore.warnings(warnings)
+	ret <- list(cluster=res.cluster, centers=res.centers,
+		tot.withinss=res.tot.withinss, size = res.size, iter=res.iter)
 
-	structure(list(cluster=res.cluster, centers=res.centers,
-        withinss=res.withinss,
-		tot.withinss=res.tot.withinss, size = res.size, iter=res.iter),
-		class="kmeans")
+    if (madlib.ver > "1.9.1"){
+        c(ret, withinss=as.vector(
+            arraydb.to.arrayr(res.raw$cluster_variance)))
+    }
+
+    ret <- structure(ret, class="kmeans")
+    .restore.warnings(warnings)
+    ret
 }
 
 .validate.input <- function( x, iter.max, nstart, algorithm, ...)
