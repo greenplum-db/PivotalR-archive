@@ -378,25 +378,3 @@ predict.svm.madlib <- function (object, newdata, id.col, ...)
     .db(sql, conn.id = conn.id, verbose = FALSE)
     db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

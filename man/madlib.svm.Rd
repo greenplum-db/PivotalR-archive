@@ -217,29 +217,6 @@ madlib.svm (formula, data,
   Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 
-\references{
-
-  [1] Xixuan Feng, Arun Kumar, Ben Recht, and Christopher Re:
-      Towards a Unified Architecture for in-RDBMS analytics,
-      in SIGMOD Conference, 2012
-  \url{http://www.eecs.berkeley.edu/~brecht/papers/12.FengEtAl.SIGMOD.pdf}
-
-  [2] Purushottam Kar and Harish Karnick: Random Feature Maps for Dot
-      Product Kernels, Proceedings of the 15th International Conference
-      on Artificial Intelligence and Statistics, 2012,
-  \url{http://machinelearning.wustl.edu/mlpapers/paper_files/AISTATS2012_KarK12.pdf}.
-
-  [3] Ali Rahmini and Ben Recht: Random Features for Large-Scale
-      Kernel Machines, Neural Information Processing Systems 2007,
-  \url{http://www.eecs.berkeley.edu/~brecht/papers/07.rah.rec.nips.pdf}
-
-  [4] Bernhard Scholkopf and Alexander Smola: Learning with Kernels,
-      The MIT Press, Cambridge, MA, 2002.
-
-  [5] Vladimir Cherkassky and Yunqian Ma: Practical Selection of SVM Parameters
-      and Noise Estimation for SVM Regression, Neural Networks, 2004
-      http://www.ece.umn.edu/users/cherkass/N2002-SI-SVM-13-whole.pdf
-}
 \note{
   \code{|} is not part of standard R formula object, but many R packages
   use \code{|} to add their own functionalities into formula
