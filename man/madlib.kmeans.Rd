@@ -86,6 +86,10 @@ madlib.kmeans(
     The proportion of subsample of original dataset to use for kmeans++
     centroid seeding method.
   }
+  \item{\dots}{
+    Further arguments passed to or from other methods. Currently, no more
+    parameters can be passed to madlib.kmeans.
+  }
 }
 
 \details{

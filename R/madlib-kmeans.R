@@ -2,8 +2,6 @@
 ## Wrapper function for MADlib's kmeans functions
 ## ----------------------------------------------------------------------
 
-setClass("kmeans.madlib")
-
 madlib.kmeans <- function(
 	x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd",
 	pid, expr, expr.centroid = NULL,
