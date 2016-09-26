@@ -15,7 +15,7 @@
 }
 
 \usage{
-arraydb.to.arrayr(str, type = "double", n = 1)
+arraydb.to.arrayr(str, type = "double", ...)
 }
 
 \arguments{
@@ -30,6 +30,10 @@ arraydb.to.arrayr(str, type = "double", n = 1)
   \code{"numeric"} etc. All types other than \code{"character"},
   \code{"logical"} and
   \code{"integer"} will be treated as \code{"numeric"}.
+  }
+  \item{\dots}{
+    Further arguments passed to or from other methods. Currently, no more
+    parameters can be passed and this is kept for backwards compatibility.
   }
 }
 
