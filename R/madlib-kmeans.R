@@ -3,8 +3,7 @@
 ## ----------------------------------------------------------------------
 
 madlib.kmeans <- function(
-	x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd",
-	pid, expr, expr.centroid = NULL,
+	x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", pid,
     fn.dist = "squared_dist_norm2", agg.centroid = "avg", min.frac = 0.001,
     kmeanspp = FALSE, seeding.sample.ratio=1.0, ...)
 {
@@ -17,14 +16,33 @@ madlib.kmeans <- function(
     db <- .get.dbms.str(conn.id)
     madlib <- schema.madlib(conn.id) # MADlib schema name
 
+
+    db.q("DROP TABLE IF EXISTS __madlib_temp_kmeans__",
+        nrows = -1, conn.id = conn.id, verbose = FALSE)
+
+    # Fix the input data
+
+    expr <- names(x)
+    expr <- expr[expr != pid]
+
+    # Collate columns other than pid
+    if (length(expr) > 1){
+
+        tmp.x <- .collate.columns(x, expr)
+        new.x.name <- .unique.string()
+        db.q("create table ", new.x.name,
+            " as (select ", pid, ", __madlib_coll__ from ",
+            content(tmp.x), ")", sep="")
+        x <- db.data.frame(new.x.name, conn.id=conn.id)
+        expr <- "__madlib_coll__"
+    }
+
     tbl.source <- content(x)
     tbl.fn.dist <- paste(madlib,".",fn.dist, sep="")
     tbl.agg <- paste(madlib,".", agg.centroid, sep="")
 
-    db.q("DROP TABLE IF EXISTS __madlib_pivotalr_kmeans__",
-        nrows = -1, conn.id = conn.id, verbose = FALSE)
-
-    if(class(centers) == "numeric") { # just the number of centroids
+    cl <- class(centers)
+    if(cl == "numeric") { # just the number of centroids
 
         center.count <- centers
         if (kmeanspp){
@@ -50,16 +68,16 @@ madlib.kmeans <- function(
         for (i in 1:nstart){
 
             db.q(paste(
-                "DROP TABLE IF EXISTS __madlib_pivotalr_kmeans__",i,"__",
+                "DROP TABLE IF EXISTS __madlib_temp_kmeans__",i,"__",
                 sep="" ), nrows = -1, conn.id = conn.id, verbose = FALSE)
 
-            sql_i <- paste("CREATE TABLE __madlib_pivotalr_kmeans__",i,
+            sql_i <- paste("CREATE TABLE __madlib_temp_kmeans__",i,
                 "__ AS SELECT * FROM ", sql_from, sep="")
 
             db.q(sql_i, nrows = -1, conn.id = conn.id, verbose = FALSE)
 
             res.i <- db.q(paste(
-                "SELECT * FROM __madlib_pivotalr_kmeans__",i,"__",sep=""
+                "SELECT * FROM __madlib_temp_kmeans__",i,"__",sep=""
                 ), nrows = -1, conn.id = conn.id, verbose = FALSE)
 
             if (res.i$objective_fn < obj){
@@ -69,24 +87,27 @@ madlib.kmeans <- function(
         }
 
         sql_km <- paste(
-            "CREATE TABLE __madlib_pivotalr_kmeans__ AS SELECT * FROM
-            __madlib_pivotalr_kmeans__",obji,"__", sep="")
+            "CREATE TABLE __madlib_temp_kmeans__ AS SELECT * FROM",
+            " __madlib_temp_kmeans__",obji,"__", sep="")
 
         db.q(sql_km, nrows = -1, conn.id = conn.id, verbose = FALSE)
 
         lapply(1:nstart, FUN=function(i) {
             db.q(paste(
-                "DROP TABLE IF EXISTS __madlib_pivotalr_kmeans__",i,"__",
+                "DROP TABLE IF EXISTS __madlib_temp_kmeans__",i,"__",
                 sep="" ), nrows = -1, conn.id = conn.id, verbose = FALSE)})
 
-    }else{
-        if (!is.null(expr.centroid)){
+    } else {
+        if (cl == "db.table") {
+
+            centers.name <- content(centers)
             center.count <- db.q(
-                paste("SELECT count(*) FROM ", centers, sep=""),
+                paste("SELECT count(*) FROM ", centers.name, sep=""),
                 nrows = -1, conn.id = conn.id, verbose = FALSE)$count
 
-            centers <- paste(centers,"','",expr.centroid)
-            print(center.count)
+            centers <- paste(centers.name,"','",names(centers)[1])
+
+
         } else if (class(centers) == "matrix"){
 
             center.count <- nrow(centers)
@@ -100,10 +121,13 @@ madlib.kmeans <- function(
             centers <- paste("{", paste( paste( "{",
                 apply( centers, 1, paste, collapse =",", sep=""), "}", sep=""),
                 sep="", collapse=","), "}", sep="")
+        } else {
+
+            stop("madlib.kmeans could not recognize the centers parameter")
         }
 
         sql_km <- paste(
-            "CREATE TABLE __madlib_pivotalr_kmeans__ AS select * from ",
+            "CREATE TABLE __madlib_temp_kmeans__ AS select * from ",
             madlib, ".kmeans('", tbl.source, "','",
             expr, "','", centers, "','",
             tbl.fn.dist, "','", tbl.agg, "',",
@@ -113,7 +137,7 @@ madlib.kmeans <- function(
     }
 
 
-    res.raw <- db.q("SELECT * FROM __madlib_pivotalr_kmeans__",
+    res.raw <- db.q("SELECT * FROM __madlib_temp_kmeans__",
     	nrows = -1, conn.id = conn.id, verbose = FALSE)
 
     # Find the closest columns for the clustering vector
@@ -121,7 +145,7 @@ madlib.kmeans <- function(
     	"SELECT data.", pid, ", (" ,madlib ,
     	".closest_column(centroids, data.",expr,")).column_id ",
     	" AS cluster_id FROM ", tbl.source, " AS data, ",
-    	"(SELECT centroids FROM __madlib_pivotalr_kmeans__) as centroids ",
+    	"(SELECT centroids FROM __madlib_temp_kmeans__) as centroids ",
     	" ORDER BY ", pid,sep="")
 
     cluster <- db.q(sql_cl, nrows = -1, conn.id = conn.id, verbose = FALSE)
@@ -139,13 +163,18 @@ madlib.kmeans <- function(
 
     rownames(res.centers) <- names(table(res.cluster))
 
-	ret <- list(cluster=res.cluster, centers=res.centers,
-		tot.withinss=res.tot.withinss, size = res.size, iter=res.iter)
-
     if (madlib.ver > "1.9.1"){
-        c(ret, withinss=as.vector(
-            arraydb.to.arrayr(res.raw$cluster_variance)))
+        res.withinss = as.vector(arraydb.to.arrayr(res.raw$cluster_variance))
+    } else {
+        res.withinss = NULL
+        warning("MADlib version is lower than 1.9.2.",
+            "Some output fields might be missing.")
     }
+
+    ret <- list( cluster=res.cluster, centers=res.centers,
+        withinss=res.withinss, tot.withinss=res.tot.withinss,
+        size = res.size, iter=res.iter)
+
 
     ret <- structure(ret, class="kmeans")
     .restore.warnings(warnings)

@@ -18,8 +18,7 @@
 \usage{
 
 madlib.kmeans(
-  x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd",
-  pid, expr, expr.centroid = NULL,
+  x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", pid,
   fn.dist = "squared_dist_norm2", agg.centroid = "avg", min.frac = 0.001,
   kmeanspp = FALSE, seeding.sample.ratio=1.0, ...)
 
@@ -37,13 +36,12 @@ madlib.kmeans(
 
   \item{centers}{
 
-    A number, a matrix or a string which indicates how the centers are
-    formed by the function. If it is a number, this sets the number of
-    target centroids and the random (or kmeans++) seeding method is
-    used. Otherwise, this parameters is used for initial centers. If
-    it is a matrix, its rows will denote the initial centroid
-    coordinates. Otherwise this parameter will contain the name of a
-    table in the connected databasethat contains the initial centroids.
+    A number, a matrix or db.data.frame object. If it is a number, this sets
+    the number of target centroids and the random (or kmeans++) seeding method
+    is used. Otherwise, this parameter is used for initial centers. If it is a
+    matrix, its rows will denote the initial centroid coordinates. Else, this
+    parameter will point to a table in the connected database that contains the
+    initial centroids.
   }
 
   \item{iter.max}{
@@ -61,18 +59,9 @@ madlib.kmeans(
     Name of the column (from the table that is pointed by \code{x}) that
     contains the ids for each point.
   }
-  \item{expr}{
-    Name of the column (from the table that is pointed by \code{x}) that
-    contains the coordinate arrays for each point.
-  }
-  \item{expr.centroid}{
-    Name of the column (from the table that is pointed by \code{centers}) that
-    contains the coordinate arrays for each initial centroid.
-  }
   \item{fn.dist}{
     The distance function used by MADlib to compute the objective function.
   }
-
   \item{agg.centroid}{
     The aggregate function used by MADlib to compute the objective function.
   }
@@ -137,6 +126,41 @@ madlib.kmeans(
     \code{\link{madlib.lm}}, \code{\link{madlib.summary}},
     \code{\link{madlib.arima}} are MADlib wrapper functions.
 
+}
+
+\examples{
+\dontrun{
+%% @test .port Database port number
+%% @test .dbname Database name
+## set up the database connection
+## Assume that .port is port number and .dbname is the database name
+cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
+
+dat <- db.data.frame("__madlib_km_sample__", conn.id = cid, verbose = FALSE)
+cent <- db.data.frame("__madlib_km_centroids__", conn.id = cid, verbose = FALSE)
+
+seed.matrix <- matrix(
+  c(14.23,1.71,2.43,15.6,127,2.8,3.06,0.28,2.29,5.64,1.04,3.92,1065,
+    13.2,1.78,2.14,11.2,1,2.65,2.76,0.26,1.28,4.38,1.05,3.49,1050),
+  byrow=T, nrow=2)
+
+fit <- madlib.kmeans(dat, 2, pid= 'pid')
+fit
+
+## kmeans++ seeding method
+fit <- madlib.kmeans(dat, 2, pid= 'pid', kmeanspp=TRUE)
+fit # display the result
+
+## Initial centroid table
+fit <- madlib.kmeans(dat, centers= cent, pid= 'pid')
+fit
+
+## Initial centroid matrix
+fit <- madlib.kmeans(dat, centers= seed.matrix, pid= 'pid')
+fit
+
+db.disconnect(cid)
+}
 }
 
 \keyword{madlib}

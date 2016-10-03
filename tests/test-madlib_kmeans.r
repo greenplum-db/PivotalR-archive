@@ -31,6 +31,7 @@ ORDER BY random()
 LIMIT 2", nrows = -1, conn.id = cid, verbose = FALSE)
 
 dat <- db.data.frame("__madlib_km_sample__", conn.id = cid, verbose = FALSE)
+cent <- db.data.frame("__madlib_km_centroids__", conn.id = cid, verbose = FALSE)
 
 seed.matrix <- matrix(
 	c(14.23,1.71,2.43,15.6,127,2.8,3.06,0.28,2.29,5.64,1.04,3.92,1065,
@@ -39,7 +40,7 @@ seed.matrix <- matrix(
 
 test_that("Test kmeans (random seed)", {
 
-	db.out <- madlib.kmeans(dat, 2, pid= 'pid', expr= 'points')
+	db.out <- madlib.kmeans(dat, 2, pid= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 
@@ -47,15 +48,14 @@ test_that("Test kmeans (random seed)", {
 
 test_that("Test kmeans (kmeans++)", {
 
-	db.out <- madlib.kmeans(dat, 2, pid= 'pid', expr= 'points', kmeanspp=TRUE)
+	db.out <- madlib.kmeans(dat, 2, pid= 'pid', kmeanspp=TRUE)
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 })
 
 test_that("Test kmeans (seed table)", {
 
-	db.out <- madlib.kmeans(dat, pid= 'pid', expr= 'points',
-		centers= '__madlib_km_centroids__', expr.centroid = 'points')
+	db.out <- madlib.kmeans(dat, centers= cent, pid= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 
@@ -63,7 +63,7 @@ test_that("Test kmeans (seed table)", {
 
 test_that("Test kmeans (seed matrix)", {
 
-	db.out <- madlib.kmeans(dat, seed.matrix, pid= 'pid', expr= 'points')
+	db.out <- madlib.kmeans(dat, seed.matrix, pid= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 
