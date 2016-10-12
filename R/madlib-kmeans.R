@@ -3,7 +3,7 @@
 ## ----------------------------------------------------------------------
 
 madlib.kmeans <- function(
-	x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", pid,
+	x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", key,
     fn.dist = "squared_dist_norm2", agg.centroid = "avg", min.frac = 0.001,
     kmeanspp = FALSE, seeding.sample.ratio=1.0, ...)
 {
@@ -16,23 +16,23 @@ madlib.kmeans <- function(
     db <- .get.dbms.str(conn.id)
     madlib <- schema.madlib(conn.id) # MADlib schema name
 
-
     db.q("DROP TABLE IF EXISTS __madlib_temp_kmeans__",
         nrows = -1, conn.id = conn.id, verbose = FALSE)
 
     # Fix the input data
 
     expr <- names(x)
-    expr <- expr[expr != pid]
+    expr <- expr[expr != key]
 
-    # Collate columns other than pid
+    # Collate columns other than key
     if (length(expr) > 1){
 
         tmp.x <- .collate.columns(x, expr)
+        print(content(tmp.x))
         new.x.name <- .unique.string()
         db.q("create table ", new.x.name,
-            " as (select ", pid, ", __madlib_coll__ from ",
-            content(tmp.x), ")", sep="")
+            " as (select ", key, ", __madlib_coll__ from ",
+            content(tmp.x), ")", sep="", verbose = FALSE))
         x <- db.data.frame(new.x.name, conn.id=conn.id)
         expr <- "__madlib_coll__"
     }
@@ -101,12 +101,23 @@ madlib.kmeans <- function(
         if (cl == "db.table") {
 
             centers.name <- content(centers)
-            center.count <- db.q(
-                paste("SELECT count(*) FROM ", centers.name, sep=""),
-                nrows = -1, conn.id = conn.id, verbose = FALSE)$count
+            center.count <- nrow(centers)
 
-            centers <- paste(centers.name,"','",names(centers)[1])
+            # Fix the centers table
+            c.expr <- names(centers)
+            if (c.expr > 1){
 
+                tmp.c <- .collate.columns(centers, c.expr)
+                centers.name <- .unique.string()
+                db.q("create table ", centers.name,
+                    " as (select __madlib_coll__ from ",
+                    content(tmp.c), ")", sep="")
+                centers <- paste(centers.name, "','__madlib_coll__")
+
+            } else{
+
+                centers <- paste(centers.name,"','",names(centers)[1])
+            }
 
         } else if (class(centers) == "matrix"){
 
@@ -142,11 +153,11 @@ madlib.kmeans <- function(
 
     # Find the closest columns for the clustering vector
     sql_cl <- paste(
-    	"SELECT data.", pid, ", (" ,madlib ,
+    	"SELECT data.", key, ", (" ,madlib ,
     	".closest_column(centroids, data.",expr,")).column_id ",
     	" AS cluster_id FROM ", tbl.source, " AS data, ",
     	"(SELECT centroids FROM __madlib_temp_kmeans__) as centroids ",
-    	" ORDER BY ", pid,sep="")
+    	" ORDER BY ", key,sep="")
 
     cluster <- db.q(sql_cl, nrows = -1, conn.id = conn.id, verbose = FALSE)
 
