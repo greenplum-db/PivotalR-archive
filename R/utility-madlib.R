@@ -237,3 +237,29 @@ clean.madlib.temp <- function(conn.id = 1)
     }
     gsub("\\s+", " ", paste(deparse(res), collapse = " "))
 }
+
+## ----------------------------------------------------------------------
+
+## Create a view that collates the specified columns into an array
+.collate.columns <- function (data, columns, arr.name = "__madlib_coll__"){
+
+    conn.id <- conn.id(data)
+    warnings <- .suppress.warnings(conn.id)
+    if (! is(data, "db.obj"))
+        stop("collate.columns can only be used on a db.obj object, and ",
+             deparse(substitute(data)), " is not!")
+
+    view.name <- .unique.string()
+    data.name <- content(data)
+
+
+    sql <- paste( "CREATE VIEW ", view.name, " AS ( SELECT *, ARRAY[",
+        paste(columns, collapse=', '),
+        "] as ",arr.name," FROM ", data.name, ")")
+
+    db.q(sql, conn.id = conn.id, verbose = FALSE)
+
+    ret <- db.data.frame(view.name, conn.id=conn.id)
+    .restore.warnings(warnings)
+    ret
+}

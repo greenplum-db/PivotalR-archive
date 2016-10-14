@@ -126,7 +126,7 @@ test <- function(tests.path = "tests", man.path = NULL, filter = NULL,
                  })
     }
 
-    if (reporter$failed) {
+    if (!is.null(reporter$failed)) {
         cleanup.conn()
         stop("Test failures", call. = FALSE)
     }

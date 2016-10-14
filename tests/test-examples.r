@@ -21,7 +21,7 @@ dat.im <- abalone
 ## Tests
 
 test_that("Examples of speed test",
-          ## takes les than 2 seconds
+          ## takes less than 2 seconds
           ## 1
           expect_that(madlib.lm(rings ~ . - id - sex, data = dat),
                       takes_less_than(5)))
