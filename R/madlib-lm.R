@@ -36,6 +36,9 @@ madlib.lm <- function (formula, data, na.action = NULL,
     ## analyze the formula
     analyzer <- .get.params(formula, data, na.action, na.as.level)
 
+
+
+
     ## For db.view or db.R.query, create a temporary table
     ## For pivoted db.Rquery, realize the pivoting
     ## Else: just return the original data table
@@ -117,6 +120,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
 
     r.grp.cols <- gsub("\"", "", arraydb.to.arrayr(params$grp.str,
                                                    "character", n))
+    r.nobs <- res$num_rows_processed
     r.grp.expr <- params$grp.expr
     r.has.intercept <- params$has.intercept # do we have an intercept
     ## r.ind.vars <- gsub("\"", "", params$ind.vars)
@@ -187,7 +191,7 @@ madlib.lm <- function (formula, data, na.action = NULL,
             rst[[i]]$data <- origin.data
 
         rst[[i]]$origin.data <- origin.data
-        rst[[i]]$nobs <- nrow(rst[[i]]$data)
+        rst[[i]]$nobs <- r.nobs[i]
 
         class(rst[[i]]) <- "lm.madlib" # A single model class
 
