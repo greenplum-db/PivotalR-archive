@@ -26,16 +26,23 @@ test_that("Test control params parsing", {
   epsilon = c(1, 2)
   control = list(max.iter = c(1, 100), norm = "l2", decay.factor = c(3, 7))
   params <- .validate.params(class.weight, tolerance, epsilon, cross, lambda, control)
-  expect_equal(params,paste0("tolerance = 1e-10, lambda = [0.1, 1], n_folds = 4, epsilon = [1, 2], ",
-                            "max_iter = [1, 100], norm = l2, decay_factor = [3, 7]"))
+  expect_equal(params,
+               paste0("tolerance = 1e-10, lambda = [0.1, 1], n_folds = 4, ",
+                      "epsilon = [1, 2], max_iter = [1, 100], norm = l2, ",
+                      "decay_factor = [3, 7]"))
 
   epsilon <- NULL
   control <- list()
   params <- .validate.params(class.weight, tolerance, epsilon, cross, lambda, control)
   expect_equal(params, "tolerance = 1e-10, lambda = [0.1, 1], n_folds = 4")
 })
+# ------------------------------------------------------------------------------
+# -- Tests for the database functions ------------------------------------------
+# ------------------------------------------------------------------------------
 
-.get.param.inputs(c(".port", ".dbname"))
+.dbname = get('pivotalr_dbname', envir=env)
+.port = get('pivotalr_port', envir=env)
+
 conn.id <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 data <- as.db.data.frame(abalone, conn.id = conn.id, verbose = FALSE)
 data.table <- content(data)
@@ -123,7 +130,3 @@ test_that("Test one-class svm", {
   res.r <- pred.r[with(pred.r, order(id)), ]$prediction
   expect_equal(res.sql, res.r, tolerance = 1e-2)
 })
-
-
-
-

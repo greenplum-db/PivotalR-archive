@@ -3,7 +3,8 @@ context("Test cases for madlib.kmeans and its helper functions")
 ## ------------------------------------------------------------
 ## Test preparations
 
-.get.param.inputs(c(".port", ".dbname"))
+.dbname = get('pivotalr_dbname', envir=env)
+.port = get('pivotalr_port', envir=env)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 dat.matrix <- matrix( c(

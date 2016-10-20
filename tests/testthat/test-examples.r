@@ -11,7 +11,7 @@ env <- new.env(parent = globalenv())
 ## connection ID
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
-## data in the datbase
+## data in the database
 dat <- as.db.data.frame(abalone, conn.id = cid, verbose = FALSE)
 
 ## data in memory
