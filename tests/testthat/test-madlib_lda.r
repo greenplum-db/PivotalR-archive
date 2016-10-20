@@ -7,7 +7,7 @@ env <- new.env(parent = globalenv())
 .dbname = get('pivotalr_dbname', envir=env)
 .port = get('pivotalr_port', envir=env)
 
-cid <- db.connect(port = pivr.port, dbname = pivr.dbname, verbose = FALSE)
+cid <- db.connect(port = pivotalr_port, dbname = pivotalr_dbname, verbose = FALSE)
 db <- .get.dbms.str(cid)
 
 library(topicmodels)

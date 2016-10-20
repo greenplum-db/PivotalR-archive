@@ -39,7 +39,7 @@ test_that("Test control params parsing", {
 # ------------------------------------------------------------------------------
 # -- Tests for the database functions ------------------------------------------
 # ------------------------------------------------------------------------------
-
+env <- new.env(parent = globalenv())
 .dbname = get('pivotalr_dbname', envir=env)
 .port = get('pivotalr_port', envir=env)
 
