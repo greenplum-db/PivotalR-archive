@@ -34,7 +34,7 @@ dat <- as.db.data.frame(as.data.frame(dat.matrix), conn.id=cid, verbose=FALSE)
 cent <- as.db.data.frame(as.data.frame(cent.r), conn.id=cid, verbose=FALSE)
 
 test_that("Test kmeans (random seed)", {
-
+    testthat::skip_on_cran()
     db.out <- madlib.kmeans(dat, 2, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
@@ -42,14 +42,14 @@ test_that("Test kmeans (random seed)", {
 })
 
 test_that("Test kmeans (kmeans++)", {
-
+    testthat::skip_on_cran()
 	  db.out <- madlib.kmeans(dat, 2, key= 'pid', kmeanspp=TRUE)
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 })
 
 test_that("Test kmeans (seed table)", {
-
+    testthat::skip_on_cran()
 	  db.out <- madlib.kmeans(dat, centers= cent, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
@@ -57,7 +57,7 @@ test_that("Test kmeans (seed table)", {
 })
 
 test_that("Test kmeans (seed matrix)", {
-
+    testthat::skip_on_cran()
 	  db.out <- madlib.kmeans(dat, cent.r, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))

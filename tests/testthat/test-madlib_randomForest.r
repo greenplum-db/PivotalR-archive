@@ -13,6 +13,7 @@ dat.r <- abalone
 
 ## The tests
 test_that("Test randomForest", {
-  expect_error(
-    fit.db <- madlib.randomForest(sex ~ . - id, data = dat, id = 'id'), NA)
+    testthat::skip_on_cran()
+    expect_error(fit.db <- madlib.randomForest(sex ~ . - id,
+                                               data = dat, id = 'id'), NA)
 })
