@@ -18,7 +18,7 @@
 \usage{
 
 madlib.kmeans(
-  x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", pid,
+  x, centers, iter.max = 10, nstart = 1, algorithm = "Lloyd", key,
   fn.dist = "squared_dist_norm2", agg.centroid = "avg", min.frac = 0.001,
   kmeanspp = FALSE, seeding.sample.ratio=1.0, ...)
 
@@ -55,7 +55,7 @@ madlib.kmeans(
     The algorithm to compute the kmeans. Currently disabled (default:
     ``\code{Lloyd}'') and kept for the future implementations.
   }
-  \item{pid}{
+  \item{key}{
     Name of the column (from the table that is pointed by \code{x}) that
     contains the ids for each point.
   }
@@ -144,19 +144,19 @@ seed.matrix <- matrix(
     13.2,1.78,2.14,11.2,1,2.65,2.76,0.26,1.28,4.38,1.05,3.49,1050),
   byrow=T, nrow=2)
 
-fit <- madlib.kmeans(dat, 2, pid= 'pid')
+fit <- madlib.kmeans(dat, 2, key= 'key')
 fit
 
 ## kmeans++ seeding method
-fit <- madlib.kmeans(dat, 2, pid= 'pid', kmeanspp=TRUE)
+fit <- madlib.kmeans(dat, 2, key= 'key', kmeanspp=TRUE)
 fit # display the result
 
 ## Initial centroid table
-fit <- madlib.kmeans(dat, centers= cent, pid= 'pid')
+fit <- madlib.kmeans(dat, centers= cent, key= 'key')
 fit
 
 ## Initial centroid matrix
-fit <- madlib.kmeans(dat, centers= seed.matrix, pid= 'pid')
+fit <- madlib.kmeans(dat, centers= seed.matrix, key= 'key')
 fit
 
 db.disconnect(cid)
