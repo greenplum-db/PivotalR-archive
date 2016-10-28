@@ -25,6 +25,7 @@ skip_if <- function(cond, test.expr)
     l1 <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
     l2 <- sum(sapply(gregexpr("expect_this\\(", expr), function(s) sum(s>0)))
     l <- l1 + l2
+
     if (cond) {
         if (.localVars$test.reporter %in% c("summary", "minimal"))
             for (i in seq_len(l)) cat(testthat_colourise(",", fg = "purple"))

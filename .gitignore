@@ -8,3 +8,4 @@ tags
 libadp.a
 *.Rproj*
 *.Rbuildignore*
+.Rproj.user

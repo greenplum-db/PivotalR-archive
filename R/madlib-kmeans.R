@@ -32,8 +32,8 @@ madlib.kmeans <- function(
         new.x.name <- .unique.string()
         db.q("create table ", new.x.name,
             " as (select ", key, ", __madlib_coll__ from ",
-            content(tmp.x), ")", sep="", verbose = FALSE))
-        x <- db.data.frame(new.x.name, conn.id=conn.id)
+            content(tmp.x), ")", sep="", verbose = FALSE)
+        x <- db.data.frame(new.x.name, conn.id=conn.id, verbose=FALSE)
         expr <- "__madlib_coll__"
     }
 
@@ -111,7 +111,7 @@ madlib.kmeans <- function(
                 centers.name <- .unique.string()
                 db.q("create table ", centers.name,
                     " as (select __madlib_coll__ from ",
-                    content(tmp.c), ")", sep="")
+                    content(tmp.c), ")", sep="", verbose = FALSE)
                 centers <- paste(centers.name, "','__madlib_coll__")
 
             } else{

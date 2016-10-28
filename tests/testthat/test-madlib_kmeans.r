@@ -2,8 +2,9 @@ context("Test cases for madlib.kmeans and its helper functions")
 
 ## ------------------------------------------------------------
 ## Test preparations
-
-.get.param.inputs(c(".port", ".dbname"))
+env <- new.env(parent = globalenv())
+.dbname = get('pivotalr_dbname', envir=env)
+.port = get('pivotalr_port', envir=env)
 cid <- db.connect(port = .port, dbname = .dbname, verbose = FALSE)
 
 dat.matrix <- matrix( c(
@@ -33,31 +34,31 @@ dat <- as.db.data.frame(as.data.frame(dat.matrix), conn.id=cid, verbose=FALSE)
 cent <- as.db.data.frame(as.data.frame(cent.r), conn.id=cid, verbose=FALSE)
 
 test_that("Test kmeans (random seed)", {
-
-	db.out <- madlib.kmeans(dat, 2, key= 'pid')
+    testthat::skip_on_cran()
+    db.out <- madlib.kmeans(dat, 2, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 
 })
 
 test_that("Test kmeans (kmeans++)", {
-
-	db.out <- madlib.kmeans(dat, 2, key= 'pid', kmeanspp=TRUE)
+    testthat::skip_on_cran()
+	  db.out <- madlib.kmeans(dat, 2, key= 'pid', kmeanspp=TRUE)
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 })
 
 test_that("Test kmeans (seed table)", {
-
-	db.out <- madlib.kmeans(dat, centers= cent, key= 'pid')
+    testthat::skip_on_cran()
+	  db.out <- madlib.kmeans(dat, centers= cent, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 
 })
 
 test_that("Test kmeans (seed matrix)", {
-
-	db.out <- madlib.kmeans(dat, cent.r, key= 'pid')
+    testthat::skip_on_cran()
+	  db.out <- madlib.kmeans(dat, cent.r, key= 'pid')
     expect_that(db.out, is_a("kmeans"))
     expect_that(db.out$centers, is_a("matrix"))
 

@@ -1,260 +1,33 @@
-Introduction to PivotalR testing framework
+Introduction to PivotalR testing
 
-• PivotalR has a complete testing framework. It is automated. And it is
-  built upon the package "testthat" 0.8.1.
+PivotalR tests are built upon the 'testthat' package by Hadley Wickham [1].
+Instructions for using this package can be found in the
+[Testing](http://r-pkgs.had.co.nz/tests.html) chapter of
+[R packages](http://r-pkgs.had.co.nz/).
 
-• For users
+Given below is the quick-start guide:
 
-    ◦ During installation, one needs to use '--install-tests' if he wants to
-      run tests. For example, two methods for installation
-        ◦ In bash terminal
-          $ R CMD install --install-tests PivotalR_0.1.15.tar.gz
-        ◦ In R console,
-          > install.packages('PivotalR', INSTALL_opts = c('--install-tests'))
+- Most PivotalR tests require a database connected on localhost. The tests
+require two variables set to ensure connection to local database:
+    - `pivotalr_dbname`: Name of the test database
+    - `pivotalr_port`: Port of the test database
 
-    ◦ After installation, in R console, run all tests in the interactive
-      mode
+- Use devtools::test() to run the tests. This function needs to be called from the
+root folder of PivotalR. Alternatively, `pkg` parameter can be set to the exact
+location of the package and `filter` parameter can be used to run specific tests.
+See the testthat documentation for details on the parameters.
 
-       > library(PivotalR)
-       > PivotalR:::test()
+- `testthat` will run all (or filtered) test files in the `tests/testthat`
+folder that start with the specific text `test`.
 
-       The function 'test' is a hidden function that is not exposed to
-       normal users. The user will be asked to input some environment
-       parameters such as port number, database name etc.
+-  In the tests, one can use the data sets "abalone" and "null.data",
+which are included in the PivotalR package. Please refer to the user
+manual for the details about these two data sets.
 
-    ◦ The tests can also be run in an automated mode. See the user manual
-      in the following about the argument "env.file".
 
-• The testing function user manual:
-
-    ◦ Description:
-      This internal function is used to run tests and doc examples after
-      the package has been installed. Each test that has passed will
-      print a green "." on the output.
-
-    ◦ Usage:
-      PivotalR:::test(tests.path = "tests", man.path = NULL, filter = NULL,
-                      reporter = c("summary", "tap", "minimal", "stop"),
-                      env.file = NULL, env.vars = list(),
-                      clean.test.env = FALSE,
-                      run = c("tests", "examples", "both"))
-
-    ◦ Arguments:
-         ▸ tests.path   A string, default is "tests", where the test files
-                        are stored. The default location is PivotalR's
-                        installation-dir/tests. But you can specify a
-                        particular directory where the testing files are
-                        stored. This is particular useful when you are
-                        developing new tests for PivotalR.
-
-         ▸ man.path     A string, default is "NULL", which means that the
-                        manual file (with examples) in the installation is
-                        used. The user can specify other paths that contains
-                        both "man/" folder and "DESCRIPTION" file, i.e the
-                        root directory of PivotalR source code.
-
-         ▸ filter       A string, default is NULL, file name pattern of
-                        those to be executed. Instead of running all tests
-                        under the testing folder, one can choose to run
-                        only some of them. When it is NULL, all tests will
-                        be run. If not "NULL", only tests with file names
-                        matching this regular expression will be executed.
-                        Matching will take on the file name after it has been
-                        stripped of "test-" from the beginning and ".r" from
-                        the end of the file name. When "run = 'both'", the user
-                        can pass a vector of strings to filter, and examples
-                        will use filter[1], the normal tests will use
-                        filter[2].
-
-         ▸ reporter     A string, default is "summary". Other choices
-                        include "tap", "minimal" and "stop". This decides
-                        how the testing result is presented. See the manual
-                        for package 'testthat' for more details about these
-                        choices.
-
-         ▸ env.file     A string, file path, default is NULL. PivotalR tests
-                        usually need some environment parameters, for example,
-                        .port and .dbname for database port number and database
-                        name respectively. If this is NULL, these values are
-                        to be input by the user interactively, otherwise they
-                        are to be loaded from this file. A row of this file
-                        should start with the format of "key : value", which
-                        specifies the variable name and its value. The same
-                        key can appear multiple time, but only the first takes
-                        effect. All other contents in this file will be ignored
-                        and can be used as comments. Inline comments should
-                        start with "#". Using a file to pass environment
-                        parameters into the tests is useful when you want to
-                        automated the tests.
-
-                        For example, create a file named 'env.txt' in the
-                        working directory, which contains two lines:
-
-                            .port : 5433 # database port number
-                            .dbname : madlib # database name
-
-                        and run in bash shell
-
-                        $ Rscript -e "library(PivotalR);
-                                      PivotalR:::test(env.file='env.txt')"
-
-                        to execute all the tests.
-
-         ▸ env.vars     A list, default is an empty list: list(). The list of
-                        environment variables. Their values can be set by using
-                        this list. If env.file is not NULL, this will be
-                        ignored, but it has higher priority than the
-                        interactive way of setting the environment variables.
-                        This can be used to re-set the values of environment
-                        variables.
-
-         ▸ clean.test.env   A logical value, default is FALSE. If it is TRUE,
-                            all environment variables are clean up, and need to
-                            be re-entered. This can be used to re-set the
-                            values of environment variables.
-
-         ▸ run          A string, default is "tests", and other choices are
-                        "examples" and "both". "t", "e" and "b" also work.
-
-                        Use "tests" to run the tests in installation-dir/tests.
-                        Use "examples" to run the examples in the user doc.
-                        Use "both" to run both of them.
-
-                        When running doc examples, we use "has_no_error" in the
-                        "expect_this" tests. So we do not check whether the
-                        results are correct. As long as the example can run
-                        without an error, the test passes.
-
-                        If you want to run the example in an Rd file (the user
-                        help file), you need to add special tags into the
-                        example section:
-                            %% @test .port      The port number
-                            %% @test .dbname    The database name
-                        which also inform the testing framework that this
-                        example needs these environment variables. Each line
-                        should have only one environment variable, and the
-                        comment in the end of the line is optional.
-
-   ◦ Details:
-        The testing framework is build upon the R package "testthat" [1].
-        If this package is not installed on the user's machine, it will be
-        fetched from CRAN and installed when the user runs the tests for
-        the first time.
-
-        [1] testthat: Testthat code and Tools to make testing fun, Hadley
-            Wickham, http://CRAN.R-project.org/package=testthat (2013).
-
-    ◦ Examples:
-        > library(PivotalR)
-        > PivotalR:::test()
-        > PivotalR:::test(run = 'b', env.vars = list(.port=5433,
-        +   .dbname = "madlib")) # reset environment variables
-        > PivotalR:::test(filter = 'example') # run some test files
-
-• The test skipping function user manual
-
-    ◦ Description:
-      This function is used to skip tests. It can skip a single or multiple
-      "expect_this" tests, or a single or multiple "test_that" groups. Each
-      test that has been skipped will print a purple "," to the output.
-
-    ◦ Usage:
-      skip_if(cond, test.expr)
-
-    ◦ Arguments:
-         ▸ cond         An expression or a block of expressions enclosed by
-                        "{" and "}", which gives a logical value (TRUE/FALSE)
-                        as the result.
-
-         ▸ test.expr    An expression or a block of expressions enclosed by
-                        "{" and "}", which contains any valid R expression
-                        including "test_that" or "expect_this". When cond is
-                        TRUE, the tests will be skipped and a blue "," will
-                        be printed.
-
-• Other helper functions
-
-    (1) has_no_error, takes_less_than, equals, is_equivalent_to, is_false,
-        is_true, is_a, is_identical_to, matches, prints_text, throws_error,
-        gives_warning, shows_message
-
-        All of these functions can be used in "expect_this" to test an
-        expression, which can be a single line expression or multiple
-        lines of expressions surrounded by a pair of "{...}".
-
-        See tests/test-examples.r for how to use them. "testthat" package [1]
-        user manual has detailed explenation for all of these functions
-        except "has_no_error", which is added by PivotalR and has a very
-        clear meaning.
-
-    (2) .get.param.inputs(param.names = c(".port", ".dbname"), reset = FALSE)
-
-        We call this function at the beginning of each function right after
-        "context". If the environment variables in the vector param.names
-        are not defined yet, the user will be prompted to input their values.
-
-         ▸ param.names  A vector of strings, default is c(".port", ".dbname").
-                        The environment variables needed in the current
-                        test*.r file.
-
-         ▸ reset        A logical, default is FALSE. By default, if an
-                        environment variable has be defined during execution
-                        of other test*.r file, the user will not be asked
-                        again for the value of this variable.
-
-                        For example, even if the user may have
-                        ".get.param.inputs('.port')" in all of test*.r files,
-                        he just needs to enter port number only once. Here,
-                        we assume that ".port" has the same meaning in all test
-                        files. However, the user can override this behavior by
-                        setting "reset = TRUE", which forces the test file to
-                        ask again the value of ".port", even if it has been
-                        asked before. This can be useful when ".port" has
-                        different meanings in different test files. Of course,
-                        the user can use different variable name to avoid all
-                        of this by using ".port1" instead of ".port" in the
-                        files where ".port" has a different meaning.
-
-                        DO NOT USE this if you want to make the tests
-                        automated.
-
-• Some basic guidelines for developers
-
-    ◦ All the test files should be put into tests/ folder
-
-    ◦ All the test files should start with "test-" and end with ".r".
-
-    ◦ It is recommended to use names starting with "." for the environment
-      variables, for example ".port", ".dbname", to avoid possible name
-      conflicts (there are functions in PivotalR that are named as port and
-      dbname).
-
-    ◦ "tests/test-examples.r" contains several example tests. It shows you
-      how to write tests. For more details about how to write tests, please
-      refer to the user manual of package "testthat" [2], or R Journal's
-      introduction paper [3].
-
-      [2] testthat CRAN page,
-          http://cran.r-project.org/web/packages/testthat/index.html.
-
-      [3] testthat: Getting Started with Testing,
-          http://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf
-
-    ◦ In the tests, one can use the data sets "abalone" and "null.data",
-      which are included in the PivotalR package. Please refer to the user
-      manual for the details about these two data sets.
-
-    ◦ If one wants to use additional data set files in the tests, he should
-      put those data set files in another repository outside of PivotalR
-      package, and pass the path of the data sets into the tests as an
-      environment parameter. We enforce this because CRAN has a size
-      limitation for the package size. In general, it is not recommended to
-      use additional data files. It is recommended to put the data in the
-      databases, and let PivotalR use them from there. If you want to load
-      the data set into memory, use "lk" (see the user manual about "lk"
-      function).
-
-    ◦ As has been explained, the recommended way to use additional data
-      sets in the tests is to load them directly from the connected
-      databases. Just like what we have been doing in the TINC tests for
-      MADlib.
+- Additional data set files in the tests should by placed outside of PivotalR
+  package, and the path of the data sets be passed into the tests as an
+  environment parameter. This is enforced since CRAN has a size
+  limitation for the package size. In general, it is not recommended to
+  use additional data files within PivotalR, rather place data in the
+  database and let PivotalR access it through DB API.
