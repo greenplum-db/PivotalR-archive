@@ -1,13 +1,12 @@
 ## The environment that contains all environment variables
 .testing.env <- new.env(parent = getNamespace(.this.pkg.name))
-# .testing.env <- new.env(parent = globalenv())
+
 ## ----------------------------------------------------------------------
 
-.get.param.inputs <- function(param.names = c("pivr.port", "pivr.dbname"),
-                              reset = FALSE, curr_env=.testing.env)
+.get.param.inputs <- function(param.names = c(".port", ".dbname"),
+                              reset = FALSE)
 {
     testing.vars <- ls(.testing.env, all.names = TRUE)
-    print(testing.vars)
     if (reset || any(!param.names %in% testing.vars)) {
         cat("\n")
         for (i in param.names)
@@ -26,7 +25,7 @@ skip_if <- function(cond, test.expr)
     l1 <- sum(sapply(gregexpr("expect_that\\(", expr), function(s) sum(s>0)))
     l2 <- sum(sapply(gregexpr("expect_this\\(", expr), function(s) sum(s>0)))
     l <- l1 + l2
-    
+
     if (cond) {
         if (.localVars$test.reporter %in% c("summary", "minimal"))
             for (i in seq_len(l)) cat(testthat_colourise(",", fg = "purple"))

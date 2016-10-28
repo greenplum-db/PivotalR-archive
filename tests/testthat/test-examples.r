@@ -3,7 +3,7 @@ context("Examples that show how to write tests")
 ## ----------------------------------------------------------------------
 ## Test preparations
 
-## Need valid 'pivotalr_port' and 'pivotalr_dbname' values
+# Need valid 'pivotalr_port' and 'pivotalr_dbname' values
 env <- new.env(parent = globalenv())
 .dbname = get('pivotalr_dbname', envir=env)
 .port = get('pivotalr_port', envir=env)
