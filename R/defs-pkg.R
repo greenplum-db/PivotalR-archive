@@ -54,13 +54,11 @@
 
 ## --
 
-.int.types <- c("smallint", "integer", "int2", "int4", "int4",
-                "bigint")
+.int.types <- c("smallint", "integer", "int2", "int4", "int4", "bigint")
 
 ## --
 
-.txt.types <- c("character varying", "varchar", "character",
-                "char", "text")
+.txt.types <- c("character varying", "varchar", "character", "char", "text")
 
 ## --
 
