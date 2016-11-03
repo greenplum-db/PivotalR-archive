@@ -5,9 +5,9 @@ setClass("rf.madlib")
 setClass("rf.madlib.grps")
 
 madlib.randomForest <- function(formula, data, id = NULL,
-                         ntree = 100, importance = FALSE, nPerm = 1,
-                         na.action = NULL, control, na.as.level = FALSE,
-                         verbose = FALSE, ...)
+                         ntree = 100, mtry = NULL, importance = FALSE,
+                         nPerm = 1, na.action = NULL, control,
+                         na.as.level = FALSE, verbose = FALSE, ...)
 {
     ## Some validations
     if ( ! is( data, "db.obj" ) )
@@ -90,7 +90,8 @@ madlib.randomForest <- function(formula, data, id = NULL,
                  grp,
                  ", ",
                  ntree,
-                 ",NULL",
+                 ",",
+                 mtry,
                  ", ",
                  importance,
                  ", ",
