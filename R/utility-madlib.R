@@ -177,7 +177,7 @@ clean.madlib.temp <- function(conn.id = 1)
 {
     for (tbl in db.objects(.unique.pattern(), conn.id=conn.id))
         delete(tbl, conn.id=conn.id, cascade = TRUE)
-    
+
 }
 
 ## ----------------------------------------------------------------------
@@ -252,6 +252,9 @@ clean.madlib.temp <- function(conn.id = 1)
     view.name <- .unique.string()
     data.name <- content(data)
 
+    if (class(data) == "db.Rquery"){
+        data.name <- paste(" ( ", data.name, " ) __madlib_x__ ")
+    }
 
     sql <- paste( "CREATE VIEW ", view.name, " AS ( SELECT *, ARRAY[",
         paste(columns, collapse=', '),

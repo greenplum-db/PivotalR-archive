@@ -32,6 +32,8 @@ madlib.kmeans(
     \code{db.view}, a temporary table will be created, and further
     computation will be done on the temporary table. After the computation,
     the temporary will be dropped from the corresponding database.
+    Data points and predefined centroids (if used) are expected to be stored
+    row-wise, and each point should be of \code{numeric} type.
   }
 
   \item{centers}{
