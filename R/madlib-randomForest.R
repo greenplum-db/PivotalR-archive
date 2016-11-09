@@ -72,6 +72,10 @@ madlib.randomForest <- function(formula, data, id = NULL,
     else
         id.col <- if (is.null(id)) key(data) else id
 
+    if (is.null(mtry))
+    {
+        mtry <- "NULL"
+    }
     ## Construct SQL string
     tbl.source <- content(data) # data table name
     madlib <- schema.madlib(conn.id) # MADlib schema
@@ -90,7 +94,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
                  grp,
                  ", ",
                  ntree,
-                 ",",
+                 ", ",
                  mtry,
                  ", ",
                  importance,

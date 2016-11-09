@@ -1,9 +1,8 @@
-context("Test cases for madlib.randomForest and its helper functions")
+context("Test cases for madlib.rpart and its helper functions")
 
 ## ------------------------------------------------------------
 ## Test preparations
-library(randomForest)
-library(MASS)
+library(rpart)
 
 env <- new.env(parent = globalenv())
 .dbname = get('pivotalr_dbname', envir=env)
@@ -24,23 +23,23 @@ class <- c( 'Don\'t Play', 'Don\'t Play', 'Play', 'Play', 'Play',
 dat.r <- data.frame(id,outlook,temperature,humidity,windy,class)
 dat.db <- as.db.data.frame(dat.r, conn.id=cid)
 
-control1 <- list(maxdepth = 8, minsplit=3, minbucket=1, nbins=10)
-
 ## The tests
-test_that("Test randomForest", {
+test_that("Test decision tree", {
 
 		testthat::skip_on_cran()
-		fit.golf <- madlib.randomForest(class ~ . -id, data = dat.db,
-			importance=TRUE, ntree=20, id="id", control=control1)
+		fit.golf <- madlib.rpart(class ~ . -id, data = dat.db, id = "id",
+			parms = list(split='gini'), method="class",
+			control = list(maxdepth=5, minsplit=3, minbucket=1, nbins=10, cp=0.0))
 		pred.db <- predict(fit.golf, newdata=dat.db)
 		est.db <- lk(pred.db$estimated_class)
 		est.db <- as.integer(est.db == "Play")
 
-		fit.golf.r <- randomForest(class ~ . -id, data = dat.r, importance=T,
-			id="id", ntree=20)
+		fit.golf.r <- rpart(class ~ . -id, data = dat.r,
+			parms = list(split='gini'), method="class",
+			control = list(maxdepth=5, minsplit=3, minbucket=1, nbins=10, cp=0.0))
         pred.r <- predict(fit.golf.r, newdata=dat.r)
-        est.r <- as.integer(pred.r == "Play")
 
-        expect_equal(est.db, est.r, tolerance=1e-2, check.attributes=FALSE)
+
+        expect_equal(est.db, pred.r[,2], tolerance=1e-2, check.attributes=FALSE)
 
 })

@@ -10,7 +10,7 @@ MADlib wrapper function for Random Forest
     can also view the result from R using \code{\link{print.rf.madlib}}.
 }
 \usage{
-madlib.randomForest(formula, data, id = NULL, ntree = 100,
+madlib.randomForest(formula, data, id = NULL, ntree = 100, mtry = NULL,
 importance = FALSE, nPerm = 1, na.action = NULL, control,
 na.as.level = FALSE, verbose = FALSE, ...) }
 %- maybe also 'usage' for other objects documented here.
@@ -32,6 +32,9 @@ na.as.level = FALSE, verbose = FALSE, ...) }
   \item{ntree}{
     An integer, maximum number of trees to grow in the random forest model, default is
     100.
+}
+  \item{mtry}{
+    An integer, number of features randomly selected for each split.
 }
   \item{importance}{
     A boolean, whether or not to calculate variable importance, default is FALSE.
