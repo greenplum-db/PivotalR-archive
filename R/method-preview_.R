@@ -55,7 +55,7 @@ setMethod (
                 "and it might take time to evaluate and extract a preview of it if the data is large!\n")
             go <- .read.input("Do you really want to continue ? (Yes/No) : ",
                               c("yes", "y", "no", "n"))
-            if (go == "no" || go == "n") return
+            if (go == "no" || go == "n") return()
         }
 
         ## if (array) {
@@ -110,7 +110,7 @@ setMethod (
                 "and it might take time to evaluate and extract a preview of it if the data is large!\n")
             go <- .read.input("Do you really want to continue ? (Yes/No) : ",
                               c("yes", "y", "no", "n"))
-            if (go == "no" || go == "n") return
+            if (go == "no" || go == "n") return()
         }
 
         ## if (array) x <- .expand.array(x)
@@ -159,7 +159,7 @@ setMethod (
                 "and it might take time to evaluate and extract a preview of it if the data is large!\n")
             go <- .read.input("Do you really want to continue ? (Yes/No) : ",
                               c("yes", "y", "no", "n"))
-            if (go == "no" || go == "n") return
+            if (go == "no" || go == "n") return()
         }
 
         ## NOTE: Unfortunately, RPostgreSQL cannot extract an array with elements

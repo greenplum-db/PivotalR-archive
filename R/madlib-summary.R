@@ -34,7 +34,7 @@ madlib.summary <- function (x, target.cols = NULL, grouping.cols = NULL,
                 "and it might take time to create a table and get the summary for this!\n")
             go <- .read.input("Do you really want to continue ? (Yes/No) : ",
                               c("yes", "y", "no", "n"))
-            if (go == "no" || go == "n") return
+            if (go == "no" || go == "n") return()
         }
         tbl <- .unique.string()
         to.drop.tbl <- TRUE
