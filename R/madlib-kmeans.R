@@ -28,7 +28,6 @@ madlib.kmeans <- function(
     if (length(expr) > 1){
 
         tmp.x <- .collate.columns(x, expr)
-        print(content(tmp.x))
         new.x.name <- .unique.string()
         db.q("create table ", new.x.name,
             " as (select ", key, ", __madlib_coll__ from ",
@@ -164,7 +163,6 @@ madlib.kmeans <- function(
     # MADlib cluster ids start from 0, R start from 1
     res.cluster <- cluster$cluster_id+1
 
-
  	res.tot.withinss <- res.raw$objective_fn
  	res.size <- as.vector(table(res.cluster))
     res.iter <- res.raw$num_iterations
@@ -173,19 +171,19 @@ madlib.kmeans <- function(
         nrow=center.count, byrow=TRUE)
 
     rownames(res.centers) <- names(table(res.cluster))
+    mlver <- strsplit(madlib.ver,".",TRUE)
 
-    if (madlib.ver > "1.9.1"){
+    if (as.integer(mlver[[1]][2]) > 9 || as.integer(mlver[[1]][1]) > 1){
         res.withinss = as.vector(arraydb.to.arrayr(res.raw$cluster_variance))
     } else {
         res.withinss = NULL
-        warning("MADlib version is lower than 1.9.2.",
+        warning("MADlib version is lower than 1.10.0",
             "Some output fields might be missing.")
     }
 
     ret <- list( cluster=res.cluster, centers=res.centers,
         withinss=res.withinss, tot.withinss=res.tot.withinss,
         size = res.size, iter=res.iter)
-
 
     ret <- structure(ret, class="kmeans")
     .restore.warnings(warnings)
