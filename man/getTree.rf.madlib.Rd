@@ -28,7 +28,7 @@ getTree.rf.madlib(object, k=1, ...) }
   A data frame object similar to R's getTree result.
 }
 \references{
-[1] Documentation of random forest in MADlib 1.7, \url{http://doc.madlib.net/latest/}
+[1] Documentation of random forest in MADlib 1.7, \url{https://madlib.apache.org/docs/latest/}
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.

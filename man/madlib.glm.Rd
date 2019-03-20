@@ -331,24 +331,24 @@ madlib.glm(formula, data, family = gaussian, na.action = NULL, control
 \references{
 
     [1] Documentation of linear regression in lastest MADlib,
-    \url{http://doc.madlib.net/latest/group__grp__linreg.html}
+    \url{https://madlib.apache.org/docs/latest/group__grp__linreg.html}
 
     [2] Documentation of logistic regression in latest MADlib,
-    \url{http://doc.madlib.net/latest/group__grp__logreg.html}
+    \url{https://madlib.apache.org/docs/latest/group__grp__logreg.html}
 
     [3] Wikipedia: Iteratively reweighted least squares,
-    \url{http://en.wikipedia.org/wiki/IRLS}
+    \url{https://en.wikipedia.org/wiki/IRLS}
 
     [4] Wikipedia: Conjugate gradient method,
-    \url{http://en.wikipedia.org/wiki/Conjugate_gradient_method}
+    \url{https://en.wikipedia.org/wiki/Conjugate_gradient_method}
 
     [5] Wikipedia: Stochastic gradient descent,
-    \url{http://en.wikipedia.org/wiki/Stochastic_gradient_descent}
+    \url{https://en.wikipedia.org/wiki/Stochastic_gradient_descent}
 
-    [6] Wikipedia: Odds ratio, \url{http://en.wikipedia.org/wiki/Odds_ratio}
+    [6] Wikipedia: Odds ratio, \url{https://en.wikipedia.org/wiki/Odds_ratio}
 
     [7] Documentation of generalized linear regression in latest MADlib,
-    \url{http://doc.madlib.net/latest/group__grp__glm.html}
+    \url{https://madlib.apache.org/docs/latest/group__grp__glm.html}
 
 }
 

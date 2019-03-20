@@ -102,9 +102,9 @@ database execution. These include
   Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 \references{
-  [1] MADlib website, \url{http://madlib.incubator.apache.org}
+  [1] MADlib website, \url{https://madlib.incubator.apache.org}
 
-  [2] MADlib user docs, \url{http://madlib.incubator.apache.org/docs/latest/}
+  [2] MADlib user docs, \url{https://madlib.incubator.apache.org/docs/latest/}
 
   [3] MADlib Wiki page, \url{ https://cwiki.apache.org/confluence/display/MADLIB}
 

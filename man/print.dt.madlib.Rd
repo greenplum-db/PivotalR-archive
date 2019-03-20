@@ -20,7 +20,7 @@
         \code{\link{madlib.rpart}} } \item{digits}{ The number of digits to
         print for numerical values. } \item{\dots}{ Arguments to be passed to
         or from other methods. } } \references{ [1] Documentation of decision
-    tree in MADlib 1.6, \url{http://doc.madlib.net/latest/} } \author{ Author:
+    tree in MADlib 1.6, \url{https://madlib.apache.org/docs/latest/} } \author{ Author:
     Predictive Analytics Team at Pivotal Inc.
 
   Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}

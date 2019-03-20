@@ -120,7 +120,7 @@ madlib.kmeans(
 \references{
 
 [1] Documentation of kmeans clustering in the latest MADlib release,
-    \url{http://madlib.incubator.apache.org/docs/latest/group__grp__kmeans.html}
+    \url{https://madlib.incubator.apache.org/docs/latest/group__grp__kmeans.html}
 }
 
 \seealso{
