@@ -199,7 +199,7 @@ method = "CSS", optim.method = "LM", optim.control = list(), ...)
 
 \references{
   [1] Rob J Hyndman and George Athanasopoulos: Forecasting: principles
-  and practice, http://otexts.com/fpp/
+  and practice, https://otexts.com/fpp/
 
   [2] Robert H. Shumway, David S. Stoffer: Time Series Analysis and Its
   Applications With R Examples, Third edition Springer Texts in

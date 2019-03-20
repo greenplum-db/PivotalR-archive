@@ -61,7 +61,7 @@ continuous values have been scaled for use with an ANN (by dividing by
 200).
 }
 \source{
-  [1] The original data is downloaded from \url{http://archive.ics.uci.edu/ml/datasets/Abalone}
+  [1] The original data is downloaded from \url{https://archive.ics.uci.edu/ml/datasets/Abalone}
 
   [2] Warwick J Nash, Tracy L Sellers, Simon R Talbot, Andrew J Cawthorn and Wes B Ford (1994)
 "The Population Biology of Abalone (_Haliotis_ species) in Tasmania. I. Blacklip Abalone (H. rubra) from the North Coast and Islands of Bass Strait",

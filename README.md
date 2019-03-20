@@ -2,15 +2,15 @@ PivotalR
 =======
 
 PivotalR is a package that enables users of R, the most popular open source statistical programming language
-and environment, to interact with [Greenplum Database](http://www.greenplum.org)
-as well as [Apache HAWQ (incubating)](http://hawq.incubator.apache.org/)
-and the [PostgreSQL](http://www.postgresql.org/) for big data
+and environment, to interact with [Greenplum Database](https://www.greenplum.org/)
+as well as [Apache HAWQ (incubating)](https://hawq.incubator.apache.org/)
+and the [PostgreSQL](https://www.postgresql.org/) for big data
 analytics. It does so by providing an interface to the operations on tables/views in the database. These
 operations are almost the same as those of data.frame. Minimal amount of data is transfered between R and
 the database. Thus the users of R do not need to learn SQL when they
 operate on the objects in the database. PivotalR also lets the user to run the functions of the open source
 machine
-learning package [Apache MADlib (incubating)](http://madlib.incubator.apache.org/) directly from R.
+learning package [Apache MADlib (incubating)](https://madlib.incubator.apache.org/) directly from R.
 
 1. An Introduction to PivotalR
 

@@ -44,7 +44,7 @@ generic.bagging(train, data, nbags = 10, fraction = 1)
 }
 
 \references{
-  [1] Wiki: bagging \url{http://en.wikipedia.org/wiki/Bootstrap_aggregating}
+  [1] Wiki: bagging \url{https://en.wikipedia.org/wiki/Bootstrap_aggregating}
 }
 
 \author{

@@ -111,7 +111,7 @@ Terms(term = NULL)
 }
 
 \references{
-[1] Stata 13 help for margins, \url{http://www.stata.com/help.cgi?margins}
+[1] Stata 13 help for margins, \url{https://www.stata.com/help.cgi?margins}
 }
 
 \author{

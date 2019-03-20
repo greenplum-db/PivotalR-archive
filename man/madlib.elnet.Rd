@@ -229,7 +229,7 @@ All parameters have been explained above. The only one left is \code{verbose}.
 
 [2] Shai Shalev-Shwartz and Ambuj Tewari, Stochastic Methods for l1 Regularized Loss Minimization. Proceedings of the 26th International Conference on Machine Learning, Montreal, Canada, 2009.
 
-[3] Elastic net regularization. http://en.wikipedia.org/wiki/Elastic_net_regularization
+[3] Elastic net regularization. https://en.wikipedia.org/wiki/Elastic_net_regularization
 
 [4] Kevin P. Murphy, Machine Learning: A Probabilistic Perspective, The MIT Press, Chap 13.4, 2012.
 

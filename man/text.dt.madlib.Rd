@@ -63,7 +63,7 @@
 }
 
 \references{
-[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
+[1] Documentation of decision tree in MADlib 1.6, \url{https://madlib.apache.org/docs/latest/}
 }
 
 \author{

@@ -90,7 +90,7 @@
 }
 \references{
   [1] Documentation of LDA in the latest MADlib release,
-    \url{http://madlib.incubator.apache.org/docs/latest/group__grp__lda.html}
+    \url{https://madlib.incubator.apache.org/docs/latest/group__grp__lda.html}
 }
 \seealso{
 
