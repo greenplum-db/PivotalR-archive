@@ -16,15 +16,15 @@
 
 }
 
-\arguments{ 
+\arguments{
     \item{x}{ The fitted forest from the result of
-        \code{\link{madlib.randomForest}} } 
+        \code{\link{madlib.randomForest}} }
     \item{digits}{ The number of digits to
-        print for numerical values. } 
+        print for numerical values. }
     \item{\dots}{ Arguments to be passed to
-        or from other methods. } } 
+        or from other methods. } }
 \references{ [1] Documentation of random
-    forest in MADlib 1.7, \url{http://doc.madlib.net/latest/} } 
+    forest in MADlib 1.7, \url{http://doc.madlib.net/latest/} }
 \author{ Author:
     Predictive Analytics Team at Pivotal Inc.
 
@@ -65,5 +65,4 @@ db.disconnect(cid)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{'tree'}

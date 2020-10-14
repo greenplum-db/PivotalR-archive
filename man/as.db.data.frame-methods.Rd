@@ -186,7 +186,7 @@ and it defaults to 0.
 }
 
 \references{
-  [1] Greenplum database, \url{http://www.greenplum.org}
+  [1] Greenplum database, \url{https://greenplum.org/}
 }
 
 \seealso{
