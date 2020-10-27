@@ -14,4 +14,4 @@ $(OUT): $(OBJ)
 	$(AR) rcs $(OUT) $(OBJ)
 
 clean:
-	rm -f $(OBJ) $(OUT) Makefile.bak 
+	rm -f $(OBJ) $(OUT) Makefile.bak

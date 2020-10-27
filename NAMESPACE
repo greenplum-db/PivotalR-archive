@@ -1,5 +1,5 @@
 # exportPattern("^[^\\.]")
-useDynLib(PivotalR)
+useDynLib(PivotalR, .registration = TRUE)
 import(methods, Matrix)
 
 importFrom("grDevices", "col2rgb")

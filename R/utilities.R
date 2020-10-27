@@ -35,7 +35,7 @@ is.db.data.frame <- function (x)
 ## ----------------------------------------------------------------------
 
 ## suppress all warnings
-.suppress.warnings <- function (conn.id, level = "panic")
+.suppress.warnings <- function (conn.id, level = "error")
 {
     msg.level <- .set.msg.level(level, conn.id = conn.id)
     warn.r <- getOption("warn")
@@ -178,10 +178,18 @@ is.db.data.frame <- function (x)
                  list(table.name=table.name,
                                       table.schema=table.schema)), conn.id)
 
+    dbms_str <- .get.dbms.str(conn.id)
+    if (startsWith(dbms_str$version.str, "5.")) {
+        dist_col = "attrnums"
+    } else {
+        dist_col = "distkey"
+    }
+
     attrnums <- .db.getQuery(
-        .format("SELECT attrnums
+        .format("SELECT <dist_col>
                  FROM pg_catalog.gp_distribution_policy t
-                 WHERE localoid = '<oid>'", list(oid=as.numeric(oid))),
+                 WHERE localoid = '<oid>'",
+                 list(dist_col=dist_col, oid=as.numeric(oid))),
         conn.id = conn.id)
     attrnums <- as.integer(arraydb.to.arrayr(attrnums, "integer"))
 
