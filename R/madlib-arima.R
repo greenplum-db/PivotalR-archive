@@ -104,7 +104,7 @@ setMethod (
              deparse(substitute(data)))
 
     ## Only newer versions of MADlib are supported
-    .check.madlib.version(data, 1.2)
+    .check.madlib.version(data)
 
     conn.id <- conn.id(data)
 

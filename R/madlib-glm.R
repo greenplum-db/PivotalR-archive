@@ -420,7 +420,7 @@ show.logregr.madlib <- function (object)
     origin.data <- data
     conn.id <- conn.id(data)
     ## Only MADlib 1.7 and newer are supported
-    .check.madlib.version(data, allowed.version = 1.6)
+    .check.madlib.version(data)
 
     warnings <- .suppress.warnings(conn.id) # turn off warning messages
 

@@ -399,19 +399,19 @@ test_that("Test poisson(identity) with grouping", {
                tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[1]]$coefficients[ , 1]))
   expect_equal(fit.db[[1]]$std_err, fit.r[[1]]$coefficients[ , 2],
-               tolerance=1e-2, check.attributes=FALSE,
+               tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[1]]$coefficients[ , 2]))
   expect_equal(fit.db[[2]]$coef, fit.r[[2]]$coefficients[ , 1],
-               tolerance=1e-2, check.attributes=FALSE,
+               tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[2]]$coefficients[ , 1]))
   expect_equal(fit.db[[2]]$std_err, fit.r[[2]]$coefficients[ , 2],
-               tolerance=1e-2, check.attributes=FALSE,
+               tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[2]]$coefficients[ , 2]))
   expect_equal(fit.db[[3]]$coef, fit.r[[3]]$coefficients[ , 1],
                tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[3]]$coefficients[ , 1]))
   expect_equal(fit.db[[3]]$std_err, fit.r[[3]]$coefficients[ , 2],
-               tolerance=1e-2, check.attributes=FALSE,
+               tolerance=1e-1, check.attributes=FALSE,
                scale=mean(fit.r[[3]]$coefficients[ , 2]))
   })
 

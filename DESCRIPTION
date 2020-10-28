@@ -4,16 +4,14 @@ Title: A Fast, Easy-to-Use Tool for Manipulating Tables in Databases
     and a Wrapper of MADlib
 Version: 0.1.18.4
 Date: 2020-10-14
-Author: Predictive Analytics Team at VMware.
-    <user@madlb.apache.org>, with contributions from Data Science Team
-    at Pivotal Inc.
-Maintainer: Orhan Kislal <okislal@vmware.com>
+Maintainer: Rahul Iyer <riyer@pivotal.io>
 Author: Predictive Analytics Team at VMware.
     <user@madlb.apache.org>
 Depends:
     R (>= 2.14.0),
     methods,
-    Matrix
+    Matrix,
+    semver
 Suggests:
     DBI,
     RPostgreSQL,

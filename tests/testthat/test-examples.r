@@ -53,8 +53,8 @@ test_that("Examples of value equivalent", {
 test_that("Examples of testing TRUE or FALSE", {
     testthat::skip_on_cran()
     ## 7, 8
-    expect_that("no_such_col" %in% fdb$col.name, is_false())
-    expect_that(fdb$has.intercept,               is_true())
+    expect_false("no_such_col" %in% fdb$col.name)
+    expect_true(fdb$has.intercept)
 })
 
 ## ----------------------------------------------------------------------
@@ -76,7 +76,7 @@ test_that("Examples of testing string existence", {
     tmp <- dat
     tmp$new.col <- 1
     ## 10, 11
-    expect_that(names(tmp), matches("new.col", all = FALSE)) # one value matches
+    expect_match(names(tmp), "new.col", all = FALSE) # one value matches
 })
 
 ## ----------------------------------------------------------------------
@@ -191,27 +191,6 @@ test_that("Different results on different platforms", {
                 } else {
                     matches("Greenplum")
                 })
-    }
-)
-
-## ----------------------------------------------------------------------
-
-test_that("Different results on different versions of HAWQ", {
-    testthat::skip_on_cran()
-    ## 33
-    expect_that(as.character(db.q("select madlib.version()", conn.id = cid,
-                                  verbose = FALSE)),
-        {
-                  db <- .get.dbms.str(cid)
-                  if (db$db.str == "HAWQ") {
-          if (grepl("^1\\.1", db$version.str)) # older HAWQ
-              matches("0\\.5")
-          else # new HAWQ
-              matches("MADlib version: 1\\.")
-          } else {
-              matches("MADlib") # always pass
-          }
-        })
     }
 )
 

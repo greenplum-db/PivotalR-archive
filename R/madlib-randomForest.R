@@ -17,7 +17,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
     if (missing(control)) control <- NULL
     ## Only newer versions of MADlib are supported for
     ## this function
-    .check.madlib.version(data) #, allowed.version = 1.7)
+    .check.madlib.version(data)
 
     origin.data <- data # needed in the result report
 
@@ -115,6 +115,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
                  ")",
                  sep = "")
 
+    print(sql)
     res <- .db(sql, conn.id = conn.id, verbose = FALSE)
 
     model <- db.data.frame(tbl.output, conn.id = conn.id, verbose = FALSE)
@@ -122,6 +123,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
                                    conn.id = conn.id, verbose = FALSE)
     model.group <- db.data.frame(paste(tbl.output, "_group", sep = ""),
                                    conn.id = conn.id, verbose = FALSE)
+    print(model.group)
     method <- if (lk(model.summary$is_classification)) "classification" else "regression"
 
     .restore.warnings(warnings)
@@ -139,8 +141,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
     #create variable importance matrix
     cat_features  <- strsplit(lk(model.summary$cat_features),",")[[1]]
     con_features  <- strsplit(lk(model.summary$con_features),",")[[1]]
-    cat_var_imp <- lk(model.group$cat_var_importance)
-    con_var_imp  <- lk(model.group$con_var_importance)
+    oob_var_imp <- lk(model.group$oob_var_importance)
 
     len_cat_features <- length(cat_features)
     len_con_features <- length(con_features)
@@ -148,26 +149,6 @@ madlib.randomForest <- function(formula, data, id = NULL,
     #populate result matrix for grouping vs non-grouping cases
     ngrps <- lk(model.summary$num_all_groups)
     if (ngrps == 1) { #no grouping
-        cat_var_imp <- c(cat_var_imp[1,])
-        con_var_imp <- c(con_var_imp[1,])
-
-        len_cat_var_imp <- length(cat_var_imp)
-        len_con_var_imp <- length(con_var_imp)
-
-        cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
-        if (is.na(cat_var_imp[1])) {
-            len_cat_var_imp <- 0
-            cat_con_combined_var_imp <- con_var_imp
-        }
-        if (is.na(con_var_imp[1])) {
-            len_con_var_imp <- 0
-            cat_con_combined_var_imp <- cat_var_imp
-        }
-        if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
-            len_cat_var_imp <- 0
-            len_con_var_imp <- 0
-            cat_con_combined_var_imp <- NA
-        }
 
         var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
         rownames(var_imp)  <- c(cat_features, con_features)
@@ -176,8 +157,8 @@ madlib.randomForest <- function(formula, data, id = NULL,
         } else {
             colnames(var_imp) <- c('MeanIncreaseMSE')
         }
-        if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
-            var_imp[,1] <- cat_con_combined_var_imp
+        if (length(oob_var_imp) == length(var_imp[,1])) {
+            var_imp[,1] <- oob_var_imp
         }
         rst <- list(model = model, model.summary = model.summary,
                     type = method, data = origin.data,
@@ -187,25 +168,7 @@ madlib.randomForest <- function(formula, data, id = NULL,
         class(rst) <- "rf.madlib"
     } else { #grouping
         rst <- lapply(seq_len(ngrps), function(i) {
-                    cat_var_imp <- c(cat_var_imp[i,])
-                    con_var_imp <- c(con_var_imp[i,])
-                    len_cat_var_imp <- length(cat_var_imp)
-                    len_con_var_imp <- length(con_var_imp)
-
-                    cat_con_combined_var_imp <- c(cat_var_imp,con_var_imp)
-                    if (is.na(cat_var_imp[1])) {
-                        len_cat_var_imp <- 0
-                        cat_con_combined_var_imp <- con_var_imp
-                    }
-                    if (is.na(con_var_imp[1])) {
-                        len_con_var_imp <- 0
-                        cat_con_combined_var_imp <- cat_var_imp
-                    }
-                    if (is.na(cat_var_imp[1]) && is.na(con_var_imp[1])) {
-                        len_cat_var_imp <- 0
-                        len_con_var_imp <- 0
-                        cat_con_combined_var_imp <- NA
-                    }
+                    local_oob_var_imp <- c(oob_var_imp[i,])
 
                     var_imp <- matrix(numeric(0), nrow=len_cat_features + len_con_features, ncol=1)
                     rownames(var_imp)  <- c(cat_features, con_features)
@@ -214,10 +177,10 @@ madlib.randomForest <- function(formula, data, id = NULL,
                     } else {
                         colnames(var_imp) <- c('MeanIncreaseMSE')
                     }
-                    if ((len_cat_var_imp + len_con_var_imp) == length(var_imp[,1])) {
-                        var_imp[,1] <- cat_con_combined_var_imp
+                    if (length(oob_var_imp) == length(var_imp[,1])) {
+                        var_imp[,1] <- local_oob_var_imp
                     }
-                     r <- list(model = model, model.summary = model.summary,
+                    r <- list(model = model, model.summary = model.summary,
                                type = method, data = origin.data,
                                mtry = num_random_features, ntree = ntrees,
                                call = func_name,
