@@ -3,7 +3,7 @@
 ## -----------------------------------------------------------------------
 
 ## check whether newer MADlib version is used
-.check.madlib.version <- function (data, allowed.version = 0.6)
+.check.madlib.version <- function (data, allowed.version = "1.15.0")
 {
     ## Only newer versions of MADlib are supported
     conn.id <- conn.id(data)
@@ -11,7 +11,7 @@
     db <- .get.dbms.str(conn.id)
     if (db$db.str != "HAWQ" || !grepl("^1\\.1", db$version.str)) {
         if (identical(.localVars$db[[idx]]$madlib.v, numeric(0)) ||
-            .madlib.version.number(conn.id) < allowed.version)
+            parse_version(.madlib.version.number(conn.id)) < allowed.version)
             stop("MADlib error: Please use Madlib version v",
                  allowed.version, " or newer !")
     }

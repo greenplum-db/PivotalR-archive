@@ -1324,7 +1324,7 @@ setMethod("is.na",
               ## else
               res <- .compare(x, "", " is NULL", NA, "", "boolean", "")
               if (length(x@.col.data_type) == 1 && x@.col.data_type == "array") {
-                  .check.madlib.version(x, 1.3)
+                  .check.madlib.version(x)
                   madlib <- schema.madlib(conn.id(x))
                   tmp <- paste(res@.expr, " or ", madlib,
                                ".array_contains_null(", x@.expr, ")", sep="")

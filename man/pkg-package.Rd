@@ -96,22 +96,22 @@ database execution. These include
 
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
-  \email{user@madlib.incubator.apache.org},  with contributions
+  \email{user@madlib.apache.org},  with contributions
   from Data Scientist Team at Pivotal Inc.
 
   Maintainer: Frank McQuillan, Pivotal Inc. \email{fmcquillan@pivotal.io}
 }
 \references{
-  [1] MADlib website, \url{http://madlib.incubator.apache.org}
+  [1] MADlib website, \url{http://madlib.apache.org}
 
-  [2] MADlib user docs, \url{http://madlib.incubator.apache.org/docs/latest/}
+  [2] MADlib user docs, \url{http://madlib.apache.org/docs/latest/}
 
   [3] MADlib Wiki page, \url{ https://cwiki.apache.org/confluence/display/MADLIB}
 
   [4] MADlib contribution guide,
   \url{https://cwiki.apache.org/confluence/display/MADLIB/Contribution+Guidelines}
 
-  [5] MADlib on GitHub, \url{https://github.com/apache/incubator-madlib}
+  [5] MADlib on GitHub, \url{https://github.com/apache/madlib}
 }
 
 \seealso{
