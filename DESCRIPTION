@@ -21,7 +21,7 @@ Suggests:
     rpart,
     randomForest,
     topicmodels
-Description: Provides an R interface for the VMware Data stack running on
+Description: Provides an R interface for the 'VMware Data Stack' running on
     'PostgreSQL' or 'Greenplum' databases with parallel and distributed
     computation ability for big data processing. 'PivotalR' provides an R
     interface to various database operations on tables or views. These

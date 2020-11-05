@@ -211,9 +211,9 @@ madlib.lm(formula, data, na.action = NULL, hetero = FALSE, na.as.level = FALSE, 
 }
 \references{
   [1] Wikipedia: Breusch-Pagan test,
-  \url{http://en.wikipedia.org/wiki/Breusch-Pagan_test}
+  \url{https://en.wikipedia.org/wiki/Breusch-Pagan_test}
   [2] Documentation of linear regression in MADlib v0.6,
-  \url{http://doc.madlib.net/v0.6/group__grp__linreg.html}.
+  \url{https://madlib.apache.org/docs/latest/group__grp__linreg.html}.
 }
 \note{
   \code{|} is not part of standard R formula object, but many R packages

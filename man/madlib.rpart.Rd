@@ -78,7 +78,7 @@ control, na.as.level = FALSE, verbose = FALSE, ...) }
   dt.madlib.grp in the case of grouping.
 }
 \references{
-[1] Documentation of decision tree in MADlib 1.6, \url{http://doc.madlib.net/latest/}
+[1] Documentation of decision tree in MADlib 1.6, \url{https://madlib.apache.org/docs/latest/}
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.

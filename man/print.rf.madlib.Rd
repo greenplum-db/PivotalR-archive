@@ -24,7 +24,7 @@
     \item{\dots}{ Arguments to be passed to
         or from other methods. } }
 \references{ [1] Documentation of random
-    forest in MADlib 1.7, \url{http://doc.madlib.net/latest/} }
+    forest in MADlib 1.7, \url{https://madlib.apache.org/docs/latest/} }
 \author{ Author:
     Predictive Analytics Team at Pivotal Inc.
 

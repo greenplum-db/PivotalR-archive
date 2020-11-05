@@ -49,7 +49,7 @@
     for that class.
 }
 \references{
-[1] Documentation of random forests in MADlib 1.7, \url{http://doc.madlib.net/latest/}
+[1] Documentation of random forests in MADlib 1.7, \url{https://madlib.apache.org/docs/latest/}
 }
 \author{
   Author: Predictive Analytics Team at Pivotal Inc.
@@ -59,13 +59,13 @@
 
 \seealso{
     \code{\link{madlib.lm}}, \code{\link{madlib.glm}}, \code{\link{madlib.randomForest}},
-    \code{\link{madlib.rpart}}, \code{\link{madlib.summary}}, \code{\link{madlib.arima}}, 
+    \code{\link{madlib.rpart}}, \code{\link{madlib.summary}}, \code{\link{madlib.arima}},
     \code{\link{madlib.elnet}}
     are all MADlib wrapper functions.
 
     \code{\link{predict.lm.madlib}}, \code{\link{predict.logregr.madlib}},
-    \code{\link{predict.elnet.madlib}}, \code{\link{predict.arima.css.madlib}}, 
-    \code{\link{predict.dt.madlib}}, \code{\link{predict.rf.madlib}} 
+    \code{\link{predict.elnet.madlib}}, \code{\link{predict.arima.css.madlib}},
+    \code{\link{predict.dt.madlib}}, \code{\link{predict.rf.madlib}}
     are all predict functions related to MADlib wrapper functions.
 }
 \examples{
