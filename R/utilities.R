@@ -191,8 +191,8 @@ is.db.data.frame <- function (x)
                  WHERE localoid = '<oid>'",
                  list(dist_col=dist_col, oid=as.numeric(oid))),
         conn.id = conn.id)
+    if (attrnums$distkey[1] == "") return (NA)
     attrnums <- as.integer(arraydb.to.arrayr(attrnums, "integer"))
-
     if (is.na(attrnums)) return (NA)
 
     cols <- .db.getQuery(
