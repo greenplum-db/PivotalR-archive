@@ -1,5 +1,7 @@
 // elastic net coordinate descent method
 
+#include <random>       // std::default_random_engine
+
 #include "adp/rmatrix.h"
 #include "adp/rvector.h"
 
@@ -8,18 +10,13 @@
 #include <Rmath.h>
 
 #include <vector>
-#include <algorithm>    // random_shuffle
+#include <algorithm>    // shuffle
 #include <ctime>        // std::time
 #include <cstdlib>      // std::rand, std::srand
+#include <chrono>       // std::chrono::system_clock
 
 using adp::Rvector;
 using adp::Rmatrix;
-
-// ------------------------------------------------------------
-
-int myrandom(int i) {
-    return (int)(unif_rand() * RAND_MAX) % i;
-}
 
 // ----------------------------------------------------------------------
 
@@ -36,7 +33,8 @@ std::vector<int> random_index(int n)
 {
     std::vector<int> res(n,0);
     for (int i = 0; i < n; i++) res[i] = i;
-    std::random_shuffle(res.begin(), res.end(), myrandom);
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(res.begin(), res.end(), std::default_random_engine(seed));
     return res;
 }
 
@@ -72,13 +70,14 @@ SEXP elcd1(SEXP rxx, SEXP rxy, SEXP rmx, SEXP rmy, SEXP rsx, SEXP rsy,
     bool active_now = true;
     double al = alpha * lambda;
     double denom = lambda * (1 - alpha);
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
     std::vector<int> idx(n,0);
     for (int i = 0; i < n; i++) idx[i] = i;
 
     int count = 0;
     do {
-        std::random_shuffle(idx.begin(), idx.end(), myrandom);
+        std::shuffle(idx.begin(), idx.end(), std::default_random_engine(seed));
         for (int id = 0; id < n; id++) {
             int i = idx[id];
             if (active_set && active_now && coef(i) == 0) continue;
@@ -186,13 +185,14 @@ SEXP elcd_binom1(SEXP rxx, SEXP rxy, SEXP rmwx, SEXP rmx,
     bool active_now = true;
     double al = alpha * lambda;
     double denom = lambda * (1 - alpha);
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
     std::vector<int> idx(n,0);
     for (int i = 0; i < n; i++) idx[i] = i;
 
     int count = 0;
     do {
-        std::random_shuffle(idx.begin(), idx.end(), myrandom);
+        std::shuffle(idx.begin(), idx.end(), std::default_random_engine(seed));
         for (int id = 0; id < n; id++) {
             int i = idx[id];
             if (active_set && active_now && coef(i) == 0) continue;
